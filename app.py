@@ -19,5 +19,10 @@ def pricing():
     """Serve the pricing plans page"""
     return render_template('index.html')
 
+@app.route('/signup')
+def signup():
+    """Serve the signup page"""
+    return render_template('signup.html')
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)

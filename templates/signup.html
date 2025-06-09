@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up - Kirana Konnect</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script> window.FontAwesomeConfig = { autoReplaceSvg: 'nest'};</script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <style>::-webkit-scrollbar { display: none;}</style>
+    
+    <script>tailwind.config = {
+  "theme": {
+    "extend": {
+      "colors": {
+        "primary": "#4CAF50",
+        "secondary": "#2196F3",
+        "accent": "#FF9800",
+        "danger": "#F44336",
+        "dark": "#333333",
+        "light": "#F5F5F5"
+      },
+      "fontFamily": {
+        "poppins": [
+          "Poppins",
+          "sans-serif"
+        ],
+        "sans": [
+          "Inter",
+          "sans-serif"
+        ]
+      }
+    }
+  }
+};</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;500;600;700;800;900&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap">
+<style>
+      body {
+        font-family: 'Inter', sans-serif !important;
+      }
+      
+      /* Preserve Font Awesome icons */
+      .fa, .fas, .far, .fal, .fab {
+        font-family: "Font Awesome 6 Free", "Font Awesome 6 Brands" !important;
+      }
+    </style>
+<style>
+  .highlighted-section {
+    outline: 2px solid #3F20FB;
+    background-color: rgba(63, 32, 251, 0.1);
+  }
+
+  .edit-button {
+    position: absolute;
+    z-index: 1000;
+  }
+
+  ::-webkit-scrollbar {
+    display: none;
+  }
+
+  html, body {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+</style>
+</head>
+<body class="font-poppins bg-light min-h-screen">
+    
+    <!-- Header -->
+    <div id="header" class="bg-white shadow-sm p-4 flex items-center justify-between sticky top-0 z-10">
+        <i class="fa-solid fa-arrow-left text-dark text-xl cursor-pointer" onclick="goBack()"></i>
+        <h1 class="text-dark text-xl font-bold">Sign Up</h1>
+        <div class="w-6"></div>
+    </div>
+
+    <!-- Main Content -->
+    <div id="signup-container" class="px-6 py-8">
+        
+        <!-- App Logo Section -->
+        <div id="logo-section" class="text-center mb-8">
+            <div class="w-20 h-20 mx-auto bg-primary rounded-2xl shadow-lg flex items-center justify-center mb-4">
+                <div class="text-center">
+                    <i class="fa-solid fa-store text-white text-2xl mb-1"></i>
+                    <div class="text-white font-bold text-sm">KC</div>
+                </div>
+            </div>
+            <h2 class="text-dark text-2xl font-bold mb-2">Create Your Account</h2>
+            <p class="text-gray-600 text-sm">Join Kirana Konnect to manage your store efficiently</p>
+        </div>
+
+        <!-- Signup Form -->
+        <div id="signup-form" class="space-y-6">
+            
+            <!-- Personal Information -->
+            <div id="personal-info" class="space-y-4">
+                <h3 class="text-dark text-lg font-semibold mb-3">Personal Information</h3>
+                
+                <div class="space-y-4">
+                    <div>
+                        <label class="text-dark text-sm font-medium mb-2 block">Full Name *</label>
+                        <input type="text" placeholder="Enter your full name" class="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-dark placeholder-gray-500 focus:border-primary focus:outline-none" required>
+                    </div>
+                    
+                    <div>
+                        <label class="text-dark text-sm font-medium mb-2 block">Phone Number *</label>
+                        <div class="flex">
+                            <div class="bg-gray-100 border border-gray-300 rounded-l-xl px-3 py-3 text-dark text-sm border-r-0">+91</div>
+                            <input type="tel" placeholder="Enter 10-digit mobile number" class="flex-1 bg-white border border-gray-300 rounded-r-xl px-4 py-3 text-dark placeholder-gray-500 focus:border-primary focus:outline-none" required>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label class="text-dark text-sm font-medium mb-2 block">Email (Optional)</label>
+                        <input type="email" placeholder="Enter your email address" class="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-dark placeholder-gray-500 focus:border-primary focus:outline-none">
+                    </div>
+                    
+                    <div>
+                        <label class="text-dark text-sm font-medium mb-2 block">Password *</label>
+                        <div class="relative">
+                            <input type="password" placeholder="Create a strong password" class="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-dark placeholder-gray-500 focus:border-primary focus:outline-none pr-12" required>
+                            <i class="fa-solid fa-eye-slash absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-500 cursor-pointer"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Store Information -->
+            <div id="store-info" class="space-y-4">
+                <h3 class="text-dark text-lg font-semibold mb-3">Store Information</h3>
+                
+                <div class="space-y-4">
+                    <div>
+                        <label class="text-dark text-sm font-medium mb-2 block">Shop Name *</label>
+                        <input type="text" placeholder="Enter your shop name" class="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-dark placeholder-gray-500 focus:border-primary focus:outline-none" required>
+                    </div>
+                    
+                    <div>
+                        <label class="text-dark text-sm font-medium mb-2 block">GST Number (Optional)</label>
+                        <input type="text" placeholder="Enter GST number (e.g., 24ABCDE1234F1Z5)" class="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-dark placeholder-gray-500 focus:border-primary focus:outline-none">
+                    </div>
+                    
+                    <div>
+                        <label class="text-dark text-sm font-medium mb-2 block">UDYAM Certificate (Optional)</label>
+                        <input type="text" placeholder="Enter UDYAM registration number" class="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-dark placeholder-gray-500 focus:border-primary focus:outline-none">
+                    </div>
+                    
+                    <div>
+                        <label class="text-dark text-sm font-medium mb-2 block">Your Role *</label>
+                        <select class="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-dark focus:border-primary focus:outline-none" required>
+                            <option value="">Select your role</option>
+                            <option value="owner">Owner</option>
+                            <option value="manager">Manager</option>
+                            <option value="cashier">Cashier</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Language Selection -->
+            <div id="language-selection" class="space-y-4">
+                <h3 class="text-dark text-lg font-semibold mb-3">Preferred Language</h3>
+                <select class="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-dark focus:border-primary focus:outline-none">
+                    <option value="english">English</option>
+                    <option value="hindi">हिंदी (Hindi)</option>
+                    <option value="tamil">தமிழ் (Tamil)</option>
+                    <option value="bengali">বাংলা (Bengali)</option>
+                    <option value="marathi">मराठी (Marathi)</option>
+                </select>
+            </div>
+
+            <!-- Terms and Conditions -->
+            <div id="terms-section" class="space-y-4">
+                <div class="flex items-start space-x-3">
+                    <input type="checkbox" id="add-employees" class="mt-1 w-4 h-4 text-primary bg-white border-gray-300 rounded focus:ring-primary">
+                    <label for="add-employees" class="text-dark text-sm">I will add employees later</label>
+                </div>
+                
+                <div class="flex items-start space-x-3">
+                    <input type="checkbox" id="terms" class="mt-1 w-4 h-4 text-primary bg-white border-gray-300 rounded focus:ring-primary">
+                    <label for="terms" class="text-dark text-sm">I agree to the <span class="text-secondary underline cursor-pointer" onclick="showTerms()">Terms & Conditions</span> and <span class="text-secondary underline cursor-pointer" onclick="showPrivacy()">Privacy Policy</span></label>
+                </div>
+            </div>
+
+            <!-- Sign Up Button -->
+            <button id="signup-btn" class="w-full bg-primary text-white font-bold py-4 px-6 rounded-xl shadow-lg hover:bg-green-600 transition-all duration-300 flex items-center justify-center space-x-3">
+                <i class="fa-solid fa-user-plus text-lg"></i>
+                <span class="text-lg">Create Account</span>
+            </button>
+
+            <!-- OTP Verification Notice -->
+            <div id="otp-notice" class="bg-blue-50 border border-secondary/20 rounded-xl p-4 text-center">
+                <i class="fa-solid fa-info-circle text-secondary text-lg mb-2"></i>
+                <p class="text-secondary text-sm font-medium">You will receive an OTP on your mobile number for verification</p>
+            </div>
+
+            <!-- Login Link -->
+            <div id="login-link" class="text-center pt-4">
+                <p class="text-gray-600 text-sm">Already have an account? <span class="text-secondary font-semibold underline cursor-pointer" onclick="goToLogin()">Sign In</span></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-2xl p-8 mx-6 text-center">
+            <div class="w-16 h-16 mx-auto mb-4 bg-primary rounded-full flex items-center justify-center">
+                <div class="w-8 h-8 border-4 border-white border-t-transparent rounded-full animate-spin"></div>
+            </div>
+            <h3 class="text-dark text-lg font-semibold mb-2">Creating Your Account</h3>
+            <p class="text-gray-600 text-sm">Please wait while we set up your store...</p>
+        </div>
+    </div>
+
+    <!-- Terms & Conditions Modal -->
+    <div id="terms-modal" class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-2xl p-6 mx-6 max-w-md w-full max-h-[80vh] overflow-y-auto">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-dark text-lg font-semibold">Terms & Conditions</h3>
+                <i class="fa-solid fa-times text-gray-500 cursor-pointer text-xl" onclick="closeTerms()"></i>
+            </div>
+            <div class="space-y-4 text-sm text-gray-600">
+                <p><strong>1. Service Usage:</strong> Kirana Konnect provides inventory management tools for retail businesses. Users must provide accurate information.</p>
+                <p><strong>2. Data Security:</strong> We protect your business data with industry-standard encryption and security measures.</p>
+                <p><strong>3. Account Responsibility:</strong> You are responsible for maintaining account security and data accuracy.</p>
+                <p><strong>4. Service Availability:</strong> We strive for 99.9% uptime but cannot guarantee uninterrupted service.</p>
+                <p><strong>5. Payment Terms:</strong> Subscription fees are billed monthly/annually as per your chosen plan.</p>
+                <p><strong>6. Limitation of Liability:</strong> Our liability is limited to the amount paid for services.</p>
+                <p><strong>7. Termination:</strong> Either party may terminate the service with 30 days notice.</p>
+            </div>
+            <button onclick="closeTerms()" class="w-full bg-primary text-white py-3 rounded-xl mt-6 font-medium">I Understand</button>
+        </div>
+    </div>
+
+    <!-- Privacy Policy Modal -->
+    <div id="privacy-modal" class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-2xl p-6 mx-6 max-w-md w-full max-h-[80vh] overflow-y-auto">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-dark text-lg font-semibold">Privacy Policy</h3>
+                <i class="fa-solid fa-times text-gray-500 cursor-pointer text-xl" onclick="closePrivacy()"></i>
+            </div>
+            <div class="space-y-4 text-sm text-gray-600">
+                <p><strong>Information Collection:</strong> We collect business information, inventory data, and usage analytics to provide our services.</p>
+                <p><strong>Data Usage:</strong> Your data is used to provide inventory management, generate reports, and improve our services.</p>
+                <p><strong>Data Sharing:</strong> We do not sell your data. Limited sharing occurs only with service providers for app functionality.</p>
+                <p><strong>Data Security:</strong> We use encryption, secure servers, and regular security audits to protect your information.</p>
+                <p><strong>Data Retention:</strong> Business data is retained as long as your account is active, plus 90 days after termination.</p>
+                <p><strong>Your Rights:</strong> You can access, modify, or delete your data at any time through the app settings.</p>
+                <p><strong>Contact:</strong> For privacy concerns, contact us at privacy@kiranakonnect.com</p>
+            </div>
+            <button onclick="closePrivacy()" class="w-full bg-primary text-white py-3 rounded-xl mt-6 font-medium">I Understand</button>
+        </div>
+    </div>
+
+    <script>
+        // Navigation functions
+        function goBack() {
+            window.history.back();
+        }
+
+        function goToLogin() {
+            window.location.href = '/login';
+        }
+
+        // Modal functions
+        function showTerms() {
+            document.getElementById('terms-modal').classList.remove('hidden');
+        }
+
+        function closeTerms() {
+            document.getElementById('terms-modal').classList.add('hidden');
+        }
+
+        function showPrivacy() {
+            document.getElementById('privacy-modal').classList.remove('hidden');
+        }
+
+        function closePrivacy() {
+            document.getElementById('privacy-modal').classList.add('hidden');
+        }
+
+        // Password visibility toggle
+        document.querySelector('.fa-eye-slash').addEventListener('click', function() {
+            const passwordInput = this.previousElementSibling;
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+            this.classList.toggle('fa-eye-slash');
+            this.classList.toggle('fa-eye');
+        });
+
+        // Form validation and submission
+        document.getElementById('signup-btn').addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            // Basic validation
+            const requiredFields = document.querySelectorAll('input[required], select[required]');
+            let isValid = true;
+            
+            requiredFields.forEach(field => {
+                if (!field.value.trim()) {
+                    field.classList.add('border-danger');
+                    isValid = false;
+                } else {
+                    field.classList.remove('border-danger');
+                }
+            });
+            
+            const termsCheckbox = document.getElementById('terms');
+            if (!termsCheckbox.checked) {
+                isValid = false;
+                termsCheckbox.parentElement.classList.add('text-danger');
+            } else {
+                termsCheckbox.parentElement.classList.remove('text-danger');
+            }
+            
+            if (isValid) {
+                document.getElementById('loading-overlay').classList.remove('hidden');
+                
+                setTimeout(() => {
+                    document.getElementById('loading-overlay').classList.add('hidden');
+                    alert('Account created successfully! Please verify your mobile number.');
+                    // Redirect to pricing or dashboard
+                    window.location.href = '/pricing';
+                }, 3000);
+            } else {
+                alert('Please fill all required fields and accept terms & conditions.');
+            }
+        });
+
+        // Phone number formatting
+        document.querySelector('input[type="tel"]').addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            if (value.length > 10) {
+                value = value.slice(0, 10);
+            }
+            e.target.value = value;
+        });
+
+        // Real-time validation
+        document.querySelectorAll('input, select').forEach(field => {
+            field.addEventListener('blur', function() {
+                if (this.hasAttribute('required')) {
+                    if (!this.value.trim()) {
+                        this.classList.add('border-danger');
+                    } else {
+                        this.classList.remove('border-danger');
+                    }
+                }
+            });
+        });
+
+        // Close modals when clicking outside
+        document.addEventListener('click', function(e) {
+            if (e.target.classList.contains('backdrop-blur-sm')) {
+                closeTerms();
+                closePrivacy();
+            }
+        });
+    </script>
+
+</body>
+</html>
