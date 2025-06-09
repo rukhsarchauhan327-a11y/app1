@@ -11,12 +11,12 @@ app.secret_key = os.environ.get("SESSION_SECRET", "dev-secret-key-for-pricing-pr
 
 @app.route('/')
 def index():
-    """Serve the Kirana Konnect pricing page"""
-    return render_template('index.html')
+    """Serve the Kirana Konnect splash screen"""
+    return render_template('splash.html')
 
 @app.route('/pricing')
 def pricing():
-    """Alternative route for pricing page"""
+    """Serve the pricing plans page"""
     return render_template('index.html')
 
 if __name__ == '__main__':
