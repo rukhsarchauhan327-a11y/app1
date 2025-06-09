@@ -123,7 +123,7 @@
                     </div>
                     <div class="flex items-center space-x-3">
                         <i class="fa-solid fa-check text-primary text-sm"></i>
-                        <span class="text-gray-700 text-sm">Billing &amp; POS system</span>
+                        <span class="text-gray-700 text-sm">Billing & POS system</span>
                     </div>
                     <div class="flex items-center space-x-3">
                         <i class="fa-solid fa-check text-primary text-sm"></i>
@@ -135,7 +135,7 @@
                     </div>
                     <div class="flex items-center space-x-3">
                         <i class="fa-solid fa-check text-primary text-sm"></i>
-                        <span class="text-gray-700 text-sm">Profit &amp; loss tracking</span>
+                        <span class="text-gray-700 text-sm">Profit & loss tracking</span>
                     </div>
                     <div class="flex items-center space-x-3">
                         <i class="fa-solid fa-check text-primary text-sm"></i>
@@ -190,7 +190,7 @@
                     </div>
                     <div class="flex items-center space-x-3">
                         <i class="fa-solid fa-check text-primary text-sm"></i>
-                        <span class="text-gray-700 text-sm">Data backup &amp; restore</span>
+                        <span class="text-gray-700 text-sm">Data backup & restore</span>
                     </div>
                     <div class="flex items-center space-x-3">
                         <i class="fa-solid fa-check text-primary text-sm"></i>
@@ -251,7 +251,7 @@
                     </div>
                     <div>
                         <h4 class="font-semibold text-dark">Profit Tracking</h4>
-                        <p class="text-sm text-gray-600">Monitor daily, weekly &amp; monthly profits</p>
+                        <p class="text-sm text-gray-600">Monitor daily, weekly & monthly profits</p>
                     </div>
                 </div>
             </div>
@@ -275,121 +275,88 @@
             
             <div class="bg-white rounded-xl shadow-sm border border-gray-100">
                 <button class="w-full text-left py-4 px-6 flex items-center justify-between" onclick="toggleFAQ(2)">
-                    <span class="font-semibold text-dark">Is there a free trial available?</span>
+                    <span class="font-semibold text-dark">Is there a free trial?</span>
                     <i id="faq-icon-2" class="fa-solid fa-chevron-down text-gray-400 transition-transform"></i>
                 </button>
                 <div id="faq-content-2" class="hidden px-6 pb-4">
-                    <p class="text-gray-600 text-sm">Yes, we offer a 7-day free trial for all new users. No credit card required to start.</p>
+                    <p class="text-gray-600 text-sm">Yes, we offer a 7-day free trial for all features. No credit card required to start.</p>
                 </div>
             </div>
             
             <div class="bg-white rounded-xl shadow-sm border border-gray-100">
                 <button class="w-full text-left py-4 px-6 flex items-center justify-between" onclick="toggleFAQ(3)">
-                    <span class="font-semibold text-dark">What payment methods do you accept?</span>
+                    <span class="font-semibold text-dark">What payment methods are accepted?</span>
                     <i id="faq-icon-3" class="fa-solid fa-chevron-down text-gray-400 transition-transform"></i>
                 </button>
                 <div id="faq-content-3" class="hidden px-6 pb-4">
-                    <p class="text-gray-600 text-sm">We accept all major credit cards, debit cards, UPI, net banking, and digital wallets like Paytm, PhonePe.</p>
+                    <p class="text-gray-600 text-sm">We accept UPI, Credit/Debit cards, Net Banking, and popular mobile wallets like Paytm, PhonePe.</p>
                 </div>
             </div>
-            
-            <div class="bg-white rounded-xl shadow-sm border border-gray-100">
-                <button class="w-full text-left py-4 px-6 flex items-center justify-between" onclick="toggleFAQ(4)">
-                    <span class="font-semibold text-dark">Can I cancel my subscription anytime?</span>
-                    <i id="faq-icon-4" class="fa-solid fa-chevron-down text-gray-400 transition-transform"></i>
-                </button>
-                <div id="faq-content-4" class="hidden px-6 pb-4">
-                    <p class="text-gray-600 text-sm">Yes, you can cancel your subscription at any time. Your account will remain active until the end of your billing period.</p>
-                </div>
-            </div>
-            
-            <div class="bg-white rounded-xl shadow-sm border border-gray-100">
-                <button class="w-full text-left py-4 px-6 flex items-center justify-between" onclick="toggleFAQ(5)">
-                    <span class="font-semibold text-dark">Do you provide customer support?</span>
-                    <i id="faq-icon-5" class="fa-solid fa-chevron-down text-gray-400 transition-transform"></i>
-                </button>
-                <div id="faq-content-5" class="hidden px-6 pb-4">
-                    <p class="text-gray-600 text-sm">Yes, we provide 24/7 customer support via WhatsApp, email, and phone. Yearly plan users get priority support.</p>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Bottom CTA -->
-    <div class="px-4 pb-8">
-        <div class="bg-gradient-to-r from-primary to-secondary rounded-2xl p-6 text-center text-white">
-            <h3 class="text-xl font-bold mb-2">Ready to grow your business?</h3>
-            <p class="text-sm opacity-90 mb-4">Join thousands of kirana stores already using Kirana Konnect</p>
-            <button class="bg-white text-primary px-6 py-3 rounded-xl font-semibold hover:bg-gray-100 transition-colors">
-                Start Free Trial
-            </button>
         </div>
     </div>
 
     <script>
-        // Plan toggle functionality
-        const monthlyTab = document.getElementById('monthly-tab');
-        const yearlyTab = document.getElementById('yearly-tab');
-        const monthlyPlans = document.getElementById('monthly-plans');
-        const yearlyPlans = document.getElementById('yearly-plans');
-        const discountBadge = document.getElementById('discount-badge');
+        let isYearly = false;
 
-        monthlyTab.addEventListener('click', function() {
-            // Switch to monthly
-            monthlyTab.classList.add('bg-white', 'text-dark', 'shadow-sm');
-            monthlyTab.classList.remove('text-gray-600');
-            yearlyTab.classList.remove('bg-white', 'text-dark', 'shadow-sm');
-            yearlyTab.classList.add('text-gray-600');
-            
-            monthlyPlans.classList.remove('hidden');
-            yearlyPlans.classList.add('hidden');
-            discountBadge.classList.add('hidden');
+        document.getElementById('monthly-tab').addEventListener('click', function() {
+            if (isYearly) {
+                switchToMonthly();
+            }
         });
 
-        yearlyTab.addEventListener('click', function() {
-            // Switch to yearly
-            yearlyTab.classList.add('bg-white', 'text-dark', 'shadow-sm');
-            yearlyTab.classList.remove('text-gray-600');
-            monthlyTab.classList.remove('bg-white', 'text-dark', 'shadow-sm');
-            monthlyTab.classList.add('text-gray-600');
-            
-            yearlyPlans.classList.remove('hidden');
-            monthlyPlans.classList.add('hidden');
-            discountBadge.classList.remove('hidden');
+        document.getElementById('yearly-tab').addEventListener('click', function() {
+            if (!isYearly) {
+                switchToYearly();
+            }
         });
 
-        // FAQ toggle functionality
-        function toggleFAQ(id) {
-            const content = document.getElementById(`faq-content-${id}`);
-            const icon = document.getElementById(`faq-icon-${id}`);
+        function switchToMonthly() {
+            isYearly = false;
+            
+            // Update tab styling
+            document.getElementById('monthly-tab').classList.add('bg-white', 'text-dark', 'shadow-sm');
+            document.getElementById('monthly-tab').classList.remove('text-gray-600');
+            document.getElementById('yearly-tab').classList.remove('bg-white', 'text-dark', 'shadow-sm');
+            document.getElementById('yearly-tab').classList.add('text-gray-600');
+            
+            // Show/hide plan sections
+            document.getElementById('monthly-plans').classList.remove('hidden');
+            document.getElementById('yearly-plans').classList.add('hidden');
+            
+            // Hide discount badge
+            document.getElementById('discount-badge').classList.add('hidden');
+        }
+
+        function switchToYearly() {
+            isYearly = true;
+            
+            // Update tab styling
+            document.getElementById('yearly-tab').classList.add('bg-white', 'text-dark', 'shadow-sm');
+            document.getElementById('yearly-tab').classList.remove('text-gray-600');
+            document.getElementById('monthly-tab').classList.remove('bg-white', 'text-dark', 'shadow-sm');
+            document.getElementById('monthly-tab').classList.add('text-gray-600');
+            
+            // Show/hide plan sections
+            document.getElementById('yearly-plans').classList.remove('hidden');
+            document.getElementById('monthly-plans').classList.add('hidden');
+            
+            // Show discount badge
+            document.getElementById('discount-badge').classList.remove('hidden');
+        }
+
+        function toggleFAQ(index) {
+            const content = document.getElementById(`faq-content-${index}`);
+            const icon = document.getElementById(`faq-icon-${index}`);
             
             if (content.classList.contains('hidden')) {
                 content.classList.remove('hidden');
-                icon.classList.add('rotate-180');
+                icon.style.transform = 'rotate(180deg)';
             } else {
                 content.classList.add('hidden');
-                icon.classList.remove('rotate-180');
+                icon.style.transform = 'rotate(0deg)';
             }
         }
-
-        // Add click handlers for plan selection buttons
-        document.addEventListener('DOMContentLoaded', function() {
-            const chooseButtons = document.querySelectorAll('button[class*="bg-primary"], button[class*="bg-accent"]');
-            chooseButtons.forEach(button => {
-                button.addEventListener('click', function() {
-                    const planType = this.textContent.includes('Monthly') ? 'Monthly' : 'Yearly';
-                    alert(`You selected the ${planType} plan! This would redirect to payment processing.`);
-                });
-            });
-
-            // Add click handler for start trial button
-            const trialButton = document.querySelector('button:contains("Start Free Trial")');
-            if (trialButton) {
-                trialButton.addEventListener('click', function() {
-                    alert('Starting free trial! This would redirect to registration.');
-                });
-            }
-        });
     </script>
+
 </body>
 </html>

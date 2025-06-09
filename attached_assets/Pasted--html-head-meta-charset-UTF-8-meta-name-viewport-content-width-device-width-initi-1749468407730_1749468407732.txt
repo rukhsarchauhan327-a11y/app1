@@ -1,0 +1,153 @@
+<html><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script> window.FontAwesomeConfig = { autoReplaceSvg: 'nest'};</script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <style>::-webkit-scrollbar { display: none;}</style>
+    
+    <script>tailwind.config = {
+  "theme": {
+    "extend": {
+      "colors": {
+        "primary": "#4CAF50",
+        "secondary": "#2196F3",
+        "accent": "#FF9800",
+        "danger": "#F44336",
+        "dark": "#333333",
+        "light": "#F5F5F5"
+      },
+      "fontFamily": {
+        "poppins": [
+          "Poppins",
+          "sans-serif"
+        ],
+        "sans": [
+          "Inter",
+          "sans-serif"
+        ]
+      }
+    }
+  }
+};</script>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin=""><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;500;600;700;800;900&amp;display=swap"><style>
+      body {
+        font-family: 'Inter', sans-serif !important;
+      }
+      
+      /* Preserve Font Awesome icons */
+      .fa, .fas, .far, .fal, .fab {
+        font-family: "Font Awesome 6 Free", "Font Awesome 6 Brands" !important;
+      }
+    </style><style>
+  .highlighted-section {
+    outline: 2px solid #3F20FB;
+    background-color: rgba(63, 32, 251, 0.1);
+  }
+
+  .edit-button {
+    position: absolute;
+    z-index: 1000;
+  }
+
+  ::-webkit-scrollbar {
+    display: none;
+  }
+
+  html, body {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  </style></head>
+<body class="font-poppins bg-gradient-to-br from-primary to-green-600 h-[100vh] flex items-center justify-center">
+    
+    <!-- Logo Container -->
+    <div id="logo-container" class="text-center px-8">
+        <!-- App Logo -->
+        <div class="mb-8">
+            <div class="w-32 h-32 mx-auto bg-white rounded-3xl shadow-2xl flex items-center justify-center mb-6 transform hover:scale-105 transition-transform duration-300">
+                <div class="text-center">
+                    <i class="fa-solid fa-store text-primary text-4xl mb-2"></i>
+                    <div class="text-primary font-bold text-lg">KC</div>
+                </div>
+            </div>
+            
+            <!-- App Name -->
+            <h1 class="text-white text-4xl font-bold mb-2">Kirana Konnect</h1>
+            <p class="text-white/90 text-lg font-medium mb-6">Complete Store Management Solution</p>
+        </div>
+
+        <!-- Store Details Card -->
+        <div id="store-details" class="bg-white/10 backdrop-blur-lg rounded-2xl p-6 mb-8 border border-white/20">
+            <div class="text-white space-y-3">
+                <div class="flex items-center justify-center space-x-3">
+                    <i class="fa-solid fa-shop text-white/80"></i>
+                    <span class="font-semibold text-lg">Sharma Kirana Store</span>
+                </div>
+                
+                <div class="space-y-2 text-sm">
+                    <div class="flex items-center justify-center space-x-2">
+                        <i class="fa-solid fa-receipt text-white/70 text-xs"></i>
+                        <span class="text-white/90">GST: 24ABCDE1234F1Z5</span>
+                    </div>
+                    
+                    <div class="flex items-center justify-center space-x-2">
+                        <i class="fa-solid fa-certificate text-white/70 text-xs"></i>
+                        <span class="text-white/90">UDYAM: UP-12-0012345</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div id="action-buttons" class="space-y-4">
+            <button id="get-started-btn" class="w-full bg-white text-primary font-bold py-4 px-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center space-x-3">
+                <i class="fa-solid fa-rocket text-xl"></i>
+                <span class="text-lg">Get Started</span>
+            </button>
+        </div>
+
+        <!-- Version Info -->
+        <div id="version-info" class="mt-8 text-white/70 text-sm">
+            <p>Version 1.0.0</p>
+            <p class="mt-1">Made for Indian Kirana Stores</p>
+        </div>
+
+        <!-- Loading Animation -->
+        <div id="loading-animation" class="mt-8 hidden">
+            <div class="flex justify-center space-x-2">
+                <div class="w-3 h-3 bg-white rounded-full animate-bounce"></div>
+                <div class="w-3 h-3 bg-white rounded-full animate-bounce" style="animation-delay: 0.1s"></div>
+                <div class="w-3 h-3 bg-white rounded-full animate-bounce" style="animation-delay: 0.2s"></div>
+            </div>
+            <p class="text-white/90 mt-3 text-sm">Loading your store...</p>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('get-started-btn').addEventListener('click', function() {
+            const loadingAnimation = document.getElementById('loading-animation');
+            const actionButtons = document.getElementById('action-buttons');
+            
+            actionButtons.style.display = 'none';
+            loadingAnimation.classList.remove('hidden');
+            
+            setTimeout(() => {
+                console.log('Navigating to dashboard...');
+            }, 2000);
+        });
+
+        const logoContainer = document.getElementById('logo-container');
+        logoContainer.style.animation = 'float 3s ease-in-out infinite';
+        
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes float {
+                0%, 100% { transform: translateY(0px); }
+                50% { transform: translateY(-10px); }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+
+</body></html>
