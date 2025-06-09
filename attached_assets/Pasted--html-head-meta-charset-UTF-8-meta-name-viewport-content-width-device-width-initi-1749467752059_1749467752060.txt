@@ -1,0 +1,352 @@
+<html><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script> window.FontAwesomeConfig = { autoReplaceSvg: 'nest'};</script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <style>::-webkit-scrollbar { display: none;}</style>
+    
+    <script>tailwind.config = {
+  "theme": {
+    "extend": {
+      "colors": {
+        "primary": "#4CAF50",
+        "secondary": "#2196F3",
+        "accent": "#FF9800",
+        "danger": "#F44336",
+        "dark": "#333333",
+        "light": "#F5F5F5"
+      },
+      "fontFamily": {
+        "poppins": [
+          "Poppins",
+          "sans-serif"
+        ],
+        "sans": [
+          "Inter",
+          "sans-serif"
+        ]
+      }
+    }
+  }
+};</script>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin=""><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;500;600;700;800;900&amp;display=swap"><style>
+      body {
+        font-family: 'Inter', sans-serif !important;
+      }
+      
+      /* Preserve Font Awesome icons */
+      .fa, .fas, .far, .fal, .fab {
+        font-family: "Font Awesome 6 Free", "Font Awesome 6 Brands" !important;
+      }
+    </style><style>
+  .highlighted-section {
+    outline: 2px solid #3F20FB;
+    background-color: rgba(63, 32, 251, 0.1);
+  }
+
+  .edit-button {
+    position: absolute;
+    z-index: 1000;
+  }
+
+  ::-webkit-scrollbar {
+    display: none;
+  }
+
+  html, body {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  </style></head>
+<body class="font-poppins bg-gray-50 min-h-screen">
+    
+    <!-- Header -->
+    <div id="header" class="bg-white shadow-sm sticky top-0 z-10">
+        <div class="flex items-center justify-between px-4 py-4">
+            <button class="p-2">
+                <i class="fa-solid fa-arrow-left text-dark text-lg"></i>
+            </button>
+            <h1 class="text-xl font-bold text-dark">Pricing Plans</h1>
+            <div class="w-8"></div>
+        </div>
+    </div>
+
+    <!-- Plan Toggle -->
+    <div id="plan-toggle" class="px-4 py-6">
+        <div class="bg-gray-200 rounded-xl p-1 flex">
+            <button id="monthly-tab" class="flex-1 py-3 px-4 rounded-lg text-center font-semibold transition-all duration-300 bg-white text-dark shadow-sm">
+                Monthly
+            </button>
+            <button id="yearly-tab" class="flex-1 py-3 px-4 rounded-lg text-center font-semibold transition-all duration-300 text-gray-600">
+                Yearly
+            </button>
+        </div>
+        <div class="text-center mt-3">
+            <span id="discount-badge" class="bg-primary text-white px-3 py-1 rounded-full text-sm font-medium hidden">
+                Save 90% on Annual Plans
+            </span>
+        </div>
+    </div>
+
+    <!-- Monthly Plans -->
+    <div id="monthly-plans" class="px-4 space-y-4">
+        <div id="monthly-plan-card" class="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
+            <div class="p-6">
+                <div class="text-center">
+                    <h3 class="text-xl font-bold text-dark mb-2">Monthly Plan</h3>
+                    <p class="text-gray-600 text-sm mb-4">Perfect for kirana stores</p>
+                    <div class="mb-6">
+                        <span class="text-3xl font-bold text-dark">₹</span>
+                        <span class="text-4xl font-bold text-dark">79</span>
+                        <span class="text-gray-600 text-sm">/month</span>
+                    </div>
+                </div>
+                
+                <div class="space-y-3 mb-6">
+                    <div class="flex items-center space-x-3">
+                        <i class="fa-solid fa-check text-primary text-sm"></i>
+                        <span class="text-gray-700 text-sm">Unlimited products</span>
+                    </div>
+                    <div class="flex items-center space-x-3">
+                        <i class="fa-solid fa-check text-primary text-sm"></i>
+                        <span class="text-gray-700 text-sm">Complete inventory management</span>
+                    </div>
+                    <div class="flex items-center space-x-3">
+                        <i class="fa-solid fa-check text-primary text-sm"></i>
+                        <span class="text-gray-700 text-sm">Billing &amp; POS system</span>
+                    </div>
+                    <div class="flex items-center space-x-3">
+                        <i class="fa-solid fa-check text-primary text-sm"></i>
+                        <span class="text-gray-700 text-sm">Customer management</span>
+                    </div>
+                    <div class="flex items-center space-x-3">
+                        <i class="fa-solid fa-check text-primary text-sm"></i>
+                        <span class="text-gray-700 text-sm">Employee management</span>
+                    </div>
+                    <div class="flex items-center space-x-3">
+                        <i class="fa-solid fa-check text-primary text-sm"></i>
+                        <span class="text-gray-700 text-sm">Profit &amp; loss tracking</span>
+                    </div>
+                    <div class="flex items-center space-x-3">
+                        <i class="fa-solid fa-check text-primary text-sm"></i>
+                        <span class="text-gray-700 text-sm">Barcode scanning</span>
+                    </div>
+                    <div class="flex items-center space-x-3">
+                        <i class="fa-solid fa-check text-primary text-sm"></i>
+                        <span class="text-gray-700 text-sm">WhatsApp integration</span>
+                    </div>
+                </div>
+                
+                <button class="w-full bg-primary text-white py-3 rounded-xl font-semibold hover:bg-green-600 transition-colors">
+                    Choose Monthly
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Yearly Plans -->
+    <div id="yearly-plans" class="px-4 space-y-4 hidden">
+        <div id="yearly-plan-card" class="bg-white rounded-2xl shadow-lg border-2 border-accent overflow-hidden relative">
+            <div class="absolute top-0 right-0 bg-accent text-white px-4 py-1 text-xs font-bold rounded-bl-lg">
+                BEST VALUE
+            </div>
+            <div class="p-6">
+                <div class="text-center">
+                    <h3 class="text-xl font-bold text-dark mb-2">Yearly Plan</h3>
+                    <p class="text-gray-600 text-sm mb-4">Save big with annual payment</p>
+                    <div class="mb-6">
+                        <span class="text-3xl font-bold text-dark">₹</span>
+                        <span class="text-4xl font-bold text-dark">799</span>
+                        <span class="text-gray-600 text-sm">/year</span>
+                        <div class="mt-2">
+                            <span class="text-sm text-gray-500 line-through">₹948</span>
+                            <span class="text-sm text-accent font-semibold ml-2">Save ₹149</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="space-y-3 mb-6">
+                    <div class="flex items-center space-x-3">
+                        <i class="fa-solid fa-check text-primary text-sm"></i>
+                        <span class="text-gray-700 text-sm">Everything in Monthly Plan</span>
+                    </div>
+                    <div class="flex items-center space-x-3">
+                        <i class="fa-solid fa-check text-primary text-sm"></i>
+                        <span class="text-gray-700 text-sm">Priority customer support</span>
+                    </div>
+                    <div class="flex items-center space-x-3">
+                        <i class="fa-solid fa-check text-primary text-sm"></i>
+                        <span class="text-gray-700 text-sm">Advanced analytics</span>
+                    </div>
+                    <div class="flex items-center space-x-3">
+                        <i class="fa-solid fa-check text-primary text-sm"></i>
+                        <span class="text-gray-700 text-sm">Data backup &amp; restore</span>
+                    </div>
+                    <div class="flex items-center space-x-3">
+                        <i class="fa-solid fa-check text-primary text-sm"></i>
+                        <span class="text-gray-700 text-sm">Multi-device sync</span>
+                    </div>
+                    <div class="flex items-center space-x-3">
+                        <i class="fa-solid fa-check text-primary text-sm"></i>
+                        <span class="text-gray-700 text-sm">Custom reports</span>
+                    </div>
+                </div>
+                
+                <button class="w-full bg-accent text-white py-3 rounded-xl font-semibold hover:bg-orange-600 transition-colors">
+                    Choose Yearly
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Features Comparison -->
+    <div id="features-section" class="px-4 py-8">
+        <h2 class="text-xl font-bold text-dark text-center mb-6">Why Choose Kirana Konnect?</h2>
+        
+        <div class="bg-white rounded-2xl shadow-lg p-6">
+            <div class="space-y-4">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 bg-primary rounded-full flex items-center justify-center">
+                        <i class="fa-solid fa-boxes-stacked text-white text-sm"></i>
+                    </div>
+                    <div>
+                        <h4 class="font-semibold text-dark">Smart Inventory</h4>
+                        <p class="text-sm text-gray-600">Track stock by weight, quantity, and expiry dates</p>
+                    </div>
+                </div>
+                
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 bg-secondary rounded-full flex items-center justify-center">
+                        <i class="fa-solid fa-receipt text-white text-sm"></i>
+                    </div>
+                    <div>
+                        <h4 class="font-semibold text-dark">Easy Billing</h4>
+                        <p class="text-sm text-gray-600">Generate bills with optional MFG/EXP dates</p>
+                    </div>
+                </div>
+                
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 bg-accent rounded-full flex items-center justify-center">
+                        <i class="fa-solid fa-users text-white text-sm"></i>
+                    </div>
+                    <div>
+                        <h4 class="font-semibold text-dark">Customer Credits</h4>
+                        <p class="text-sm text-gray-600">Track udhar and customer payments easily</p>
+                    </div>
+                </div>
+                
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 bg-primary rounded-full flex items-center justify-center">
+                        <i class="fa-solid fa-chart-line text-white text-sm"></i>
+                    </div>
+                    <div>
+                        <h4 class="font-semibold text-dark">Profit Tracking</h4>
+                        <p class="text-sm text-gray-600">Monitor daily, weekly &amp; monthly profits</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- FAQ Section -->
+    <div id="faq-section" class="px-4 pb-8">
+        <h2 class="text-xl font-bold text-dark text-center mb-6">Frequently Asked Questions</h2>
+        
+        <div class="space-y-4">
+            <div class="bg-white rounded-xl shadow-sm border border-gray-100">
+                <button class="w-full text-left py-4 px-6 flex items-center justify-between" onclick="toggleFAQ(1)">
+                    <span class="font-semibold text-dark">Can I switch between plans?</span>
+                    <i id="faq-icon-1" class="fa-solid fa-chevron-down text-gray-400 transition-transform"></i>
+                </button>
+                <div id="faq-content-1" class="hidden px-6 pb-4">
+                    <p class="text-gray-600 text-sm">Yes, you can upgrade from monthly to yearly plan at any time. The difference will be adjusted in your payment.</p>
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-xl shadow-sm border border-gray-100">
+                <button class="w-full text-left py-4 px-6 flex items-center justify-between" onclick="toggleFAQ(2)">
+                    <span class="font-semibold text-dark">Is there a free trial?</span>
+                    <i id="faq-icon-2" class="fa-solid fa-chevron-down text-gray-400 transition-transform"></i>
+                </button>
+                <div id="faq-content-2" class="hidden px-6 pb-4">
+                    <p class="text-gray-600 text-sm">Yes, we offer a 7-day free trial for all features. No credit card required to start.</p>
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-xl shadow-sm border border-gray-100">
+                <button class="w-full text-left py-4 px-6 flex items-center justify-between" onclick="toggleFAQ(3)">
+                    <span class="font-semibold text-dark">What payment methods are accepted?</span>
+                    <i id="faq-icon-3" class="fa-solid fa-chevron-down text-gray-400 transition-transform"></i>
+                </button>
+                <div id="faq-content-3" class="hidden px-6 pb-4">
+                    <p class="text-gray-600 text-sm">We accept UPI, Credit/Debit cards, Net Banking, and popular mobile wallets like Paytm, PhonePe.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let isYearly = false;
+
+        document.getElementById('monthly-tab').addEventListener('click', function() {
+            if (isYearly) {
+                switchToMonthly();
+            }
+        });
+
+        document.getElementById('yearly-tab').addEventListener('click', function() {
+            if (!isYearly) {
+                switchToYearly();
+            }
+        });
+
+        function switchToMonthly() {
+            isYearly = false;
+            
+            // Update tab styling
+            document.getElementById('monthly-tab').classList.add('bg-white', 'text-dark', 'shadow-sm');
+            document.getElementById('monthly-tab').classList.remove('text-gray-600');
+            document.getElementById('yearly-tab').classList.remove('bg-white', 'text-dark', 'shadow-sm');
+            document.getElementById('yearly-tab').classList.add('text-gray-600');
+            
+            // Show/hide plan sections
+            document.getElementById('monthly-plans').classList.remove('hidden');
+            document.getElementById('yearly-plans').classList.add('hidden');
+            
+            // Hide discount badge
+            document.getElementById('discount-badge').classList.add('hidden');
+        }
+
+        function switchToYearly() {
+            isYearly = true;
+            
+            // Update tab styling
+            document.getElementById('yearly-tab').classList.add('bg-white', 'text-dark', 'shadow-sm');
+            document.getElementById('yearly-tab').classList.remove('text-gray-600');
+            document.getElementById('monthly-tab').classList.remove('bg-white', 'text-dark', 'shadow-sm');
+            document.getElementById('monthly-tab').classList.add('text-gray-600');
+            
+            // Show/hide plan sections
+            document.getElementById('yearly-plans').classList.remove('hidden');
+            document.getElementById('monthly-plans').classList.add('hidden');
+            
+            // Show discount badge
+            document.getElementById('discount-badge').classList.remove('hidden');
+        }
+
+        function toggleFAQ(index) {
+            const content = document.getElementById(`faq-content-${index}`);
+            const icon = document.getElementById(`faq-icon-${index}`);
+            
+            if (content.classList.contains('hidden')) {
+                content.classList.remove('hidden');
+                icon.style.transform = 'rotate(180deg)';
+            } else {
+                content.classList.add('hidden');
+                icon.style.transform = 'rotate(0deg)';
+            }
+        }
+    </script>
+
+</body></html>
