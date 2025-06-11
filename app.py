@@ -430,5 +430,40 @@ def api_customer_ledger(customer_id):
         'payments': payment_data
     })
 
+@app.route('/api/bills/<bill_number>')
+def api_get_bill(bill_number):
+    """Get bill details by bill number"""
+    try:
+        bill = Bill.query.filter_by(bill_number=bill_number).first()
+        if not bill:
+            return jsonify({'success': False, 'error': 'Bill not found'}), 404
+        
+        # Get bill items
+        items = BillItem.query.filter_by(bill_id=bill.id).all()
+        
+        return jsonify({
+            'success': True,
+            'bill_number': bill.bill_number,
+            'customer_name': bill.customer_name,
+            'subtotal': bill.subtotal,
+            'tax_amount': bill.tax_amount,
+            'discount_amount': bill.discount_amount,
+            'total_amount': bill.total_amount,
+            'payment_mode': bill.payment_mode,
+            'payment_status': bill.payment_status,
+            'generated_by': bill.generated_by,
+            'created_at': bill.created_at.isoformat(),
+            'items': [{
+                'item_name': item.item_name,
+                'quantity': item.quantity,
+                'unit_price': item.unit_price,
+                'total_price': item.total_price,
+                'weight': item.weight,
+                'price_per_kg': item.price_per_kg
+            } for item in items]
+        })
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
