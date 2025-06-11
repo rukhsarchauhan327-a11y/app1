@@ -696,16 +696,21 @@
                 weightBasedInput.classList.remove('hidden');
                 quantityHelp.textContent = 'Enter weight in Kg or Grams';
                 
-                // Reset to quantity input mode
+                // Reset to quantity input mode for weight-based
                 document.querySelector('input[name="inputMethod"][value="quantity"]').checked = true;
                 document.getElementById('quantity-section').classList.remove('hidden');
                 document.getElementById('price-section').classList.add('hidden');
             } else {
+                // For all non-weight-based products (bag, bottle, pack, box, etc.)
                 quantityLabel.textContent = currentProduct.stockUnit;
                 inputMethod.classList.add('hidden');
                 bagBasedInput.classList.remove('hidden');
                 weightBasedInput.classList.add('hidden');
                 quantityHelp.textContent = 'Tap + or - to adjust quantity';
+                
+                // Ensure only quantity section is visible for unit-based products
+                document.getElementById('quantity-section').classList.remove('hidden');
+                document.getElementById('price-section').classList.add('hidden');
             }
 
             // Reset quantity input
@@ -804,9 +809,12 @@
         unitSelect.addEventListener('change', updateWeightCalculations);
         priceInput.addEventListener('input', updatePriceCalculations);
 
-        // Input method switching for weight-based products
+        // Input method switching for weight-based products only
         inputMethodRadios.forEach(radio => {
             radio.addEventListener('change', (e) => {
+                // Only apply this logic for weight-based products
+                if (!currentProduct || currentProduct.type !== 'weight-based') return;
+                
                 const quantitySection = document.getElementById('quantity-section');
                 const priceSection = document.getElementById('price-section');
                 
