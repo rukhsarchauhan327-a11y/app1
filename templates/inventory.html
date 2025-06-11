@@ -580,12 +580,12 @@
         // Product data structure
         const productData = {
             'item-1': {
-                name: 'Basmati Rice Premium',
-                image: 'https://storage.googleapis.com/uxpilot-auth.appspot.com/c17cf1f603-c63583a41c10eef051a5.png',
+                name: 'Wheat Flour',
+                image: 'https://storage.googleapis.com/uxpilot-auth.appspot.com/ad8aa6cee1-b621e3cd72c9ea714c53.png',
                 price: 50,
                 unit: 'Kg',
                 type: 'weight-based',
-                stock: 100,
+                stock: 2.5,
                 stockUnit: 'Kg'
             },
             'item-2': {
@@ -593,7 +593,7 @@
                 image: 'https://storage.googleapis.com/uxpilot-auth.appspot.com/02cda64d32-ca63fc32eaab87b7db4c.png',
                 price: 180,
                 unit: 'Bottle',
-                type: 'bottle-based',
+                type: 'regular',
                 stock: 25,
                 stockUnit: 'Bottles',
                 size: '500ml'
@@ -603,7 +603,7 @@
                 image: 'https://storage.googleapis.com/uxpilot-auth.appspot.com/dd29a1f85f-469e6193e37489fc8c43.png',
                 price: 120,
                 unit: 'Bag',
-                type: 'bag-based',
+                type: 'regular',
                 stock: 5,
                 stockUnit: 'Bags',
                 size: '10 Kg'
@@ -613,7 +613,7 @@
                 image: 'https://storage.googleapis.com/uxpilot-auth.appspot.com/46dc2aecf3-4ae1d7f8a3bc9c8b21d6.png',
                 price: 15,
                 unit: 'Pack',
-                type: 'pack-based',
+                type: 'regular',
                 stock: 50,
                 stockUnit: 'Packs'
             },
@@ -622,7 +622,7 @@
                 image: 'https://storage.googleapis.com/uxpilot-auth.appspot.com/e8f1a9b234-salt-package-1kg-white.png',
                 price: 25,
                 unit: 'Bag',
-                type: 'bag-based',
+                type: 'regular',
                 stock: 30,
                 stockUnit: 'Bags',
                 size: '1 Kg'
@@ -632,7 +632,7 @@
                 image: 'https://storage.googleapis.com/uxpilot-auth.appspot.com/f2c3d4e567-chocolate-bar-dairy-milk.png',
                 price: 45,
                 unit: 'Bar',
-                type: 'piece-based',
+                type: 'regular',
                 stock: 100,
                 stockUnit: 'Bars'
             },
@@ -641,10 +641,28 @@
                 image: 'https://storage.googleapis.com/uxpilot-auth.appspot.com/medical-pills-box.png',
                 price: 25,
                 unit: 'Box',
-                type: 'box-based',
+                type: 'regular',
                 stock: 12,
                 stockUnit: 'Boxes',
                 size: '10 tablets'
+            },
+            'item-8': {
+                name: 'Basmati Rice',
+                image: 'https://storage.googleapis.com/uxpilot-auth.appspot.com/c17cf1f603-c63583a41c10eef051a5.png',
+                price: 80,
+                unit: 'Kg',
+                type: 'weight-based',
+                stock: 15.5,
+                stockUnit: 'Kg'
+            },
+            'item-9': {
+                name: 'Sugar',
+                image: 'https://storage.googleapis.com/uxpilot-auth.appspot.com/sugar-bag-white.png',
+                price: 45,
+                unit: 'Kg',
+                type: 'weight-based',
+                stock: 8.2,
+                stockUnit: 'Kg'
             }
         };
 
@@ -739,8 +757,20 @@
         }
 
         function viewProductDetails(itemId) {
-            // Navigate to product details page with item ID
-            window.location.href = `/product-details?id=${itemId}`;
+            // Get product data to determine routing
+            const product = productData[itemId];
+            
+            if (product) {
+                // Route to appropriate product details page based on product type
+                if (product.type === 'weight-based') {
+                    window.location.href = '/product-details-weight';
+                } else {
+                    window.location.href = '/product-details';
+                }
+            } else {
+                // Default to regular product details if product not found
+                window.location.href = '/product-details';
+            }
         }
 
         // Modal event handlers
