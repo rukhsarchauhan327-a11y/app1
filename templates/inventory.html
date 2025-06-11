@@ -380,6 +380,102 @@
         </div>
     </main>
 
+    <!-- Add to Cart Modal -->
+    <div id="cart-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-white rounded-lg w-full max-w-md mx-auto">
+                <!-- Modal Header -->
+                <div class="flex items-center justify-between p-4 border-b border-gray-200">
+                    <h3 class="text-lg font-bold text-dark">Add to Cart</h3>
+                    <button id="close-modal" class="p-1 hover:bg-gray-100 rounded">
+                        <i class="fa-solid fa-times text-gray-600"></i>
+                    </button>
+                </div>
+
+                <!-- Modal Content -->
+                <div class="p-4">
+                    <!-- Product Info -->
+                    <div class="flex items-center space-x-3 mb-4 p-3 bg-gray-50 rounded-lg">
+                        <img id="modal-product-img" class="w-12 h-12 rounded object-cover" src="" alt="Product">
+                        <div class="flex-1">
+                            <h4 id="modal-product-name" class="font-medium text-dark"></h4>
+                            <p id="modal-product-price" class="text-sm text-gray-600"></p>
+                            <p id="modal-product-stock" class="text-xs text-green-600"></p>
+                        </div>
+                    </div>
+
+                    <!-- Input Method Selection (for weight-based products) -->
+                    <div id="input-method" class="mb-4 hidden">
+                        <label class="block text-sm font-medium text-dark mb-3">Select Input Method</label>
+                        <div class="space-y-2">
+                            <label class="flex items-center space-x-3 cursor-pointer p-3 bg-gray-50 rounded-lg hover:bg-gray-100">
+                                <input type="radio" name="inputMethod" value="quantity" class="text-orange-500 focus:ring-orange-500" checked>
+                                <span class="text-sm font-medium text-dark">Enter Quantity</span>
+                            </label>
+                            <label class="flex items-center space-x-3 cursor-pointer p-3 bg-gray-50 rounded-lg hover:bg-gray-100">
+                                <input type="radio" name="inputMethod" value="price" class="text-orange-500 focus:ring-orange-500">
+                                <span class="text-sm font-medium text-dark">Enter Price</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Quantity Input Section -->
+                    <div id="quantity-section" class="mb-4">
+                        <label id="quantity-label" class="block text-sm font-medium text-dark mb-3">Quantity</label>
+                        <div id="bag-based-input" class="flex items-center space-x-3">
+                            <button id="decrease-qty" class="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center hover:bg-gray-200">
+                                <i class="fa-solid fa-minus text-gray-600"></i>
+                            </button>
+                            <input type="number" id="quantity-input" value="1" min="1" class="flex-1 px-4 py-3 border border-gray-300 rounded-lg text-center font-medium text-lg">
+                            <button id="increase-qty" class="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center hover:bg-gray-200">
+                                <i class="fa-solid fa-plus text-gray-600"></i>
+                            </button>
+                        </div>
+                        <div id="weight-based-input" class="flex items-center space-x-3 hidden">
+                            <input type="number" id="weight-quantity-input" value="1" min="0" step="0.001" class="flex-1 px-4 py-3 border border-gray-300 rounded-lg text-center font-medium text-lg">
+                            <select id="unit-select" class="px-4 py-3 border border-gray-300 rounded-lg font-medium">
+                                <option value="kg">Kg</option>
+                                <option value="gm">Gram</option>
+                            </select>
+                        </div>
+                        <p class="text-xs text-gray-500 mt-2 text-center" id="quantity-help">Tap + or - to adjust quantity</p>
+                    </div>
+
+                    <!-- Price Input Section (for weight-based products) -->
+                    <div id="price-section" class="mb-4 hidden">
+                        <label class="block text-sm font-medium text-dark mb-3">Price</label>
+                        <div class="flex items-center space-x-3 mb-3">
+                            <span class="text-lg font-medium text-gray-600">₹</span>
+                            <input type="number" id="price-input" value="110" min="0" step="0.01" class="flex-1 px-4 py-3 border border-orange-300 rounded-lg text-center font-medium text-lg border-2">
+                        </div>
+                    </div>
+
+                    <!-- Auto-calculated Display -->
+                    <div class="mb-6 p-4 bg-blue-50 rounded-lg">
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="text-sm text-gray-600">Quantity:</span>
+                            <span id="calculated-quantity" class="text-sm font-medium text-dark">1 Unit</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm text-gray-600">Total Price:</span>
+                            <span id="calculated-price" class="text-lg font-bold text-green-600">₹0</span>
+                        </div>
+                    </div>
+
+                    <!-- Modal Actions -->
+                    <div class="flex space-x-3">
+                        <button id="cancel-btn" class="flex-1 py-3 px-4 bg-gray-200 text-gray-700 rounded-lg font-medium hover:bg-gray-300 transition-colors">
+                            Cancel
+                        </button>
+                        <button id="add-cart-btn" class="flex-1 py-3 px-4 bg-orange-500 text-white rounded-lg font-medium hover:bg-orange-600 transition-colors">
+                            Add to Cart
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Floating Add Button -->
     <button id="add-item-btn" class="fixed bottom-20 right-4 bg-primary text-white rounded-full w-14 h-14 shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center" onclick="addNewItem()">
         <i class="fa-solid fa-plus text-xl"></i>
@@ -493,16 +589,133 @@
             }
         }
 
-        function addToCart(itemId) {
-            const item = document.getElementById(itemId);
-            const itemName = item.querySelector('h3').textContent;
-            const quantity = prompt(`Enter quantity to add to cart for ${itemName}:`);
-            
-            if (quantity && !isNaN(quantity)) {
-                alert(`Added ${quantity} units of ${itemName} to cart.`);
-                // Redirect to cart or update cart count
-                // window.location.href = '/cart';
+        // Product data structure
+        const productData = {
+            'item-1': {
+                name: 'Basmati Rice Premium',
+                image: 'https://storage.googleapis.com/uxpilot-auth.appspot.com/c17cf1f603-c63583a41c10eef051a5.png',
+                price: 50,
+                unit: 'Kg',
+                type: 'weight-based',
+                stock: 100,
+                stockUnit: 'Kg'
+            },
+            'item-2': {
+                name: 'Coconut Oil',
+                image: 'https://storage.googleapis.com/uxpilot-auth.appspot.com/02cda64d32-ca63fc32eaab87b7db4c.png',
+                price: 180,
+                unit: 'Bottle',
+                type: 'bottle-based',
+                stock: 25,
+                stockUnit: 'Bottles',
+                size: '500ml'
+            },
+            'item-3': {
+                name: 'Aashirvaad Atta',
+                image: 'https://storage.googleapis.com/uxpilot-auth.appspot.com/dd29a1f85f-469e6193e37489fc8c43.png',
+                price: 120,
+                unit: 'Bag',
+                type: 'bag-based',
+                stock: 5,
+                stockUnit: 'Bags',
+                size: '10 Kg'
+            },
+            'item-4': {
+                name: 'Maggi Noodles',
+                image: 'https://storage.googleapis.com/uxpilot-auth.appspot.com/46dc2aecf3-4ae1d7f8a3bc9c8b21d6.png',
+                price: 15,
+                unit: 'Pack',
+                type: 'pack-based',
+                stock: 50,
+                stockUnit: 'Packs'
+            },
+            'item-5': {
+                name: 'Tata Salt',
+                image: 'https://storage.googleapis.com/uxpilot-auth.appspot.com/e8f1a9b234-salt-package-1kg-white.png',
+                price: 25,
+                unit: 'Bag',
+                type: 'bag-based',
+                stock: 30,
+                stockUnit: 'Bags',
+                size: '1 Kg'
+            },
+            'item-6': {
+                name: 'Dairy Milk Chocolate',
+                image: 'https://storage.googleapis.com/uxpilot-auth.appspot.com/f2c3d4e567-chocolate-bar-dairy-milk.png',
+                price: 45,
+                unit: 'Bar',
+                type: 'piece-based',
+                stock: 100,
+                stockUnit: 'Bars'
+            },
+            'item-7': {
+                name: 'Paracetamol',
+                image: 'https://storage.googleapis.com/uxpilot-auth.appspot.com/medical-pills-box.png',
+                price: 25,
+                unit: 'Box',
+                type: 'box-based',
+                stock: 12,
+                stockUnit: 'Boxes',
+                size: '10 tablets'
             }
+        };
+
+        let currentProduct = null;
+
+        function addToCart(itemId) {
+            currentProduct = productData[itemId];
+            if (!currentProduct) return;
+
+            openCartModal();
+        }
+
+        function openCartModal() {
+            const cartModal = document.getElementById('cart-modal');
+            const modalProductImg = document.getElementById('modal-product-img');
+            const modalProductName = document.getElementById('modal-product-name');
+            const modalProductPrice = document.getElementById('modal-product-price');
+            const modalProductStock = document.getElementById('modal-product-stock');
+            const quantityLabel = document.getElementById('quantity-label');
+            const inputMethod = document.getElementById('input-method');
+            const bagBasedInput = document.getElementById('bag-based-input');
+            const weightBasedInput = document.getElementById('weight-based-input');
+            const quantityHelp = document.getElementById('quantity-help');
+
+            // Update modal with product data
+            modalProductImg.src = currentProduct.image;
+            modalProductImg.alt = currentProduct.name;
+            modalProductName.textContent = currentProduct.name;
+            modalProductPrice.textContent = `₹${currentProduct.price}/${currentProduct.unit}`;
+            modalProductStock.textContent = `${currentProduct.stock} ${currentProduct.stockUnit} in stock`;
+
+            // Configure input based on product type
+            if (currentProduct.type === 'weight-based') {
+                quantityLabel.textContent = 'Quantity';
+                inputMethod.classList.remove('hidden');
+                bagBasedInput.classList.add('hidden');
+                weightBasedInput.classList.remove('hidden');
+                quantityHelp.textContent = 'Enter weight in Kg or Grams';
+                
+                // Reset to quantity input mode
+                document.querySelector('input[name="inputMethod"][value="quantity"]').checked = true;
+                document.getElementById('quantity-section').classList.remove('hidden');
+                document.getElementById('price-section').classList.add('hidden');
+            } else {
+                quantityLabel.textContent = currentProduct.stockUnit;
+                inputMethod.classList.add('hidden');
+                bagBasedInput.classList.remove('hidden');
+                weightBasedInput.classList.add('hidden');
+                quantityHelp.textContent = 'Tap + or - to adjust quantity';
+            }
+
+            // Reset quantity input
+            document.getElementById('quantity-input').value = 1;
+            document.getElementById('weight-quantity-input').value = 1;
+
+            // Update calculations
+            updateCalculations();
+
+            cartModal.classList.remove('hidden');
         }
 
         function deleteItem(itemId) {
@@ -535,6 +748,169 @@
         function viewProductDetails(itemId) {
             // Navigate to product details page with item ID
             window.location.href = `/product-details?id=${itemId}`;
+        }
+
+        // Modal event handlers
+        const cartModal = document.getElementById('cart-modal');
+        const closeModal = document.getElementById('close-modal');
+        const cancelBtn = document.getElementById('cancel-btn');
+        const quantityInput = document.getElementById('quantity-input');
+        const weightQuantityInput = document.getElementById('weight-quantity-input');
+        const unitSelect = document.getElementById('unit-select');
+        const priceInput = document.getElementById('price-input');
+        const decreaseBtn = document.getElementById('decrease-qty');
+        const increaseBtn = document.getElementById('increase-qty');
+        const calculatedQuantity = document.getElementById('calculated-quantity');
+        const calculatedPrice = document.getElementById('calculated-price');
+        const addCartBtn = document.getElementById('add-cart-btn');
+        const inputMethodRadios = document.querySelectorAll('input[name="inputMethod"]');
+
+        // Close modal events
+        closeModal.addEventListener('click', () => {
+            cartModal.classList.add('hidden');
+        });
+
+        cancelBtn.addEventListener('click', () => {
+            cartModal.classList.add('hidden');
+        });
+
+        cartModal.addEventListener('click', (e) => {
+            if (e.target === cartModal) {
+                cartModal.classList.add('hidden');
+            }
+        });
+
+        // Quantity adjustment for bag-based products
+        decreaseBtn.addEventListener('click', () => {
+            const current = parseInt(quantityInput.value) || 1;
+            if (current > 1) {
+                quantityInput.value = current - 1;
+                updateCalculations();
+            }
+        });
+
+        increaseBtn.addEventListener('click', () => {
+            const current = parseInt(quantityInput.value) || 1;
+            const maxStock = currentProduct ? currentProduct.stock : 999;
+            if (current < maxStock) {
+                quantityInput.value = current + 1;
+                updateCalculations();
+            }
+        });
+
+        // Input event listeners
+        quantityInput.addEventListener('input', updateCalculations);
+        weightQuantityInput.addEventListener('input', updateWeightCalculations);
+        unitSelect.addEventListener('change', updateWeightCalculations);
+        priceInput.addEventListener('input', updatePriceCalculations);
+
+        // Input method switching for weight-based products
+        inputMethodRadios.forEach(radio => {
+            radio.addEventListener('change', (e) => {
+                const quantitySection = document.getElementById('quantity-section');
+                const priceSection = document.getElementById('price-section');
+                
+                if (e.target.value === 'quantity') {
+                    quantitySection.classList.remove('hidden');
+                    priceSection.classList.add('hidden');
+                    updateWeightCalculations();
+                } else {
+                    quantitySection.classList.add('hidden');
+                    priceSection.classList.remove('hidden');
+                    updatePriceCalculations();
+                }
+            });
+        });
+
+        // Add to cart button
+        addCartBtn.addEventListener('click', () => {
+            if (!currentProduct) return;
+            
+            let quantity, unit;
+            
+            if (currentProduct.type === 'weight-based') {
+                const inputMethod = document.querySelector('input[name="inputMethod"]:checked').value;
+                if (inputMethod === 'quantity') {
+                    quantity = parseFloat(weightQuantityInput.value) || 1;
+                    unit = unitSelect.value;
+                    if (unit === 'gm') {
+                        quantity = quantity / 1000; // Convert to kg
+                        unit = 'kg';
+                    }
+                } else {
+                    const price = parseFloat(priceInput.value) || 0;
+                    quantity = price / currentProduct.price;
+                    unit = 'kg';
+                }
+            } else {
+                quantity = parseInt(quantityInput.value) || 1;
+                unit = currentProduct.unit.toLowerCase();
+            }
+            
+            const total = quantity * currentProduct.price;
+            const displayQty = currentProduct.type === 'weight-based' && quantity < 1 ? 
+                (quantity * 1000).toFixed(0) + ' gm' : 
+                quantity.toFixed(currentProduct.type === 'weight-based' ? 3 : 0) + ' ' + currentProduct.unit + (quantity > 1 && currentProduct.type !== 'weight-based' ? 's' : '');
+            
+            alert(`Added ${displayQty} of ${currentProduct.name} to cart.\nTotal: ₹${total.toFixed(2)}`);
+            cartModal.classList.add('hidden');
+        });
+
+        function updateCalculations() {
+            if (!currentProduct) return;
+            
+            if (currentProduct.type === 'weight-based') {
+                updateWeightCalculations();
+            } else {
+                const quantity = parseInt(quantityInput.value) || 1;
+                const total = quantity * currentProduct.price;
+                const unit = currentProduct.unit + (quantity > 1 ? 's' : '');
+                
+                calculatedQuantity.textContent = `${quantity} ${unit}`;
+                calculatedPrice.textContent = `₹${total.toFixed(2)}`;
+            }
+        }
+
+        function updateWeightCalculations() {
+            if (!currentProduct || currentProduct.type !== 'weight-based') return;
+            
+            let qty = parseFloat(weightQuantityInput.value) || 0;
+            const unit = unitSelect.value;
+            
+            if (unit === 'gm') {
+                qty = qty / 1000; // Convert to kg for calculation
+            }
+            
+            const total = qty * currentProduct.price;
+            
+            let displayQty = qty;
+            let displayUnit = 'Kg';
+            
+            if (qty < 1) {
+                displayQty = qty * 1000;
+                displayUnit = 'gm';
+            }
+            
+            calculatedQuantity.textContent = `${displayQty.toFixed(displayQty < 1 ? 0 : 3)} ${displayUnit}`;
+            calculatedPrice.textContent = `₹${total.toFixed(2)}`;
+        }
+
+        function updatePriceCalculations() {
+            if (!currentProduct || currentProduct.type !== 'weight-based') return;
+            
+            const price = parseFloat(priceInput.value) || 0;
+            const qty = price / currentProduct.price;
+            
+            let displayQty = qty;
+            let displayUnit = 'Kg';
+            
+            if (qty < 1) {
+                displayQty = qty * 1000;
+                displayUnit = 'gm';
+            }
+            
+            calculatedQuantity.textContent = `${displayQty.toFixed(displayQty < 1 ? 0 : 3)} ${displayUnit}`;
+            calculatedPrice.textContent = `₹${price.toFixed(2)}`;
         }
 
         // Initialize filters
