@@ -375,31 +375,54 @@
 
         // Load product data from localStorage
         function loadProductData() {
+            console.log('Loading product data...');
             const productData = localStorage.getItem('currentProduct');
+            console.log('Raw localStorage data:', productData);
+            
             if (productData) {
                 const product = JSON.parse(productData);
+                console.log('Parsed product:', product);
                 
                 // Update product name
-                document.getElementById('product-name').textContent = product.name;
+                const nameElement = document.getElementById('product-name');
+                if (nameElement) {
+                    nameElement.textContent = product.name;
+                    console.log('Updated product name to:', product.name);
+                }
                 
                 // Update product image
-                document.getElementById('product-image').src = product.image;
-                document.getElementById('product-image').alt = product.name;
+                const imageElement = document.getElementById('product-image');
+                if (imageElement) {
+                    imageElement.src = product.image;
+                    imageElement.alt = product.name;
+                    console.log('Updated product image');
+                }
                 
                 // Update pricing (using product price as selling price)
-                const sellingPriceElement = document.querySelector('.text-green-600:last-child');
-                if (sellingPriceElement) {
-                    sellingPriceElement.textContent = `₹${product.price}/${product.unit}`;
-                }
+                const sellingPriceElements = document.querySelectorAll('.text-green-600');
+                console.log('Found price elements:', sellingPriceElements.length);
+                sellingPriceElements.forEach((element, index) => {
+                    if (element.textContent.includes('₹')) {
+                        element.textContent = `₹${product.price}/${product.unit}`;
+                        console.log('Updated price element', index);
+                    }
+                });
                 
                 // Update stock information
-                const stockElement = document.querySelector('.text-blue-600');
-                if (stockElement) {
-                    stockElement.textContent = `${product.stock} ${product.stockUnit}`;
-                }
+                const stockElements = document.querySelectorAll('.text-blue-600');
+                console.log('Found stock elements:', stockElements.length);
+                stockElements.forEach((element, index) => {
+                    if (element.textContent.includes('Kg') || element.textContent.includes('g')) {
+                        element.textContent = `${product.stock} ${product.stockUnit}`;
+                        console.log('Updated stock element', index);
+                    }
+                });
                 
                 // Update unit price for calculations
                 unitPrice = product.price;
+                console.log('Set unit price to:', unitPrice);
+            } else {
+                console.log('No product data found in localStorage');
             }
         }
 
