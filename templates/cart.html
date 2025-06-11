@@ -989,28 +989,28 @@
     </script>
 
     <!-- Bottom Navigation -->
-    <nav id="footer" class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200">
-        <div class="grid grid-cols-5 py-2">
-            <a href="/dashboard" class="flex flex-col items-center py-2 text-gray-600 hover:text-primary">
-                <i class="fa-solid fa-home text-lg mb-1"></i>
-                <span class="text-xs">Home</span>
-            </a>
-            <a href="/inventory" class="flex flex-col items-center py-2 text-gray-600 hover:text-primary">
-                <i class="fa-solid fa-boxes-stacked text-lg mb-1"></i>
-                <span class="text-xs">Inventory</span>
-            </a>
-            <a href="/cart" class="flex flex-col items-center py-2 text-primary">
-                <i class="fa-solid fa-shopping-cart text-lg mb-1"></i>
-                <span class="text-xs">Cart</span>
-            </a>
-            <a href="/customer_ledger" class="flex flex-col items-center py-2 text-gray-600 hover:text-primary">
-                <i class="fa-solid fa-users text-lg mb-1"></i>
-                <span class="text-xs">Customers</span>
-            </a>
-            <a href="/profile" class="flex flex-col items-center py-2 text-gray-600 hover:text-primary">
-                <i class="fa-solid fa-user text-lg mb-1"></i>
-                <span class="text-xs">Profile</span>
-            </a>
+    <nav id="footer" class="fixed bottom-0 left-0 right-0 bg-white shadow-lg border-t">
+        <div class="flex justify-around items-end py-2">
+            <button class="flex flex-col items-center py-1 px-3" onclick="window.location.href='/dashboard'">
+                <i class="fa-solid fa-home text-gray-400 text-xl"></i>
+                <span class="text-xs mt-1 text-gray-400">Home</span>
+            </button>
+            <button class="flex flex-col items-center py-1 px-3" onclick="window.location.href='/inventory'">
+                <i class="fa-solid fa-box text-gray-400 text-xl"></i>
+                <span class="text-xs mt-1 text-gray-400">Inventory</span>
+            </button>
+            <button onclick="window.location.href='/add-item'" class="relative -top-4 bg-primary rounded-full p-4 shadow-lg">
+                <i class="fa-solid fa-barcode text-white text-xl"></i>
+            </button>
+            <button class="flex flex-col items-center py-1 px-3 relative">
+                <i class="fa-solid fa-shopping-cart text-primary text-xl"></i>
+                <span class="text-xs mt-1 text-primary font-semibold">Cart</span>
+                <span class="absolute -top-1 -right-1 bg-danger text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold">3</span>
+            </button>
+            <button class="flex flex-col items-center py-1 px-3" onclick="window.location.href='/profile'">
+                <i class="fa-solid fa-user text-gray-400 text-xl"></i>
+                <span class="text-xs mt-1 text-gray-400">Profile</span>
+            </button>
         </div>
     </nav>
 
