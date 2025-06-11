@@ -377,7 +377,7 @@
     <div id="payment-section" class="px-4 mb-3">
         <div class="bg-white rounded-xl shadow-sm p-3">
             <div class="flex justify-center mb-3">
-                <div class="flex bg-gray-100 rounded-full p-1 w-full max-w-xs">
+                <div id="payment-buttons-container" class="flex bg-gray-100 rounded-full p-1 w-full max-w-xs">
                     <button id="cash-payment" class="flex-1 py-2 px-2 rounded-full bg-primary text-white font-medium text-xs" onclick="selectPayment('cash')">
                         Cash
                     </button>
@@ -386,6 +386,9 @@
                     </button>
                     <button id="split-payment" class="flex-1 py-2 px-2 rounded-full text-gray-600 font-medium text-xs" onclick="selectPayment('split')">
                         Split
+                    </button>
+                    <button id="credit-payment" class="flex-1 py-2 px-2 rounded-full text-gray-600 font-medium text-xs hidden" onclick="selectPayment('credit')">
+                        Credit
                     </button>
                 </div>
             </div>
@@ -414,6 +417,25 @@
                             <button id="remaining-cash" class="py-2 px-3 border border-gray-300 rounded-lg text-xs" onclick="selectRemaining('cash')">Cash</button>
                             <button id="remaining-online" class="py-2 px-3 border border-gray-300 rounded-lg text-xs" onclick="selectRemaining('online')">Online</button>
                             <button id="remaining-credit" class="py-2 px-3 border border-gray-300 rounded-lg text-xs" onclick="selectRemaining('credit')">Credit</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Credit Payment Section -->
+            <div id="credit-payment-section" class="hidden">
+                <div class="space-y-2">
+                    <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
+                        <div class="flex items-center space-x-2 mb-2">
+                            <i class="fa-solid fa-credit-card text-yellow-600"></i>
+                            <span class="text-sm font-medium text-yellow-800">Credit Purchase</span>
+                        </div>
+                        <p class="text-xs text-yellow-700">Amount will be added to customer's ledger for future payment</p>
+                    </div>
+                    <div class="bg-gray-50 rounded-lg p-3">
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm text-gray-600">Credit Amount:</span>
+                            <span class="text-lg font-bold text-red-600" id="credit-amount">₹0</span>
                         </div>
                     </div>
                 </div>
@@ -480,16 +502,22 @@
                 field.readOnly = false;
                 field.classList.remove('bg-blue-50', 'text-blue-700', 'font-medium');
                 document.getElementById('clear-customer').classList.add('hidden');
+                // Hide credit payment button for billing customers
+                document.getElementById('credit-payment').classList.add('hidden');
             } else if (tab === 'customer') {
                 document.getElementById('customer-tab').className = 'flex-1 py-2 px-2 rounded-full bg-green-500 text-white font-medium text-xs text-center';
                 document.getElementById('customer-section').classList.remove('hidden');
                 label.textContent = 'Customer Name:';
                 field.placeholder = 'Select a customer from search';
+                // Show credit payment button for registered customers
+                document.getElementById('credit-payment').classList.remove('hidden');
             } else if (tab === 'new-customer') {
                 document.getElementById('new-customer-tab').className = 'flex-1 py-2 px-2 rounded-full bg-green-500 text-white font-medium text-xs text-center';
                 document.getElementById('new-customer-section').classList.remove('hidden');
                 label.textContent = 'Customer Name:';
                 field.placeholder = 'Add new customer details';
+                // Show credit payment button for new customers
+                document.getElementById('credit-payment').classList.remove('hidden');
             }
         }
 
@@ -711,10 +739,12 @@
             document.getElementById('cash-payment').className = 'flex-1 py-2 px-2 rounded-full text-gray-600 font-medium text-xs';
             document.getElementById('online-payment').className = 'flex-1 py-2 px-2 rounded-full text-gray-600 font-medium text-xs';
             document.getElementById('split-payment').className = 'flex-1 py-2 px-2 rounded-full text-gray-600 font-medium text-xs';
+            document.getElementById('credit-payment').className = 'flex-1 py-2 px-2 rounded-full text-gray-600 font-medium text-xs';
             
             // Hide payment sections
             document.getElementById('online-payment-section').classList.add('hidden');
             document.getElementById('split-payment-section').classList.add('hidden');
+            document.getElementById('credit-payment-section').classList.add('hidden');
             
             // Show active payment method
             if (mode === 'cash') {
@@ -725,6 +755,12 @@
             } else if (mode === 'split') {
                 document.getElementById('split-payment').className = 'flex-1 py-2 px-2 rounded-full bg-primary text-white font-medium text-xs';
                 document.getElementById('split-payment-section').classList.remove('hidden');
+            } else if (mode === 'credit') {
+                document.getElementById('credit-payment').className = 'flex-1 py-2 px-2 rounded-full bg-primary text-white font-medium text-xs';
+                document.getElementById('credit-payment-section').classList.remove('hidden');
+                // Update credit amount display
+                const total = calculateFinalTotal();
+                document.getElementById('credit-amount').textContent = `₹${total.toFixed(2)}`;
             }
         }
 
