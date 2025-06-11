@@ -67,14 +67,9 @@
                 <h1 class="text-lg font-semibold text-dark">Receipt</h1>
                 <p class="text-xs text-gray-500" id="bill-number-header">Bill #001234</p>
             </div>
-            <div class="flex space-x-2">
-                <button onclick="downloadPDF()" class="p-2 hover:bg-gray-100 rounded-lg" title="Download PDF">
-                    <i class="fa-solid fa-download text-gray-600 text-lg"></i>
-                </button>
-                <button onclick="printReceipt()" class="p-2 hover:bg-gray-100 rounded-lg" title="Print Receipt">
-                    <i class="fa-solid fa-print text-gray-600 text-lg"></i>
-                </button>
-            </div>
+            <button onclick="goBack()" class="p-2 hover:bg-gray-100 rounded-lg">
+                <i class="fa-solid fa-times text-gray-600 text-lg"></i>
+            </button>
         </div>
     </header>
 
