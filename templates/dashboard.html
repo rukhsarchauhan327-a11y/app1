@@ -467,7 +467,7 @@
         document.querySelectorAll('#quick-actions button').forEach(button => {
             button.addEventListener('click', function() {
                 const action = this.textContent.trim();
-                alert(`${action} feature will be available soon!`);
+                console.log(`${action} feature clicked`);
             });
         });
 

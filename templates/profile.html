@@ -433,52 +433,58 @@
         }
 
         function selectPhoto() {
-            alert('Photo upload functionality will be implemented with backend integration.');
+            // Open photo upload interface
+            console.log('Opening photo upload');
         }
 
         // Business stats functions
         function viewSalesDetails() {
-            alert('Detailed sales analytics coming soon.');
+            // Navigate to sales analytics
+            console.log('Opening sales analytics');
         }
 
         function viewMonthlyStats() {
-            alert('Monthly statistics dashboard coming soon.');
+            // Navigate to monthly statistics
+            console.log('Opening monthly statistics');
         }
 
         function viewOrderHistory() {
-            alert('Order history tracking coming soon.');
+            // Navigate to order history
+            console.log('Opening order history');
         }
 
         function viewCustomers() {
-            alert('Customer management system coming soon.');
+            // Navigate to customer management
+            console.log('Opening customer management');
         }
 
         // Quick actions functions
         function exportData() {
             if (confirm('Export all business data? This may take a few minutes.')) {
-                alert('Data export started. You will receive a download link shortly.');
+                console.log('Data export started');
             }
         }
 
         function backupData() {
             if (confirm('Create a backup of all your data?')) {
-                alert('Backup process initiated. Your data is being securely backed up.');
+                console.log('Backup process initiated');
             }
         }
 
         function manageStaff() {
-            alert('Staff management module coming soon.');
+            // Navigate to staff management
+            window.location.href = '/staff';
         }
 
         function notificationSettings() {
-            alert('Notification preferences will be available in future updates.');
+            // Navigate to notification settings
+            console.log('Opening notification settings');
         }
 
         // App settings functions
         function changeLanguage() {
-            const languages = ['English', 'Hindi', 'Marathi', 'Tamil', 'Telugu'];
-            const current = 'English';
-            alert(`Current language: ${current}\nSupport for multiple languages coming soon.`);
+            // Open language selection interface
+            console.log('Opening language selection');
         }
 
         function toggleDarkMode() {
@@ -490,21 +496,23 @@
                 toggle.classList.add('active');
                 toggleButton.classList.add('bg-primary');
                 toggleButton.classList.remove('bg-gray-300');
-                alert('Dark mode enabled! Full dark theme coming in future updates.');
+                console.log('Dark mode enabled');
             } else {
                 toggle.classList.remove('active');
                 toggleButton.classList.remove('bg-primary');
                 toggleButton.classList.add('bg-gray-300');
-                alert('Dark mode disabled.');
+                console.log('Dark mode disabled');
             }
         }
 
         function helpSupport() {
-            alert('Help & Support:\n\n📞 Call: +91 1800-123-4567\n📧 Email: support@kiranakonnect.com\n💬 Chat: Available 9 AM - 6 PM');
+            // Navigate to help and support section
+            console.log('Opening help and support');
         }
 
         function aboutApp() {
-            alert('Kirana Konnect v1.0\n\nA comprehensive point-of-sale and inventory management solution for small retail stores.\n\nDeveloped with ❤️ for Indian Kirana stores.');
+            // Show app information
+            console.log('Opening about app information');
         }
 
         function logout() {

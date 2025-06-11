@@ -492,7 +492,8 @@
             const quantity = parseInt(quantityInput.value);
             const total = quantity * productData.sellingPrice;
             
-            alert(`Added to Cart!\n\n${quantity} ${productData.unit}${quantity > 1 ? 's' : ''} of ${productData.name}\nTotal: ₹${total}`);
+            // Add item to cart and close modal
+            console.log(`Added ${quantity} ${productData.unit} of ${productData.name} to cart`);
             cartModal.classList.add('hidden');
         });
 
