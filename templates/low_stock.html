@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Low Stock Alert - Kirana Konnect</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#2563eb',
+                        secondary: '#64748b',
+                        accent: '#f59e0b',
+                        success: '#10b981',
+                        danger: '#ef4444',
+                        dark: '#1e293b',
+                        light: '#f8fafc'
+                    },
+                    fontFamily: {
+                        inter: ['Inter', 'sans-serif'],
+                        sans: ['Inter', 'sans-serif']
+                    }
+                }
+            }
+        };
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif !important;
+        }
+        .fa, .fas, .far, .fal, .fab {
+            font-family: "Font Awesome 6 Free", "Font Awesome 6 Brands" !important;
+        }
+        ::-webkit-scrollbar {
+            display: none;
+        }
+        html, body {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+<body class="font-inter bg-gray-50">
+    <!-- Header Section -->
+    <header class="bg-white border-b border-gray-200 fixed top-0 left-0 right-0 z-10">
+        <div class="flex items-center justify-between px-4 py-3">
+            <button onclick="goBack()" class="p-2 hover:bg-gray-100 rounded-lg">
+                <i class="fa-solid fa-arrow-left text-gray-600 text-lg"></i>
+            </button>
+            <div class="text-center">
+                <h1 class="text-lg font-semibold text-dark">Low Stock Alert</h1>
+                <p class="text-xs text-gray-500">Inventory Management</p>
+            </div>
+            <button onclick="refreshStock()" class="p-2 hover:bg-gray-100 rounded-lg">
+                <i class="fa-solid fa-refresh text-gray-600 text-lg"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="pt-16 pb-20 bg-gray-50">
+        <!-- Summary Cards -->
+        <div class="px-4 py-4">
+            <div class="grid grid-cols-3 gap-3 mb-4">
+                <div class="bg-red-50 p-3 rounded-lg text-center border border-red-200">
+                    <p class="text-xl font-bold text-red-600">5</p>
+                    <p class="text-xs text-red-500">Critical</p>
+                </div>
+                <div class="bg-orange-50 p-3 rounded-lg text-center border border-orange-200">
+                    <p class="text-xl font-bold text-orange-600">8</p>
+                    <p class="text-xs text-orange-500">Low Stock</p>
+                </div>
+                <div class="bg-yellow-50 p-3 rounded-lg text-center border border-yellow-200">
+                    <p class="text-xl font-bold text-yellow-600">12</p>
+                    <p class="text-xs text-yellow-500">Medium</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filter Tabs -->
+        <div class="px-4 mb-4">
+            <div class="bg-white rounded-lg p-3 shadow-sm border border-gray-100">
+                <div class="flex space-x-2 overflow-x-auto">
+                    <button class="filter-btn active px-3 py-2 bg-red-500 text-white text-sm rounded-lg whitespace-nowrap" data-filter="critical">
+                        <i class="fa-solid fa-triangle-exclamation mr-1"></i>
+                        Critical (5)
+                    </button>
+                    <button class="filter-btn px-3 py-2 bg-gray-200 text-gray-600 text-sm rounded-lg whitespace-nowrap" data-filter="low">
+                        <i class="fa-solid fa-exclamation mr-1"></i>
+                        Low Stock (8)
+                    </button>
+                    <button class="filter-btn px-3 py-2 bg-gray-200 text-gray-600 text-sm rounded-lg whitespace-nowrap" data-filter="medium">
+                        <i class="fa-solid fa-clock mr-1"></i>
+                        Medium (12)
+                    </button>
+                    <button class="filter-btn px-3 py-2 bg-gray-200 text-gray-600 text-sm rounded-lg whitespace-nowrap" data-filter="all">
+                        All Items
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stock Items List -->
+        <div class="px-4 space-y-3">
+            <!-- Critical Stock Items -->
+            <div class="stock-item bg-white rounded-lg p-4 shadow-sm border-l-4 border-red-500" data-level="critical">
+                <div class="flex items-center space-x-3">
+                    <div class="w-12 h-12 rounded-lg overflow-hidden bg-gray-100">
+                        <img src="https://storage.googleapis.com/uxpilot-auth.appspot.com/ad8aa6cee1-b621e3cd72c9ea714c53.png" alt="Wheat Flour" class="w-full h-full object-cover">
+                    </div>
+                    <div class="flex-1">
+                        <div class="flex items-start justify-between">
+                            <div class="flex-1">
+                                <h3 class="font-bold text-dark">Wheat Flour</h3>
+                                <p class="text-sm text-gray-600">₹50/Kg</p>
+                                <div class="flex items-center space-x-2 mt-1">
+                                    <span class="bg-red-100 text-red-700 px-2 py-1 rounded-full text-xs font-medium">Critical</span>
+                                    <span class="text-xs text-gray-500">Last restocked: 5 days ago</span>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-lg font-bold text-red-600">0.5 Kg</p>
+                                <p class="text-xs text-gray-500">Min: 5 Kg</p>
+                                <div class="w-16 bg-gray-200 rounded-full h-2 mt-1">
+                                    <div class="bg-red-500 h-2 rounded-full" style="width: 10%"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-between mt-3">
+                            <span class="text-xs text-gray-500">Suggested reorder: 50 Kg</span>
+                            <div class="flex space-x-2">
+                                <button onclick="refillStock('wheat-flour')" class="bg-blue-500 text-white px-3 py-1 rounded text-xs font-medium">
+                                    <i class="fa-solid fa-plus mr-1"></i>Refill
+                                </button>
+                                <button onclick="viewDetails('wheat-flour')" class="bg-gray-200 text-gray-700 px-3 py-1 rounded text-xs font-medium">
+                                    Details
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stock-item bg-white rounded-lg p-4 shadow-sm border-l-4 border-red-500" data-level="critical">
+                <div class="flex items-center space-x-3">
+                    <div class="w-12 h-12 rounded-lg overflow-hidden bg-gray-100">
+                        <img src="https://storage.googleapis.com/uxpilot-auth.appspot.com/e8f1a9b234-salt-package-1kg-white.png" alt="Tata Salt" class="w-full h-full object-cover">
+                    </div>
+                    <div class="flex-1">
+                        <div class="flex items-start justify-between">
+                            <div class="flex-1">
+                                <h3 class="font-bold text-dark">Tata Salt</h3>
+                                <p class="text-sm text-gray-600">₹25/Bag</p>
+                                <div class="flex items-center space-x-2 mt-1">
+                                    <span class="bg-red-100 text-red-700 px-2 py-1 rounded-full text-xs font-medium">Critical</span>
+                                    <span class="text-xs text-gray-500">Last restocked: 3 days ago</span>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-lg font-bold text-red-600">1 Bag</p>
+                                <p class="text-xs text-gray-500">Min: 10 Bags</p>
+                                <div class="w-16 bg-gray-200 rounded-full h-2 mt-1">
+                                    <div class="bg-red-500 h-2 rounded-full" style="width: 10%"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-between mt-3">
+                            <span class="text-xs text-gray-500">Suggested reorder: 50 Bags</span>
+                            <div class="flex space-x-2">
+                                <button onclick="refillStock('tata-salt')" class="bg-blue-500 text-white px-3 py-1 rounded text-xs font-medium">
+                                    <i class="fa-solid fa-plus mr-1"></i>Refill
+                                </button>
+                                <button onclick="viewDetails('tata-salt')" class="bg-gray-200 text-gray-700 px-3 py-1 rounded text-xs font-medium">
+                                    Details
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Low Stock Items -->
+            <div class="stock-item bg-white rounded-lg p-4 shadow-sm border-l-4 border-orange-500" data-level="low">
+                <div class="flex items-center space-x-3">
+                    <div class="w-12 h-12 rounded-lg overflow-hidden bg-gray-100">
+                        <img src="https://storage.googleapis.com/uxpilot-auth.appspot.com/dd29a1f85f-469e6193e37489fc8c43.png" alt="Aashirvaad Atta" class="w-full h-full object-cover">
+                    </div>
+                    <div class="flex-1">
+                        <div class="flex items-start justify-between">
+                            <div class="flex-1">
+                                <h3 class="font-bold text-dark">Aashirvaad Atta</h3>
+                                <p class="text-sm text-gray-600">₹120/Bag</p>
+                                <div class="flex items-center space-x-2 mt-1">
+                                    <span class="bg-orange-100 text-orange-700 px-2 py-1 rounded-full text-xs font-medium">Low Stock</span>
+                                    <span class="text-xs text-gray-500">Last restocked: 2 days ago</span>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-lg font-bold text-orange-600">3 Bags</p>
+                                <p class="text-xs text-gray-500">Min: 10 Bags</p>
+                                <div class="w-16 bg-gray-200 rounded-full h-2 mt-1">
+                                    <div class="bg-orange-500 h-2 rounded-full" style="width: 30%"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-between mt-3">
+                            <span class="text-xs text-gray-500">Suggested reorder: 25 Bags</span>
+                            <div class="flex space-x-2">
+                                <button onclick="refillStock('aashirvaad-atta')" class="bg-blue-500 text-white px-3 py-1 rounded text-xs font-medium">
+                                    <i class="fa-solid fa-plus mr-1"></i>Refill
+                                </button>
+                                <button onclick="viewDetails('aashirvaad-atta')" class="bg-gray-200 text-gray-700 px-3 py-1 rounded text-xs font-medium">
+                                    Details
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stock-item bg-white rounded-lg p-4 shadow-sm border-l-4 border-orange-500" data-level="low">
+                <div class="flex items-center space-x-3">
+                    <div class="w-12 h-12 rounded-lg overflow-hidden bg-gray-100">
+                        <img src="https://storage.googleapis.com/uxpilot-auth.appspot.com/02cda64d32-ca63fc32eaab87b7db4c.png" alt="Coconut Oil" class="w-full h-full object-cover">
+                    </div>
+                    <div class="flex-1">
+                        <div class="flex items-start justify-between">
+                            <div class="flex-1">
+                                <h3 class="font-bold text-dark">Coconut Oil</h3>
+                                <p class="text-sm text-gray-600">₹180/Bottle</p>
+                                <div class="flex items-center space-x-2 mt-1">
+                                    <span class="bg-orange-100 text-orange-700 px-2 py-1 rounded-full text-xs font-medium">Low Stock</span>
+                                    <span class="text-xs text-gray-500">Last restocked: 1 week ago</span>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-lg font-bold text-orange-600">8 Bottles</p>
+                                <p class="text-xs text-gray-500">Min: 15 Bottles</p>
+                                <div class="w-16 bg-gray-200 rounded-full h-2 mt-1">
+                                    <div class="bg-orange-500 h-2 rounded-full" style="width: 50%"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-between mt-3">
+                            <span class="text-xs text-gray-500">Suggested reorder: 30 Bottles</span>
+                            <div class="flex space-x-2">
+                                <button onclick="refillStock('coconut-oil')" class="bg-blue-500 text-white px-3 py-1 rounded text-xs font-medium">
+                                    <i class="fa-solid fa-plus mr-1"></i>Refill
+                                </button>
+                                <button onclick="viewDetails('coconut-oil')" class="bg-gray-200 text-gray-700 px-3 py-1 rounded text-xs font-medium">
+                                    Details
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Medium Stock Items -->
+            <div class="stock-item bg-white rounded-lg p-4 shadow-sm border-l-4 border-yellow-500" data-level="medium">
+                <div class="flex items-center space-x-3">
+                    <div class="w-12 h-12 rounded-lg overflow-hidden bg-gray-100">
+                        <img src="https://storage.googleapis.com/uxpilot-auth.appspot.com/5fc8cd7bc4-09ff84e61b7234ca57e8.png" alt="Basmati Rice" class="w-full h-full object-cover">
+                    </div>
+                    <div class="flex-1">
+                        <div class="flex items-start justify-between">
+                            <div class="flex-1">
+                                <h3 class="font-bold text-dark">Basmati Rice</h3>
+                                <p class="text-sm text-gray-600">₹80/Bag</p>
+                                <div class="flex items-center space-x-2 mt-1">
+                                    <span class="bg-yellow-100 text-yellow-700 px-2 py-1 rounded-full text-xs font-medium">Medium Stock</span>
+                                    <span class="text-xs text-gray-500">Last restocked: 3 days ago</span>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-lg font-bold text-yellow-600">15 Bags</p>
+                                <p class="text-xs text-gray-500">Min: 10 Bags</p>
+                                <div class="w-16 bg-gray-200 rounded-full h-2 mt-1">
+                                    <div class="bg-yellow-500 h-2 rounded-full" style="width: 60%"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-between mt-3">
+                            <span class="text-xs text-gray-500">Suggested reorder: 20 Bags</span>
+                            <div class="flex space-x-2">
+                                <button onclick="refillStock('basmati-rice')" class="bg-blue-500 text-white px-3 py-1 rounded text-xs font-medium">
+                                    <i class="fa-solid fa-plus mr-1"></i>Refill
+                                </button>
+                                <button onclick="viewDetails('basmati-rice')" class="bg-gray-200 text-gray-700 px-3 py-1 rounded text-xs font-medium">
+                                    Details
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="px-4 mt-6 mb-4">
+            <div class="bg-white rounded-lg p-4 shadow-sm border border-gray-100">
+                <h3 class="font-semibold text-dark mb-3">Quick Actions</h3>
+                <div class="grid grid-cols-2 gap-3">
+                    <button onclick="bulkRefill()" class="bg-green-500 text-white p-3 rounded-lg font-medium">
+                        <i class="fa-solid fa-truck mr-2"></i>Bulk Refill
+                    </button>
+                    <button onclick="generateReport()" class="bg-blue-500 text-white p-3 rounded-lg font-medium">
+                        <i class="fa-solid fa-file-lines mr-2"></i>Export Report
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Bottom Navigation -->
+    <nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200">
+        <div class="flex justify-around items-end py-2">
+            <button class="flex flex-col items-center py-1 px-3" onclick="window.location.href='/dashboard'">
+                <i class="fa-solid fa-home text-gray-400 text-lg"></i>
+                <span class="text-xs mt-1 text-gray-400">Home</span>
+            </button>
+            <button class="flex flex-col items-center py-1 px-3" onclick="window.location.href='/inventory'">
+                <i class="fa-solid fa-box text-primary text-lg"></i>
+                <span class="text-xs mt-1 text-primary">Inventory</span>
+            </button>
+            <button class="relative -top-3 bg-primary rounded-full p-3 shadow-lg" onclick="window.location.href='/add-item'">
+                <i class="fa-solid fa-barcode text-white text-lg"></i>
+            </button>
+            <button class="flex flex-col items-center py-1 px-3" onclick="window.location.href='/cart'">
+                <i class="fa-solid fa-shopping-cart text-gray-400 text-lg"></i>
+                <span class="text-xs mt-1 text-gray-400">Cart</span>
+            </button>
+            <button class="flex flex-col items-center py-1 px-3" onclick="window.location.href='/profile'">
+                <i class="fa-solid fa-user text-gray-400 text-lg"></i>
+                <span class="text-xs mt-1 text-gray-400">Profile</span>
+            </button>
+        </div>
+    </nav>
+
+    <script>
+        function goBack() {
+            window.history.back();
+        }
+
+        function refreshStock() {
+            location.reload();
+        }
+
+        function refillStock(itemId) {
+            // Store the item for refill and navigate
+            localStorage.setItem('refillItem', itemId);
+            window.location.href = '/refill-stock';
+        }
+
+        function viewDetails(itemId) {
+            // Navigate to product details
+            window.location.href = '/product-details';
+        }
+
+        function bulkRefill() {
+            alert('Bulk refill functionality will open ordering interface for multiple items');
+        }
+
+        function generateReport() {
+            alert('Generating low stock report...');
+            // In a real app, this would generate and download a report
+        }
+
+        // Filter functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const filterBtns = document.querySelectorAll('.filter-btn');
+            const stockItems = document.querySelectorAll('.stock-item');
+
+            filterBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const filter = this.getAttribute('data-filter');
+                    
+                    // Update active button
+                    filterBtns.forEach(b => {
+                        b.classList.remove('active');
+                        if (filter === 'critical') {
+                            b.classList.remove('bg-red-500', 'text-white');
+                            b.classList.add('bg-gray-200', 'text-gray-600');
+                        } else if (filter === 'low') {
+                            b.classList.remove('bg-orange-500', 'text-white');
+                            b.classList.add('bg-gray-200', 'text-gray-600');
+                        } else if (filter === 'medium') {
+                            b.classList.remove('bg-yellow-500', 'text-white');
+                            b.classList.add('bg-gray-200', 'text-gray-600');
+                        } else {
+                            b.classList.remove('bg-blue-500', 'text-white');
+                            b.classList.add('bg-gray-200', 'text-gray-600');
+                        }
+                    });
+                    
+                    this.classList.add('active');
+                    this.classList.remove('bg-gray-200', 'text-gray-600');
+                    if (filter === 'critical') {
+                        this.classList.add('bg-red-500', 'text-white');
+                    } else if (filter === 'low') {
+                        this.classList.add('bg-orange-500', 'text-white');
+                    } else if (filter === 'medium') {
+                        this.classList.add('bg-yellow-500', 'text-white');
+                    } else {
+                        this.classList.add('bg-blue-500', 'text-white');
+                    }
+
+                    // Filter items
+                    stockItems.forEach(item => {
+                        const level = item.getAttribute('data-level');
+                        if (filter === 'all' || level === filter) {
+                            item.style.display = 'block';
+                        } else {
+                            item.style.display = 'none';
+                        }
+                    });
+                });
+            });
+        });
+    </script>
+</body>
+</html>
