@@ -536,7 +536,10 @@
             document.getElementById('customer-results').classList.add('hidden');
             document.getElementById('customer-results').innerHTML = '';
             document.getElementById('no-search-message').classList.remove('hidden');
-            showBillingTab();
+            
+            // Keep Customer tab active instead of switching to Billing
+            switchTab('customer');
+            document.getElementById('bill-section').classList.remove('hidden');
         }
 
         function clearCustomer() {
@@ -586,7 +589,10 @@
                     document.getElementById('new-customer-name').value = '';
                     document.getElementById('new-customer-phone').value = '';
                     showNotification(`Customer ${name} saved successfully!`, 'success');
-                    showBillingTab();
+                    
+                    // Keep New Customer tab active and show bill section
+                    switchTab('new-customer');
+                    document.getElementById('bill-section').classList.remove('hidden');
                 } else {
                     showNotification('Error saving customer. Please try again.', 'error');
                 }
