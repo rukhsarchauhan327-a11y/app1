@@ -98,17 +98,16 @@
             
             <!-- Quantity Input -->
             <div class="mb-4">
-                <label id="quantity-label" class="block text-sm font-medium text-gray-700 mb-2">Additional Bottles</label>
-                <div class="relative">
-                    <input type="number" id="quantity-input" class="w-full px-4 py-3 border border-gray-300 rounded-lg text-lg font-semibold text-center focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="0" value="12">
-                    <span id="unit-label" class="absolute right-3 top-3 text-gray-500 text-sm">Bottles</span>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Additional Quantity</label>
+                <div class="flex space-x-2">
+                    <div class="flex-1 relative">
+                        <input type="number" id="quantity-input" class="w-full px-4 py-3 border border-gray-300 rounded-lg text-lg font-semibold text-center focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="0" value="25" step="0.001">
+                    </div>
+                    <select id="unit-select" class="px-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        <option value="kg">Kg</option>
+                        <option value="gm">Gram</option>
+                    </select>
                 </div>
-            </div>
-
-            <!-- Size Confirmation -->
-            <div class="mb-4">
-                <label class="block text-sm font-medium text-gray-700 mb-2">Size</label>
-                <input type="text" id="size-input" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" value="200 ml" readonly>
             </div>
 
             <!-- Purchase Price -->
@@ -116,7 +115,7 @@
                 <label class="block text-sm font-medium text-gray-700 mb-2">Total Purchase Price</label>
                 <div class="relative">
                     <span class="absolute left-3 top-3 text-gray-500 text-lg">₹</span>
-                    <input type="number" id="purchase-price" class="w-full pl-8 pr-4 py-3 border border-gray-300 rounded-lg text-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="0" value="180">
+                    <input type="number" id="purchase-price" class="w-full pl-8 pr-4 py-3 border border-gray-300 rounded-lg text-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="0" value="2000">
                 </div>
             </div>
 
@@ -124,12 +123,12 @@
             <div class="bg-gray-50 p-4 rounded-lg mb-4">
                 <div class="grid grid-cols-2 gap-4">
                     <div>
-                        <p id="price-per-unit-label" class="text-xs text-gray-500 mb-1">Price per Bottle</p>
-                        <p class="text-lg font-bold text-dark" id="price-per-unit">₹15</p>
+                        <p class="text-xs text-gray-500 mb-1">Price per Kg</p>
+                        <p class="text-lg font-bold text-dark" id="price-per-kg">₹80</p>
                     </div>
                     <div>
                         <p class="text-xs text-gray-500 mb-1">New Total Stock</p>
-                        <p class="text-lg font-bold text-green-600" id="new-total">36 Bottles</p>
+                        <p class="text-lg font-bold text-green-600" id="new-total">40.5 Kg</p>
                     </div>
                 </div>
             </div>
@@ -137,27 +136,17 @@
             <!-- Selling Price Update -->
             <div class="mb-4">
                 <label class="block text-sm font-medium text-gray-700 mb-2">Update Selling Price (Optional)</label>
-                <div class="flex space-x-2 mb-2">
-                    <div class="relative flex-1">
+                <div class="flex space-x-2">
+                    <div class="flex-1 relative">
                         <span class="absolute left-3 top-3 text-gray-500 text-lg">₹</span>
-                        <input type="number" id="selling-price" class="w-full pl-8 pr-4 py-3 border border-gray-300 rounded-lg text-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="20" value="20">
+                        <input type="number" id="selling-price" class="w-full pl-8 pr-4 py-3 border border-gray-300 rounded-lg text-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="90" value="90">
                     </div>
-                    <select id="price-mode" class="px-4 py-3 border border-gray-300 rounded-lg font-medium focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                        <option value="per-unit">Per Bottle</option>
-                        <option value="total">Total Amount</option>
+                    <select id="selling-unit-select" class="px-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        <option value="kg">/Kg</option>
+                        <option value="gm">/Gram</option>
                     </select>
                 </div>
-                <div class="bg-blue-50 p-3 rounded-lg">
-                    <div class="flex justify-between items-center mb-1">
-                        <span class="text-sm text-gray-600">Per Unit Price:</span>
-                        <span id="calculated-per-unit" class="text-sm font-medium text-dark">₹20/Bottle</span>
-                    </div>
-                    <div class="flex justify-between items-center">
-                        <span class="text-sm text-gray-600">Total Revenue:</span>
-                        <span id="calculated-total-revenue" class="text-sm font-medium text-green-600">₹240</span>
-                    </div>
-                </div>
-                <p id="current-selling-price" class="text-sm text-green-600 mt-1">Current: ₹20/Bottle</p>
+                <p class="text-sm text-green-600 mt-1">Current: ₹90/Kg</p>
             </div>
 
             <!-- Optional Dates -->
@@ -227,16 +216,16 @@
     <script>
         // Product data - this would normally come from URL parameters or API
         const productData = {
-            name: 'Frooti Mango Drink',
-            image: 'https://storage.googleapis.com/uxpilot-auth.appspot.com/9307613d34-298d7bee124789ba3905.png',
-            size: '200 ml',
-            category: 'Beverages',
-            type: 'Bottle-Based',
-            currentStock: 24,
-            threshold: 6,
-            unit: 'Bottle',
-            unitPlural: 'Bottles',
-            currentSellingPrice: 20
+            name: 'Basmati Rice',
+            image: 'https://storage.googleapis.com/uxpilot-auth.appspot.com/c17cf1f603-c63583a41c10eef051a5.png',
+            size: 'Premium Quality',
+            category: 'Grains',
+            type: 'Weight-Based',
+            currentStock: 15.5,
+            threshold: 5,
+            unit: 'Kg',
+            unitPlural: 'Kg',
+            currentSellingPrice: 90
         };
 
         // Initialize page with product data
@@ -246,65 +235,28 @@
             document.getElementById('product-size').textContent = productData.size;
             document.getElementById('product-category').textContent = productData.category;
             document.getElementById('product-type').textContent = productData.type;
-            document.getElementById('current-stock').textContent = `${productData.currentStock} ${productData.unitPlural}`;
-            document.getElementById('stock-threshold').textContent = `${productData.threshold} ${productData.unitPlural}`;
-            document.getElementById('quantity-label').textContent = `Additional ${productData.unitPlural}`;
-            document.getElementById('unit-label').textContent = productData.unitPlural;
-            document.getElementById('size-input').value = productData.size;
-            document.getElementById('price-per-unit-label').textContent = `Price per ${productData.unit}`;
-            document.getElementById('selling-unit-label').textContent = `/${productData.unit}`;
-            document.getElementById('current-selling-price').textContent = `Current: ₹${productData.currentSellingPrice}/${productData.unit}`;
-            document.getElementById('selling-price').value = productData.currentSellingPrice;
-            
-            // Update price mode dropdown
-            updatePriceModeOptions();
+            document.getElementById('current-stock').textContent = `${productData.currentStock} ${productData.unit}`;
+            document.getElementById('stock-threshold').textContent = `${productData.threshold} ${productData.unit}`;
             
             updateCalculations();
         }
 
-        // Auto calculate price per unit and new total
+        // Calculate weight-based values
         function updateCalculations() {
-            const quantity = document.getElementById('quantity-input').value || 0;
-            const purchasePrice = document.getElementById('purchase-price').value || 0;
+            const quantity = parseFloat(document.getElementById('quantity-input').value) || 0;
+            const purchasePrice = parseFloat(document.getElementById('purchase-price').value) || 0;
+            const unit = document.getElementById('unit-select').value;
             
-            const pricePerUnit = quantity > 0 ? (purchasePrice / quantity).toFixed(0) : 0;
-            const newTotal = parseInt(productData.currentStock) + parseInt(quantity);
-            
-            document.getElementById('price-per-unit').textContent = `₹${pricePerUnit}`;
-            document.getElementById('new-total').textContent = `${newTotal} ${productData.unitPlural}`;
-            
-            // Update selling price calculations
-            updateSellingPriceCalculations();
-        }
-
-        // Calculate selling price based on mode (per-unit or total)
-        function updateSellingPriceCalculations() {
-            const sellingPrice = document.getElementById('selling-price').value || 0;
-            const priceMode = document.getElementById('price-mode').value;
-            const quantity = document.getElementById('quantity-input').value || 0;
-            
-            let perUnitPrice = 0;
-            let totalRevenue = 0;
-            
-            if (priceMode === 'per-unit') {
-                perUnitPrice = parseFloat(sellingPrice);
-                totalRevenue = perUnitPrice * parseInt(quantity);
-            } else {
-                totalRevenue = parseFloat(sellingPrice);
-                perUnitPrice = quantity > 0 ? totalRevenue / parseInt(quantity) : 0;
+            let quantityInKg = quantity;
+            if (unit === 'gm') {
+                quantityInKg = quantity / 1000;
             }
             
-            document.getElementById('calculated-per-unit').textContent = `₹${perUnitPrice.toFixed(2)}/${productData.unit}`;
-            document.getElementById('calculated-total-revenue').textContent = `₹${totalRevenue.toFixed(2)}`;
-        }
-
-        // Update dropdown options based on product type
-        function updatePriceModeOptions() {
-            const priceMode = document.getElementById('price-mode');
-            priceMode.innerHTML = `
-                <option value="per-unit">Per ${productData.unit}</option>
-                <option value="total">Total Amount</option>
-            `;
+            const pricePerKg = quantityInKg > 0 ? (purchasePrice / quantityInKg).toFixed(0) : 0;
+            const newTotal = productData.currentStock + quantityInKg;
+            
+            document.getElementById('price-per-kg').textContent = `₹${pricePerKg}`;
+            document.getElementById('new-total').textContent = `${newTotal.toFixed(1)} Kg`;
         }
 
         function addStock() {
@@ -341,8 +293,7 @@
         // Add event listeners
         document.getElementById('quantity-input').addEventListener('input', updateCalculations);
         document.getElementById('purchase-price').addEventListener('input', updateCalculations);
-        document.getElementById('selling-price').addEventListener('input', updateSellingPriceCalculations);
-        document.getElementById('price-mode').addEventListener('change', updateSellingPriceCalculations);
+        document.getElementById('unit-select').addEventListener('change', updateCalculations);
 
         // Initialize the page
         initializePage();
