@@ -136,15 +136,30 @@
             <!-- Selling Price Update -->
             <div class="mb-4">
                 <label class="block text-sm font-medium text-gray-700 mb-2">Update Selling Price (Optional)</label>
-                <div class="flex space-x-2">
+                <div class="flex space-x-2 mb-2">
                     <div class="flex-1 relative">
                         <span class="absolute left-3 top-3 text-gray-500 text-lg">₹</span>
                         <input type="number" id="selling-price" class="w-full pl-8 pr-4 py-3 border border-gray-300 rounded-lg text-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="90" value="90">
                     </div>
-                    <select id="selling-unit-select" class="px-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                        <option value="kg">/Kg</option>
-                        <option value="gm">/Gram</option>
+                    <select id="selling-mode" class="px-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        <option value="per-kg">Per Kg</option>
+                        <option value="per-gm">Per Gram</option>
+                        <option value="entire">Entire Amount</option>
                     </select>
+                </div>
+                <div class="bg-blue-50 p-3 rounded-lg">
+                    <div class="flex justify-between items-center mb-1">
+                        <span class="text-sm text-gray-600">Per Kg Price:</span>
+                        <span id="calculated-per-kg" class="text-sm font-medium text-dark">₹90/Kg</span>
+                    </div>
+                    <div class="flex justify-between items-center mb-1">
+                        <span class="text-sm text-gray-600">Per Gram Price:</span>
+                        <span id="calculated-per-gram" class="text-sm font-medium text-dark">₹0.09/Gram</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-sm text-gray-600">Total Revenue:</span>
+                        <span id="calculated-total-revenue" class="text-sm font-medium text-green-600">₹3650</span>
+                    </div>
                 </div>
                 <p class="text-sm text-green-600 mt-1">Current: ₹90/Kg</p>
             </div>
@@ -257,6 +272,45 @@
             
             document.getElementById('price-per-kg').textContent = `₹${pricePerKg}`;
             document.getElementById('new-total').textContent = `${newTotal.toFixed(1)} Kg`;
+            
+            // Update selling price calculations
+            updateSellingPriceCalculations();
+        }
+
+        // Calculate selling price based on mode
+        function updateSellingPriceCalculations() {
+            const sellingPrice = parseFloat(document.getElementById('selling-price').value) || 0;
+            const sellingMode = document.getElementById('selling-mode').value;
+            const quantity = parseFloat(document.getElementById('quantity-input').value) || 0;
+            const unit = document.getElementById('unit-select').value;
+            
+            let quantityInKg = quantity;
+            if (unit === 'gm') {
+                quantityInKg = quantity / 1000;
+            }
+            
+            let perKgPrice = 0;
+            let perGramPrice = 0;
+            let totalRevenue = 0;
+            
+            if (sellingMode === 'per-kg') {
+                perKgPrice = sellingPrice;
+                perGramPrice = sellingPrice / 1000;
+                totalRevenue = perKgPrice * (productData.currentStock + quantityInKg);
+            } else if (sellingMode === 'per-gm') {
+                perGramPrice = sellingPrice;
+                perKgPrice = sellingPrice * 1000;
+                totalRevenue = perKgPrice * (productData.currentStock + quantityInKg);
+            } else if (sellingMode === 'entire') {
+                totalRevenue = sellingPrice;
+                const totalStock = productData.currentStock + quantityInKg;
+                perKgPrice = totalStock > 0 ? totalRevenue / totalStock : 0;
+                perGramPrice = perKgPrice / 1000;
+            }
+            
+            document.getElementById('calculated-per-kg').textContent = `₹${perKgPrice.toFixed(2)}/Kg`;
+            document.getElementById('calculated-per-gram').textContent = `₹${perGramPrice.toFixed(3)}/Gram`;
+            document.getElementById('calculated-total-revenue').textContent = `₹${totalRevenue.toFixed(2)}`;
         }
 
         function addStock() {
@@ -294,6 +348,8 @@
         document.getElementById('quantity-input').addEventListener('input', updateCalculations);
         document.getElementById('purchase-price').addEventListener('input', updateCalculations);
         document.getElementById('unit-select').addEventListener('change', updateCalculations);
+        document.getElementById('selling-price').addEventListener('input', updateSellingPriceCalculations);
+        document.getElementById('selling-mode').addEventListener('change', updateSellingPriceCalculations);
 
         // Initialize the page
         initializePage();
