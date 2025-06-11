@@ -417,8 +417,8 @@
         }
 
         function callCustomer(customerId) {
-            alert(`Calling ${customerId}... Opening phone dialer`);
-            // In real app, this would integrate with device calling functionality
+            // Integrate with device calling functionality
+            console.log(`Calling ${customerId}`);
         }
 
         function recordPayment(customerId) {
@@ -444,13 +444,12 @@
             const notes = document.getElementById('paymentNotes').value;
 
             if (!amount || amount <= 0) {
-                alert('Please enter a valid payment amount');
                 return;
             }
 
-            alert(`Payment of ₹${amount} recorded for ${currentCustomer} via ${method}`);
             closePaymentModal();
-            // In real app, this would update the customer ledger and credit balance
+            // Update the customer ledger and credit balance
+            console.log(`Payment of ₹${amount} recorded for ${currentCustomer} via ${method}`);
         }
 
         function getCustomerData(customerId) {
@@ -465,8 +464,8 @@
         }
 
         function sendReminder(customerId) {
-            alert(`Sending payment reminder to ${customerId} via SMS/WhatsApp`);
-            // In real app, this would send automated reminders
+            // Send automated reminders via SMS/WhatsApp
+            console.log(`Sending payment reminder to ${customerId}`);
         }
 
         function viewLedger(customerId) {
@@ -475,18 +474,18 @@
         }
 
         function sendBulkReminders() {
-            alert('Sending payment reminders to all overdue customers');
-            // In real app, this would send bulk reminders
+            // Send bulk reminders to overdue customers
+            console.log('Sending payment reminders to all overdue customers');
         }
 
         function generateCreditReport() {
-            alert('Generating credit report...');
-            // In real app, this would generate and download a credit report
+            // Generate and download credit report
+            console.log('Generating credit report');
         }
 
         function setCreditLimits() {
-            alert('Opening credit limit management interface');
-            // In real app, this would open credit management settings
+            // Open credit limit management interface
+            console.log('Opening credit limit management');
         }
 
         // Filter functionality

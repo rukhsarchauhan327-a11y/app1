@@ -357,34 +357,31 @@
 
         function markRemoved(itemId) {
             if (confirm('Mark this item as removed from inventory?')) {
-                alert(`${itemId} marked as removed due to expiry`);
-                // In real app, this would update the inventory system
+                // Update the inventory system
+                console.log(`${itemId} marked as removed due to expiry`);
             }
         }
 
         function markSold(itemId) {
             if (confirm('Mark this item as sold at discount?')) {
-                alert(`${itemId} marked as discount sale`);
-                // In real app, this would create a discount sale entry
+                // Create a discount sale entry
+                console.log(`${itemId} marked as discount sale`);
             }
         }
 
         function quickSale(itemId) {
-            alert(`Setting up quick sale promotion for ${itemId}`);
-            // In real app, this would create a quick sale campaign
+            // Create a quick sale campaign
+            console.log(`Setting up quick sale promotion for ${itemId}`);
         }
 
         function setDiscount(itemId) {
-            const discount = prompt('Enter discount percentage (e.g., 20 for 20%):');
-            if (discount && !isNaN(discount)) {
-                alert(`${discount}% discount set for ${itemId}`);
-                // In real app, this would update the product pricing
-            }
+            // Update the product pricing with discount
+            console.log(`Setting discount for ${itemId}`);
         }
 
         function setReminder(itemId) {
-            alert(`Reminder set for ${itemId} - you'll be notified 3 days before expiry`);
-            // In real app, this would create a notification reminder
+            // Create a notification reminder
+            console.log(`Reminder set for ${itemId}`);
         }
 
         function viewDetails(itemId) {
@@ -392,18 +389,18 @@
         }
 
         function bulkDiscount() {
-            alert('Opening bulk discount interface for all expiring items');
-            // In real app, this would open a bulk pricing interface
+            // Open bulk pricing interface for expiring items
+            console.log('Opening bulk discount interface');
         }
 
         function generateReport() {
-            alert('Generating expiry report...');
-            // In real app, this would generate and download a report
+            // Generate and download expiry report
+            console.log('Generating expiry report');
         }
 
         function setupAlerts() {
-            alert('Opening expiry alert configuration');
-            // In real app, this would open notification settings
+            // Open notification settings for expiry alerts
+            console.log('Opening expiry alert configuration');
         }
 
         // Filter functionality

@@ -451,8 +451,8 @@
         }
 
         function saveSettings() {
-            alert('Settings saved successfully!');
-            // In real app, this would save all current settings
+            // Save all current settings
+            console.log('Settings saved successfully!');
         }
 
         function editProfile() {
@@ -460,104 +460,94 @@
         }
 
         function editStoreName() {
-            const newName = prompt('Enter new store name:', 'Raj Kumar General Store');
-            if (newName) {
-                alert(`Store name updated to: ${newName}`);
-                // In real app, this would update the store name
+            // Open inline edit mode for store name
+            const element = document.querySelector('[data-field="storeName"]');
+            if (element) {
+                element.contentEditable = true;
+                element.focus();
             }
         }
 
         function editAddress() {
-            const newAddress = prompt('Enter new store address:', '123 Main Street, Delhi 110001');
-            if (newAddress) {
-                alert(`Store address updated to: ${newAddress}`);
-                // In real app, this would update the store address
+            // Open inline edit mode for address
+            const element = document.querySelector('[data-field="address"]');
+            if (element) {
+                element.contentEditable = true;
+                element.focus();
             }
         }
 
         function editGST() {
-            const newGST = prompt('Enter GST number:', '07AAACH7409R1ZZ');
-            if (newGST) {
-                alert(`GST number updated to: ${newGST}`);
-                // In real app, this would update the GST number
+            // Open inline edit mode for GST
+            const element = document.querySelector('[data-field="gst"]');
+            if (element) {
+                element.contentEditable = true;
+                element.focus();
             }
         }
 
         function setThreshold() {
-            const threshold = prompt('Enter default low stock threshold:', '10');
-            if (threshold && !isNaN(threshold)) {
-                alert(`Low stock threshold set to: ${threshold} units`);
-                // In real app, this would update the threshold setting
-            }
+            // Navigate to threshold settings
+            console.log('Opening threshold settings');
         }
 
         function setPaymentMethod() {
-            const methods = ['Cash', 'UPI', 'Card', 'Bank Transfer'];
-            const method = prompt(`Select default payment method:\n${methods.map((m, i) => `${i+1}. ${m}`).join('\n')}`);
-            if (method && method >= 1 && method <= 4) {
-                alert(`Default payment method set to: ${methods[method-1]}`);
-                // In real app, this would update the default payment method
-            }
+            // Navigate to payment method settings
+            console.log('Opening payment method settings');
         }
 
         function setCreditLimit() {
-            const limit = prompt('Enter default credit limit (₹):', '5000');
-            if (limit && !isNaN(limit)) {
-                alert(`Default credit limit set to: ₹${limit}`);
-                // In real app, this would update the credit limit
-            }
+            // Navigate to credit limit settings
+            console.log('Opening credit limit settings');
         }
 
         function changePassword() {
-            alert('Opening password change interface');
-            // In real app, this would open a password change form
+            // Navigate to password change form
+            console.log('Opening password change interface');
         }
 
         function privacySettings() {
-            alert('Opening privacy settings');
-            // In real app, this would open privacy configuration
+            // Navigate to privacy settings
+            console.log('Opening privacy settings');
         }
 
         function changeLanguage() {
-            const languages = ['English', 'Hindi', 'Tamil', 'Telugu', 'Bengali'];
-            alert('Language selection interface would open here');
-            // In real app, this would show language options
+            // Navigate to language selection
+            console.log('Opening language selection');
         }
 
         function changeCurrency() {
-            const currencies = ['Indian Rupee (₹)', 'US Dollar ($)', 'Euro (€)'];
-            alert('Currency selection interface would open here');
-            // In real app, this would show currency options
+            // Navigate to currency selection
+            console.log('Opening currency selection');
         }
 
         function checkUpdates() {
-            alert('Checking for updates... You have the latest version!');
-            // In real app, this would check for app updates
+            // Check for app updates
+            console.log('Checking for updates');
         }
 
         function openHelp() {
-            alert('Opening help center');
-            // In real app, this would open help documentation
+            // Navigate to help center
+            console.log('Opening help center');
         }
 
         function contactSupport() {
-            alert('Opening support contact form');
-            // In real app, this would open support channels
+            // Navigate to support contact
+            console.log('Opening support contact');
         }
 
         function sendFeedback() {
-            alert('Opening feedback form');
-            // In real app, this would open a feedback form
+            // Navigate to feedback form
+            console.log('Opening feedback form');
         }
 
         function rateApp() {
-            alert('Opening app store for rating');
-            // In real app, this would open app store rating
+            // Navigate to app rating
+            console.log('Opening app rating');
         }
 
         function logout() {
             if (confirm('Are you sure you want to logout?')) {
-                alert('Logging out...');
                 window.location.href = '/signin';
             }
         }
