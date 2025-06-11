@@ -647,10 +647,20 @@
                 const result = await response.json();
                 
                 if (response.ok) {
+                    // Automatically select the newly created customer
+                    selectedCustomerId = result.id;
+                    const billCustomerField = document.getElementById('bill-customer-name');
+                    const clearButton = document.getElementById('clear-customer');
+                    
+                    billCustomerField.value = name;
+                    billCustomerField.readOnly = true;
+                    billCustomerField.classList.add('bg-blue-50', 'text-blue-700', 'font-medium');
+                    clearButton.classList.remove('hidden');
+                    
                     // Clear the form
                     document.getElementById('new-customer-name').value = '';
                     document.getElementById('new-customer-phone').value = '';
-                    showNotification(`Customer ${name} saved successfully!`, 'success');
+                    showNotification(`Customer ${name} saved and selected!`, 'success');
                     
                     // Switch to customer tab and show the newly added customer
                     switchTab('customer');
@@ -659,12 +669,12 @@
                     const customerList = document.getElementById('customer-list');
                     if (customerList) {
                         const customerItem = document.createElement('div');
-                        customerItem.className = 'flex items-center justify-between p-3 border-b border-gray-100 hover:bg-gray-50 cursor-pointer';
+                        customerItem.className = 'flex items-center justify-between p-3 border-b border-gray-100 bg-blue-50 border-l-4 border-l-blue-500';
                         customerItem.onclick = () => selectCustomer(result.id, name, phone);
                         customerItem.innerHTML = `
                             <div class="flex-1">
-                                <p class="font-medium text-dark text-sm">${name}</p>
-                                <p class="text-gray-600 text-xs">${phone}</p>
+                                <p class="font-medium text-blue-700 text-sm">${name} ✓</p>
+                                <p class="text-blue-600 text-xs">${phone}</p>
                             </div>
                             <div class="text-right">
                                 <p class="text-green-600 font-bold text-sm">₹0.00</p>
@@ -685,6 +695,9 @@
                             noSearchMessage.classList.add('hidden');
                         }
                     }
+                    
+                    // Show the bill section since customer is selected
+                    document.getElementById('bill-section').classList.remove('hidden');
                 } else {
                     showNotification('Error saving customer. Please try again.', 'error');
                 }
