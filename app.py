@@ -90,6 +90,11 @@ def expiry_alert():
     """Serve the expiry alert page"""
     return render_template('expiry_alert.html')
 
+@app.route('/pending-credits')
+def pending_credits():
+    """Serve the pending credits page"""
+    return render_template('pending_credits.html')
+
 @app.route('/refill-stock')
 def refill_stock():
     """Serve the refill stock page"""
