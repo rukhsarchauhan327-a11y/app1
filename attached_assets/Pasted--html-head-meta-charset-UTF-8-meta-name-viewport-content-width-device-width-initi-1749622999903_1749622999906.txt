@@ -1,0 +1,284 @@
+<html><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script> window.FontAwesomeConfig = { autoReplaceSvg: 'nest'};</script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <style>::-webkit-scrollbar { display: none;}</style>
+    
+    <script>tailwind.config = {
+  "theme": {
+    "extend": {
+      "colors": {
+        "primary": "#4CAF50",
+        "secondary": "#2196F3",
+        "accent": "#FF9800",
+        "danger": "#F44336",
+        "dark": "#333333",
+        "light": "#F5F5F5"
+      },
+      "fontFamily": {
+        "poppins": [
+          "Poppins",
+          "sans-serif"
+        ],
+        "sans": [
+          "Inter",
+          "sans-serif"
+        ]
+      }
+    }
+  }
+};</script>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin=""><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;500;600;700;800;900&amp;display=swap"><style>
+      body {
+        font-family: 'Inter', sans-serif !important;
+      }
+      
+      /* Preserve Font Awesome icons */
+      .fa, .fas, .far, .fal, .fab {
+        font-family: "Font Awesome 6 Free", "Font Awesome 6 Brands" !important;
+      }
+    </style><style>
+  .highlighted-section {
+    outline: 2px solid #3F20FB;
+    background-color: rgba(63, 32, 251, 0.1);
+  }
+
+  .edit-button {
+    position: absolute;
+    z-index: 1000;
+  }
+
+  ::-webkit-scrollbar {
+    display: none;
+  }
+
+  html, body {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  </style></head>
+<body class="font-poppins bg-light min-h-screen">
+    
+    <!-- Header -->
+    <div id="header" class="bg-white shadow-sm p-4 flex items-center justify-between sticky top-0 z-10">
+        <i class="fa-solid fa-arrow-left text-dark text-xl"></i>
+        <h1 class="text-dark text-xl font-bold">Sign In</h1>
+        <div class="w-6"></div>
+    </div>
+
+    <!-- Main Content -->
+    <div id="signin-container" class="px-6 py-8">
+        
+        <!-- App Logo Section -->
+        <div id="logo-section" class="text-center mb-8">
+            <div class="w-20 h-20 mx-auto bg-primary rounded-2xl shadow-lg flex items-center justify-center mb-4">
+                <div class="text-center">
+                    <i class="fa-solid fa-store text-white text-2xl mb-1"></i>
+                    <div class="text-white font-bold text-sm">KC</div>
+                </div>
+            </div>
+            <h2 class="text-dark text-2xl font-bold mb-2">Welcome Back!</h2>
+            <p class="text-gray-600 text-sm">Sign in to your Kirana Konnect account</p>
+        </div>
+
+        <!-- Sign In Form -->
+        <div id="signin-form" class="space-y-6">
+            
+            <!-- Login Credentials -->
+            <div id="login-credentials" class="space-y-4">
+                
+                <div>
+                    <label class="text-dark text-sm font-medium mb-2 block">Phone Number or Email</label>
+                    <div class="relative">
+                        <i class="fa-solid fa-phone absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500"></i>
+                        <input type="text" placeholder="Enter phone number or email" class="w-full bg-white border border-gray-300 rounded-xl pl-12 pr-4 py-3 text-dark placeholder-gray-500 focus:border-primary focus:outline-none">
+                    </div>
+                </div>
+                
+                <div>
+                    <label class="text-dark text-sm font-medium mb-2 block">Password</label>
+                    <div class="relative">
+                        <i class="fa-solid fa-lock absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500"></i>
+                        <input type="password" placeholder="Enter your password" class="w-full bg-white border border-gray-300 rounded-xl pl-12 pr-12 py-3 text-dark placeholder-gray-500 focus:border-primary focus:outline-none">
+                        <i class="fa-solid fa-eye-slash absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-500 cursor-pointer"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Remember Me & Forgot Password -->
+            <div id="login-options" class="flex items-center justify-between">
+                <div class="flex items-center space-x-2">
+                    <input type="checkbox" id="remember" class="w-4 h-4 text-primary bg-white border-gray-300 rounded focus:ring-primary">
+                    <label for="remember" class="text-dark text-sm">Remember me</label>
+                </div>
+                <span class="text-secondary text-sm font-medium underline cursor-pointer">Forgot Password?</span>
+            </div>
+
+            <!-- Sign In Button -->
+            <button id="signin-btn" class="w-full bg-primary text-white font-bold py-4 px-6 rounded-xl shadow-lg hover:bg-green-600 transition-all duration-300 flex items-center justify-center space-x-3">
+                <i class="fa-solid fa-sign-in-alt text-lg"></i>
+                <span class="text-lg">Sign In</span>
+            </button>
+
+            <!-- Alternative Login Methods -->
+            <div id="alternative-login" class="space-y-4">
+                <div class="relative">
+                    <div class="absolute inset-0 flex items-center">
+                        <div class="w-full border-t border-gray-300"></div>
+                    </div>
+                    <div class="relative flex justify-center text-sm">
+                        <span class="px-4 bg-light text-gray-600">Or continue with</span>
+                    </div>
+                </div>
+
+                <!-- OTP Login -->
+                <button id="otp-btn" class="w-full bg-white border border-gray-300 text-dark font-medium py-3 px-6 rounded-xl shadow-sm hover:bg-gray-50 transition-all duration-300 flex items-center justify-center space-x-3">
+                    <i class="fa-solid fa-mobile-alt text-accent text-lg"></i>
+                    <span>Login with OTP</span>
+                </button>
+            </div>
+
+            <!-- Language Selection -->
+            <div id="language-selection" class="space-y-2">
+                <label class="text-dark text-sm font-medium">Preferred Language</label>
+                <select class="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-dark focus:border-primary focus:outline-none">
+                    <option value="english">English</option>
+                    <option value="hindi">हिंदी (Hindi)</option>
+                    <option value="tamil">தமிழ் (Tamil)</option>
+                    <option value="bengali">বাংলা (Bengali)</option>
+                    <option value="marathi">मराठी (Marathi)</option>
+                </select>
+            </div>
+
+            <!-- Sign Up Link -->
+            <div id="signup-link" class="text-center pt-4">
+                <p class="text-gray-600 text-sm">Don't have an account? <span class="text-secondary font-semibold underline cursor-pointer">Create Account</span></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-2xl p-8 mx-6 text-center">
+            <div class="w-16 h-16 mx-auto mb-4 bg-primary rounded-full flex items-center justify-center">
+                <div class="w-8 h-8 border-4 border-white border-t-transparent rounded-full animate-spin"></div>
+            </div>
+            <h3 class="text-dark text-lg font-semibold mb-2">Signing You In</h3>
+            <p class="text-gray-600 text-sm">Please wait while we verify your credentials...</p>
+        </div>
+    </div>
+
+    <!-- OTP Modal -->
+    <div id="otp-modal" class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-2xl p-8 mx-6 w-full max-w-sm">
+            <div class="text-center mb-6">
+                <div class="w-16 h-16 mx-auto bg-accent rounded-full flex items-center justify-center mb-4">
+                    <i class="fa-solid fa-mobile-alt text-white text-2xl"></i>
+                </div>
+                <h3 class="text-dark text-lg font-semibold mb-2">Enter OTP</h3>
+                <p class="text-gray-600 text-sm">We've sent a 6-digit code to your phone number</p>
+            </div>
+            
+            <div class="flex space-x-2 mb-6">
+                <input type="text" maxlength="1" class="w-12 h-12 text-center border border-gray-300 rounded-lg text-dark font-bold text-lg focus:border-primary focus:outline-none">
+                <input type="text" maxlength="1" class="w-12 h-12 text-center border border-gray-300 rounded-lg text-dark font-bold text-lg focus:border-primary focus:outline-none">
+                <input type="text" maxlength="1" class="w-12 h-12 text-center border border-gray-300 rounded-lg text-dark font-bold text-lg focus:border-primary focus:outline-none">
+                <input type="text" maxlength="1" class="w-12 h-12 text-center border border-gray-300 rounded-lg text-dark font-bold text-lg focus:border-primary focus:outline-none">
+                <input type="text" maxlength="1" class="w-12 h-12 text-center border border-gray-300 rounded-lg text-dark font-bold text-lg focus:border-primary focus:outline-none">
+                <input type="text" maxlength="1" class="w-12 h-12 text-center border border-gray-300 rounded-lg text-dark font-bold text-lg focus:border-primary focus:outline-none">
+            </div>
+            
+            <button class="w-full bg-accent text-white font-bold py-3 px-6 rounded-xl mb-4">Verify OTP</button>
+            <button id="close-otp" class="w-full bg-gray-200 text-dark font-medium py-3 px-6 rounded-xl">Cancel</button>
+            
+            <div class="text-center mt-4">
+                <p class="text-gray-600 text-sm">Didn't receive code? <span class="text-secondary underline cursor-pointer">Resend</span></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Password visibility toggle
+        document.querySelector('.fa-eye-slash').addEventListener('click', function() {
+            const passwordInput = this.previousElementSibling;
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+            this.classList.toggle('fa-eye-slash');
+            this.classList.toggle('fa-eye');
+        });
+
+        // Sign in form submission
+        document.getElementById('signin-btn').addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            const loginField = document.querySelector('input[placeholder*="phone number or email"]');
+            const passwordField = document.querySelector('input[type="password"]');
+            
+            if (!loginField.value.trim() || !passwordField.value.trim()) {
+                alert('Please fill in all required fields.');
+                return;
+            }
+            
+            // Show loading overlay
+            document.getElementById('loading-overlay').classList.remove('hidden');
+            
+            // Simulate login process
+            setTimeout(() => {
+                document.getElementById('loading-overlay').classList.add('hidden');
+                alert('Login successful! Redirecting to dashboard...');
+            }, 2000);
+        });
+
+        // OTP Login
+        document.getElementById('otp-btn').addEventListener('click', function() {
+            document.getElementById('otp-modal').classList.remove('hidden');
+        });
+
+        document.getElementById('close-otp').addEventListener('click', function() {
+            document.getElementById('otp-modal').classList.add('hidden');
+        });
+
+        // OTP Input handling
+        const otpInputs = document.querySelectorAll('#otp-modal input[type="text"]');
+        otpInputs.forEach((input, index) => {
+            input.addEventListener('input', function(e) {
+                if (e.target.value.length === 1 && index < otpInputs.length - 1) {
+                    otpInputs[index + 1].focus();
+                }
+            });
+            
+            input.addEventListener('keydown', function(e) {
+                if (e.key === 'Backspace' && e.target.value === '' && index > 0) {
+                    otpInputs[index - 1].focus();
+                }
+            });
+        });
+
+        // Phone number formatting for login field
+        document.querySelector('input[placeholder*="phone number or email"]').addEventListener('input', function(e) {
+            let value = e.target.value;
+            // If it looks like a phone number (starts with + or digits), format it
+            if (/^[\d+]/.test(value)) {
+                value = value.replace(/\D/g, '');
+                if (value.length > 10) {
+                    value = value.slice(0, 10);
+                }
+                e.target.value = value;
+            }
+        });
+
+        // Real-time validation
+        document.querySelectorAll('input').forEach(field => {
+            field.addEventListener('blur', function() {
+                if (!this.value.trim() && this.placeholder.includes('Enter')) {
+                    this.classList.add('border-danger');
+                } else {
+                    this.classList.remove('border-danger');
+                }
+            });
+        });
+    </script>
+
+</body></html>
