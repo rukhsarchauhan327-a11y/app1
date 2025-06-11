@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Kirana Konnect</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script> window.FontAwesomeConfig = { autoReplaceSvg: 'nest'};</script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <style>::-webkit-scrollbar { display: none;}</style>
+    
+    <script>tailwind.config = {
+  "theme": {
+    "extend": {
+      "colors": {
+        "primary": "#4CAF50",
+        "secondary": "#2196F3",
+        "accent": "#FF9800",
+        "danger": "#F44336",
+        "dark": "#333333",
+        "light": "#F5F5F5"
+      },
+      "fontFamily": {
+        "poppins": [
+          "Poppins",
+          "sans-serif"
+        ],
+        "sans": [
+          "Inter",
+          "sans-serif"
+        ]
+      }
+    }
+  }
+};</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;500;600;700;800;900&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap">
+<style>
+      body {
+        font-family: 'Inter', sans-serif !important;
+      }
+      
+      /* Preserve Font Awesome icons */
+      .fa, .fas, .far, .fal, .fab {
+        font-family: "Font Awesome 6 Free", "Font Awesome 6 Brands" !important;
+      }
+    </style>
+<style>
+  .highlighted-section {
+    outline: 2px solid #3F20FB;
+    background-color: rgba(63, 32, 251, 0.1);
+  }
+
+  .edit-button {
+    position: absolute;
+    z-index: 1000;
+  }
+
+  ::-webkit-scrollbar {
+    display: none;
+  }
+
+  html, body {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+</style>
+</head>
+<body class="font-poppins bg-gray-50">
+    <!-- Header Section -->
+    <header id="header" class="bg-white shadow-sm fixed top-0 left-0 right-0 z-10">
+        <div class="flex items-center justify-between p-4">
+            <div class="flex items-center space-x-3">
+                <img src="https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-2.jpg" alt="Owner" class="w-10 h-10 rounded-full border-2 border-primary">
+                <div>
+                    <h1 class="text-lg font-bold text-dark">Kirana Konnect</h1>
+                    <p class="text-xs text-gray-600 font-medium">Sharma Kirana Store</p>
+                    <div class="flex flex-col space-y-1 mt-1">
+                        <span class="text-xs text-gray-500">GST: 24ABCDE1234F1Z5</span>
+                        <span class="text-xs text-gray-500">UDYAM: UP-12-0012345</span>
+                    </div>
+                </div>
+            </div>
+            <div class="flex items-center space-x-3">
+                <button id="notification-bell" class="relative bg-gray-100 p-2 rounded-full">
+                    <i class="fa-solid fa-bell text-gray-600"></i>
+                    <span class="absolute -top-1 -right-1 bg-danger text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">3</span>
+                </button>
+                <button class="bg-gray-100 p-2 rounded-full">
+                    <i class="fa-solid fa-search text-gray-600"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Notification Dropdown -->
+    <div id="notification-dropdown" class="fixed top-20 right-4 bg-white rounded-xl shadow-lg border z-20 w-80 hidden">
+        <div class="p-4 border-b">
+            <h3 class="font-bold text-dark text-lg">Alerts & Notifications</h3>
+        </div>
+        <div class="max-h-80 overflow-y-auto">
+            <div class="p-4 border-b hover:bg-gray-50">
+                <div class="flex items-start space-x-3">
+                    <div class="bg-danger/10 p-2 rounded-full">
+                        <i class="fa-solid fa-triangle-exclamation text-danger text-sm"></i>
+                    </div>
+                    <div class="flex-1">
+                        <p class="font-semibold text-danger text-sm">5 items expired</p>
+                        <p class="text-xs text-gray-600 mt-1">Remove from inventory immediately</p>
+                        <p class="text-xs text-gray-400 mt-1">2 hours ago</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="p-4 border-b hover:bg-gray-50">
+                <div class="flex items-start space-x-3">
+                    <div class="bg-accent/10 p-2 rounded-full">
+                        <i class="fa-solid fa-clock text-accent text-sm"></i>
+                    </div>
+                    <div class="flex-1">
+                        <p class="font-semibold text-accent text-sm">10 items low stock</p>
+                        <p class="text-xs text-gray-600 mt-1">Reorder soon to avoid stockouts</p>
+                        <p class="text-xs text-gray-400 mt-1">4 hours ago</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="p-4 hover:bg-gray-50">
+                <div class="flex items-start space-x-3">
+                    <div class="bg-secondary/10 p-2 rounded-full">
+                        <i class="fa-solid fa-credit-card text-secondary text-sm"></i>
+                    </div>
+                    <div class="flex-1">
+                        <p class="font-semibold text-secondary text-sm">₹1,500 pending credits</p>
+                        <p class="text-xs text-gray-600 mt-1">From 3 customers - follow up required</p>
+                        <p class="text-xs text-gray-400 mt-1">6 hours ago</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="p-3 border-t">
+            <button class="text-secondary text-sm font-semibold w-full text-center">View All Notifications</button>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main id="main-content" class="pt-32 pb-20">
+        <!-- Welcome Section -->
+        <div id="welcome-section" class="mx-4 mb-6 bg-gradient-to-r from-primary to-green-600 rounded-xl p-4 shadow-md">
+            <div class="text-white">
+                <h2 class="text-xl font-bold mb-1">Welcome back, Rajesh!</h2>
+                <p class="text-sm opacity-90 mb-3">Here's your store overview for today</p>
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center">
+                        <i class="fa-solid fa-calendar-day mr-2"></i>
+                        <span class="text-sm" id="current-date">June 11, 2025</span>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-xs opacity-80">Current Time</p>
+                        <p class="text-sm font-semibold" id="current-time">11:55 AM</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Stats Cards -->
+        <div id="stats-section" class="px-4 mb-6">
+            <div class="grid grid-cols-2 gap-4">
+                <!-- Today's Profit -->
+                <div class="bg-white p-4 rounded-xl shadow-sm border-l-4 border-primary">
+                    <div class="flex items-center justify-between">
+                        <div class="flex-1">
+                            <p class="text-xs text-gray-500 uppercase tracking-wide font-medium">Today's Profit</p>
+                            <p class="text-2xl font-bold text-primary mt-1">₹5,200</p>
+                            <p class="text-xs text-green-600 mt-1">+12% from yesterday</p>
+                        </div>
+                        <div class="bg-primary/10 p-3 rounded-full">
+                            <i class="fa-solid fa-chart-line text-primary text-lg"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Total Sales -->
+                <div class="bg-white p-4 rounded-xl shadow-sm border-l-4 border-secondary">
+                    <div class="flex items-center justify-between">
+                        <div class="flex-1">
+                            <p class="text-xs text-gray-500 uppercase tracking-wide font-medium">Total Sales</p>
+                            <p class="text-2xl font-bold text-secondary mt-1">₹8,000</p>
+                            <p class="text-xs text-gray-500 mt-1">25 transactions</p>
+                        </div>
+                        <div class="bg-secondary/10 p-3 rounded-full">
+                            <i class="fa-solid fa-rupee-sign text-secondary text-lg"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Udhar Ledger -->
+                <div class="bg-white p-4 rounded-xl shadow-sm border-l-4 border-accent">
+                    <div class="flex items-center justify-between">
+                        <div class="flex-1">
+                            <p class="text-xs text-gray-500 uppercase tracking-wide font-medium">Udhar Ledger</p>
+                            <p class="text-sm font-semibold text-accent mt-1">3 Customers</p>
+                            <p class="text-xl font-bold text-accent">₹1,500</p>
+                        </div>
+                        <div class="bg-accent/10 p-3 rounded-full">
+                            <i class="fa-solid fa-credit-card text-accent text-lg"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Inventory Health -->
+                <div class="bg-white p-4 rounded-xl shadow-sm border-l-4 border-danger">
+                    <div class="flex items-center justify-between">
+                        <div class="flex-1">
+                            <p class="text-xs text-gray-500 uppercase tracking-wide font-medium">Inventory</p>
+                            <p class="text-sm text-gray-600 mt-1">120 Items</p>
+                            <p class="text-xs text-danger font-medium">5 Expired • 10 Low</p>
+                        </div>
+                        <div class="bg-danger/10 p-3 rounded-full">
+                            <i class="fa-solid fa-boxes-stacked text-danger text-lg"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div id="quick-actions" class="px-4 mb-6">
+            <h3 class="text-lg font-bold mb-4 text-dark">Quick Actions</h3>
+            <div class="grid grid-cols-2 gap-4">
+                <button class="bg-purple-500 text-white p-4 rounded-xl flex items-center space-x-3 shadow-md hover:bg-purple-600 transition-colors">
+                    <i class="fa-solid fa-credit-card text-xl"></i>
+                    <span class="font-semibold">Payment</span>
+                </button>
+                <button class="bg-secondary text-white p-4 rounded-xl flex items-center space-x-3 shadow-md hover:bg-secondary/90 transition-colors">
+                    <i class="fa-solid fa-box text-xl"></i>
+                    <span class="font-semibold">Add Item</span>
+                </button>
+                <button class="bg-accent text-white p-4 rounded-xl flex items-center space-x-3 shadow-md hover:bg-accent/90 transition-colors">
+                    <i class="fa-solid fa-users text-xl"></i>
+                    <span class="font-semibold">Customers</span>
+                </button>
+                <button class="bg-green-600 text-white p-4 rounded-xl flex items-center space-x-3 shadow-md hover:bg-green-700 transition-colors">
+                    <i class="fa-solid fa-user-tie text-xl"></i>
+                    <span class="font-semibold">Staff</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Reports & Ledger Section -->
+        <div id="reports-ledger" class="px-4 mb-6">
+            <h3 class="text-lg font-bold mb-4 text-dark">Reports & Ledger</h3>
+            <div class="space-y-3">
+                <button class="w-full bg-white p-4 rounded-xl shadow-sm flex items-center justify-between hover:shadow-md transition-shadow">
+                    <div class="flex items-center space-x-4">
+                        <div class="bg-primary/10 p-3 rounded-full">
+                            <i class="fa-solid fa-chart-bar text-primary text-lg"></i>
+                        </div>
+                        <div class="text-left">
+                            <p class="font-semibold text-dark">Daily Reports</p>
+                            <p class="text-sm text-gray-500">Sales, profit & loss analytics</p>
+                        </div>
+                    </div>
+                    <i class="fa-solid fa-chevron-right text-gray-400"></i>
+                </button>
+                
+                <button class="w-full bg-white p-4 rounded-xl shadow-sm flex items-center justify-between hover:shadow-md transition-shadow">
+                    <div class="flex items-center space-x-4">
+                        <div class="bg-accent/10 p-3 rounded-full">
+                            <i class="fa-solid fa-book text-accent text-lg"></i>
+                        </div>
+                        <div class="text-left">
+                            <p class="font-semibold text-dark">Udhar Ledger</p>
+                            <p class="text-sm text-gray-500">Customer credit management</p>
+                        </div>
+                    </div>
+                    <i class="fa-solid fa-chevron-right text-gray-400"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Quick Links -->
+        <div id="quick-links" class="px-4 mb-6">
+            <h3 class="text-lg font-bold mb-4 text-dark">Quick Links</h3>
+            <div class="space-y-3">
+                <button class="w-full bg-white p-4 rounded-xl shadow-sm flex items-center justify-between hover:shadow-md transition-shadow">
+                    <div class="flex items-center space-x-4">
+                        <div class="bg-danger/10 p-3 rounded-full">
+                            <i class="fa-solid fa-triangle-exclamation text-danger text-lg"></i>
+                        </div>
+                        <div class="text-left">
+                            <p class="font-semibold text-dark">Low Stock</p>
+                            <p class="text-sm text-gray-500">10 items need restocking</p>
+                        </div>
+                    </div>
+                    <i class="fa-solid fa-chevron-right text-gray-400"></i>
+                </button>
+                
+                <button class="w-full bg-white p-4 rounded-xl shadow-sm flex items-center justify-between hover:shadow-md transition-shadow">
+                    <div class="flex items-center space-x-4">
+                        <div class="bg-accent/10 p-3 rounded-full">
+                            <i class="fa-solid fa-clock text-accent text-lg"></i>
+                        </div>
+                        <div class="text-left">
+                            <p class="font-semibold text-dark">Expiring Soon</p>
+                            <p class="text-sm text-gray-500">5 items expire this week</p>
+                        </div>
+                    </div>
+                    <i class="fa-solid fa-chevron-right text-gray-400"></i>
+                </button>
+
+                <button class="w-full bg-white p-4 rounded-xl shadow-sm flex items-center justify-between hover:shadow-md transition-shadow">
+                    <div class="flex items-center space-x-4">
+                        <div class="bg-secondary/10 p-3 rounded-full">
+                            <i class="fa-solid fa-credit-card text-secondary text-lg"></i>
+                        </div>
+                        <div class="text-left">
+                            <p class="font-semibold text-dark">Pending Credits</p>
+                            <p class="text-sm text-gray-500">₹1,500 from 3 customers</p>
+                        </div>
+                    </div>
+                    <i class="fa-solid fa-chevron-right text-gray-400"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Top Selling Item -->
+        <div id="top-selling" class="px-4 mb-6">
+            <h3 class="text-lg font-bold mb-4 text-dark">Top Selling Today</h3>
+            <div class="bg-white p-4 rounded-xl shadow-sm">
+                <div class="flex items-center space-x-4">
+                    <div class="w-16 h-16 rounded-xl overflow-hidden">
+                        <img class="w-full h-full object-cover" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/5e2d506a94-d83c5da4ca6ad8fcd0ad.png" alt="Aashirvaad wheat flour bag product packaging">
+                    </div>
+                    <div class="flex-1">
+                        <h4 class="font-bold text-dark text-lg">Aashirvaad Atta</h4>
+                        <p class="text-sm text-gray-600">₹2,000 in sales today</p>
+                        <p class="text-xs text-gray-500">15 units sold</p>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-lg font-bold text-primary">₹45/Kg</p>
+                        <p class="text-sm text-gray-500">25 Kg left</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Transactions -->
+        <div id="recent-transactions" class="px-4 mb-6">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-bold text-dark">Recent Transactions</h3>
+                <button class="text-secondary text-sm font-semibold">View All</button>
+            </div>
+            <div class="space-y-3">
+                <div class="bg-white p-4 rounded-xl shadow-sm">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-3">
+                            <img src="https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-3.jpg" alt="Customer" class="w-10 h-10 rounded-full">
+                            <div>
+                                <p class="font-semibold text-dark">Rajesh Kumar</p>
+                                <p class="text-xs text-gray-500">2 items • 10:30 AM</p>
+                            </div>
+                        </div>
+                        <p class="font-bold text-primary text-lg">₹280</p>
+                    </div>
+                </div>
+                
+                <div class="bg-white p-4 rounded-xl shadow-sm">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center">
+                                <i class="fa-solid fa-user text-gray-500"></i>
+                            </div>
+                            <div>
+                                <p class="font-semibold text-dark">Guest Customer</p>
+                                <p class="text-xs text-gray-500">5 items • 09:45 AM</p>
+                            </div>
+                        </div>
+                        <p class="font-bold text-primary text-lg">₹650</p>
+                    </div>
+                </div>
+                
+                <div class="bg-white p-4 rounded-xl shadow-sm">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-3">
+                            <img src="https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-1.jpg" alt="Customer" class="w-10 h-10 rounded-full">
+                            <div>
+                                <p class="font-semibold text-dark">Priya Sharma</p>
+                                <p class="text-xs text-gray-500">3 items • 09:15 AM</p>
+                            </div>
+                        </div>
+                        <p class="font-bold text-primary text-lg">₹420</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Bottom Navigation -->
+    <nav id="footer" class="fixed bottom-0 left-0 right-0 bg-white shadow-lg border-t">
+        <div class="flex justify-around items-end py-2">
+            <button class="flex flex-col items-center py-1 px-3">
+                <i class="fa-solid fa-home text-primary text-xl"></i>
+                <span class="text-xs mt-1 text-primary font-semibold">Home</span>
+            </button>
+            <button class="flex flex-col items-center py-1 px-3">
+                <i class="fa-solid fa-box text-gray-400 text-xl"></i>
+                <span class="text-xs mt-1 text-gray-400">Inventory</span>
+            </button>
+            <button class="relative -top-4 bg-primary rounded-full p-4 shadow-lg">
+                <i class="fa-solid fa-barcode text-white text-xl"></i>
+            </button>
+            <button class="flex flex-col items-center py-1 px-3 relative">
+                <i class="fa-solid fa-shopping-cart text-gray-400 text-xl"></i>
+                <span class="text-xs mt-1 text-gray-400">Cart</span>
+                <span class="absolute -top-1 -right-1 bg-danger text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold">7</span>
+            </button>
+            <button class="flex flex-col items-center py-1 px-3">
+                <i class="fa-solid fa-user text-gray-400 text-xl"></i>
+                <span class="text-xs mt-1 text-gray-400">Profile</span>
+            </button>
+        </div>
+    </nav>
+
+    <script>
+        // Update current time and date
+        function updateDateTime() {
+            const now = new Date();
+            const options = { 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            };
+            const timeOptions = {
+                hour: 'numeric',
+                minute: '2-digit',
+                hour12: true
+            };
+            
+            document.getElementById('current-date').textContent = now.toLocaleDateString('en-US', options);
+            document.getElementById('current-time').textContent = now.toLocaleTimeString('en-US', timeOptions);
+        }
+
+        // Notification dropdown toggle
+        document.getElementById('notification-bell').addEventListener('click', function() {
+            const dropdown = document.getElementById('notification-dropdown');
+            dropdown.classList.toggle('hidden');
+        });
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(e) {
+            const bell = document.getElementById('notification-bell');
+            const dropdown = document.getElementById('notification-dropdown');
+            
+            if (!bell.contains(e.target) && !dropdown.contains(e.target)) {
+                dropdown.classList.add('hidden');
+            }
+        });
+
+        // Initialize
+        updateDateTime();
+        setInterval(updateDateTime, 60000); // Update every minute
+
+        // Quick action handlers
+        document.querySelectorAll('#quick-actions button').forEach(button => {
+            button.addEventListener('click', function() {
+                const action = this.textContent.trim();
+                alert(`${action} feature will be available soon!`);
+            });
+        });
+
+        // Navigation handlers
+        document.querySelectorAll('#footer button').forEach(button => {
+            button.addEventListener('click', function() {
+                // Remove active class from all buttons
+                document.querySelectorAll('#footer button').forEach(btn => {
+                    btn.querySelector('i').className = btn.querySelector('i').className.replace('text-primary', 'text-gray-400');
+                    const span = btn.querySelector('span');
+                    if (span) {
+                        span.className = span.className.replace('text-primary font-semibold', 'text-gray-400');
+                    }
+                });
+                
+                // Add active class to clicked button (except scan button)
+                if (!this.querySelector('.fa-barcode')) {
+                    this.querySelector('i').className = this.querySelector('i').className.replace('text-gray-400', 'text-primary');
+                    const span = this.querySelector('span');
+                    if (span) {
+                        span.className = span.className.replace('text-gray-400', 'text-primary font-semibold');
+                    }
+                }
+            });
+        });
+
+        // Report and ledger button handlers
+        document.querySelectorAll('#reports-ledger button, #quick-links button').forEach(button => {
+            button.addEventListener('click', function() {
+                const title = this.querySelector('p').textContent;
+                alert(`${title} feature coming soon!`);
+            });
+        });
+    </script>
+
+</body>
+</html>

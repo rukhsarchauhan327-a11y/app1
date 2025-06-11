@@ -30,5 +30,10 @@ def signin():
     """Serve the signin page"""
     return render_template('signin.html')
 
+@app.route('/dashboard')
+def dashboard():
+    """Serve the main dashboard page"""
+    return render_template('dashboard.html')
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)

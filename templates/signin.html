@@ -254,8 +254,8 @@
             setTimeout(() => {
                 document.getElementById('loading-overlay').classList.add('hidden');
                 alert('Login successful! Redirecting to dashboard...');
-                // Redirect to dashboard or pricing page
-                window.location.href = '/pricing';
+                // Redirect to dashboard
+                window.location.href = '/dashboard';
             }, 2000);
         });
 
@@ -289,7 +289,7 @@
             setTimeout(() => {
                 document.getElementById('loading-overlay').classList.add('hidden');
                 alert('OTP verified successfully! Welcome to Kirana Konnect.');
-                window.location.href = '/pricing';
+                window.location.href = '/dashboard';
             }, 2000);
         });
 
