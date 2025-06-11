@@ -40,5 +40,10 @@ def cart():
     """Serve the cart/billing page"""
     return render_template('cart.html')
 
+@app.route('/inventory')
+def inventory():
+    """Serve the inventory management page"""
+    return render_template('inventory.html')
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)

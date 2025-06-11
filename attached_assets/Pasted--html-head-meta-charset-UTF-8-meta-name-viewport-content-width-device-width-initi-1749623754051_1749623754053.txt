@@ -1,0 +1,331 @@
+<html><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script> window.FontAwesomeConfig = { autoReplaceSvg: 'nest'};</script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <style>::-webkit-scrollbar { display: none;}</style>
+    
+    <script>tailwind.config = {
+  "theme": {
+    "extend": {
+      "colors": {
+        "primary": "#4CAF50",
+        "secondary": "#2196F3",
+        "accent": "#FF9800",
+        "danger": "#F44336",
+        "dark": "#333333",
+        "light": "#F5F5F5"
+      },
+      "fontFamily": {
+        "poppins": [
+          "Poppins",
+          "sans-serif"
+        ],
+        "sans": [
+          "Inter",
+          "sans-serif"
+        ]
+      }
+    }
+  }
+};</script>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin=""><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;500;600;700;800;900&amp;display=swap"><style>
+      body {
+        font-family: 'Inter', sans-serif !important;
+      }
+      
+      /* Preserve Font Awesome icons */
+      .fa, .fas, .far, .fal, .fab {
+        font-family: "Font Awesome 6 Free", "Font Awesome 6 Brands" !important;
+      }
+    </style><style>
+  .highlighted-section {
+    outline: 2px solid #3F20FB;
+    background-color: rgba(63, 32, 251, 0.1);
+  }
+
+  .edit-button {
+    position: absolute;
+    z-index: 1000;
+  }
+
+  ::-webkit-scrollbar {
+    display: none;
+  }
+
+  html, body {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  </style></head>
+<body class="font-poppins bg-gray-50">
+    <!-- Header Section -->
+    <header id="header" class="bg-white shadow-sm fixed top-0 left-0 right-0 z-10">
+        <div class="flex items-center justify-between p-4">
+            <button class="p-2 hover:bg-gray-100 rounded-lg transition-colors" onclick="goBack()">
+                <i class="fa-solid fa-arrow-left text-gray-600 text-lg"></i>
+            </button>
+            <h1 class="text-xl font-bold text-dark">Inventory</h1>
+            <button class="p-2 hover:bg-gray-100 rounded-lg transition-colors" onclick="openSearch()">
+                <i class="fa-solid fa-search text-gray-600 text-lg"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- Inventory Stats Header -->
+    <div id="inventory-stats" class="bg-white px-4 py-3 mt-16 shadow-sm border-b">
+        <div class="grid grid-cols-4 gap-2">
+            <div class="text-center cursor-pointer hover:bg-gray-50 p-2 rounded-lg transition-colors" onclick="filterBy('all')">
+                <p class="text-2xl font-bold text-dark">156</p>
+                <p class="text-xs text-gray-500">Total Products</p>
+            </div>
+            <div class="text-center cursor-pointer hover:bg-gray-50 p-2 rounded-lg transition-colors" onclick="filterBy('available')">
+                <p class="text-2xl font-bold text-primary">142</p>
+                <p class="text-xs text-gray-500">Available</p>
+            </div>
+            <div class="text-center cursor-pointer hover:bg-gray-50 p-2 rounded-lg transition-colors" onclick="filterBy('expiring')">
+                <p class="text-2xl font-bold text-danger">6</p>
+                <p class="text-xs text-gray-500">Expiring</p>
+            </div>
+            <div class="text-center cursor-pointer hover:bg-gray-50 p-2 rounded-lg transition-colors" onclick="filterBy('lowstock')">
+                <p class="text-2xl font-bold text-accent">8</p>
+                <p class="text-xs text-gray-500">Low Stock</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main id="main-content" class="pb-24">
+        <!-- Category Tabs -->
+        <div id="category-tabs" class="bg-white px-4 py-3 shadow-sm">
+            <div class="flex space-x-4 overflow-x-auto scrollbar-hide">
+                <button class="category-tab active bg-primary text-white px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap hover:bg-primary/90 transition-colors" onclick="filterCategory('all')">All</button>
+                <button class="category-tab bg-gray-100 text-gray-600 px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap hover:bg-gray-200 transition-colors" onclick="filterCategory('grains')">Grains</button>
+                <button class="category-tab bg-gray-100 text-gray-600 px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap hover:bg-gray-200 transition-colors" onclick="filterCategory('snacks')">Snacks</button>
+                <button class="category-tab bg-gray-100 text-gray-600 px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap hover:bg-gray-200 transition-colors" onclick="filterCategory('oils')">Oils</button>
+                <button class="category-tab bg-gray-100 text-gray-600 px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap hover:bg-gray-200 transition-colors" onclick="filterCategory('beverages')">Beverages</button>
+                <button class="category-tab bg-gray-100 text-gray-600 px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap hover:bg-gray-200 transition-colors" onclick="filterCategory('household')">Household</button>
+                <button class="category-tab bg-gray-100 text-gray-600 px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap hover:bg-gray-200 transition-colors" onclick="filterCategory('medical')">Medical</button>
+                <button class="category-tab bg-gray-100 text-gray-600 px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap hover:bg-gray-200 transition-colors" onclick="filterCategory('others')">Others</button>
+            </div>
+        </div>
+
+        <!-- Inventory Items List -->
+        <div id="inventory-list" class="p-4 space-y-4">
+            <!-- Weight-Based Item - Wheat Flour -->
+            <div id="item-1" class="bg-white rounded-xl p-4 shadow-sm border hover:shadow-md transition-shadow" data-category="grains" data-status="lowstock">
+                <div class="flex items-center space-x-4">
+                    <div class="w-16 h-16 rounded-xl overflow-hidden">
+                        <img class="w-full h-full object-cover" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/ad8aa6cee1-b621e3cd72c9ea714c53.png" alt="wheat flour bag packaging product">
+                    </div>
+                    <div class="flex-1">
+                        <div class="flex items-start justify-between">
+                            <div class="flex-1">
+                                <h3 class="font-bold text-dark text-lg">Wheat Flour</h3>
+                                <div class="text-xs text-gray-500 mt-1">
+                                    <p>MFG: 10 Jan 2025</p>
+                                    <p>EXP: 10 Jan 2026</p>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <span class="bg-danger text-white text-xs px-2 py-1 rounded-full font-semibold">Low Stock</span>
+                                <p class="text-lg font-bold text-primary mt-2">₹50/Kg</p>
+                                <p class="text-sm text-gray-600">100 Kg</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-end space-x-2 mt-3">
+                            <button class="p-2 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors" onclick="refillItem('item-1')" title="Refill Stock">
+                                <i class="fa-solid fa-plus text-blue-600 text-sm"></i>
+                            </button>
+                            <button class="p-2 bg-green-50 hover:bg-green-100 rounded-lg transition-colors" onclick="addToCart('item-1')" title="Add to Cart">
+                                <i class="fa-solid fa-shopping-cart text-green-600 text-sm"></i>
+                            </button>
+                            <button class="p-2 bg-red-50 hover:bg-red-100 rounded-lg transition-colors" onclick="deleteItem('item-1')" title="Delete Item">
+                                <i class="fa-solid fa-trash text-red-600 text-sm"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bottle-Based Item - Coconut Oil -->
+            <div id="item-2" class="bg-white rounded-xl p-4 shadow-sm border hover:shadow-md transition-shadow" data-category="oils" data-status="available">
+                <div class="flex items-center space-x-4">
+                    <div class="w-16 h-16 rounded-xl overflow-hidden">
+                        <img class="w-full h-full object-cover" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/02cda64d32-ca63fc32eaab87b7db4c.png" alt="coconut oil bottle product packaging">
+                    </div>
+                    <div class="flex-1">
+                        <div class="flex items-start justify-between">
+                            <div class="flex-1">
+                                <h3 class="font-bold text-dark text-lg">Coconut Oil</h3>
+                                <div class="text-xs text-gray-500 mt-1">
+                                    <p>MFG: 15 Feb 2025</p>
+                                    <p>EXP: 15 Feb 2027</p>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <span class="bg-primary text-white text-xs px-2 py-1 rounded-full font-semibold">In Stock</span>
+                                <p class="text-lg font-bold text-primary mt-2">₹180/Bottle</p>
+                                <p class="text-sm text-gray-600">25 Bottles (500ml)</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-end space-x-2 mt-3">
+                            <button class="p-2 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors" onclick="refillItem('item-2')" title="Refill Stock">
+                                <i class="fa-solid fa-plus text-blue-600 text-sm"></i>
+                            </button>
+                            <button class="p-2 bg-green-50 hover:bg-green-100 rounded-lg transition-colors" onclick="addToCart('item-2')" title="Add to Cart">
+                                <i class="fa-solid fa-shopping-cart text-green-600 text-sm"></i>
+                            </button>
+                            <button class="p-2 bg-red-50 hover:bg-red-100 rounded-lg transition-colors" onclick="deleteItem('item-2')" title="Delete Item">
+                                <i class="fa-solid fa-trash text-red-600 text-sm"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Packet-Based Item - Chips -->
+            <div id="item-3" class="bg-white rounded-xl p-4 shadow-sm border hover:shadow-md transition-shadow" data-category="snacks" data-status="available">
+                <div class="flex items-center space-x-4">
+                    <div class="w-16 h-16 rounded-xl overflow-hidden">
+                        <img class="w-full h-full object-cover" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/7a6efc6e19-1450fc73b8c187b3042e.png" alt="potato chips packet snack food">
+                    </div>
+                    <div class="flex-1">
+                        <div class="flex items-start justify-between">
+                            <div class="flex-1">
+                                <h3 class="font-bold text-dark text-lg">Lays Chips</h3>
+                                <div class="text-xs text-gray-500 mt-1">
+                                    <p>MFG: 20 Mar 2025</p>
+                                    <p>EXP: 20 Sep 2025</p>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <span class="bg-primary text-white text-xs px-2 py-1 rounded-full font-semibold">In Stock</span>
+                                <p class="text-lg font-bold text-primary mt-2">₹20/Packet</p>
+                                <p class="text-sm text-gray-600">45 Packets (50g)</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-end space-x-2 mt-3">
+                            <button class="p-2 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors" onclick="refillItem('item-3')" title="Refill Stock">
+                                <i class="fa-solid fa-plus text-blue-600 text-sm"></i>
+                            </button>
+                            <button class="p-2 bg-green-50 hover:bg-green-100 rounded-lg transition-colors" onclick="addToCart('item-3')" title="Add to Cart">
+                                <i class="fa-solid fa-shopping-cart text-green-600 text-sm"></i>
+                            </button>
+                            <button class="p-2 bg-red-50 hover:bg-red-100 rounded-lg transition-colors" onclick="deleteItem('item-3')" title="Delete Item">
+                                <i class="fa-solid fa-trash text-red-600 text-sm"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bag-Based Item - Rice -->
+            <div id="item-4" class="bg-white rounded-xl p-4 shadow-sm border hover:shadow-md transition-shadow" data-category="grains" data-status="available">
+                <div class="flex items-center space-x-4">
+                    <div class="w-16 h-16 rounded-xl overflow-hidden">
+                        <img class="w-full h-full object-cover" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/5fc8cd7bc4-09ff84e61b7234ca57e8.png" alt="basmati rice bag packaging product">
+                    </div>
+                    <div class="flex-1">
+                        <div class="flex items-start justify-between">
+                            <div class="flex-1">
+                                <h3 class="font-bold text-dark text-lg">Basmati Rice</h3>
+                                <div class="text-xs text-gray-500 mt-1">
+                                    <p>MFG: 05 Apr 2025</p>
+                                    <p>EXP: 05 Apr 2027</p>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <span class="bg-accent text-white text-xs px-2 py-1 rounded-full font-semibold">Medium</span>
+                                <p class="text-lg font-bold text-primary mt-2">₹650/Bag</p>
+                                <p class="text-sm text-gray-600">8 Bags (10Kg)</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-end space-x-2 mt-3">
+                            <button class="p-2 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors" onclick="refillItem('item-4')" title="Refill Stock">
+                                <i class="fa-solid fa-plus text-blue-600 text-sm"></i>
+                            </button>
+                            <button class="p-2 bg-green-50 hover:bg-green-100 rounded-lg transition-colors" onclick="addToCart('item-4')" title="Add to Cart">
+                                <i class="fa-solid fa-shopping-cart text-green-600 text-sm"></i>
+                            </button>
+                            <button class="p-2 bg-red-50 hover:bg-red-100 rounded-lg transition-colors" onclick="deleteItem('item-4')" title="Delete Item">
+                                <i class="fa-solid fa-trash text-red-600 text-sm"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Piece-Based Item - Soap -->
+            <div id="item-5" class="bg-white rounded-xl p-4 shadow-sm border hover:shadow-md transition-shadow" data-category="household" data-status="available">
+                <div class="flex items-center space-x-4">
+                    <div class="w-16 h-16 rounded-xl overflow-hidden">
+                        <img class="w-full h-full object-cover" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/50a0fc9b33-ba52fd7cb36100ee8a97.png" alt="soap bar household product packaging">
+                    </div>
+                    <div class="flex-1">
+                        <div class="flex items-start justify-between">
+                            <div class="flex-1">
+                                <h3 class="font-bold text-dark text-lg">Dettol Soap</h3>
+                            </div>
+                            <div class="text-right">
+                                <span class="bg-primary text-white text-xs px-2 py-1 rounded-full font-semibold">In Stock</span>
+                                <p class="text-lg font-bold text-primary mt-2">₹45/Piece</p>
+                                <p class="text-sm text-gray-600">30 Pieces (125g)</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-end space-x-2 mt-3">
+                            <button class="p-2 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors" onclick="refillItem('item-5')" title="Refill Stock">
+                                <i class="fa-solid fa-plus text-blue-600 text-sm"></i>
+                            </button>
+                            <button class="p-2 bg-green-50 hover:bg-green-100 rounded-lg transition-colors" onclick="addToCart('item-5')" title="Add to Cart">
+                                <i class="fa-solid fa-shopping-cart text-green-600 text-sm"></i>
+                            </button>
+                            <button class="p-2 bg-red-50 hover:bg-red-100 rounded-lg transition-colors" onclick="deleteItem('item-5')" title="Delete Item">
+                                <i class="fa-solid fa-trash text-red-600 text-sm"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Volume-Based Item - Milk -->
+            <div id="item-6" class="bg-white rounded-xl p-4 shadow-sm border hover:shadow-md transition-shadow" data-category="beverages" data-status="expiring">
+                <div class="flex items-center space-x-4">
+                    <div class="w-16 h-16 rounded-xl overflow-hidden">
+                        <img class="w-full h-full object-cover" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/4dbd7f8565-a15492fc004780da6dd6.png" alt="milk carton dairy product packaging">
+                    </div>
+                    <div class="flex-1">
+                        <div class="flex items-start justify-between">
+                            <div class="flex-1">
+                                <h3 class="font-bold text-dark text-lg">Fresh Milk</h3>
+                                <div class="text-xs text-gray-500 mt-1">
+                                    <p>MFG: 08 Jun 2025</p>
+                                    <p>EXP: 10 Jun 2025</p>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <span class="bg-danger text-white text-xs px-2 py-1 rounded-full font-semibold">Expiring</span>
+                                <p class="text-lg font-bold text-primary mt-2">₹65/Litre</p>
+                                <p class="text-sm text-gray-600">15 Litres</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-end space-x-2 mt-3">
+                            <button class="p-2 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors" onclick="refillItem('item-6')" title="Refill Stock">
+                                <i class="fa-solid fa-plus text-blue-600 text-sm"></i>
+                            </button>
+                            <button class="p-2 bg-green-50 hover:bg-green-100 rounded-lg transition-colors" onclick="addToCart('item-6')" title="Add to Cart">
+                                <i class="fa-solid fa-shopping-cart text-green-600 text-sm"></i>
+                            </button>
+                            <button class="p-2 bg-red-50 hover:bg-red-100 rounded-lg transition-colors" onclick="deleteItem('item-6')" title="Delete Item">
+                                <i class="fa-solid fa-trash text-red-600 text-sm"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Box-Based Item - Medicine -->
+            <div id="item-7" class="bg-white rounded-xl p-4 shadow-sm border hover:shadow-md transition-shadow" data-category="medical" data-status="available">
+                <div class="flex items-center space-x-4">
+                    </div></div></div></main></body></html>

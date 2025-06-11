@@ -405,7 +405,7 @@
                 <i class="fa-solid fa-home text-primary text-xl"></i>
                 <span class="text-xs mt-1 text-primary font-semibold">Home</span>
             </button>
-            <button class="flex flex-col items-center py-1 px-3">
+            <button class="flex flex-col items-center py-1 px-3" onclick="goToInventory()">
                 <i class="fa-solid fa-box text-gray-400 text-xl"></i>
                 <span class="text-xs mt-1 text-gray-400">Inventory</span>
             </button>
@@ -497,6 +497,10 @@
         // Navigation functions
         function goToCart() {
             window.location.href = '/cart';
+        }
+
+        function goToInventory() {
+            window.location.href = '/inventory';
         }
 
         // Report and ledger button handlers
