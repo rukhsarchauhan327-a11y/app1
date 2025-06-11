@@ -733,6 +733,18 @@
                 const remaining = total - splitAmount;
                 document.getElementById('remaining-value').textContent = `₹${remaining.toFixed(2)}`;
                 document.getElementById('remaining-amount').classList.remove('hidden');
+                
+                // Show/hide credit option based on current tab
+                const creditButton = document.getElementById('remaining-credit');
+                if (currentTab === 'billing') {
+                    creditButton.style.display = 'none';
+                    // Adjust grid to 2 columns for billing customers
+                    creditButton.parentElement.className = 'grid grid-cols-2 gap-2';
+                } else {
+                    creditButton.style.display = 'block';
+                    // Keep 3 columns for customer/new-customer tabs
+                    creditButton.parentElement.className = 'grid grid-cols-3 gap-2';
+                }
             }
         }
 
