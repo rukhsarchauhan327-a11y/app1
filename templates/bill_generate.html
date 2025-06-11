@@ -474,57 +474,51 @@
             }
         }
 
-        // Customer database
-        const customers = [
-            { name: 'Rajesh Kumar', phone: '+91 98765 43210', outstanding: '₹2,150' },
-            { name: 'Priya Sharma', phone: '+91 98765 43211', outstanding: '₹850' },
-            { name: 'Amit Singh', phone: '+91 98765 43212', outstanding: 'No Outstanding' },
-            { name: 'Sunita Devi', phone: '+91 98765 43213', outstanding: '₹1,200' },
-            { name: 'Ravi Patel', phone: '+91 98765 43214', outstanding: '₹500' },
-            { name: 'Meera Gupta', phone: '+91 98765 43215', outstanding: '₹750' },
-            { name: 'Arjun Reddy', phone: '+91 98765 43216', outstanding: 'No Outstanding' },
-            { name: 'Kavita Jain', phone: '+91 98765 43217', outstanding: '₹1,800' }
-        ];
+        let selectedCustomerId = null;
 
-        function filterCustomers(searchTerm) {
+        async function filterCustomers(searchTerm) {
             const resultsContainer = document.getElementById('customer-results');
             const noSearchMessage = document.getElementById('no-search-message');
             
-            if (searchTerm.length === 0) {
+            if (searchTerm.length < 2) {
                 resultsContainer.classList.add('hidden');
                 resultsContainer.innerHTML = '';
                 noSearchMessage.classList.remove('hidden');
                 return;
             }
             
-            const filteredCustomers = customers.filter(customer => 
-                customer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                customer.phone.includes(searchTerm)
-            );
-            
-            if (filteredCustomers.length > 0) {
-                noSearchMessage.classList.add('hidden');
-                resultsContainer.classList.remove('hidden');
+            try {
+                const response = await fetch(`/api/customers/search?q=${encodeURIComponent(searchTerm)}`);
+                const customers = await response.json();
                 
-                resultsContainer.innerHTML = filteredCustomers.map(customer => `
-                    <div class="p-2 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100" onclick="selectCustomer('${customer.name}')">
-                        <div class="flex justify-between items-center">
-                            <div>
-                                <p class="font-medium text-dark text-sm">${customer.name}</p>
-                                <p class="text-xs text-gray-600">${customer.phone}</p>
+                if (customers.length > 0) {
+                    noSearchMessage.classList.add('hidden');
+                    resultsContainer.classList.remove('hidden');
+                    
+                    resultsContainer.innerHTML = customers.map(customer => `
+                        <div class="p-2 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100" onclick="selectCustomer('${customer.name}', ${customer.id})">
+                            <div class="flex justify-between items-center">
+                                <div>
+                                    <p class="font-medium text-dark text-sm">${customer.name}</p>
+                                    <p class="text-xs text-gray-600">${customer.phone}</p>
+                                </div>
+                                <span class="text-xs ${customer.outstanding === 'No Outstanding' ? 'text-green-500' : 'text-red-500'} font-medium">${customer.outstanding}</span>
                             </div>
-                            <span class="text-xs ${customer.outstanding === 'No Outstanding' ? 'text-green-500' : 'text-red-500'} font-medium">${customer.outstanding}</span>
                         </div>
-                    </div>
-                `).join('');
-            } else {
-                noSearchMessage.classList.add('hidden');
-                resultsContainer.classList.remove('hidden');
-                resultsContainer.innerHTML = '<div class="p-4 text-center text-gray-500 text-sm">No customers found</div>';
+                    `).join('');
+                } else {
+                    noSearchMessage.classList.add('hidden');
+                    resultsContainer.classList.remove('hidden');
+                    resultsContainer.innerHTML = '<div class="p-4 text-center text-gray-500 text-sm">No customers found</div>';
+                }
+            } catch (error) {
+                console.error('Error searching customers:', error);
+                resultsContainer.innerHTML = '<div class="p-4 text-center text-red-500 text-sm">Error searching customers</div>';
             }
         }
 
-        function selectCustomer(name) {
+        function selectCustomer(name, customerId = null) {
+            selectedCustomerId = customerId;
             document.getElementById('bill-customer-name').value = name;
             document.getElementById('customer-search-input').value = '';
             document.getElementById('customer-results').classList.add('hidden');
@@ -533,17 +527,59 @@
             showBillingTab();
         }
 
-        function saveNewCustomer() {
+        async function saveNewCustomer() {
             const name = document.getElementById('new-customer-name').value;
             const phone = document.getElementById('new-customer-phone').value;
             
-            if (name && phone) {
-                document.getElementById('bill-customer-name').value = name;
-                alert(`Customer ${name} saved successfully!`);
-                showBillingTab();
-            } else {
-                alert('Please fill in both name and phone number.');
+            if (!name || !phone) {
+                showNotification('Please fill in both name and phone number.', 'error');
+                return;
             }
+            
+            try {
+                const response = await fetch('/api/customers', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        name: name,
+                        phone: phone
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    selectedCustomerId = result.id;
+                    document.getElementById('bill-customer-name').value = name;
+                    document.getElementById('new-customer-name').value = '';
+                    document.getElementById('new-customer-phone').value = '';
+                    showNotification(`Customer ${name} saved successfully!`, 'success');
+                    showBillingTab();
+                } else {
+                    showNotification('Error saving customer. Please try again.', 'error');
+                }
+            } catch (error) {
+                console.error('Error saving customer:', error);
+                showNotification('Error saving customer. Please try again.', 'error');
+            }
+        }
+
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `fixed top-4 right-4 z-50 p-3 rounded-lg shadow-lg ${
+                type === 'success' ? 'bg-green-500 text-white' : 
+                type === 'error' ? 'bg-red-500 text-white' : 
+                'bg-blue-500 text-white'
+            }`;
+            notification.textContent = message;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
         }
 
         function removeItem(itemId) {

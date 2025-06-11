@@ -278,5 +278,157 @@ def staff():
     """Serve the staff management page"""
     return render_template('staff.html')
 
+# API Endpoints for Customer Management and Billing
+
+@app.route('/api/customers/search')
+def search_customers():
+    """Search customers by name or phone number"""
+    query = request.args.get('q', '').strip()
+    
+    if len(query) < 2:
+        return jsonify([])
+    
+    customers = Customer.query.filter(
+        db.or_(
+            Customer.name.ilike(f'%{query}%'),
+            Customer.phone.ilike(f'%{query}%')
+        )
+    ).limit(10).all()
+    
+    results = []
+    for customer in customers:
+        outstanding = customer.outstanding_balance
+        results.append({
+            'id': customer.id,
+            'name': customer.name,
+            'phone': customer.phone,
+            'outstanding': f'₹{outstanding:.0f}' if outstanding > 0 else 'No Outstanding',
+            'outstanding_amount': outstanding
+        })
+    
+    return jsonify(results)
+
+@app.route('/api/customers', methods=['POST'])
+def create_customer():
+    """Create a new customer"""
+    data = request.get_json()
+    
+    customer = Customer(
+        name=data['name'],
+        phone=data['phone'],
+        address=data.get('address', ''),
+        aadhar_number=data.get('aadhar_number', ''),
+        email=data.get('email', '')
+    )
+    
+    db.session.add(customer)
+    db.session.commit()
+    
+    return jsonify({
+        'id': customer.id,
+        'name': customer.name,
+        'phone': customer.phone,
+        'message': 'Customer created successfully'
+    })
+
+@app.route('/api/bills', methods=['POST'])
+def create_bill():
+    """Generate a new bill and save it to database"""
+    data = request.get_json()
+    
+    # Generate bill number
+    import random
+    bill_number = f"KK-{datetime.now().year}-{random.randint(1000, 9999)}"
+    
+    # Create the bill
+    bill = Bill(
+        bill_number=bill_number,
+        customer_id=data.get('customer_id'),
+        customer_name=data.get('customer_name'),
+        subtotal=data['subtotal'],
+        tax_amount=data.get('tax_amount', 0),
+        discount_amount=data.get('discount_amount', 0),
+        total_amount=data['total_amount'],
+        payment_mode=data['payment_mode'],
+        payment_status='pending' if data['payment_mode'] == 'credit' else 'paid',
+        generated_by=data.get('generated_by', 'System')
+    )
+    
+    db.session.add(bill)
+    db.session.flush()  # Get the bill ID
+    
+    # Add bill items
+    for item_data in data.get('items', []):
+        bill_item = BillItem(
+            bill_id=bill.id,
+            item_name=item_data['name'],
+            quantity=item_data['quantity'],
+            unit_price=item_data['unit_price'],
+            total_price=item_data['total_price'],
+            weight=item_data.get('weight'),
+            price_per_kg=item_data.get('price_per_kg')
+        )
+        db.session.add(bill_item)
+    
+    # If payment is made, create payment record
+    if data['payment_mode'] != 'credit' and data.get('customer_id'):
+        payment = Payment(
+            customer_id=data['customer_id'],
+            bill_id=bill.id,
+            amount=data['total_amount'],
+            payment_mode=data['payment_mode'],
+            reference_number=data.get('reference_number')
+        )
+        db.session.add(payment)
+    
+    db.session.commit()
+    
+    return jsonify({
+        'bill_id': bill.id,
+        'bill_number': bill.bill_number,
+        'message': 'Bill generated successfully'
+    })
+
+@app.route('/api/customers/<int:customer_id>/ledger')
+def api_customer_ledger(customer_id):
+    """Get customer's ledger with bills and payments"""
+    customer = Customer.query.get_or_404(customer_id)
+    
+    bills = Bill.query.filter_by(customer_id=customer_id).order_by(Bill.created_at.desc()).all()
+    payments = Payment.query.filter_by(customer_id=customer_id).order_by(Payment.created_at.desc()).all()
+    
+    bill_data = []
+    for bill in bills:
+        bill_data.append({
+            'id': bill.id,
+            'bill_number': bill.bill_number,
+            'amount': bill.total_amount,
+            'payment_status': bill.payment_status,
+            'created_at': bill.created_at.strftime('%Y-%m-%d %H:%M'),
+            'items': [{'name': item.item_name, 'quantity': item.quantity, 'total': item.total_price} 
+                     for item in bill.items]
+        })
+    
+    payment_data = []
+    for payment in payments:
+        payment_data.append({
+            'id': payment.id,
+            'amount': payment.amount,
+            'payment_mode': payment.payment_mode,
+            'created_at': payment.created_at.strftime('%Y-%m-%d %H:%M'),
+            'reference_number': payment.reference_number
+        })
+    
+    return jsonify({
+        'customer': {
+            'id': customer.id,
+            'name': customer.name,
+            'phone': customer.phone,
+            'outstanding_balance': customer.outstanding_balance
+        },
+        'bills': bill_data,
+        'payments': payment_data
+    })
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
