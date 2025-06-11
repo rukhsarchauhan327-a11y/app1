@@ -95,8 +95,8 @@
         <!-- Product Info Section -->
         <div id="product-info" class="bg-white mt-2 px-4 py-4">
             <div class="mb-4">
-                <h2 id="product-name" class="text-xl font-bold text-dark mb-1">Aashirvaad Atta</h2>
-                <p id="product-description" class="text-sm text-gray-600 mb-2">Premium quality wheat flour for daily use</p>
+                <h2 id="product-name" class="text-xl font-bold text-dark mb-1">Loading...</h2>
+                <p id="product-description" class="text-sm text-gray-600 mb-2">Premium quality product for daily use</p>
                 <div class="flex items-center space-x-2 mb-2">
                     <span id="product-category" class="bg-blue-100 text-blue-600 px-2 py-1 rounded-full text-xs font-medium">Grains</span>
                     <span id="product-type" class="bg-green-100 text-green-600 px-2 py-1 rounded-full text-xs font-medium">Bag-Based</span>
@@ -272,7 +272,7 @@
     </nav>
 
     <script>
-        // Load product data from localStorage
+        // Product data variable
         let productData = {};
         
         function loadProductFromInventory() {
@@ -298,7 +298,6 @@
                 };
                 updateUI();
             } else {
-                // Fallback to default data if no product in localStorage
                 productData = getDefaultProductData();
                 updateUI();
             }
