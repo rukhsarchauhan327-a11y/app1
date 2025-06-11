@@ -359,13 +359,24 @@
                         <input type="number" id="paymentAmount" class="w-full p-3 border border-gray-300 rounded-lg" placeholder="Enter amount">
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Payment Method</label>
-                        <select id="paymentMethod" class="w-full p-3 border border-gray-300 rounded-lg">
-                            <option value="cash">Cash</option>
-                            <option value="upi">UPI</option>
-                            <option value="card">Card</option>
-                            <option value="bank">Bank Transfer</option>
-                        </select>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Payment Method</label>
+                        <div class="grid grid-cols-2 gap-2 mb-3">
+                            <button id="modal-cash-btn" class="p-3 border-2 border-green-500 bg-green-100 text-green-700 rounded-lg font-medium" onclick="selectModalPayment('cash')">
+                                <i class="fa-solid fa-money-bill mr-1"></i>Cash
+                            </button>
+                            <button id="modal-online-btn" class="p-3 border border-gray-300 text-gray-600 rounded-lg font-medium" onclick="selectModalPayment('online')">
+                                <i class="fa-solid fa-credit-card mr-1"></i>Online
+                            </button>
+                        </div>
+                        
+                        <!-- Online Payment Options -->
+                        <div id="modal-online-section" class="hidden">
+                            <div class="grid grid-cols-2 gap-2 mb-3">
+                                <button id="modal-upi-btn" class="p-2 border border-gray-200 rounded-lg text-sm bg-blue-50 text-blue-600" onclick="selectModalOnlineMethod('upi')">UPI</button>
+                                <button id="modal-card-btn" class="p-2 border border-gray-200 rounded-lg text-sm bg-green-50 text-green-600" onclick="selectModalOnlineMethod('card')">Card</button>
+                            </div>
+                            <input type="text" id="modal-transaction-reference" placeholder="UPI Transaction ID" class="w-full p-2 border border-gray-300 rounded-lg text-sm">
+                        </div>
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Notes (Optional)</label>
@@ -407,9 +418,49 @@
 
     <script>
         let currentCustomer = '';
+        let modalPaymentMethod = 'cash';
+        let modalOnlineMethod = 'upi';
 
         function goBack() {
             window.history.back();
+        }
+
+        function selectModalPayment(method) {
+            modalPaymentMethod = method;
+            
+            // Reset button styles
+            document.getElementById('modal-cash-btn').className = 'p-3 border border-gray-300 text-gray-600 rounded-lg font-medium';
+            document.getElementById('modal-online-btn').className = 'p-3 border border-gray-300 text-gray-600 rounded-lg font-medium';
+            
+            // Hide online section
+            document.getElementById('modal-online-section').classList.add('hidden');
+            
+            // Highlight selected method
+            if (method === 'cash') {
+                document.getElementById('modal-cash-btn').className = 'p-3 border-2 border-green-500 bg-green-100 text-green-700 rounded-lg font-medium';
+            } else if (method === 'online') {
+                document.getElementById('modal-online-btn').className = 'p-3 border-2 border-blue-500 bg-blue-100 text-blue-700 rounded-lg font-medium';
+                document.getElementById('modal-online-section').classList.remove('hidden');
+                selectModalOnlineMethod('upi'); // Default to UPI
+            }
+        }
+
+        function selectModalOnlineMethod(method) {
+            modalOnlineMethod = method;
+            
+            // Reset button styles
+            document.getElementById('modal-upi-btn').className = 'p-2 border border-gray-200 rounded-lg text-sm bg-blue-50 text-blue-600';
+            document.getElementById('modal-card-btn').className = 'p-2 border border-gray-200 rounded-lg text-sm bg-green-50 text-green-600';
+            
+            // Update placeholder text and highlight selected button
+            const referenceInput = document.getElementById('modal-transaction-reference');
+            if (method === 'upi') {
+                document.getElementById('modal-upi-btn').className = 'p-2 border-2 border-blue-500 rounded-lg text-sm bg-blue-100 text-blue-700 font-medium';
+                referenceInput.placeholder = 'Enter UPI Transaction ID';
+            } else if (method === 'card') {
+                document.getElementById('modal-card-btn').className = 'p-2 border-2 border-green-500 rounded-lg text-sm bg-green-100 text-green-700 font-medium';
+                referenceInput.placeholder = 'Enter Card Transaction Reference';
+            }
         }
 
         function refreshCredits() {
@@ -428,8 +479,10 @@
             document.getElementById('customerName').value = customerData.name;
             document.getElementById('outstandingAmount').value = `₹${customerData.amount}`;
             document.getElementById('paymentAmount').value = '';
-            document.getElementById('paymentMethod').value = 'cash';
             document.getElementById('paymentNotes').value = '';
+            
+            // Initialize payment method selection
+            selectModalPayment('cash');
             
             document.getElementById('paymentModal').classList.remove('hidden');
         }
