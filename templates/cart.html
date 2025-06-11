@@ -886,6 +886,9 @@
 
         // Initialize
         calculateTotals();
+        
+        // Hide credit button on page load since billing tab is default
+        document.getElementById('credit-payment').classList.add('hidden');
     </script>
 
 </body>
