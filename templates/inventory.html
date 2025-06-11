@@ -883,7 +883,7 @@
                 (quantity * 1000).toFixed(0) + ' gm' : 
                 quantity.toFixed(currentProduct.type === 'weight-based' ? 3 : 0) + ' ' + currentProduct.unit + (quantity > 1 && currentProduct.type !== 'weight-based' ? 's' : '');
             
-            alert(`Added ${displayQty} of ${currentProduct.name} to cart.\nTotal: ₹${total.toFixed(2)}`);
+            console.log(`Added ${displayQty} of ${currentProduct.name} to cart. Total: ₹${total.toFixed(2)}`);
             cartModal.classList.add('hidden');
         });
 

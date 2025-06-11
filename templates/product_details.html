@@ -447,7 +447,10 @@
             cartModal.classList.remove('hidden');
         }
 
-        addToCartBtn.addEventListener('click', openCartModal);
+        addToCartBtn.addEventListener('click', () => {
+            // Navigate to cart instead of opening modal
+            window.location.href = '/cart';
+        });
 
         closeModal.addEventListener('click', () => {
             cartModal.classList.add('hidden');

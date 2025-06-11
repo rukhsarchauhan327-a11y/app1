@@ -288,7 +288,8 @@
         const maxStock = 25.5;
 
         addToCartBtn.addEventListener('click', () => {
-            cartModal.classList.remove('hidden');
+            // Navigate to cart instead of opening modal
+            window.location.href = '/cart';
         });
 
         closeModal.addEventListener('click', () => {
