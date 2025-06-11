@@ -165,14 +165,18 @@
 
     <!-- Fixed Bottom Actions -->
     <div id="bottom-actions" class="fixed bottom-16 left-0 right-0 bg-white border-t border-gray-200 p-4">
-        <div class="grid grid-cols-2 gap-3">
-            <button class="flex items-center justify-center space-x-2 bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 transition-colors" onclick="refillStock()">
-                <i class="fa-solid fa-plus text-lg"></i>
-                <span class="font-medium">Refill Stock</span>
+        <div class="grid grid-cols-3 gap-2">
+            <button class="flex items-center justify-center space-x-1 bg-blue-600 text-white py-3 px-3 rounded-lg hover:bg-blue-700 transition-colors" onclick="refillStock()">
+                <i class="fa-solid fa-plus text-sm"></i>
+                <span class="font-medium text-sm">Refill</span>
             </button>
-            <button id="add-to-cart-btn" class="flex items-center justify-center space-x-2 bg-green-600 text-white py-3 px-4 rounded-lg hover:bg-green-700 transition-colors">
-                <i class="fa-solid fa-shopping-cart text-lg"></i>
-                <span class="font-medium">Add to Cart</span>
+            <button id="add-to-cart-btn" class="flex items-center justify-center space-x-1 bg-green-600 text-white py-3 px-3 rounded-lg hover:bg-green-700 transition-colors">
+                <i class="fa-solid fa-shopping-cart text-sm"></i>
+                <span class="font-medium text-sm">Add Cart</span>
+            </button>
+            <button class="flex items-center justify-center space-x-1 bg-red-600 text-white py-3 px-3 rounded-lg hover:bg-red-700 transition-colors" onclick="deleteProduct()">
+                <i class="fa-solid fa-trash text-sm"></i>
+                <span class="font-medium text-sm">Delete</span>
             </button>
         </div>
     </div>
