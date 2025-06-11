@@ -60,5 +60,10 @@ def product_details():
     """Serve the product details page"""
     return render_template('product_details.html')
 
+@app.route('/product-details-weight')
+def product_details_weight():
+    """Serve the weight-based product details page"""
+    return render_template('product_details_weight.html')
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
