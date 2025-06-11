@@ -385,6 +385,32 @@
         <i class="fa-solid fa-plus text-xl"></i>
     </button>
 
+    <!-- Bottom Navigation -->
+    <nav id="footer" class="fixed bottom-0 left-0 right-0 bg-white shadow-lg border-t">
+        <div class="flex justify-around items-end py-2">
+            <button class="flex flex-col items-center py-1 px-3" onclick="goToDashboard()">
+                <i class="fa-solid fa-home text-gray-400 text-xl"></i>
+                <span class="text-xs mt-1 text-gray-400">Home</span>
+            </button>
+            <button class="flex flex-col items-center py-1 px-3">
+                <i class="fa-solid fa-box text-primary text-xl"></i>
+                <span class="text-xs mt-1 text-primary font-semibold">Inventory</span>
+            </button>
+            <button class="relative -top-4 bg-primary rounded-full p-4 shadow-lg">
+                <i class="fa-solid fa-barcode text-white text-xl"></i>
+            </button>
+            <button class="flex flex-col items-center py-1 px-3 relative" onclick="goToCart()">
+                <i class="fa-solid fa-shopping-cart text-gray-400 text-xl"></i>
+                <span class="text-xs mt-1 text-gray-400">Cart</span>
+                <span class="absolute -top-1 -right-1 bg-danger text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold">7</span>
+            </button>
+            <button class="flex flex-col items-center py-1 px-3">
+                <i class="fa-solid fa-user text-gray-400 text-xl"></i>
+                <span class="text-xs mt-1 text-gray-400">Profile</span>
+            </button>
+        </div>
+    </nav>
+
     <script>
         let currentFilter = 'all';
         let currentCategory = 'all';
@@ -493,6 +519,15 @@
             alert('Add New Item feature will redirect to item creation form.');
             // You can redirect to an add item form here
             // window.location.href = '/add-item';
+        }
+
+        // Navigation functions
+        function goToDashboard() {
+            window.location.href = '/dashboard';
+        }
+
+        function goToCart() {
+            window.location.href = '/cart';
         }
 
         // Initialize filters
