@@ -65,5 +65,10 @@ def product_details_weight():
     """Serve the weight-based product details page"""
     return render_template('product_details_weight.html')
 
+@app.route('/refill-stock')
+def refill_stock():
+    """Serve the refill stock page"""
+    return render_template('refill_stock.html')
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)

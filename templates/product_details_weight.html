@@ -362,9 +362,8 @@
         }
 
         function refillStock() {
-            if (confirm('Do you want to refill stock for this product?')) {
-                alert('Stock refill request has been submitted successfully!');
-            }
+            // Navigate to refill stock page
+            window.location.href = '/refill-stock';
         }
 
         function deleteProduct() {

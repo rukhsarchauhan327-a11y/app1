@@ -345,14 +345,8 @@
         }
 
         function refillStock() {
-            const quantity = prompt(`Enter quantity to add for ${productData.name} (${productData.unit}s):`);
-            
-            if (quantity && !isNaN(quantity) && parseInt(quantity) > 0) {
-                productData.stock += parseInt(quantity);
-                document.getElementById('available-stock').textContent = `${productData.stock} ${productData.unit}s`;
-                updateStockStatus();
-                alert(`Added ${quantity} ${productData.unit}s to ${productData.name} inventory.\nNew stock: ${productData.stock} ${productData.unit}s`);
-            }
+            // Navigate to refill stock page
+            window.location.href = '/refill-stock';
         }
 
         function addToCart() {

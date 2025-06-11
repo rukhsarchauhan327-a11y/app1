@@ -573,20 +573,8 @@
         }
 
         function refillItem(itemId) {
-            const item = document.getElementById(itemId);
-            const itemName = item.querySelector('h3').textContent;
-            const quantity = prompt(`Enter quantity to add for ${itemName}:`);
-            
-            if (quantity && !isNaN(quantity)) {
-                alert(`Added ${quantity} units to ${itemName} inventory.`);
-                // Update stock status if was low stock
-                const statusBadge = item.querySelector('.bg-danger');
-                if (statusBadge && statusBadge.textContent === 'Low Stock') {
-                    statusBadge.className = 'bg-primary text-white text-xs px-2 py-1 rounded-full font-semibold';
-                    statusBadge.textContent = 'In Stock';
-                    item.setAttribute('data-status', 'available');
-                }
-            }
+            // Navigate to refill stock page with item ID
+            window.location.href = `/refill-stock?id=${itemId}`;
         }
 
         // Product data structure
