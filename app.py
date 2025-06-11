@@ -65,6 +65,11 @@ def product_details_weight():
     """Serve the weight-based product details page"""
     return render_template('product_details_weight.html')
 
+@app.route('/customer-ledger')
+def customer_ledger():
+    """Serve the customer ledger page"""
+    return render_template('customer_ledger.html')
+
 @app.route('/refill-stock')
 def refill_stock():
     """Serve the refill stock page"""

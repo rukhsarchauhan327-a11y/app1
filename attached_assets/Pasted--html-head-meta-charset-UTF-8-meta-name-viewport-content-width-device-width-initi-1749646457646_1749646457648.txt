@@ -1,0 +1,417 @@
+<html><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script> window.FontAwesomeConfig = { autoReplaceSvg: 'nest'};</script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <style>::-webkit-scrollbar { display: none;}</style>
+    
+    <script>tailwind.config = {
+  "theme": {
+    "extend": {
+      "colors": {
+        "primary": "#2563eb",
+        "secondary": "#64748b",
+        "accent": "#f59e0b",
+        "success": "#10b981",
+        "danger": "#ef4444",
+        "dark": "#1e293b",
+        "light": "#f8fafc"
+      },
+      "fontFamily": {
+        "inter": [
+          "Inter",
+          "sans-serif"
+        ],
+        "sans": [
+          "Inter",
+          "sans-serif"
+        ]
+      }
+    }
+  }
+};</script>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin=""><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;500;600;700;800;900&amp;display=swap"><style>
+      body {
+        font-family: 'Inter', sans-serif !important;
+      }
+      
+      /* Preserve Font Awesome icons */
+      .fa, .fas, .far, .fal, .fab {
+        font-family: "Font Awesome 6 Free", "Font Awesome 6 Brands" !important;
+      }
+    </style><style>
+  .highlighted-section {
+    outline: 2px solid #3F20FB;
+    background-color: rgba(63, 32, 251, 0.1);
+  }
+
+  .edit-button {
+    position: absolute;
+    z-index: 1000;
+  }
+
+  ::-webkit-scrollbar {
+    display: none;
+  }
+
+  html, body {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  </style></head>
+<body class="font-inter bg-gray-50">
+    <!-- Header Section -->
+    <header id="header" class="bg-white border-b border-gray-200 fixed top-0 left-0 right-0 z-10">
+        <div class="flex items-center justify-between px-4 py-3">
+            <button class="p-2 hover:bg-gray-100 rounded-lg">
+                <i class="fa-solid fa-arrow-left text-gray-600 text-lg"></i>
+            </button>
+            <div class="text-center">
+                <h1 class="text-lg font-semibold text-dark">Customer Ledger</h1>
+                <p class="text-xs text-gray-500">Rajesh Kumar</p>
+            </div>
+            <button class="p-2 hover:bg-gray-100 rounded-lg">
+                <i class="fa-solid fa-plus text-gray-600 text-lg"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main id="main-content" class="pt-16 pb-20 bg-gray-50">
+        <!-- Customer Summary Card -->
+        <div id="customer-summary" class="px-4 py-4">
+            <div class="bg-white rounded-lg p-4 shadow-sm border border-gray-100">
+                <div class="flex items-center space-x-3 mb-4">
+                    <div class="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center">
+                        <span class="text-white font-bold text-lg">RK</span>
+                    </div>
+                    <div class="flex-1">
+                        <h2 class="text-lg font-bold text-dark">Rajesh Kumar</h2>
+                        <p class="text-sm text-gray-600">+91 98765 43210</p>
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-3">
+                    <div class="text-center p-3 bg-red-50 rounded-lg">
+                        <p class="text-xl font-bold text-red-600">₹2,150</p>
+                        <p class="text-xs text-red-500">Total Outstanding</p>
+                    </div>
+                    <div class="text-center p-3 bg-green-50 rounded-lg">
+                        <p class="text-xl font-bold text-green-600">₹800</p>
+                        <p class="text-xs text-green-500">Cash Advanced</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filter Section -->
+        <div id="filter-section" class="px-4 mb-4">
+            <div class="bg-white rounded-lg p-3 shadow-sm border border-gray-100">
+                <div class="flex items-center justify-between mb-3">
+                    <h3 class="font-medium text-dark">Filter Transactions</h3>
+                    <button id="clear-filters" class="text-xs text-gray-500">Clear All</button>
+                </div>
+                <div class="flex space-x-2 overflow-x-auto">
+                    <button class="filter-btn active px-3 py-1 bg-primary text-white text-sm rounded-full whitespace-nowrap" data-filter="all">All</button>
+                    <button class="filter-btn px-3 py-1 bg-gray-200 text-gray-600 text-sm rounded-full whitespace-nowrap" data-filter="purchase">Purchases</button>
+                    <button class="filter-btn px-3 py-1 bg-gray-200 text-gray-600 text-sm rounded-full whitespace-nowrap" data-filter="payment">Payments</button>
+                    <button class="filter-btn px-3 py-1 bg-gray-200 text-gray-600 text-sm rounded-full whitespace-nowrap" data-filter="cash-advance">Cash Advance</button>
+                    <button class="filter-btn px-3 py-1 bg-gray-200 text-gray-600 text-sm rounded-full whitespace-nowrap" data-filter="split">Split Payment</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Ledger Entries -->
+        <div id="ledger-entries" class="px-4 space-y-3">
+            <!-- Purchase Entry -->
+            <div class="transaction-entry bg-white rounded-lg p-4 shadow-sm border-l-4 border-red-400" data-type="purchase">
+                <div class="flex items-start justify-between mb-3">
+                    <div class="flex-1">
+                        <div class="flex items-center space-x-2 mb-1">
+                            <i class="fa-solid fa-shopping-cart text-red-500 text-sm"></i>
+                            <h3 class="font-semibold text-dark">Purchase - Bill #001234</h3>
+                        </div>
+                        <p class="text-xs text-gray-500">Today, 2:30 PM</p>
+                        <div class="flex items-center space-x-1 mt-1">
+                            <i class="fa-solid fa-user text-gray-400 text-xs"></i>
+                            <p class="text-xs text-gray-600">Served by: Anil Kumar</p>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <p class="font-bold text-red-600">₹450</p>
+                        <span class="text-xs bg-red-100 text-red-600 px-2 py-1 rounded">Credit</span>
+                    </div>
+                </div>
+                <div class="text-sm text-gray-600 mb-2">
+                    <p>Aashirvaad Atta 5kg, Tata Salt 1kg, Good Day Biscuits</p>
+                </div>
+                <div class="flex items-center justify-between text-xs text-gray-500">
+                    <span>Running Balance: ₹2,150</span>
+                    <button class="text-primary">View Details</button>
+                </div>
+            </div>
+
+            <!-- Split Payment Entry -->
+            <div class="transaction-entry bg-white rounded-lg p-4 shadow-sm border-l-4 border-orange-400" data-type="split">
+                <div class="flex items-start justify-between mb-3">
+                    <div class="flex-1">
+                        <div class="flex items-center space-x-2 mb-1">
+                            <i class="fa-solid fa-arrows-split-up-and-left text-orange-500 text-sm"></i>
+                            <h3 class="font-semibold text-dark">Split Payment - Bill #001198</h3>
+                        </div>
+                        <p class="text-xs text-gray-500">Yesterday, 11:45 AM</p>
+                        <div class="flex items-center space-x-1 mt-1">
+                            <i class="fa-solid fa-user text-gray-400 text-xs"></i>
+                            <p class="text-xs text-gray-600">Served by: Priya Sharma</p>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <p class="font-bold text-dark">₹320</p>
+                        <span class="text-xs bg-orange-100 text-orange-600 px-2 py-1 rounded">Partial</span>
+                    </div>
+                </div>
+                <div class="bg-gray-50 rounded p-3 mb-2">
+                    <div class="space-y-1 text-sm">
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">Total Bill Amount:</span>
+                            <span class="text-dark font-medium">₹320</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">Cash Paid:</span>
+                            <span class="text-green-600 font-medium">₹150</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">Credit Amount:</span>
+                            <span class="text-red-600 font-medium">₹170</span>
+                        </div>
+                    </div>
+                    <div class="mt-2 pt-2 border-t border-gray-200">
+                        <p class="text-xs text-gray-600">Remarks: Customer paid half amount, remaining on credit</p>
+                    </div>
+                </div>
+                <div class="flex items-center justify-between text-xs text-gray-500">
+                    <span>Running Balance: ₹1,700</span>
+                    <button class="text-primary">View Receipt</button>
+                </div>
+            </div>
+
+            <!-- Payment Entry -->
+            <div class="transaction-entry bg-white rounded-lg p-4 shadow-sm border-l-4 border-green-400" data-type="payment">
+                <div class="flex items-start justify-between mb-3">
+                    <div class="flex-1">
+                        <div class="flex items-center space-x-2 mb-1">
+                            <i class="fa-solid fa-money-bill text-green-500 text-sm"></i>
+                            <h3 class="font-semibold text-dark">Payment Received</h3>
+                        </div>
+                        <p class="text-xs text-gray-500">2 days ago, 4:15 PM</p>
+                        <div class="flex items-center space-x-1 mt-1">
+                            <i class="fa-solid fa-user text-gray-400 text-xs"></i>
+                            <p class="text-xs text-gray-600">Received by: Rajesh Sharma</p>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <p class="font-bold text-green-600">₹500</p>
+                        <span class="text-xs bg-green-100 text-green-600 px-2 py-1 rounded">Received</span>
+                    </div>
+                </div>
+                <div class="bg-green-50 rounded p-3 mb-2">
+                    <div class="space-y-1 text-sm">
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">Payment Method:</span>
+                            <span class="text-dark font-medium">Cash</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">Reference:</span>
+                            <span class="text-dark font-medium">PMT-001</span>
+                        </div>
+                    </div>
+                    <div class="mt-2 pt-2 border-t border-green-200">
+                        <p class="text-xs text-gray-600">Remarks: Partial payment for previous purchases</p>
+                    </div>
+                </div>
+                <div class="flex items-center justify-between text-xs text-gray-500">
+                    <span>Running Balance: ₹1,530</span>
+                    <button class="text-primary">Print Receipt</button>
+                </div>
+            </div>
+
+            <!-- Cash Advance Entry -->
+            <div class="transaction-entry bg-white rounded-lg p-4 shadow-sm border-l-4 border-purple-400" data-type="cash-advance">
+                <div class="flex items-start justify-between mb-3">
+                    <div class="flex-1">
+                        <div class="flex items-center space-x-2 mb-1">
+                            <i class="fa-solid fa-hand-holding-dollar text-purple-500 text-sm"></i>
+                            <h3 class="font-semibold text-dark">Cash Advance Given</h3>
+                        </div>
+                        <p class="text-xs text-gray-500">5 days ago, 2:20 PM</p>
+                        <div class="flex items-center space-x-1 mt-1">
+                            <i class="fa-solid fa-user text-gray-400 text-xs"></i>
+                            <p class="text-xs text-gray-600">Given by: Rajesh Sharma</p>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <p class="font-bold text-purple-600">₹800</p>
+                        <span class="text-xs bg-purple-100 text-purple-600 px-2 py-1 rounded">Advanced</span>
+                    </div>
+                </div>
+                <div class="bg-purple-50 rounded p-3 mb-2">
+                    <div class="space-y-1 text-sm">
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">Advance ID:</span>
+                            <span class="text-dark font-medium">ADV-001</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">Expected Return:</span>
+                            <span class="text-dark font-medium">15 days</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">Amount Adjusted:</span>
+                            <span class="text-green-600 font-medium">₹0</span>
+                        </div>
+                    </div>
+                    <div class="mt-2 pt-2 border-t border-purple-200">
+                        <p class="text-xs text-gray-600">Remarks: Family emergency - medical expenses</p>
+                    </div>
+                </div>
+                <div class="flex items-center justify-between text-xs text-gray-500">
+                    <span>Running Balance: ₹2,030</span>
+                    <button class="text-primary">Adjust Amount</button>
+                </div>
+            </div>
+
+            <!-- Purchase with Cash Adjustment -->
+            <div class="transaction-entry bg-white rounded-lg p-4 shadow-sm border-l-4 border-blue-400" data-type="purchase">
+                <div class="flex items-start justify-between mb-3">
+                    <div class="flex-1">
+                        <div class="flex items-center space-x-2 mb-1">
+                            <i class="fa-solid fa-shopping-cart text-blue-500 text-sm"></i>
+                            <h3 class="font-semibold text-dark">Purchase - Bill #001156</h3>
+                        </div>
+                        <p class="text-xs text-gray-500">1 week ago, 10:30 AM</p>
+                        <div class="flex items-center space-x-1 mt-1">
+                            <i class="fa-solid fa-user text-gray-400 text-xs"></i>
+                            <p class="text-xs text-gray-600">Served by: Anil Kumar</p>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <p class="font-bold text-blue-600">₹230</p>
+                        <span class="text-xs bg-blue-100 text-blue-600 px-2 py-1 rounded">Adjusted</span>
+                    </div>
+                </div>
+                <div class="bg-blue-50 rounded p-3 mb-2">
+                    <div class="space-y-1 text-sm">
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">Bill Amount:</span>
+                            <span class="text-dark font-medium">₹230</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">Cash Advance Used:</span>
+                            <span class="text-purple-600 font-medium">₹230</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">Customer Paid:</span>
+                            <span class="text-green-600 font-medium">₹0</span>
+                        </div>
+                    </div>
+                    <div class="mt-2 pt-2 border-t border-blue-200">
+                        <p class="text-xs text-gray-600">Remarks: Amount adjusted from advance ADV-001</p>
+                    </div>
+                </div>
+                <div class="flex items-center justify-between text-xs text-gray-500">
+                    <span>Running Balance: ₹1,230</span>
+                    <button class="text-primary">View Bill</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Add Transaction Button -->
+        <div id="add-transaction" class="px-4 py-4">
+            <button id="add-transaction-btn" class="w-full bg-primary text-white py-3 rounded-lg font-medium shadow-sm">
+                <i class="fa-solid fa-plus mr-2"></i>Add Manual Entry
+            </button>
+        </div>
+
+        <!-- Quick Actions -->
+        <div id="quick-actions" class="px-4 py-2">
+            <div class="grid grid-cols-2 gap-3">
+                <button class="bg-green-600 text-white py-3 rounded-lg text-sm font-medium">
+                    <i class="fa-solid fa-money-bill mr-2"></i>Record Payment
+                </button>
+                <button class="bg-orange-500 text-white py-3 rounded-lg text-sm font-medium">
+                    <i class="fa-solid fa-hand-holding-dollar mr-2"></i>Cash Advance
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <!-- Bottom Navigation -->
+    <nav id="footer" class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200">
+        <div class="flex justify-around items-end py-2">
+            <button class="flex flex-col items-center py-1 px-3">
+                <i class="fa-solid fa-home text-gray-400 text-lg"></i>
+                <span class="text-xs mt-1 text-gray-400">Home</span>
+            </button>
+            <button class="flex flex-col items-center py-1 px-3">
+                <i class="fa-solid fa-box text-gray-400 text-lg"></i>
+                <span class="text-xs mt-1 text-gray-400">Inventory</span>
+            </button>
+            <button class="relative -top-3 bg-primary rounded-full p-3 shadow-lg">
+                <i class="fa-solid fa-barcode text-white text-lg"></i>
+            </button>
+            <button class="flex flex-col items-center py-1 px-3">
+                <i class="fa-solid fa-shopping-cart text-gray-400 text-lg"></i>
+                <span class="text-xs mt-1 text-gray-400">Cart</span>
+            </button>
+            <button class="flex flex-col items-center py-1 px-3">
+                <i class="fa-solid fa-user text-gray-400 text-lg"></i>
+                <span class="text-xs mt-1 text-gray-400">Profile</span>
+            </button>
+        </div>
+    </nav>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const filterBtns = document.querySelectorAll('.filter-btn');
+            const transactionEntries = document.querySelectorAll('.transaction-entry');
+            const clearFiltersBtn = document.getElementById('clear-filters');
+            
+            filterBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const filter = this.getAttribute('data-filter');
+                    
+                    filterBtns.forEach(b => {
+                        b.classList.remove('active', 'bg-primary', 'text-white');
+                        b.classList.add('bg-gray-200', 'text-gray-600');
+                    });
+                    
+                    this.classList.remove('bg-gray-200', 'text-gray-600');
+                    this.classList.add('active', 'bg-primary', 'text-white');
+                    
+                    transactionEntries.forEach(entry => {
+                        if (filter === 'all' || entry.getAttribute('data-type') === filter) {
+                            entry.style.display = 'block';
+                        } else {
+                            entry.style.display = 'none';
+                        }
+                    });
+                });
+            });
+            
+            clearFiltersBtn.addEventListener('click', function() {
+                filterBtns.forEach(btn => {
+                    btn.classList.remove('active', 'bg-primary', 'text-white');
+                    btn.classList.add('bg-gray-200', 'text-gray-600');
+                });
+                
+                filterBtns[0].classList.remove('bg-gray-200', 'text-gray-600');
+                filterBtns[0].classList.add('active', 'bg-primary', 'text-white');
+                
+                transactionEntries.forEach(entry => {
+                    entry.style.display = 'block';
+                });
+            });
+        });
+    </script>
+
+</body></html>
