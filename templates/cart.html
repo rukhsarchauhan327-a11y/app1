@@ -122,18 +122,15 @@
             <!-- Customer Search Section -->
             <div id="customer-section" class="mt-3 hidden">
                 <div class="relative">
-                    <input type="text" placeholder="Search customer..." class="w-full p-2 border border-gray-200 rounded-lg pr-10 text-sm">
+                    <input type="text" id="customer-search-input" placeholder="Search customer..." class="w-full p-2 border border-gray-200 rounded-lg pr-10 text-sm" oninput="filterCustomers(this.value)">
                     <i class="fa-solid fa-search absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
                 </div>
-                <div class="mt-2 space-y-2">
-                    <div class="p-2 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100" onclick="selectCustomer('Rajesh Kumar')">
-                        <p class="font-medium text-dark text-sm">Rajesh Kumar</p>
-                        <p class="text-xs text-gray-600">+91 9876543210</p>
-                    </div>
-                    <div class="p-2 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100" onclick="selectCustomer('Priya Sharma')">
-                        <p class="font-medium text-dark text-sm">Priya Sharma</p>
-                        <p class="text-xs text-gray-600">+91 9876543211</p>
-                    </div>
+                <div id="customer-results" class="mt-2 space-y-2 hidden">
+                    <!-- Customer results will appear here when searching -->
+                </div>
+                <div id="no-search-message" class="mt-4 text-center text-gray-500 text-sm">
+                    <i class="fa-solid fa-search text-gray-400 text-lg mb-2"></i>
+                    <p>Start typing to search customers</p>
                 </div>
             </div>
 
@@ -478,8 +475,62 @@
             }
         }
 
+        // Customer database
+        const customers = [
+            { name: 'Rajesh Kumar', phone: '+91 98765 43210', outstanding: '₹2,150' },
+            { name: 'Priya Sharma', phone: '+91 98765 43211', outstanding: '₹850' },
+            { name: 'Amit Singh', phone: '+91 98765 43212', outstanding: 'No Outstanding' },
+            { name: 'Sunita Devi', phone: '+91 98765 43213', outstanding: '₹1,200' },
+            { name: 'Ravi Patel', phone: '+91 98765 43214', outstanding: '₹500' },
+            { name: 'Meera Gupta', phone: '+91 98765 43215', outstanding: '₹750' },
+            { name: 'Arjun Reddy', phone: '+91 98765 43216', outstanding: 'No Outstanding' },
+            { name: 'Kavita Jain', phone: '+91 98765 43217', outstanding: '₹1,800' }
+        ];
+
+        function filterCustomers(searchTerm) {
+            const resultsContainer = document.getElementById('customer-results');
+            const noSearchMessage = document.getElementById('no-search-message');
+            
+            if (searchTerm.length === 0) {
+                resultsContainer.classList.add('hidden');
+                resultsContainer.innerHTML = '';
+                noSearchMessage.classList.remove('hidden');
+                return;
+            }
+            
+            const filteredCustomers = customers.filter(customer => 
+                customer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                customer.phone.includes(searchTerm)
+            );
+            
+            if (filteredCustomers.length > 0) {
+                noSearchMessage.classList.add('hidden');
+                resultsContainer.classList.remove('hidden');
+                
+                resultsContainer.innerHTML = filteredCustomers.map(customer => `
+                    <div class="p-2 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100" onclick="selectCustomer('${customer.name}')">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <p class="font-medium text-dark text-sm">${customer.name}</p>
+                                <p class="text-xs text-gray-600">${customer.phone}</p>
+                            </div>
+                            <span class="text-xs ${customer.outstanding === 'No Outstanding' ? 'text-green-500' : 'text-red-500'} font-medium">${customer.outstanding}</span>
+                        </div>
+                    </div>
+                `).join('');
+            } else {
+                noSearchMessage.classList.add('hidden');
+                resultsContainer.classList.remove('hidden');
+                resultsContainer.innerHTML = '<div class="p-4 text-center text-gray-500 text-sm">No customers found</div>';
+            }
+        }
+
         function selectCustomer(name) {
             document.getElementById('bill-customer-name').value = name;
+            document.getElementById('customer-search-input').value = '';
+            document.getElementById('customer-results').classList.add('hidden');
+            document.getElementById('customer-results').innerHTML = '';
+            document.getElementById('no-search-message').classList.remove('hidden');
             showBillingTab();
         }
 
