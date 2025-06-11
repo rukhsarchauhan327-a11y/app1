@@ -757,27 +757,22 @@
         }
 
         function viewProductDetails(itemId) {
-            console.log('Viewing product details for:', itemId);
-            console.log('Available product data:', Object.keys(productData));
-            
             // Get product data to determine routing
             const product = productData[itemId];
-            console.log('Product found:', product);
             
             if (product) {
+                // Store product data in localStorage for the detail page
+                localStorage.setItem('currentProduct', JSON.stringify(product));
+                localStorage.setItem('currentProductId', itemId);
+                
                 // Route to appropriate product details page based on product type
-                console.log('Product type:', product.type);
                 if (product.type === 'weight-based') {
-                    console.log('Routing to weight-based product details');
                     window.location.href = '/product-details-weight';
                 } else {
-                    console.log('Routing to regular product details');
                     window.location.href = '/product-details';
                 }
             } else {
-                console.error('Product not found for ID:', itemId);
-                alert('Product data not found for ' + itemId);
-                // Default to regular product details if product not found
+                alert('Product data not found');
                 window.location.href = '/product-details';
             }
         }

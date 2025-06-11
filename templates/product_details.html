@@ -272,16 +272,22 @@
     </nav>
 
     <script>
-        // Sample product data - in a real app, this would come from the server
-        let productData = {
-            id: 1,
-            name: "Aashirvaad Atta",
-            description: "Premium quality wheat flour for daily use",
-            category: "Grains",
-            type: "Bag-Based",
-            purchasePrice: 90,
-            sellingPrice: 120,
-            unit: "Bag",
+        // Load product data from localStorage
+        let productData = {};
+        
+        function loadProductFromInventory() {
+            const storedProduct = localStorage.getItem('currentProduct');
+            if (storedProduct) {
+                const product = JSON.parse(storedProduct);
+                productData = {
+                    id: localStorage.getItem('currentProductId') || '1',
+                    name: product.name,
+                    description: `Premium quality ${product.name.toLowerCase()} for daily use`,
+                    category: "Grocery",
+                    type: product.type === 'regular' ? "Unit-Based" : "Weight-Based",
+                    purchasePrice: Math.round(product.price * 0.8),
+                    sellingPrice: product.price,
+                    unit: product.unit,
             stock: 5,
             size: "10 Kg",
             threshold: 5,

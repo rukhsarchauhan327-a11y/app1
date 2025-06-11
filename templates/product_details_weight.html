@@ -66,15 +66,15 @@
         <!-- Product Image Section -->
         <div class="bg-white px-4 py-6">
             <div class="flex justify-center">
-                <img class="w-48 h-48 rounded-lg object-cover border border-gray-200" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/c17cf1f603-c63583a41c10eef051a5.png" alt="premium basmati rice 25kg sack white background product photography">
+                <img id="product-image" class="w-48 h-48 rounded-lg object-cover border border-gray-200" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/ad8aa6cee1-b621e3cd72c9ea714c53.png" alt="product image">
             </div>
         </div>
 
         <!-- Product Info Section -->
         <div class="bg-white mt-2 px-4 py-4">
             <div class="mb-4">
-                <h2 class="text-xl font-bold text-dark mb-1">Basmati Rice Premium</h2>
-                <p class="text-sm text-gray-600 mb-2">Premium quality long grain rice for daily cooking</p>
+                <h2 id="product-name" class="text-xl font-bold text-dark mb-1">Loading...</h2>
+                <p class="text-sm text-gray-600 mb-2">Premium quality product for daily use</p>
                 <div class="flex items-center space-x-2 mb-2">
                     <span class="bg-blue-100 text-blue-600 px-2 py-1 rounded-full text-xs font-medium">Grains</span>
                     <span class="bg-green-100 text-green-600 px-2 py-1 rounded-full text-xs font-medium">Weight-Based</span>
@@ -373,8 +373,41 @@
             }
         }
 
-        // Initialize calculations
-        updateFromQuantity();
+        // Load product data from localStorage
+        function loadProductData() {
+            const productData = localStorage.getItem('currentProduct');
+            if (productData) {
+                const product = JSON.parse(productData);
+                
+                // Update product name
+                document.getElementById('product-name').textContent = product.name;
+                
+                // Update product image
+                document.getElementById('product-image').src = product.image;
+                document.getElementById('product-image').alt = product.name;
+                
+                // Update pricing (using product price as selling price)
+                const sellingPriceElement = document.querySelector('.text-green-600:last-child');
+                if (sellingPriceElement) {
+                    sellingPriceElement.textContent = `₹${product.price}/${product.unit}`;
+                }
+                
+                // Update stock information
+                const stockElement = document.querySelector('.text-blue-600');
+                if (stockElement) {
+                    stockElement.textContent = `${product.stock} ${product.stockUnit}`;
+                }
+                
+                // Update unit price for calculations
+                unitPrice = product.price;
+            }
+        }
+
+        // Initialize on page load
+        window.addEventListener('load', function() {
+            loadProductData();
+            updateFromQuantity();
+        });
     </script>
 </body>
 </html>
