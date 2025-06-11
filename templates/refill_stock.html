@@ -106,6 +106,10 @@
                     <select id="unit-select" class="px-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                         <option value="kg">Kg</option>
                         <option value="gm">Gram</option>
+                        <option value="units">Units</option>
+                        <option value="bottles">Bottles</option>
+                        <option value="bags">Bags</option>
+                        <option value="packs">Packs</option>
                     </select>
                 </div>
             </div>
@@ -123,12 +127,12 @@
             <div class="bg-gray-50 p-4 rounded-lg mb-4">
                 <div class="grid grid-cols-2 gap-4">
                     <div>
-                        <p class="text-xs text-gray-500 mb-1">Price per Kg</p>
-                        <p class="text-lg font-bold text-dark" id="price-per-kg">₹80</p>
+                        <p id="price-label" class="text-xs text-gray-500 mb-1">Price per Unit</p>
+                        <p class="text-lg font-bold text-dark" id="price-per-kg">₹0</p>
                     </div>
                     <div>
                         <p class="text-xs text-gray-500 mb-1">New Total Stock</p>
-                        <p class="text-lg font-bold text-green-600" id="new-total">40.5 Kg</p>
+                        <p class="text-lg font-bold text-green-600" id="new-total">0 Units</p>
                     </div>
                 </div>
             </div>
@@ -229,22 +233,46 @@
     </nav>
 
     <script>
-        // Product data - this would normally come from URL parameters or API
-        const productData = {
-            name: 'Basmati Rice',
-            image: 'https://storage.googleapis.com/uxpilot-auth.appspot.com/c17cf1f603-c63583a41c10eef051a5.png',
-            size: 'Premium Quality',
-            category: 'Grains',
-            type: 'Weight-Based',
-            currentStock: 15.5,
-            threshold: 5,
-            unit: 'Kg',
-            unitPlural: 'Kg',
-            currentSellingPrice: 90
-        };
+        // Load product data from localStorage
+        let productData = {};
+        
+        function loadProductData() {
+            const storedProduct = localStorage.getItem('currentProduct');
+            if (storedProduct) {
+                const product = JSON.parse(storedProduct);
+                productData = {
+                    name: product.name,
+                    image: product.image,
+                    size: product.size || 'Premium Quality',
+                    category: 'Grocery',
+                    type: product.type === 'weight-based' ? 'Weight-Based' : 'Unit-Based',
+                    currentStock: product.stock,
+                    threshold: product.type === 'weight-based' ? 1 : 5,
+                    unit: product.stockUnit || product.unit,
+                    unitPlural: product.stockUnit || product.unit,
+                    currentSellingPrice: product.price
+                };
+            } else {
+                // Default fallback data
+                productData = {
+                    name: 'Product',
+                    image: 'https://storage.googleapis.com/uxpilot-auth.appspot.com/c17cf1f603-c63583a41c10eef051a5.png',
+                    size: 'Premium Quality',
+                    category: 'Grocery',
+                    type: 'Unit-Based',
+                    currentStock: 15,
+                    threshold: 5,
+                    unit: 'Units',
+                    unitPlural: 'Units',
+                    currentSellingPrice: 50
+                };
+            }
+        }
 
         // Initialize page with product data
         function initializePage() {
+            loadProductData();
+            
             document.getElementById('product-image').src = productData.image;
             document.getElementById('product-name').textContent = productData.name;
             document.getElementById('product-size').textContent = productData.size;
@@ -253,25 +281,79 @@
             document.getElementById('current-stock').textContent = `${productData.currentStock} ${productData.unit}`;
             document.getElementById('stock-threshold').textContent = `${productData.threshold} ${productData.unit}`;
             
+            // Set appropriate unit options based on product type
+            setupUnitSelector();
+            
+            // Update price label based on product type
+            const priceLabel = document.getElementById('price-label');
+            if (productData.type === 'Weight-Based') {
+                priceLabel.textContent = 'Price per Kg';
+            } else {
+                priceLabel.textContent = `Price per ${productData.unit}`;
+            }
+            
+            // Clear default values and set appropriate defaults
+            document.getElementById('quantity-input').value = '';
+            document.getElementById('purchase-price').value = '';
+            
             updateCalculations();
         }
 
-        // Calculate weight-based values
+        function setupUnitSelector() {
+            const unitSelect = document.getElementById('unit-select');
+            const productUnit = productData.unit.toLowerCase();
+            
+            // Clear existing options
+            unitSelect.innerHTML = '';
+            
+            if (productData.type === 'Weight-Based') {
+                unitSelect.innerHTML = `
+                    <option value="kg">Kg</option>
+                    <option value="gm">Gram</option>
+                `;
+            } else {
+                // For unit-based products, use the actual unit
+                const unitOptions = {
+                    'bottles': 'Bottles',
+                    'bags': 'Bags',
+                    'packs': 'Packs',
+                    'units': 'Units',
+                    'boxes': 'Boxes'
+                };
+                
+                const unitKey = productUnit.replace(/s$/, ''); // Remove 's' if present
+                const displayUnit = unitOptions[unitKey] || 'Units';
+                
+                unitSelect.innerHTML = `<option value="${unitKey}">${displayUnit}</option>`;
+            }
+        }
+
+        // Calculate values based on product type
         function updateCalculations() {
             const quantity = parseFloat(document.getElementById('quantity-input').value) || 0;
             const purchasePrice = parseFloat(document.getElementById('purchase-price').value) || 0;
             const unit = document.getElementById('unit-select').value;
             
-            let quantityInKg = quantity;
-            if (unit === 'gm') {
-                quantityInKg = quantity / 1000;
+            if (productData.type === 'Weight-Based') {
+                // Weight-based calculations
+                let quantityInKg = quantity;
+                if (unit === 'gm') {
+                    quantityInKg = quantity / 1000;
+                }
+                
+                const pricePerKg = quantityInKg > 0 ? (purchasePrice / quantityInKg).toFixed(0) : 0;
+                const newTotal = productData.currentStock + quantityInKg;
+                
+                document.getElementById('price-per-kg').textContent = `₹${pricePerKg}/Kg`;
+                document.getElementById('new-total').textContent = `${newTotal.toFixed(1)} Kg`;
+            } else {
+                // Unit-based calculations
+                const pricePerUnit = quantity > 0 ? (purchasePrice / quantity).toFixed(0) : 0;
+                const newTotal = productData.currentStock + quantity;
+                
+                document.getElementById('price-per-kg').textContent = `₹${pricePerUnit}/${productData.unit}`;
+                document.getElementById('new-total').textContent = `${newTotal} ${productData.unit}`;
             }
-            
-            const pricePerKg = quantityInKg > 0 ? (purchasePrice / quantityInKg).toFixed(0) : 0;
-            const newTotal = productData.currentStock + quantityInKg;
-            
-            document.getElementById('price-per-kg').textContent = `₹${pricePerKg}`;
-            document.getElementById('new-total').textContent = `${newTotal.toFixed(1)} Kg`;
             
             // Update selling price calculations
             updateSellingPriceCalculations();
