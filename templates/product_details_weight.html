@@ -94,10 +94,10 @@
             </div>
 
             <!-- Stock Info -->
-            <div class="bg-blue-50 p-4 rounded-lg mb-4">
+            <div id="stock-info" class="bg-blue-50 p-4 rounded-lg mb-4">
                 <div class="flex items-center justify-between mb-2">
                     <h3 class="font-semibold text-dark">Stock Information</h3>
-                    <span class="bg-green-500 text-white px-2 py-1 rounded-full text-xs">In Stock</span>
+                    <span id="stock-status" class="bg-green-500 text-white px-2 py-1 rounded-full text-xs">In Stock</span>
                 </div>
                 <div class="grid grid-cols-3 gap-3 text-center">
                     <div>
@@ -395,8 +395,43 @@
                 // Update stock information
                 document.getElementById('available-stock').textContent = `${product.stock} ${product.stockUnit}`;
                 
+                // Update stock status with proper levels
+                updateStockStatus(product);
+                
                 // Update unit price for calculations
                 unitPrice = product.price;
+            }
+        }
+
+        function updateStockStatus(product) {
+            const stockInfo = document.getElementById('stock-info');
+            const stockStatus = document.getElementById('stock-status');
+            const availableStock = document.getElementById('available-stock');
+            
+            // Calculate stock levels - for weight-based products, use different thresholds
+            const lowThreshold = 1;  // 1 kg/unit is low
+            const mediumThreshold = 5; // 5 kg/units is medium
+            
+            if (product.stock === 0) {
+                stockInfo.className = 'bg-red-50 p-4 rounded-lg mb-4';
+                stockStatus.className = 'bg-red-500 text-white px-2 py-1 rounded-full text-xs';
+                stockStatus.textContent = 'Out of Stock';
+                availableStock.className = 'text-lg font-bold text-red-600';
+            } else if (product.stock <= lowThreshold) {
+                stockInfo.className = 'bg-orange-50 p-4 rounded-lg mb-4';
+                stockStatus.className = 'bg-orange-500 text-white px-2 py-1 rounded-full text-xs';
+                stockStatus.textContent = 'Low Stock';
+                availableStock.className = 'text-lg font-bold text-orange-600';
+            } else if (product.stock <= mediumThreshold) {
+                stockInfo.className = 'bg-yellow-50 p-4 rounded-lg mb-4';
+                stockStatus.className = 'bg-yellow-500 text-white px-2 py-1 rounded-full text-xs';
+                stockStatus.textContent = 'Medium Stock';
+                availableStock.className = 'text-lg font-bold text-yellow-600';
+            } else {
+                stockInfo.className = 'bg-green-50 p-4 rounded-lg mb-4';
+                stockStatus.className = 'bg-green-500 text-white px-2 py-1 rounded-full text-xs';
+                stockStatus.textContent = 'High Stock';
+                availableStock.className = 'text-lg font-bold text-green-600';
             }
         }
 

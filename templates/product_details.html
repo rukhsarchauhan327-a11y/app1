@@ -354,16 +354,25 @@
             const stockStatus = document.getElementById('stock-status');
             const availableStock = document.getElementById('available-stock');
             
-            if (productData.stock <= productData.threshold) {
-                stockInfo.className = 'bg-orange-50 p-4 rounded-lg mb-4';
-                stockStatus.className = 'bg-orange-500 text-white px-2 py-1 rounded-full text-xs';
-                stockStatus.textContent = 'Low Stock';
-                availableStock.className = 'text-lg font-bold text-orange-600';
-            } else if (productData.stock === 0) {
+            // Calculate stock levels based on thresholds
+            const lowThreshold = 5;  // 5 units or less = low stock
+            const mediumThreshold = 15; // 6-15 units = medium stock
+            
+            if (productData.stock === 0) {
                 stockInfo.className = 'bg-red-50 p-4 rounded-lg mb-4';
                 stockStatus.className = 'bg-red-500 text-white px-2 py-1 rounded-full text-xs';
                 stockStatus.textContent = 'Out of Stock';
                 availableStock.className = 'text-lg font-bold text-red-600';
+            } else if (productData.stock <= lowThreshold) {
+                stockInfo.className = 'bg-orange-50 p-4 rounded-lg mb-4';
+                stockStatus.className = 'bg-orange-500 text-white px-2 py-1 rounded-full text-xs';
+                stockStatus.textContent = 'Low Stock';
+                availableStock.className = 'text-lg font-bold text-orange-600';
+            } else if (productData.stock <= mediumThreshold) {
+                stockInfo.className = 'bg-yellow-50 p-4 rounded-lg mb-4';
+                stockStatus.className = 'bg-yellow-500 text-white px-2 py-1 rounded-full text-xs';
+                stockStatus.textContent = 'Medium Stock';
+                availableStock.className = 'text-lg font-bold text-yellow-600';
             } else {
                 stockInfo.className = 'bg-green-50 p-4 rounded-lg mb-4';
                 stockStatus.className = 'bg-green-500 text-white px-2 py-1 rounded-full text-xs';
