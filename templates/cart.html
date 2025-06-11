@@ -746,6 +746,11 @@
             document.getElementById('split-payment-section').classList.add('hidden');
             document.getElementById('credit-payment-section').classList.add('hidden');
             
+            // Ensure credit button is hidden for billing customers
+            if (currentTab === 'billing') {
+                document.getElementById('credit-payment').classList.add('hidden');
+            }
+            
             // Show active payment method
             if (mode === 'cash') {
                 document.getElementById('cash-payment').className = 'flex-1 py-2 px-2 rounded-full bg-primary text-white font-medium text-xs';
