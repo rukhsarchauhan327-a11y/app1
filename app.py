@@ -70,6 +70,11 @@ def customer_ledger():
     """Serve the customer ledger page"""
     return render_template('customer_ledger.html')
 
+@app.route('/receipt')
+def receipt():
+    """Serve the receipt page"""
+    return render_template('receipt.html')
+
 @app.route('/refill-stock')
 def refill_stock():
     """Serve the refill stock page"""
