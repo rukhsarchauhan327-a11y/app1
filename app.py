@@ -95,6 +95,11 @@ def pending_credits():
     """Serve the pending credits page"""
     return render_template('pending_credits.html')
 
+@app.route('/settings')
+def settings():
+    """Serve the settings page"""
+    return render_template('settings.html')
+
 @app.route('/refill-stock')
 def refill_stock():
     """Serve the refill stock page"""

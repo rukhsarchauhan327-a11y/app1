@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings - Kirana Konnect</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#2563eb',
+                        secondary: '#64748b',
+                        accent: '#f59e0b',
+                        success: '#10b981',
+                        danger: '#ef4444',
+                        dark: '#1e293b',
+                        light: '#f8fafc'
+                    },
+                    fontFamily: {
+                        inter: ['Inter', 'sans-serif'],
+                        sans: ['Inter', 'sans-serif']
+                    }
+                }
+            }
+        };
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif !important;
+        }
+        .fa, .fas, .far, .fal, .fab {
+            font-family: "Font Awesome 6 Free", "Font Awesome 6 Brands" !important;
+        }
+        ::-webkit-scrollbar {
+            display: none;
+        }
+        html, body {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        .toggle-switch {
+            width: 48px;
+            height: 24px;
+            background-color: #d1d5db;
+            border-radius: 12px;
+            position: relative;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .toggle-switch.active {
+            background-color: #2563eb;
+        }
+        .toggle-switch::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background-color: white;
+            top: 2px;
+            left: 2px;
+            transition: transform 0.3s;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        .toggle-switch.active::after {
+            transform: translateX(24px);
+        }
+    </style>
+</head>
+<body class="font-inter bg-gray-50">
+    <!-- Header Section -->
+    <header class="bg-white border-b border-gray-200 fixed top-0 left-0 right-0 z-10">
+        <div class="flex items-center justify-between px-4 py-3">
+            <button onclick="goBack()" class="p-2 hover:bg-gray-100 rounded-lg">
+                <i class="fa-solid fa-arrow-left text-gray-600 text-lg"></i>
+            </button>
+            <div class="text-center">
+                <h1 class="text-lg font-semibold text-dark">Settings</h1>
+                <p class="text-xs text-gray-500">Application Preferences</p>
+            </div>
+            <button onclick="saveSettings()" class="p-2 hover:bg-gray-100 rounded-lg">
+                <i class="fa-solid fa-save text-gray-600 text-lg"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="pt-16 pb-20 bg-gray-50">
+        <!-- Profile Section -->
+        <div class="px-4 py-4">
+            <div class="bg-white rounded-lg p-4 shadow-sm border border-gray-100 mb-4">
+                <div class="flex items-center space-x-4">
+                    <div class="w-16 h-16 rounded-full bg-primary flex items-center justify-center">
+                        <span class="text-white font-bold text-xl">RK</span>
+                    </div>
+                    <div class="flex-1">
+                        <h3 class="font-bold text-dark text-lg">Raj Kumar Store</h3>
+                        <p class="text-gray-600">raj.kumar@email.com</p>
+                        <p class="text-sm text-gray-500">+91 98765 43210</p>
+                    </div>
+                    <button onclick="editProfile()" class="bg-gray-100 p-2 rounded-lg">
+                        <i class="fa-solid fa-edit text-gray-600"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Settings Sections -->
+        <div class="px-4 space-y-4">
+            <!-- Store Settings -->
+            <div class="bg-white rounded-lg shadow-sm border border-gray-100">
+                <div class="p-4 border-b border-gray-100">
+                    <h3 class="font-semibold text-dark flex items-center">
+                        <i class="fa-solid fa-store text-primary mr-2"></i>
+                        Store Settings
+                    </h3>
+                </div>
+                <div class="p-4 space-y-4">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="font-medium text-dark">Store Name</p>
+                            <p class="text-sm text-gray-500">Raj Kumar General Store</p>
+                        </div>
+                        <button onclick="editStoreName()" class="text-primary">
+                            <i class="fa-solid fa-chevron-right"></i>
+                        </button>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="font-medium text-dark">Store Address</p>
+                            <p class="text-sm text-gray-500">123 Main Street, Delhi 110001</p>
+                        </div>
+                        <button onclick="editAddress()" class="text-primary">
+                            <i class="fa-solid fa-chevron-right"></i>
+                        </button>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="font-medium text-dark">GST Number</p>
+                            <p class="text-sm text-gray-500">07AAACH7409R1ZZ</p>
+                        </div>
+                        <button onclick="editGST()" class="text-primary">
+                            <i class="fa-solid fa-chevron-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Inventory Settings -->
+            <div class="bg-white rounded-lg shadow-sm border border-gray-100">
+                <div class="p-4 border-b border-gray-100">
+                    <h3 class="font-semibold text-dark flex items-center">
+                        <i class="fa-solid fa-box text-accent mr-2"></i>
+                        Inventory Settings
+                    </h3>
+                </div>
+                <div class="p-4 space-y-4">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="font-medium text-dark">Low Stock Alerts</p>
+                            <p class="text-sm text-gray-500">Get notified when items are running low</p>
+                        </div>
+                        <div class="toggle-switch active" data-setting="lowStockAlerts"></div>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="font-medium text-dark">Expiry Alerts</p>
+                            <p class="text-sm text-gray-500">Notifications for expiring products</p>
+                        </div>
+                        <div class="toggle-switch active" data-setting="expiryAlerts"></div>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="font-medium text-dark">Auto-reorder Suggestions</p>
+                            <p class="text-sm text-gray-500">Smart reorder recommendations</p>
+                        </div>
+                        <div class="toggle-switch" data-setting="autoReorder"></div>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="font-medium text-dark">Low Stock Threshold</p>
+                            <p class="text-sm text-gray-500">Default minimum quantity: 10 units</p>
+                        </div>
+                        <button onclick="setThreshold()" class="text-primary">
+                            <i class="fa-solid fa-chevron-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Billing Settings -->
+            <div class="bg-white rounded-lg shadow-sm border border-gray-100">
+                <div class="p-4 border-b border-gray-100">
+                    <h3 class="font-semibold text-dark flex items-center">
+                        <i class="fa-solid fa-receipt text-success mr-2"></i>
+                        Billing Settings
+                    </h3>
+                </div>
+                <div class="p-4 space-y-4">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="font-medium text-dark">Auto Print Receipts</p>
+                            <p class="text-sm text-gray-500">Print receipt after each sale</p>
+                        </div>
+                        <div class="toggle-switch active" data-setting="autoPrint"></div>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="font-medium text-dark">Include GST</p>
+                            <p class="text-sm text-gray-500">Add GST to all transactions</p>
+                        </div>
+                        <div class="toggle-switch active" data-setting="includeGST"></div>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="font-medium text-dark">Default Payment Method</p>
+                            <p class="text-sm text-gray-500">Cash</p>
+                        </div>
+                        <button onclick="setPaymentMethod()" class="text-primary">
+                            <i class="fa-solid fa-chevron-right"></i>
+                        </button>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="font-medium text-dark">Credit Limit</p>
+                            <p class="text-sm text-gray-500">Default customer credit: ₹5,000</p>
+                        </div>
+                        <button onclick="setCreditLimit()" class="text-primary">
+                            <i class="fa-solid fa-chevron-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Notification Settings -->
+            <div class="bg-white rounded-lg shadow-sm border border-gray-100">
+                <div class="p-4 border-b border-gray-100">
+                    <h3 class="font-semibold text-dark flex items-center">
+                        <i class="fa-solid fa-bell text-accent mr-2"></i>
+                        Notifications
+                    </h3>
+                </div>
+                <div class="p-4 space-y-4">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="font-medium text-dark">Push Notifications</p>
+                            <p class="text-sm text-gray-500">Receive app notifications</p>
+                        </div>
+                        <div class="toggle-switch active" data-setting="pushNotifications"></div>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="font-medium text-dark">SMS Alerts</p>
+                            <p class="text-sm text-gray-500">SMS for important updates</p>
+                        </div>
+                        <div class="toggle-switch" data-setting="smsAlerts"></div>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="font-medium text-dark">Email Reports</p>
+                            <p class="text-sm text-gray-500">Daily/weekly business reports</p>
+                        </div>
+                        <div class="toggle-switch active" data-setting="emailReports"></div>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="font-medium text-dark">Customer Reminders</p>
+                            <p class="text-sm text-gray-500">Auto-send payment reminders</p>
+                        </div>
+                        <div class="toggle-switch active" data-setting="customerReminders"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Security Settings -->
+            <div class="bg-white rounded-lg shadow-sm border border-gray-100">
+                <div class="p-4 border-b border-gray-100">
+                    <h3 class="font-semibold text-dark flex items-center">
+                        <i class="fa-solid fa-shield text-danger mr-2"></i>
+                        Security & Privacy
+                    </h3>
+                </div>
+                <div class="p-4 space-y-4">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="font-medium text-dark">Change Password</p>
+                            <p class="text-sm text-gray-500">Update your account password</p>
+                        </div>
+                        <button onclick="changePassword()" class="text-primary">
+                            <i class="fa-solid fa-chevron-right"></i>
+                        </button>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="font-medium text-dark">Two-Factor Authentication</p>
+                            <p class="text-sm text-gray-500">Extra security for your account</p>
+                        </div>
+                        <div class="toggle-switch" data-setting="twoFactor"></div>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="font-medium text-dark">Data Backup</p>
+                            <p class="text-sm text-gray-500">Auto-backup to cloud storage</p>
+                        </div>
+                        <div class="toggle-switch active" data-setting="dataBackup"></div>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="font-medium text-dark">Privacy Settings</p>
+                            <p class="text-sm text-gray-500">Manage data sharing preferences</p>
+                        </div>
+                        <button onclick="privacySettings()" class="text-primary">
+                            <i class="fa-solid fa-chevron-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- App Settings -->
+            <div class="bg-white rounded-lg shadow-sm border border-gray-100">
+                <div class="p-4 border-b border-gray-100">
+                    <h3 class="font-semibold text-dark flex items-center">
+                        <i class="fa-solid fa-mobile text-secondary mr-2"></i>
+                        App Settings
+                    </h3>
+                </div>
+                <div class="p-4 space-y-4">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="font-medium text-dark">Dark Mode</p>
+                            <p class="text-sm text-gray-500">Use dark theme</p>
+                        </div>
+                        <div class="toggle-switch" data-setting="darkMode"></div>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="font-medium text-dark">Language</p>
+                            <p class="text-sm text-gray-500">English</p>
+                        </div>
+                        <button onclick="changeLanguage()" class="text-primary">
+                            <i class="fa-solid fa-chevron-right"></i>
+                        </button>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="font-medium text-dark">Currency</p>
+                            <p class="text-sm text-gray-500">Indian Rupee (₹)</p>
+                        </div>
+                        <button onclick="changeCurrency()" class="text-primary">
+                            <i class="fa-solid fa-chevron-right"></i>
+                        </button>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="font-medium text-dark">App Version</p>
+                            <p class="text-sm text-gray-500">v2.1.0 (Latest)</p>
+                        </div>
+                        <button onclick="checkUpdates()" class="text-primary">
+                            <i class="fa-solid fa-download"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Support & Help -->
+            <div class="bg-white rounded-lg shadow-sm border border-gray-100">
+                <div class="p-4 border-b border-gray-100">
+                    <h3 class="font-semibold text-dark flex items-center">
+                        <i class="fa-solid fa-question-circle text-primary mr-2"></i>
+                        Support & Help
+                    </h3>
+                </div>
+                <div class="p-4 space-y-4">
+                    <button onclick="openHelp()" class="w-full flex items-center justify-between p-2 hover:bg-gray-50 rounded">
+                        <div class="flex items-center">
+                            <i class="fa-solid fa-book text-gray-600 mr-3"></i>
+                            <span class="font-medium">Help Center</span>
+                        </div>
+                        <i class="fa-solid fa-chevron-right text-gray-400"></i>
+                    </button>
+                    <button onclick="contactSupport()" class="w-full flex items-center justify-between p-2 hover:bg-gray-50 rounded">
+                        <div class="flex items-center">
+                            <i class="fa-solid fa-headset text-gray-600 mr-3"></i>
+                            <span class="font-medium">Contact Support</span>
+                        </div>
+                        <i class="fa-solid fa-chevron-right text-gray-400"></i>
+                    </button>
+                    <button onclick="sendFeedback()" class="w-full flex items-center justify-between p-2 hover:bg-gray-50 rounded">
+                        <div class="flex items-center">
+                            <i class="fa-solid fa-comment text-gray-600 mr-3"></i>
+                            <span class="font-medium">Send Feedback</span>
+                        </div>
+                        <i class="fa-solid fa-chevron-right text-gray-400"></i>
+                    </button>
+                    <button onclick="rateApp()" class="w-full flex items-center justify-between p-2 hover:bg-gray-50 rounded">
+                        <div class="flex items-center">
+                            <i class="fa-solid fa-star text-gray-600 mr-3"></i>
+                            <span class="font-medium">Rate App</span>
+                        </div>
+                        <i class="fa-solid fa-chevron-right text-gray-400"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Logout Section -->
+            <div class="bg-white rounded-lg shadow-sm border border-gray-100">
+                <div class="p-4">
+                    <button onclick="logout()" class="w-full bg-red-500 text-white py-3 rounded-lg font-medium">
+                        <i class="fa-solid fa-sign-out-alt mr-2"></i>
+                        Logout
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Bottom Navigation -->
+    <nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200">
+        <div class="flex justify-around items-end py-2">
+            <button class="flex flex-col items-center py-1 px-3" onclick="window.location.href='/dashboard'">
+                <i class="fa-solid fa-home text-gray-400 text-lg"></i>
+                <span class="text-xs mt-1 text-gray-400">Home</span>
+            </button>
+            <button class="flex flex-col items-center py-1 px-3" onclick="window.location.href='/inventory'">
+                <i class="fa-solid fa-box text-gray-400 text-lg"></i>
+                <span class="text-xs mt-1 text-gray-400">Inventory</span>
+            </button>
+            <button class="relative -top-3 bg-primary rounded-full p-3 shadow-lg" onclick="window.location.href='/add-item'">
+                <i class="fa-solid fa-barcode text-white text-lg"></i>
+            </button>
+            <button class="flex flex-col items-center py-1 px-3" onclick="window.location.href='/cart'">
+                <i class="fa-solid fa-shopping-cart text-gray-400 text-lg"></i>
+                <span class="text-xs mt-1 text-gray-400">Cart</span>
+            </button>
+            <button class="flex flex-col items-center py-1 px-3" onclick="window.location.href='/profile'">
+                <i class="fa-solid fa-user text-primary text-lg"></i>
+                <span class="text-xs mt-1 text-primary">Profile</span>
+            </button>
+        </div>
+    </nav>
+
+    <script>
+        function goBack() {
+            window.history.back();
+        }
+
+        function saveSettings() {
+            alert('Settings saved successfully!');
+            // In real app, this would save all current settings
+        }
+
+        function editProfile() {
+            window.location.href = '/profile';
+        }
+
+        function editStoreName() {
+            const newName = prompt('Enter new store name:', 'Raj Kumar General Store');
+            if (newName) {
+                alert(`Store name updated to: ${newName}`);
+                // In real app, this would update the store name
+            }
+        }
+
+        function editAddress() {
+            const newAddress = prompt('Enter new store address:', '123 Main Street, Delhi 110001');
+            if (newAddress) {
+                alert(`Store address updated to: ${newAddress}`);
+                // In real app, this would update the store address
+            }
+        }
+
+        function editGST() {
+            const newGST = prompt('Enter GST number:', '07AAACH7409R1ZZ');
+            if (newGST) {
+                alert(`GST number updated to: ${newGST}`);
+                // In real app, this would update the GST number
+            }
+        }
+
+        function setThreshold() {
+            const threshold = prompt('Enter default low stock threshold:', '10');
+            if (threshold && !isNaN(threshold)) {
+                alert(`Low stock threshold set to: ${threshold} units`);
+                // In real app, this would update the threshold setting
+            }
+        }
+
+        function setPaymentMethod() {
+            const methods = ['Cash', 'UPI', 'Card', 'Bank Transfer'];
+            const method = prompt(`Select default payment method:\n${methods.map((m, i) => `${i+1}. ${m}`).join('\n')}`);
+            if (method && method >= 1 && method <= 4) {
+                alert(`Default payment method set to: ${methods[method-1]}`);
+                // In real app, this would update the default payment method
+            }
+        }
+
+        function setCreditLimit() {
+            const limit = prompt('Enter default credit limit (₹):', '5000');
+            if (limit && !isNaN(limit)) {
+                alert(`Default credit limit set to: ₹${limit}`);
+                // In real app, this would update the credit limit
+            }
+        }
+
+        function changePassword() {
+            alert('Opening password change interface');
+            // In real app, this would open a password change form
+        }
+
+        function privacySettings() {
+            alert('Opening privacy settings');
+            // In real app, this would open privacy configuration
+        }
+
+        function changeLanguage() {
+            const languages = ['English', 'Hindi', 'Tamil', 'Telugu', 'Bengali'];
+            alert('Language selection interface would open here');
+            // In real app, this would show language options
+        }
+
+        function changeCurrency() {
+            const currencies = ['Indian Rupee (₹)', 'US Dollar ($)', 'Euro (€)'];
+            alert('Currency selection interface would open here');
+            // In real app, this would show currency options
+        }
+
+        function checkUpdates() {
+            alert('Checking for updates... You have the latest version!');
+            // In real app, this would check for app updates
+        }
+
+        function openHelp() {
+            alert('Opening help center');
+            // In real app, this would open help documentation
+        }
+
+        function contactSupport() {
+            alert('Opening support contact form');
+            // In real app, this would open support channels
+        }
+
+        function sendFeedback() {
+            alert('Opening feedback form');
+            // In real app, this would open a feedback form
+        }
+
+        function rateApp() {
+            alert('Opening app store for rating');
+            // In real app, this would open app store rating
+        }
+
+        function logout() {
+            if (confirm('Are you sure you want to logout?')) {
+                alert('Logging out...');
+                window.location.href = '/signin';
+            }
+        }
+
+        // Toggle switch functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const toggles = document.querySelectorAll('.toggle-switch');
+            
+            toggles.forEach(toggle => {
+                toggle.addEventListener('click', function() {
+                    this.classList.toggle('active');
+                    const setting = this.getAttribute('data-setting');
+                    const isActive = this.classList.contains('active');
+                    
+                    console.log(`Setting ${setting} changed to: ${isActive}`);
+                    // In real app, this would save the setting preference
+                });
+            });
+        });
+    </script>
+</body>
+</html>
