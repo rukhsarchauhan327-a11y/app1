@@ -509,11 +509,7 @@
 
         function logout() {
             if (confirm('Are you sure you want to logout?')) {
-                alert('Logging out...');
-                // Redirect to signin page after a brief delay
-                setTimeout(() => {
-                    window.location.href = '/signin';
-                }, 1000);
+                window.location.href = '/signin';
             }
         }
 
