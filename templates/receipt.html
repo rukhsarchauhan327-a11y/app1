@@ -6,6 +6,7 @@
     <title>Receipt - Kirana Konnect</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <script>
         tailwind.config = {
             theme: {
@@ -64,11 +65,16 @@
             </button>
             <div class="text-center">
                 <h1 class="text-lg font-semibold text-dark">Receipt</h1>
-                <p class="text-xs text-gray-500">Bill #001234</p>
+                <p class="text-xs text-gray-500" id="bill-number-header">Bill #001234</p>
             </div>
-            <button onclick="printReceipt()" class="p-2 hover:bg-gray-100 rounded-lg">
-                <i class="fa-solid fa-print text-gray-600 text-lg"></i>
-            </button>
+            <div class="flex space-x-2">
+                <button onclick="downloadPDF()" class="p-2 hover:bg-gray-100 rounded-lg" title="Download PDF">
+                    <i class="fa-solid fa-download text-gray-600 text-lg"></i>
+                </button>
+                <button onclick="printReceipt()" class="p-2 hover:bg-gray-100 rounded-lg" title="Print Receipt">
+                    <i class="fa-solid fa-print text-gray-600 text-lg"></i>
+                </button>
+            </div>
         </div>
     </header>
 
@@ -202,7 +208,11 @@
 
         <!-- Action Buttons -->
         <div class="max-w-md mx-auto px-4 mt-4 no-print">
-            <div class="grid grid-cols-2 gap-3">
+            <div class="grid grid-cols-3 gap-3">
+                <button onclick="downloadPDF()" class="bg-red-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-red-700 transition-colors flex items-center justify-center space-x-2">
+                    <i class="fa-solid fa-download text-sm"></i>
+                    <span>PDF</span>
+                </button>
                 <button onclick="shareReceipt()" class="bg-blue-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-blue-700 transition-colors flex items-center justify-center space-x-2">
                     <i class="fa-solid fa-share text-sm"></i>
                     <span>Share</span>
@@ -249,15 +259,32 @@
             window.print();
         }
 
+        function downloadPDF() {
+            const billNumber = new URLSearchParams(window.location.search).get('bill') || '001234';
+            const element = document.querySelector('.bg-white.rounded-lg.shadow-sm');
+            
+            const opt = {
+                margin: 0.5,
+                filename: `Receipt_${billNumber}.pdf`,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2, useCORS: true },
+                jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
+            };
+            
+            html2pdf().set(opt).from(element).save();
+        }
+
         function shareReceipt() {
+            const billNumber = new URLSearchParams(window.location.search).get('bill') || '001234';
+            const totalAmount = document.querySelector('.text-lg.font-bold.text-dark').textContent;
+            
             if (navigator.share) {
                 navigator.share({
-                    title: 'Receipt - Bill #001234',
-                    text: 'Receipt from Kirana Konnect for ₹472.50',
+                    title: `Receipt - Bill #${billNumber}`,
+                    text: `Receipt from Kirana Konnect for ${totalAmount}`,
                     url: window.location.href
                 }).catch(console.error);
             } else {
-                // Fallback for browsers that don't support Web Share API
                 const url = window.location.href;
                 navigator.clipboard.writeText(url).then(() => {
                     alert('Receipt link copied to clipboard!');
@@ -267,14 +294,58 @@
             }
         }
 
-        // Load receipt data from URL parameters or localStorage if needed
-        document.addEventListener('DOMContentLoaded', function() {
+        // Load receipt data from URL parameters
+        document.addEventListener('DOMContentLoaded', async function() {
             const urlParams = new URLSearchParams(window.location.search);
-            const billId = urlParams.get('bill') || '001234';
+            const billNumber = urlParams.get('bill');
             
-            // Update bill number in header and receipt
-            document.querySelector('header .text-xs').textContent = `Bill #${billId}`;
+            if (billNumber) {
+                // Update bill number in header
+                document.getElementById('bill-number-header').textContent = `Bill #${billNumber}`;
+                
+                // Load bill data from backend
+                try {
+                    const response = await fetch(`/api/bills/${billNumber}`);
+                    if (response.ok) {
+                        const billData = await response.json();
+                        updateReceiptWithData(billData);
+                    }
+                } catch (error) {
+                    console.error('Error loading bill data:', error);
+                }
+            }
         });
+
+        function updateReceiptWithData(billData) {
+            // Update bill details
+            document.querySelector('.px-4.py-3.border-b .flex:nth-child(1) .text-sm.text-gray-700').textContent = `#${billData.bill_number}`;
+            document.querySelector('.px-4.py-3.border-b .flex:nth-child(2) .text-sm.text-gray-700').textContent = new Date(billData.created_at).toLocaleString();
+            document.querySelector('.px-4.py-3.border-b .flex:nth-child(3) .text-sm.text-gray-700').textContent = billData.customer_name || 'Guest Customer';
+            document.querySelector('.px-4.py-3.border-b .flex:nth-child(4) .text-sm.text-gray-700').textContent = billData.generated_by || 'Store Staff';
+            
+            // Update items
+            const itemsContainer = document.querySelector('.px-4.py-3 h3').parentElement;
+            const itemsHTML = billData.items.map(item => `
+                <div class="flex justify-between items-start mb-3">
+                    <div class="flex-1">
+                        <p class="text-sm font-medium text-dark">${item.item_name}</p>
+                        <p class="text-xs text-gray-500">${item.quantity} ${item.weight ? 'Kg' : 'Pcs'} @ ₹${item.unit_price}/${item.weight ? 'Kg' : 'Pc'}</p>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-sm font-semibold text-dark">₹${item.total_price.toFixed(2)}</p>
+                    </div>
+                </div>
+            `).join('');
+            
+            // Replace items (keep the header)
+            itemsContainer.innerHTML = `<h3 class="text-sm font-semibold text-dark mb-3">Items Purchased</h3>${itemsHTML}`;
+            
+            // Update totals
+            document.querySelector('.space-y-2 .flex:nth-child(1) .text-sm.font-medium').textContent = `₹${billData.subtotal.toFixed(2)}`;
+            document.querySelector('.space-y-2 .flex:nth-child(2) .text-sm.font-medium').textContent = `₹${billData.tax_amount.toFixed(2)}`;
+            document.querySelector('.space-y-2 .flex:nth-child(3) .text-sm.font-medium').textContent = `₹${billData.discount_amount.toFixed(2)}`;
+            document.querySelector('.text-lg.font-bold.text-dark').textContent = `₹${billData.total_amount.toFixed(2)}`;
+        }
     </script>
 </body>
 </html>

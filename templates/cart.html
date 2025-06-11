@@ -921,16 +921,9 @@
                 if (response.ok) {
                     showNotification(`Bill ${result.bill_number} generated successfully!`, 'success');
                     
-                    // Show success message with bill details
+                    // Redirect to receipt page with bill details
                     setTimeout(() => {
-                        if (selectedCustomerId && paymentMode === 'credit') {
-                            showNotification(`Bill added to ${customerName}'s ledger for future payment`, 'info');
-                        }
-                        
-                        // Redirect to dashboard after 2 seconds
-                        setTimeout(() => {
-                            window.location.href = '/dashboard';
-                        }, 2000);
+                        window.location.href = `/receipt?bill=${result.bill_number}`;
                     }, 1000);
                 } else {
                     showNotification('Error generating bill. Please try again.', 'error');
