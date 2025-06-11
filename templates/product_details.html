@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Details - Kirana Konnect</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script> window.FontAwesomeConfig = { autoReplaceSvg: 'nest'};</script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <style>::-webkit-scrollbar { display: none;}</style>
+    
+    <script>tailwind.config = {
+  "theme": {
+    "extend": {
+      "colors": {
+        "primary": "#2563eb",
+        "secondary": "#64748b",
+        "accent": "#f59e0b",
+        "success": "#10b981",
+        "danger": "#ef4444",
+        "dark": "#1e293b",
+        "light": "#f8fafc"
+      },
+      "fontFamily": {
+        "inter": [
+          "Inter",
+          "sans-serif"
+        ],
+        "sans": [
+          "Inter",
+          "sans-serif"
+        ]
+      }
+    }
+  }
+};</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;500;600;700;800;900&display=swap">
+<style>
+      body {
+        font-family: 'Inter', sans-serif !important;
+      }
+      
+      /* Preserve Font Awesome icons */
+      .fa, .fas, .far, .fal, .fab {
+        font-family: "Font Awesome 6 Free", "Font Awesome 6 Brands" !important;
+      }
+    </style>
+<style>
+  .highlighted-section {
+    outline: 2px solid #3F20FB;
+    background-color: rgba(63, 32, 251, 0.1);
+  }
+
+  .edit-button {
+    position: absolute;
+    z-index: 1000;
+  }
+
+  ::-webkit-scrollbar {
+    display: none;
+  }
+
+  html, body {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+</style>
+</head>
+<body class="font-inter bg-gray-100">
+    <!-- Header Section -->
+    <header id="header" class="bg-white border-b border-gray-200 fixed top-0 left-0 right-0 z-10">
+        <div class="flex items-center justify-between px-4 py-3">
+            <button class="p-2 hover:bg-gray-100 rounded-lg" onclick="goBack()">
+                <i class="fa-solid fa-arrow-left text-gray-600 text-lg"></i>
+            </button>
+            <div class="text-center">
+                <h1 class="text-lg font-semibold text-dark">Product Details</h1>
+                <p class="text-xs text-gray-500">Kirana Konnect</p>
+            </div>
+            <div class="w-10"></div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main id="main-content" class="pt-16 pb-32 bg-gray-100">
+        <!-- Product Image Section -->
+        <div id="product-image" class="bg-white px-4 py-6">
+            <div class="flex justify-center">
+                <img id="product-img" class="w-48 h-48 rounded-lg object-cover border border-gray-200" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/dd29a1f85f-469e6193e37489fc8c43.png" alt="Product image">
+            </div>
+        </div>
+
+        <!-- Product Info Section -->
+        <div id="product-info" class="bg-white mt-2 px-4 py-4">
+            <div class="mb-4">
+                <h2 id="product-name" class="text-xl font-bold text-dark mb-1">Aashirvaad Atta</h2>
+                <p id="product-description" class="text-sm text-gray-600 mb-2">Premium quality wheat flour for daily use</p>
+                <div class="flex items-center space-x-2 mb-2">
+                    <span id="product-category" class="bg-blue-100 text-blue-600 px-2 py-1 rounded-full text-xs font-medium">Grains</span>
+                    <span id="product-type" class="bg-green-100 text-green-600 px-2 py-1 rounded-full text-xs font-medium">Bag-Based</span>
+                </div>
+            </div>
+
+            <!-- Pricing Info -->
+            <div class="grid grid-cols-2 gap-4 mb-4">
+                <div class="bg-gray-50 p-3 rounded-lg">
+                    <p class="text-xs text-gray-500 mb-1">Purchase Price</p>
+                    <p id="purchase-price" class="text-lg font-bold text-dark">₹90/Bag</p>
+                </div>
+                <div class="bg-green-50 p-3 rounded-lg">
+                    <p class="text-xs text-green-500 mb-1">Selling Price</p>
+                    <p id="selling-price" class="text-lg font-bold text-green-600">₹120/Bag</p>
+                </div>
+            </div>
+
+            <!-- Stock Info -->
+            <div id="stock-info" class="bg-orange-50 p-4 rounded-lg mb-4">
+                <div class="flex items-center justify-between mb-2">
+                    <h3 class="font-semibold text-dark">Stock Information</h3>
+                    <span id="stock-status" class="bg-orange-500 text-white px-2 py-1 rounded-full text-xs">Low Stock</span>
+                </div>
+                <div class="grid grid-cols-3 gap-3 text-center">
+                    <div>
+                        <p class="text-xs text-gray-500">Available</p>
+                        <p id="available-stock" class="text-lg font-bold text-orange-600">5 Bags</p>
+                    </div>
+                    <div>
+                        <p class="text-xs text-gray-500">Size</p>
+                        <p id="product-size" class="text-lg font-bold text-dark">10 Kg</p>
+                    </div>
+                    <div>
+                        <p class="text-xs text-gray-500">Threshold</p>
+                        <p id="stock-threshold" class="text-lg font-bold text-red-500">5 Bags</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Product Dates -->
+            <div class="bg-blue-50 p-4 rounded-lg mb-4">
+                <h3 class="font-semibold text-dark mb-3">Product Dates</h3>
+                <div class="space-y-2">
+                    <div class="flex justify-between items-center">
+                        <span class="text-sm text-gray-600">Manufacturing Date</span>
+                        <span id="mfg-date" class="text-sm font-medium text-dark">01/05/2025</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-sm text-gray-600">Expiry Date</span>
+                        <span id="exp-date" class="text-sm font-medium text-dark">01/09/2025</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Barcode Section -->
+            <div class="bg-gray-50 p-4 rounded-lg">
+                <h3 class="font-semibold text-dark mb-2">Barcode</h3>
+                <div class="flex items-center space-x-3">
+                    <i class="fa-solid fa-barcode text-2xl text-gray-600"></i>
+                    <span id="product-barcode" class="text-sm font-mono text-gray-700">8901030875466</span>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Fixed Bottom Actions -->
+    <div id="bottom-actions" class="fixed bottom-16 left-0 right-0 bg-white border-t border-gray-200 p-4">
+        <div class="grid grid-cols-3 gap-2">
+            <button class="flex items-center justify-center space-x-1 bg-blue-600 text-white py-3 px-3 rounded-lg hover:bg-blue-700 transition-colors" onclick="refillStock()">
+                <i class="fa-solid fa-plus text-sm"></i>
+                <span class="font-medium text-sm">Refill</span>
+            </button>
+            <button class="flex items-center justify-center space-x-1 bg-green-600 text-white py-3 px-3 rounded-lg hover:bg-green-700 transition-colors" onclick="addToCart()">
+                <i class="fa-solid fa-shopping-cart text-sm"></i>
+                <span class="font-medium text-sm">Add Cart</span>
+            </button>
+            <button class="flex items-center justify-center space-x-1 bg-red-600 text-white py-3 px-3 rounded-lg hover:bg-red-700 transition-colors" onclick="deleteProduct()">
+                <i class="fa-solid fa-trash text-sm"></i>
+                <span class="font-medium text-sm">Delete</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Bottom Navigation -->
+    <nav id="footer" class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200">
+        <div class="flex justify-around items-end py-2">
+            <button class="flex flex-col items-center py-1 px-3" onclick="goToDashboard()">
+                <i class="fa-solid fa-home text-gray-400 text-lg"></i>
+                <span class="text-xs mt-1 text-gray-400">Home</span>
+            </button>
+            <button class="flex flex-col items-center py-1 px-3" onclick="goToInventory()">
+                <i class="fa-solid fa-box text-gray-400 text-lg"></i>
+                <span class="text-xs mt-1 text-gray-400">Inventory</span>
+            </button>
+            <button class="relative -top-3 bg-primary rounded-full p-3 shadow-lg">
+                <i class="fa-solid fa-barcode text-white text-lg"></i>
+            </button>
+            <button class="flex flex-col items-center py-1 px-3" onclick="goToCart()">
+                <i class="fa-solid fa-shopping-cart text-gray-400 text-lg"></i>
+                <span class="text-xs mt-1 text-gray-400">Cart</span>
+            </button>
+            <button class="flex flex-col items-center py-1 px-3" onclick="goToProfile()">
+                <i class="fa-solid fa-user text-gray-400 text-lg"></i>
+                <span class="text-xs mt-1 text-gray-400">Profile</span>
+            </button>
+        </div>
+    </nav>
+
+    <script>
+        // Sample product data - in a real app, this would come from the server
+        let productData = {
+            id: 1,
+            name: "Aashirvaad Atta",
+            description: "Premium quality wheat flour for daily use",
+            category: "Grains",
+            type: "Bag-Based",
+            purchasePrice: 90,
+            sellingPrice: 120,
+            unit: "Bag",
+            stock: 5,
+            size: "10 Kg",
+            threshold: 5,
+            mfgDate: "01/05/2025",
+            expDate: "01/09/2025",
+            barcode: "8901030875466",
+            image: "https://storage.googleapis.com/uxpilot-auth.appspot.com/dd29a1f85f-469e6193e37489fc8c43.png"
+        };
+
+        // Load product data on page load
+        function loadProductData() {
+            // Get product ID from URL parameters (in real app)
+            const urlParams = new URLSearchParams(window.location.search);
+            const productId = urlParams.get('id') || '1';
+            
+            // Update UI with product data
+            document.getElementById('product-name').textContent = productData.name;
+            document.getElementById('product-description').textContent = productData.description;
+            document.getElementById('product-category').textContent = productData.category;
+            document.getElementById('product-type').textContent = productData.type;
+            document.getElementById('purchase-price').textContent = `₹${productData.purchasePrice}/${productData.unit}`;
+            document.getElementById('selling-price').textContent = `₹${productData.sellingPrice}/${productData.unit}`;
+            document.getElementById('available-stock').textContent = `${productData.stock} ${productData.unit}s`;
+            document.getElementById('product-size').textContent = productData.size;
+            document.getElementById('stock-threshold').textContent = `${productData.threshold} ${productData.unit}s`;
+            document.getElementById('mfg-date').textContent = productData.mfgDate;
+            document.getElementById('exp-date').textContent = productData.expDate;
+            document.getElementById('product-barcode').textContent = productData.barcode;
+            document.getElementById('product-img').src = productData.image;
+            document.getElementById('product-img').alt = productData.name;
+            
+            // Update stock status
+            updateStockStatus();
+        }
+
+        function updateStockStatus() {
+            const stockInfo = document.getElementById('stock-info');
+            const stockStatus = document.getElementById('stock-status');
+            const availableStock = document.getElementById('available-stock');
+            
+            if (productData.stock <= productData.threshold) {
+                stockInfo.className = 'bg-orange-50 p-4 rounded-lg mb-4';
+                stockStatus.className = 'bg-orange-500 text-white px-2 py-1 rounded-full text-xs';
+                stockStatus.textContent = 'Low Stock';
+                availableStock.className = 'text-lg font-bold text-orange-600';
+            } else if (productData.stock === 0) {
+                stockInfo.className = 'bg-red-50 p-4 rounded-lg mb-4';
+                stockStatus.className = 'bg-red-500 text-white px-2 py-1 rounded-full text-xs';
+                stockStatus.textContent = 'Out of Stock';
+                availableStock.className = 'text-lg font-bold text-red-600';
+            } else {
+                stockInfo.className = 'bg-green-50 p-4 rounded-lg mb-4';
+                stockStatus.className = 'bg-green-500 text-white px-2 py-1 rounded-full text-xs';
+                stockStatus.textContent = 'In Stock';
+                availableStock.className = 'text-lg font-bold text-green-600';
+            }
+        }
+
+        function goBack() {
+            window.history.back();
+        }
+
+        function refillStock() {
+            const quantity = prompt(`Enter quantity to add for ${productData.name} (${productData.unit}s):`);
+            
+            if (quantity && !isNaN(quantity) && parseInt(quantity) > 0) {
+                productData.stock += parseInt(quantity);
+                document.getElementById('available-stock').textContent = `${productData.stock} ${productData.unit}s`;
+                updateStockStatus();
+                alert(`Added ${quantity} ${productData.unit}s to ${productData.name} inventory.\nNew stock: ${productData.stock} ${productData.unit}s`);
+            }
+        }
+
+        function addToCart() {
+            const quantity = prompt(`Enter quantity to add to cart for ${productData.name}:`);
+            
+            if (quantity && !isNaN(quantity) && parseInt(quantity) > 0) {
+                if (parseInt(quantity) <= productData.stock) {
+                    alert(`Added ${quantity} ${productData.unit}s of ${productData.name} to cart.\nPrice: ₹${productData.sellingPrice * parseInt(quantity)}`);
+                } else {
+                    alert(`Sorry, only ${productData.stock} ${productData.unit}s available in stock.`);
+                }
+            }
+        }
+
+        function deleteProduct() {
+            if (confirm(`Are you sure you want to delete ${productData.name} from inventory?\n\nThis action cannot be undone.`)) {
+                alert(`${productData.name} has been deleted from inventory.`);
+                window.location.href = '/inventory';
+            }
+        }
+
+        // Navigation functions
+        function goToDashboard() {
+            window.location.href = '/dashboard';
+        }
+
+        function goToInventory() {
+            window.location.href = '/inventory';
+        }
+
+        function goToCart() {
+            window.location.href = '/cart';
+        }
+
+        function goToProfile() {
+            window.location.href = '/profile';
+        }
+
+        // Initialize page
+        loadProductData();
+    </script>
+</body>
+</html>

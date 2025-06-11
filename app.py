@@ -55,5 +55,10 @@ def profile():
     """Serve the user profile page"""
     return render_template('profile.html')
 
+@app.route('/product-details')
+def product_details():
+    """Serve the product details page"""
+    return render_template('product_details.html')
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)

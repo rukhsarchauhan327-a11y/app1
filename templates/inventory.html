@@ -131,7 +131,7 @@
         <!-- Inventory Items List -->
         <div id="inventory-list" class="p-4 space-y-4">
             <!-- Weight-Based Item - Wheat Flour -->
-            <div id="item-1" class="bg-white rounded-xl p-4 shadow-sm border hover:shadow-md transition-shadow" data-category="grains" data-status="lowstock">
+            <div id="item-1" class="bg-white rounded-xl p-4 shadow-sm border hover:shadow-md transition-shadow cursor-pointer" data-category="grains" data-status="lowstock" onclick="viewProductDetails('item-1')">
                 <div class="flex items-center space-x-4">
                     <div class="w-16 h-16 rounded-xl overflow-hidden">
                         <img class="w-full h-full object-cover" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/ad8aa6cee1-b621e3cd72c9ea714c53.png" alt="wheat flour bag packaging product">
@@ -152,13 +152,13 @@
                             </div>
                         </div>
                         <div class="flex items-center justify-end space-x-2 mt-3">
-                            <button class="p-2 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors" onclick="refillItem('item-1')" title="Refill Stock">
+                            <button class="p-2 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors" onclick="event.stopPropagation(); refillItem('item-1')" title="Refill Stock">
                                 <i class="fa-solid fa-plus text-blue-600 text-sm"></i>
                             </button>
-                            <button class="p-2 bg-green-50 hover:bg-green-100 rounded-lg transition-colors" onclick="addToCart('item-1')" title="Add to Cart">
+                            <button class="p-2 bg-green-50 hover:bg-green-100 rounded-lg transition-colors" onclick="event.stopPropagation(); addToCart('item-1')" title="Add to Cart">
                                 <i class="fa-solid fa-shopping-cart text-green-600 text-sm"></i>
                             </button>
-                            <button class="p-2 bg-red-50 hover:bg-red-100 rounded-lg transition-colors" onclick="deleteItem('item-1')" title="Delete Item">
+                            <button class="p-2 bg-red-50 hover:bg-red-100 rounded-lg transition-colors" onclick="event.stopPropagation(); deleteItem('item-1')" title="Delete Item">
                                 <i class="fa-solid fa-trash text-red-600 text-sm"></i>
                             </button>
                         </div>
@@ -530,6 +530,11 @@
 
         function goToProfile() {
             window.location.href = '/profile';
+        }
+
+        function viewProductDetails(itemId) {
+            // Navigate to product details page with item ID
+            window.location.href = `/product-details?id=${itemId}`;
         }
 
         // Initialize filters
