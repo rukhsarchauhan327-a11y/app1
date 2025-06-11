@@ -660,8 +660,38 @@
                     document.getElementById('new-customer-phone').value = '';
                     showNotification(`Customer ${name} saved successfully!`, 'success');
                     
-                    // Keep New Customer tab active and show bill section
-                    switchTab('new-customer');
+                    // Switch to customer tab and show the newly added customer
+                    switchTab('customer');
+                    
+                    // Add the new customer to the customer list
+                    const customerList = document.getElementById('customer-list');
+                    const customerItem = document.createElement('div');
+                    customerItem.className = 'flex items-center justify-between p-3 border-b border-gray-100 hover:bg-gray-50 cursor-pointer';
+                    customerItem.onclick = () => selectCustomer(result.id, name, phone);
+                    customerItem.innerHTML = `
+                        <div class="flex-1">
+                            <p class="font-medium text-dark text-sm">${name}</p>
+                            <p class="text-gray-600 text-xs">${phone}</p>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-green-600 font-bold text-sm">₹0.00</p>
+                            <p class="text-gray-500 text-xs">Balance</p>
+                        </div>
+                    `;
+                    
+                    // Insert at the top of the customer list
+                    if (customerList.firstChild) {
+                        customerList.insertBefore(customerItem, customerList.firstChild);
+                    } else {
+                        customerList.appendChild(customerItem);
+                    }
+                    
+                    // Hide the no search message if it's visible
+                    const noSearchMessage = document.getElementById('no-search-message');
+                    if (noSearchMessage) {
+                        noSearchMessage.classList.add('hidden');
+                    }
+                    
                     document.getElementById('bill-section').classList.remove('hidden');
                 } else {
                     showNotification('Error saving customer. Please try again.', 'error');
