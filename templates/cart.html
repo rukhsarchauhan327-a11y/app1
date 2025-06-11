@@ -397,10 +397,10 @@
             <div id="online-payment-section" class="hidden">
                 <div class="space-y-2">
                     <div class="grid grid-cols-2 gap-2">
-                        <button class="p-2 border border-gray-200 rounded-lg text-sm bg-blue-50 text-blue-600">UPI</button>
-                        <button class="p-2 border border-gray-200 rounded-lg text-sm bg-green-50 text-green-600">Card</button>
+                        <button id="upi-button" class="p-2 border border-gray-200 rounded-lg text-sm bg-blue-50 text-blue-600" onclick="selectOnlineMethod('upi')">UPI</button>
+                        <button id="card-button" class="p-2 border border-gray-200 rounded-lg text-sm bg-green-50 text-green-600" onclick="selectOnlineMethod('card')">Card</button>
                     </div>
-                    <input type="text" placeholder="UPI ID or Transaction Reference" class="w-full p-2 border border-gray-200 rounded-lg text-sm">
+                    <input type="text" id="transaction-reference" placeholder="UPI ID or Transaction Reference" class="w-full p-2 border border-gray-200 rounded-lg text-sm">
                 </div>
             </div>
 
@@ -522,6 +522,25 @@
         }
 
         let selectedCustomerId = null;
+        let onlinePaymentMethod = 'upi'; // Default to UPI
+
+        function selectOnlineMethod(method) {
+            onlinePaymentMethod = method;
+            
+            // Reset button styles
+            document.getElementById('upi-button').className = 'p-2 border border-gray-200 rounded-lg text-sm bg-blue-50 text-blue-600';
+            document.getElementById('card-button').className = 'p-2 border border-gray-200 rounded-lg text-sm bg-green-50 text-green-600';
+            
+            // Update placeholder text and highlight selected button
+            const referenceInput = document.getElementById('transaction-reference');
+            if (method === 'upi') {
+                document.getElementById('upi-button').className = 'p-2 border-2 border-blue-500 rounded-lg text-sm bg-blue-100 text-blue-700 font-medium';
+                referenceInput.placeholder = 'Enter UPI Transaction ID';
+            } else if (method === 'card') {
+                document.getElementById('card-button').className = 'p-2 border-2 border-green-500 rounded-lg text-sm bg-green-100 text-green-700 font-medium';
+                referenceInput.placeholder = 'Enter Card Transaction Reference';
+            }
+        }
 
         async function filterCustomers(searchTerm) {
             const resultsContainer = document.getElementById('customer-results');
@@ -894,6 +913,9 @@
         
         // Hide credit button on page load since billing tab is default
         document.getElementById('credit-payment').classList.add('hidden');
+        
+        // Initialize UPI as selected by default
+        selectOnlineMethod('upi');
     </script>
 
 </body>
