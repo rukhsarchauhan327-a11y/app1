@@ -75,6 +75,11 @@ def receipt():
     """Serve the receipt page"""
     return render_template('receipt.html')
 
+@app.route('/bill-generate')
+def bill_generate():
+    """Serve the bill generation page"""
+    return render_template('bill_generate.html')
+
 @app.route('/refill-stock')
 def refill_stock():
     """Serve the refill stock page"""

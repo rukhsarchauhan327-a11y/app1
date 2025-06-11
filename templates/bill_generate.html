@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generate Bill - Kirana Konnect</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#2563eb',
+                        secondary: '#64748b',
+                        accent: '#f59e0b',
+                        success: '#10b981',
+                        danger: '#ef4444',
+                        dark: '#1e293b',
+                        light: '#f8fafc'
+                    },
+                    fontFamily: {
+                        inter: ['Inter', 'sans-serif'],
+                        sans: ['Inter', 'sans-serif']
+                    }
+                }
+            }
+        };
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif !important;
+        }
+        .fa, .fas, .far, .fal, .fab {
+            font-family: "Font Awesome 6 Free", "Font Awesome 6 Brands" !important;
+        }
+        ::-webkit-scrollbar {
+            display: none;
+        }
+        html, body {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+<body class="font-inter bg-gray-50">
+    <!-- Header Section -->
+    <header class="bg-white border-b border-gray-200 fixed top-0 left-0 right-0 z-10">
+        <div class="flex items-center justify-between px-4 py-3">
+            <button onclick="goBack()" class="p-2 hover:bg-gray-100 rounded-lg">
+                <i class="fa-solid fa-arrow-left text-gray-600 text-lg"></i>
+            </button>
+            <div class="text-center">
+                <h1 class="text-lg font-semibold text-dark">Generate Bill</h1>
+                <p class="text-xs text-gray-500">New Transaction</p>
+            </div>
+            <button onclick="clearAll()" class="p-2 hover:bg-gray-100 rounded-lg">
+                <i class="fa-solid fa-trash text-gray-600 text-lg"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="pt-16 pb-32 bg-gray-50">
+        <!-- Customer Selection -->
+        <div class="px-4 py-4">
+            <div class="bg-white rounded-lg p-4 shadow-sm border border-gray-100">
+                <h3 class="font-semibold text-dark mb-3">Customer Details</h3>
+                <div class="space-y-3">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Select Customer</label>
+                        <select id="customer-select" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            <option value="">Walk-in Customer</option>
+                            <option value="rajesh">Rajesh Kumar (+91 98765 43210)</option>
+                            <option value="priya">Priya Sharma (+91 98765 43211)</option>
+                            <option value="amit">Amit Singh (+91 98765 43212)</option>
+                        </select>
+                    </div>
+                    <div id="customer-info" class="hidden bg-blue-50 p-3 rounded-lg">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
+                                <span class="text-white font-bold text-sm">RK</span>
+                            </div>
+                            <div class="flex-1">
+                                <p class="font-medium text-dark">Rajesh Kumar</p>
+                                <p class="text-xs text-gray-600">Outstanding: ₹2,150</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Product Search & Add -->
+        <div class="px-4 mb-4">
+            <div class="bg-white rounded-lg p-4 shadow-sm border border-gray-100">
+                <h3 class="font-semibold text-dark mb-3">Add Products</h3>
+                <div class="relative mb-3">
+                    <i class="fa-solid fa-search absolute left-3 top-3 text-gray-400"></i>
+                    <input type="text" id="product-search" placeholder="Search products by name or scan barcode" class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                </div>
+                <div id="product-suggestions" class="space-y-2 max-h-40 overflow-y-auto hidden">
+                    <!-- Product suggestions will be populated here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Cart Items -->
+        <div class="px-4 mb-4">
+            <div class="bg-white rounded-lg shadow-sm border border-gray-100">
+                <div class="flex items-center justify-between p-4 border-b border-gray-200">
+                    <h3 class="font-semibold text-dark">Cart Items</h3>
+                    <span id="item-count" class="text-sm text-gray-500">0 items</span>
+                </div>
+                <div id="cart-items" class="divide-y divide-gray-100">
+                    <!-- Cart items will be populated here -->
+                    <div id="empty-cart" class="p-8 text-center">
+                        <i class="fa-solid fa-shopping-cart text-gray-300 text-3xl mb-2"></i>
+                        <p class="text-gray-500">No items in cart</p>
+                        <p class="text-xs text-gray-400">Search and add products above</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bill Summary -->
+        <div class="px-4 mb-4">
+            <div class="bg-white rounded-lg p-4 shadow-sm border border-gray-100">
+                <h3 class="font-semibold text-dark mb-3">Bill Summary</h3>
+                <div class="space-y-2">
+                    <div class="flex justify-between">
+                        <span class="text-gray-600">Subtotal:</span>
+                        <span id="subtotal" class="text-gray-800">₹0.00</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-gray-600">GST (5%):</span>
+                        <span id="gst-amount" class="text-gray-800">₹0.00</span>
+                    </div>
+                    <div class="flex justify-between items-center border-t border-gray-200 pt-2">
+                        <span class="text-lg font-semibold text-dark">Total:</span>
+                        <span id="total-amount" class="text-lg font-bold text-dark">₹0.00</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Payment Method -->
+        <div class="px-4 mb-4">
+            <div class="bg-white rounded-lg p-4 shadow-sm border border-gray-100">
+                <h3 class="font-semibold text-dark mb-3">Payment Method</h3>
+                <div class="grid grid-cols-3 gap-3 mb-4">
+                    <button class="payment-method active bg-green-500 text-white p-3 rounded-lg text-sm font-medium" data-method="cash">
+                        <i class="fa-solid fa-money-bill block mb-1"></i>
+                        Cash
+                    </button>
+                    <button class="payment-method bg-gray-200 text-gray-700 p-3 rounded-lg text-sm font-medium" data-method="credit">
+                        <i class="fa-solid fa-credit-card block mb-1"></i>
+                        Credit
+                    </button>
+                    <button class="payment-method bg-gray-200 text-gray-700 p-3 rounded-lg text-sm font-medium" data-method="split">
+                        <i class="fa-solid fa-arrows-split-up-and-left block mb-1"></i>
+                        Split
+                    </button>
+                </div>
+                
+                <!-- Cash Payment Details -->
+                <div id="cash-details" class="payment-details">
+                    <div class="space-y-3">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Amount Received</label>
+                            <div class="relative">
+                                <span class="absolute left-3 top-2 text-gray-500">₹</span>
+                                <input type="number" id="amount-received" placeholder="0" class="w-full pl-8 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            </div>
+                        </div>
+                        <div class="bg-green-50 p-3 rounded-lg">
+                            <div class="flex justify-between">
+                                <span class="text-sm text-gray-600">Change to return:</span>
+                                <span id="change-amount" class="text-sm font-bold text-green-600">₹0.00</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Credit Payment Details -->
+                <div id="credit-details" class="payment-details hidden">
+                    <div class="bg-orange-50 p-3 rounded-lg">
+                        <p class="text-sm text-orange-700 mb-2">This amount will be added to customer's credit account</p>
+                        <div class="flex justify-between">
+                            <span class="text-sm font-medium">Amount to Credit:</span>
+                            <span id="credit-amount" class="text-sm font-bold text-orange-600">₹0.00</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Split Payment Details -->
+                <div id="split-details" class="payment-details hidden">
+                    <div class="space-y-3">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Cash Amount</label>
+                            <div class="relative">
+                                <span class="absolute left-3 top-2 text-gray-500">₹</span>
+                                <input type="number" id="split-cash" placeholder="0" class="w-full pl-8 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            </div>
+                        </div>
+                        <div class="bg-yellow-50 p-3 rounded-lg">
+                            <div class="flex justify-between">
+                                <span class="text-sm text-gray-600">Remaining (Credit):</span>
+                                <span id="split-credit" class="text-sm font-bold text-yellow-600">₹0.00</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Fixed Bottom Actions -->
+    <div class="fixed bottom-16 left-0 right-0 bg-white border-t border-gray-200 p-4">
+        <div class="max-w-md mx-auto">
+            <button id="generate-bill-btn" onclick="generateBill()" class="w-full bg-blue-600 text-white py-4 px-6 rounded-lg font-semibold text-lg hover:bg-blue-700 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed" disabled>
+                <i class="fa-solid fa-receipt mr-2"></i>
+                Generate Bill
+            </button>
+        </div>
+    </div>
+
+    <!-- Bottom Navigation -->
+    <nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200">
+        <div class="flex justify-around items-end py-2">
+            <button class="flex flex-col items-center py-1 px-3" onclick="window.location.href='/dashboard'">
+                <i class="fa-solid fa-home text-gray-400 text-lg"></i>
+                <span class="text-xs mt-1 text-gray-400">Home</span>
+            </button>
+            <button class="flex flex-col items-center py-1 px-3" onclick="window.location.href='/inventory'">
+                <i class="fa-solid fa-box text-gray-400 text-lg"></i>
+                <span class="text-xs mt-1 text-gray-400">Inventory</span>
+            </button>
+            <button class="relative -top-3 bg-primary rounded-full p-3 shadow-lg" onclick="window.location.href='/add-item'">
+                <i class="fa-solid fa-barcode text-white text-lg"></i>
+            </button>
+            <button class="flex flex-col items-center py-1 px-3" onclick="window.location.href='/cart'">
+                <i class="fa-solid fa-shopping-cart text-primary text-lg"></i>
+                <span class="text-xs mt-1 text-primary">Cart</span>
+            </button>
+            <button class="flex flex-col items-center py-1 px-3" onclick="window.location.href='/profile'">
+                <i class="fa-solid fa-user text-gray-400 text-lg"></i>
+                <span class="text-xs mt-1 text-gray-400">Profile</span>
+            </button>
+        </div>
+    </nav>
+
+    <script>
+        let cart = [];
+        let currentPaymentMethod = 'cash';
+        
+        const products = [
+            { id: 1, name: 'Wheat Flour', price: 50, unit: 'Kg', image: 'https://storage.googleapis.com/uxpilot-auth.appspot.com/ad8aa6cee1-b621e3cd72c9ea714c53.png' },
+            { id: 2, name: 'Coconut Oil', price: 180, unit: 'Bottle', image: 'https://storage.googleapis.com/uxpilot-auth.appspot.com/02cda64d32-ca63fc32eaab87b7db4c.png' },
+            { id: 3, name: 'Aashirvaad Atta', price: 120, unit: 'Bag', image: 'https://storage.googleapis.com/uxpilot-auth.appspot.com/dd29a1f85f-469e6193e37489fc8c43.png' },
+            { id: 4, name: 'Basmati Rice', price: 80, unit: 'Bag', image: 'https://storage.googleapis.com/uxpilot-auth.appspot.com/5fc8cd7bc4-09ff84e61b7234ca57e8.png' },
+            { id: 5, name: 'Tata Salt', price: 25, unit: 'Bag', image: 'https://storage.googleapis.com/uxpilot-auth.appspot.com/e8f1a9b234-salt-package-1kg-white.png' }
+        ];
+
+        function goBack() {
+            window.history.back();
+        }
+
+        function clearAll() {
+            cart = [];
+            updateCartDisplay();
+            updateBillSummary();
+            document.getElementById('product-search').value = '';
+            document.getElementById('customer-select').value = '';
+            document.getElementById('customer-info').classList.add('hidden');
+        }
+
+        // Product search functionality
+        document.getElementById('product-search').addEventListener('input', function(e) {
+            const query = e.target.value.toLowerCase();
+            const suggestions = document.getElementById('product-suggestions');
+            
+            if (query.length > 0) {
+                const filtered = products.filter(p => p.name.toLowerCase().includes(query));
+                suggestions.innerHTML = '';
+                suggestions.classList.remove('hidden');
+                
+                filtered.forEach(product => {
+                    const div = document.createElement('div');
+                    div.className = 'flex items-center space-x-3 p-2 hover:bg-gray-50 rounded cursor-pointer';
+                    div.innerHTML = `
+                        <img src="${product.image}" alt="${product.name}" class="w-8 h-8 rounded object-cover">
+                        <div class="flex-1">
+                            <p class="text-sm font-medium">${product.name}</p>
+                            <p class="text-xs text-gray-500">₹${product.price}/${product.unit}</p>
+                        </div>
+                        <button class="bg-blue-500 text-white px-2 py-1 rounded text-xs">Add</button>
+                    `;
+                    div.addEventListener('click', () => addToCart(product));
+                    suggestions.appendChild(div);
+                });
+            } else {
+                suggestions.classList.add('hidden');
+            }
+        });
+
+        // Customer selection
+        document.getElementById('customer-select').addEventListener('change', function(e) {
+            const customerInfo = document.getElementById('customer-info');
+            if (e.target.value) {
+                customerInfo.classList.remove('hidden');
+            } else {
+                customerInfo.classList.add('hidden');
+            }
+        });
+
+        // Payment method selection
+        document.querySelectorAll('.payment-method').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.payment-method').forEach(b => {
+                    b.classList.remove('active', 'bg-green-500', 'text-white');
+                    b.classList.add('bg-gray-200', 'text-gray-700');
+                });
+                this.classList.add('active', 'bg-green-500', 'text-white');
+                this.classList.remove('bg-gray-200', 'text-gray-700');
+                
+                currentPaymentMethod = this.getAttribute('data-method');
+                showPaymentDetails(currentPaymentMethod);
+                updateBillSummary();
+            });
+        });
+
+        function showPaymentDetails(method) {
+            document.querySelectorAll('.payment-details').forEach(detail => {
+                detail.classList.add('hidden');
+            });
+            document.getElementById(`${method}-details`).classList.remove('hidden');
+        }
+
+        function addToCart(product) {
+            const existingItem = cart.find(item => item.id === product.id);
+            if (existingItem) {
+                existingItem.quantity += 1;
+            } else {
+                cart.push({ ...product, quantity: 1 });
+            }
+            updateCartDisplay();
+            updateBillSummary();
+            document.getElementById('product-search').value = '';
+            document.getElementById('product-suggestions').classList.add('hidden');
+        }
+
+        function removeFromCart(productId) {
+            cart = cart.filter(item => item.id !== productId);
+            updateCartDisplay();
+            updateBillSummary();
+        }
+
+        function updateQuantity(productId, newQuantity) {
+            if (newQuantity <= 0) {
+                removeFromCart(productId);
+                return;
+            }
+            const item = cart.find(item => item.id === productId);
+            if (item) {
+                item.quantity = newQuantity;
+                updateCartDisplay();
+                updateBillSummary();
+            }
+        }
+
+        function updateCartDisplay() {
+            const cartContainer = document.getElementById('cart-items');
+            const emptyCart = document.getElementById('empty-cart');
+            const itemCount = document.getElementById('item-count');
+            
+            if (cart.length === 0) {
+                emptyCart.classList.remove('hidden');
+                itemCount.textContent = '0 items';
+                document.getElementById('generate-bill-btn').disabled = true;
+                return;
+            }
+            
+            emptyCart.classList.add('hidden');
+            itemCount.textContent = `${cart.length} items`;
+            document.getElementById('generate-bill-btn').disabled = false;
+            
+            const cartHTML = cart.map(item => `
+                <div class="p-4 flex items-center space-x-3">
+                    <img src="${item.image}" alt="${item.name}" class="w-12 h-12 rounded object-cover">
+                    <div class="flex-1">
+                        <p class="font-medium text-dark">${item.name}</p>
+                        <p class="text-sm text-gray-600">₹${item.price}/${item.unit}</p>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <button onclick="updateQuantity(${item.id}, ${item.quantity - 1})" class="w-8 h-8 bg-gray-100 rounded flex items-center justify-center">
+                            <i class="fa-solid fa-minus text-xs"></i>
+                        </button>
+                        <span class="w-8 text-center font-medium">${item.quantity}</span>
+                        <button onclick="updateQuantity(${item.id}, ${item.quantity + 1})" class="w-8 h-8 bg-gray-100 rounded flex items-center justify-center">
+                            <i class="fa-solid fa-plus text-xs"></i>
+                        </button>
+                    </div>
+                    <div class="text-right">
+                        <p class="font-bold text-dark">₹${(item.price * item.quantity).toFixed(2)}</p>
+                        <button onclick="removeFromCart(${item.id})" class="text-red-500 text-xs">Remove</button>
+                    </div>
+                </div>
+            `).join('');
+            
+            cartContainer.innerHTML = cartHTML;
+        }
+
+        function updateBillSummary() {
+            const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            const gst = subtotal * 0.05;
+            const total = subtotal + gst;
+            
+            document.getElementById('subtotal').textContent = `₹${subtotal.toFixed(2)}`;
+            document.getElementById('gst-amount').textContent = `₹${gst.toFixed(2)}`;
+            document.getElementById('total-amount').textContent = `₹${total.toFixed(2)}`;
+            document.getElementById('credit-amount').textContent = `₹${total.toFixed(2)}`;
+            
+            // Update payment-specific calculations
+            const amountReceived = parseFloat(document.getElementById('amount-received')?.value || 0);
+            const changeAmount = Math.max(0, amountReceived - total);
+            document.getElementById('change-amount').textContent = `₹${changeAmount.toFixed(2)}`;
+            
+            const splitCash = parseFloat(document.getElementById('split-cash')?.value || 0);
+            const splitCredit = Math.max(0, total - splitCash);
+            document.getElementById('split-credit').textContent = `₹${splitCredit.toFixed(2)}`;
+        }
+
+        // Update calculations when payment amounts change
+        document.getElementById('amount-received')?.addEventListener('input', updateBillSummary);
+        document.getElementById('split-cash')?.addEventListener('input', updateBillSummary);
+
+        function generateBill() {
+            if (cart.length === 0) {
+                alert('Please add items to cart before generating bill');
+                return;
+            }
+            
+            const customer = document.getElementById('customer-select').value;
+            const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0) * 1.05;
+            
+            const billData = {
+                customer: customer || 'Walk-in Customer',
+                items: cart,
+                paymentMethod: currentPaymentMethod,
+                total: total.toFixed(2),
+                billNumber: 'BIL' + Date.now()
+            };
+            
+            // Store bill data for receipt page
+            localStorage.setItem('currentBill', JSON.stringify(billData));
+            
+            // Navigate to receipt page
+            window.location.href = `/receipt?bill=${billData.billNumber}`;
+        }
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            updateCartDisplay();
+            updateBillSummary();
+        });
+    </script>
+</body>
+</html>
