@@ -110,6 +110,9 @@
                 <button class="p-2 text-primary hover:bg-blue-50 rounded-lg transition-colors" onclick="editProfile()">
                     <i class="fa-solid fa-edit text-lg"></i>
                 </button>
+                <button class="p-2 text-green-600 hover:bg-green-50 rounded-lg transition-colors ml-2" onclick="alert('JavaScript is working!')">
+                    <i class="fa-solid fa-bug text-lg"></i>
+                </button>
             </div>
         </div>
 
@@ -359,7 +362,16 @@
         }
 
         function editProfile() {
-            document.getElementById('editProfileModal').classList.remove('hidden');
+            console.log('Edit profile button clicked');
+            const modal = document.getElementById('editProfileModal');
+            console.log('Modal element:', modal);
+            if (modal) {
+                modal.classList.remove('hidden');
+                console.log('Modal should now be visible');
+            } else {
+                console.error('Modal element not found');
+                alert('Modal element not found - debugging needed');
+            }
         }
 
         function closeEditProfile() {
