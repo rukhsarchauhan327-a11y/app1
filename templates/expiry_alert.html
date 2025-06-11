@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Expiry Alert - Kirana Konnect</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#2563eb',
+                        secondary: '#64748b',
+                        accent: '#f59e0b',
+                        success: '#10b981',
+                        danger: '#ef4444',
+                        dark: '#1e293b',
+                        light: '#f8fafc'
+                    },
+                    fontFamily: {
+                        inter: ['Inter', 'sans-serif'],
+                        sans: ['Inter', 'sans-serif']
+                    }
+                }
+            }
+        };
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif !important;
+        }
+        .fa, .fas, .far, .fal, .fab {
+            font-family: "Font Awesome 6 Free", "Font Awesome 6 Brands" !important;
+        }
+        ::-webkit-scrollbar {
+            display: none;
+        }
+        html, body {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+<body class="font-inter bg-gray-50">
+    <!-- Header Section -->
+    <header class="bg-white border-b border-gray-200 fixed top-0 left-0 right-0 z-10">
+        <div class="flex items-center justify-between px-4 py-3">
+            <button onclick="goBack()" class="p-2 hover:bg-gray-100 rounded-lg">
+                <i class="fa-solid fa-arrow-left text-gray-600 text-lg"></i>
+            </button>
+            <div class="text-center">
+                <h1 class="text-lg font-semibold text-dark">Expiry Alert</h1>
+                <p class="text-xs text-gray-500">Product Expiration Management</p>
+            </div>
+            <button onclick="refreshExpiry()" class="p-2 hover:bg-gray-100 rounded-lg">
+                <i class="fa-solid fa-refresh text-gray-600 text-lg"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="pt-16 pb-20 bg-gray-50">
+        <!-- Summary Cards -->
+        <div class="px-4 py-4">
+            <div class="grid grid-cols-3 gap-3 mb-4">
+                <div class="bg-red-50 p-3 rounded-lg text-center border border-red-200">
+                    <p class="text-xl font-bold text-red-600">5</p>
+                    <p class="text-xs text-red-500">Expired</p>
+                </div>
+                <div class="bg-orange-50 p-3 rounded-lg text-center border border-orange-200">
+                    <p class="text-xl font-bold text-orange-600">8</p>
+                    <p class="text-xs text-orange-500">Expiring Soon</p>
+                </div>
+                <div class="bg-yellow-50 p-3 rounded-lg text-center border border-yellow-200">
+                    <p class="text-xl font-bold text-yellow-600">12</p>
+                    <p class="text-xs text-yellow-500">This Month</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filter Tabs -->
+        <div class="px-4 mb-4">
+            <div class="bg-white rounded-lg p-3 shadow-sm border border-gray-100">
+                <div class="flex space-x-2 overflow-x-auto">
+                    <button class="filter-btn active px-3 py-2 bg-red-500 text-white text-sm rounded-lg whitespace-nowrap" data-filter="expired">
+                        <i class="fa-solid fa-ban mr-1"></i>
+                        Expired (5)
+                    </button>
+                    <button class="filter-btn px-3 py-2 bg-gray-200 text-gray-600 text-sm rounded-lg whitespace-nowrap" data-filter="soon">
+                        <i class="fa-solid fa-clock mr-1"></i>
+                        Soon (8)
+                    </button>
+                    <button class="filter-btn px-3 py-2 bg-gray-200 text-gray-600 text-sm rounded-lg whitespace-nowrap" data-filter="month">
+                        <i class="fa-solid fa-calendar mr-1"></i>
+                        This Month (12)
+                    </button>
+                    <button class="filter-btn px-3 py-2 bg-gray-200 text-gray-600 text-sm rounded-lg whitespace-nowrap" data-filter="all">
+                        All Items
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Expiry Items List -->
+        <div class="px-4 space-y-3">
+            <!-- Expired Items -->
+            <div class="expiry-item bg-white rounded-lg p-4 shadow-sm border-l-4 border-red-500" data-status="expired">
+                <div class="flex items-center space-x-3">
+                    <div class="w-12 h-12 rounded-lg overflow-hidden bg-gray-100">
+                        <img src="https://storage.googleapis.com/uxpilot-auth.appspot.com/f2c3d4e567-chocolate-bar-dairy-milk.png" alt="Dairy Milk Chocolate" class="w-full h-full object-cover">
+                    </div>
+                    <div class="flex-1">
+                        <div class="flex items-start justify-between">
+                            <div class="flex-1">
+                                <h3 class="font-bold text-dark">Dairy Milk Chocolate</h3>
+                                <p class="text-sm text-gray-600">₹45/Bar • Batch: DM240815</p>
+                                <div class="flex items-center space-x-2 mt-1">
+                                    <span class="bg-red-100 text-red-700 px-2 py-1 rounded-full text-xs font-medium">
+                                        <i class="fa-solid fa-ban mr-1"></i>Expired
+                                    </span>
+                                    <span class="text-xs text-gray-500">3 days ago</span>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-lg font-bold text-red-600">25 Bars</p>
+                                <p class="text-xs text-gray-500">Exp: 12 Jan 2025</p>
+                                <p class="text-xs text-red-600 font-medium">Remove Now</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-between mt-3">
+                            <span class="text-xs text-gray-500">Value Loss: ₹1,125</span>
+                            <div class="flex space-x-2">
+                                <button onclick="markRemoved('dairy-milk')" class="bg-red-500 text-white px-3 py-1 rounded text-xs font-medium">
+                                    <i class="fa-solid fa-trash mr-1"></i>Remove
+                                </button>
+                                <button onclick="markSold('dairy-milk')" class="bg-orange-500 text-white px-3 py-1 rounded text-xs font-medium">
+                                    <i class="fa-solid fa-tag mr-1"></i>Discount Sale
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="expiry-item bg-white rounded-lg p-4 shadow-sm border-l-4 border-red-500" data-status="expired">
+                <div class="flex items-center space-x-3">
+                    <div class="w-12 h-12 rounded-lg overflow-hidden bg-gray-100">
+                        <img src="https://storage.googleapis.com/uxpilot-auth.appspot.com/46dc2aecf3-4ae1d7f8a3bc9c8b21d6.png" alt="Maggi Noodles" class="w-full h-full object-cover">
+                    </div>
+                    <div class="flex-1">
+                        <div class="flex items-start justify-between">
+                            <div class="flex-1">
+                                <h3 class="font-bold text-dark">Maggi Noodles</h3>
+                                <p class="text-sm text-gray-600">₹15/Pack • Batch: MG240810</p>
+                                <div class="flex items-center space-x-2 mt-1">
+                                    <span class="bg-red-100 text-red-700 px-2 py-1 rounded-full text-xs font-medium">
+                                        <i class="fa-solid fa-ban mr-1"></i>Expired
+                                    </span>
+                                    <span class="text-xs text-gray-500">1 week ago</span>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-lg font-bold text-red-600">40 Packs</p>
+                                <p class="text-xs text-gray-500">Exp: 08 Jan 2025</p>
+                                <p class="text-xs text-red-600 font-medium">Remove Now</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-between mt-3">
+                            <span class="text-xs text-gray-500">Value Loss: ₹600</span>
+                            <div class="flex space-x-2">
+                                <button onclick="markRemoved('maggi')" class="bg-red-500 text-white px-3 py-1 rounded text-xs font-medium">
+                                    <i class="fa-solid fa-trash mr-1"></i>Remove
+                                </button>
+                                <button onclick="markSold('maggi')" class="bg-orange-500 text-white px-3 py-1 rounded text-xs font-medium">
+                                    <i class="fa-solid fa-tag mr-1"></i>Discount Sale
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Expiring Soon Items -->
+            <div class="expiry-item bg-white rounded-lg p-4 shadow-sm border-l-4 border-orange-500" data-status="soon">
+                <div class="flex items-center space-x-3">
+                    <div class="w-12 h-12 rounded-lg overflow-hidden bg-gray-100">
+                        <img src="https://storage.googleapis.com/uxpilot-auth.appspot.com/dd29a1f85f-469e6193e37489fc8c43.png" alt="Aashirvaad Atta" class="w-full h-full object-cover">
+                    </div>
+                    <div class="flex-1">
+                        <div class="flex items-start justify-between">
+                            <div class="flex-1">
+                                <h3 class="font-bold text-dark">Aashirvaad Atta</h3>
+                                <p class="text-sm text-gray-600">₹120/Bag • Batch: AA250110</p>
+                                <div class="flex items-center space-x-2 mt-1">
+                                    <span class="bg-orange-100 text-orange-700 px-2 py-1 rounded-full text-xs font-medium">
+                                        <i class="fa-solid fa-clock mr-1"></i>Expiring Soon
+                                    </span>
+                                    <span class="text-xs text-gray-500">2 days left</span>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-lg font-bold text-orange-600">3 Bags</p>
+                                <p class="text-xs text-gray-500">Exp: 17 Jan 2025</p>
+                                <p class="text-xs text-orange-600 font-medium">Action Needed</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-between mt-3">
+                            <span class="text-xs text-gray-500">Potential Loss: ₹360</span>
+                            <div class="flex space-x-2">
+                                <button onclick="quickSale('aashirvaad')" class="bg-green-500 text-white px-3 py-1 rounded text-xs font-medium">
+                                    <i class="fa-solid fa-bolt mr-1"></i>Quick Sale
+                                </button>
+                                <button onclick="setDiscount('aashirvaad')" class="bg-blue-500 text-white px-3 py-1 rounded text-xs font-medium">
+                                    <i class="fa-solid fa-percent mr-1"></i>Set Discount
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="expiry-item bg-white rounded-lg p-4 shadow-sm border-l-4 border-orange-500" data-status="soon">
+                <div class="flex items-center space-x-3">
+                    <div class="w-12 h-12 rounded-lg overflow-hidden bg-gray-100">
+                        <img src="https://storage.googleapis.com/uxpilot-auth.appspot.com/02cda64d32-ca63fc32eaab87b7db4c.png" alt="Coconut Oil" class="w-full h-full object-cover">
+                    </div>
+                    <div class="flex-1">
+                        <div class="flex items-start justify-between">
+                            <div class="flex-1">
+                                <h3 class="font-bold text-dark">Coconut Oil</h3>
+                                <p class="text-sm text-gray-600">₹180/Bottle • Batch: CO241215</p>
+                                <div class="flex items-center space-x-2 mt-1">
+                                    <span class="bg-orange-100 text-orange-700 px-2 py-1 rounded-full text-xs font-medium">
+                                        <i class="fa-solid fa-clock mr-1"></i>Expiring Soon
+                                    </span>
+                                    <span class="text-xs text-gray-500">5 days left</span>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-lg font-bold text-orange-600">8 Bottles</p>
+                                <p class="text-xs text-gray-500">Exp: 20 Jan 2025</p>
+                                <p class="text-xs text-orange-600 font-medium">Action Needed</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-between mt-3">
+                            <span class="text-xs text-gray-500">Potential Loss: ₹1,440</span>
+                            <div class="flex space-x-2">
+                                <button onclick="quickSale('coconut-oil')" class="bg-green-500 text-white px-3 py-1 rounded text-xs font-medium">
+                                    <i class="fa-solid fa-bolt mr-1"></i>Quick Sale
+                                </button>
+                                <button onclick="setDiscount('coconut-oil')" class="bg-blue-500 text-white px-3 py-1 rounded text-xs font-medium">
+                                    <i class="fa-solid fa-percent mr-1"></i>Set Discount
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- This Month Expiry Items -->
+            <div class="expiry-item bg-white rounded-lg p-4 shadow-sm border-l-4 border-yellow-500" data-status="month">
+                <div class="flex items-center space-x-3">
+                    <div class="w-12 h-12 rounded-lg overflow-hidden bg-gray-100">
+                        <img src="https://storage.googleapis.com/uxpilot-auth.appspot.com/5fc8cd7bc4-09ff84e61b7234ca57e8.png" alt="Basmati Rice" class="w-full h-full object-cover">
+                    </div>
+                    <div class="flex-1">
+                        <div class="flex items-start justify-between">
+                            <div class="flex-1">
+                                <h3 class="font-bold text-dark">Basmati Rice</h3>
+                                <p class="text-sm text-gray-600">₹80/Bag • Batch: BR250201</p>
+                                <div class="flex items-center space-x-2 mt-1">
+                                    <span class="bg-yellow-100 text-yellow-700 px-2 py-1 rounded-full text-xs font-medium">
+                                        <i class="fa-solid fa-calendar mr-1"></i>This Month
+                                    </span>
+                                    <span class="text-xs text-gray-500">20 days left</span>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-lg font-bold text-yellow-600">15 Bags</p>
+                                <p class="text-xs text-gray-500">Exp: 05 Feb 2025</p>
+                                <p class="text-xs text-yellow-600 font-medium">Monitor</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-between mt-3">
+                            <span class="text-xs text-gray-500">Value at risk: ₹1,200</span>
+                            <div class="flex space-x-2">
+                                <button onclick="setReminder('basmati-rice')" class="bg-yellow-500 text-white px-3 py-1 rounded text-xs font-medium">
+                                    <i class="fa-solid fa-bell mr-1"></i>Set Reminder
+                                </button>
+                                <button onclick="viewDetails('basmati-rice')" class="bg-gray-200 text-gray-700 px-3 py-1 rounded text-xs font-medium">
+                                    Details
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="px-4 mt-6 mb-4">
+            <div class="bg-white rounded-lg p-4 shadow-sm border border-gray-100">
+                <h3 class="font-semibold text-dark mb-3">Quick Actions</h3>
+                <div class="grid grid-cols-2 gap-3">
+                    <button onclick="bulkDiscount()" class="bg-orange-500 text-white p-3 rounded-lg font-medium">
+                        <i class="fa-solid fa-percent mr-2"></i>Bulk Discount
+                    </button>
+                    <button onclick="generateReport()" class="bg-blue-500 text-white p-3 rounded-lg font-medium">
+                        <i class="fa-solid fa-file-lines mr-2"></i>Expiry Report
+                    </button>
+                </div>
+                <button onclick="setupAlerts()" class="w-full mt-3 bg-green-500 text-white p-3 rounded-lg font-medium">
+                    <i class="fa-solid fa-bell mr-2"></i>Setup Expiry Alerts
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <!-- Bottom Navigation -->
+    <nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200">
+        <div class="flex justify-around items-end py-2">
+            <button class="flex flex-col items-center py-1 px-3" onclick="window.location.href='/dashboard'">
+                <i class="fa-solid fa-home text-gray-400 text-lg"></i>
+                <span class="text-xs mt-1 text-gray-400">Home</span>
+            </button>
+            <button class="flex flex-col items-center py-1 px-3" onclick="window.location.href='/inventory'">
+                <i class="fa-solid fa-box text-primary text-lg"></i>
+                <span class="text-xs mt-1 text-primary">Inventory</span>
+            </button>
+            <button class="relative -top-3 bg-primary rounded-full p-3 shadow-lg" onclick="window.location.href='/add-item'">
+                <i class="fa-solid fa-barcode text-white text-lg"></i>
+            </button>
+            <button class="flex flex-col items-center py-1 px-3" onclick="window.location.href='/cart'">
+                <i class="fa-solid fa-shopping-cart text-gray-400 text-lg"></i>
+                <span class="text-xs mt-1 text-gray-400">Cart</span>
+            </button>
+            <button class="flex flex-col items-center py-1 px-3" onclick="window.location.href='/profile'">
+                <i class="fa-solid fa-user text-gray-400 text-lg"></i>
+                <span class="text-xs mt-1 text-gray-400">Profile</span>
+            </button>
+        </div>
+    </nav>
+
+    <script>
+        function goBack() {
+            window.history.back();
+        }
+
+        function refreshExpiry() {
+            location.reload();
+        }
+
+        function markRemoved(itemId) {
+            if (confirm('Mark this item as removed from inventory?')) {
+                alert(`${itemId} marked as removed due to expiry`);
+                // In real app, this would update the inventory system
+            }
+        }
+
+        function markSold(itemId) {
+            if (confirm('Mark this item as sold at discount?')) {
+                alert(`${itemId} marked as discount sale`);
+                // In real app, this would create a discount sale entry
+            }
+        }
+
+        function quickSale(itemId) {
+            alert(`Setting up quick sale promotion for ${itemId}`);
+            // In real app, this would create a quick sale campaign
+        }
+
+        function setDiscount(itemId) {
+            const discount = prompt('Enter discount percentage (e.g., 20 for 20%):');
+            if (discount && !isNaN(discount)) {
+                alert(`${discount}% discount set for ${itemId}`);
+                // In real app, this would update the product pricing
+            }
+        }
+
+        function setReminder(itemId) {
+            alert(`Reminder set for ${itemId} - you'll be notified 3 days before expiry`);
+            // In real app, this would create a notification reminder
+        }
+
+        function viewDetails(itemId) {
+            window.location.href = '/product-details';
+        }
+
+        function bulkDiscount() {
+            alert('Opening bulk discount interface for all expiring items');
+            // In real app, this would open a bulk pricing interface
+        }
+
+        function generateReport() {
+            alert('Generating expiry report...');
+            // In real app, this would generate and download a report
+        }
+
+        function setupAlerts() {
+            alert('Opening expiry alert configuration');
+            // In real app, this would open notification settings
+        }
+
+        // Filter functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const filterBtns = document.querySelectorAll('.filter-btn');
+            const expiryItems = document.querySelectorAll('.expiry-item');
+
+            filterBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const filter = this.getAttribute('data-filter');
+                    
+                    // Update active button
+                    filterBtns.forEach(b => {
+                        b.classList.remove('active');
+                        if (filter === 'expired') {
+                            b.classList.remove('bg-red-500', 'text-white');
+                            b.classList.add('bg-gray-200', 'text-gray-600');
+                        } else if (filter === 'soon') {
+                            b.classList.remove('bg-orange-500', 'text-white');
+                            b.classList.add('bg-gray-200', 'text-gray-600');
+                        } else if (filter === 'month') {
+                            b.classList.remove('bg-yellow-500', 'text-white');
+                            b.classList.add('bg-gray-200', 'text-gray-600');
+                        } else {
+                            b.classList.remove('bg-blue-500', 'text-white');
+                            b.classList.add('bg-gray-200', 'text-gray-600');
+                        }
+                    });
+                    
+                    this.classList.add('active');
+                    this.classList.remove('bg-gray-200', 'text-gray-600');
+                    if (filter === 'expired') {
+                        this.classList.add('bg-red-500', 'text-white');
+                    } else if (filter === 'soon') {
+                        this.classList.add('bg-orange-500', 'text-white');
+                    } else if (filter === 'month') {
+                        this.classList.add('bg-yellow-500', 'text-white');
+                    } else {
+                        this.classList.add('bg-blue-500', 'text-white');
+                    }
+
+                    // Filter items
+                    expiryItems.forEach(item => {
+                        const status = item.getAttribute('data-status');
+                        if (filter === 'all' || status === filter) {
+                            item.style.display = 'block';
+                        } else {
+                            item.style.display = 'none';
+                        }
+                    });
+                });
+            });
+        });
+    </script>
+</body>
+</html>

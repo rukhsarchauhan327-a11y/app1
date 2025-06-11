@@ -85,6 +85,11 @@ def low_stock():
     """Serve the low stock alert page"""
     return render_template('low_stock.html')
 
+@app.route('/expiry-alert')
+def expiry_alert():
+    """Serve the expiry alert page"""
+    return render_template('expiry_alert.html')
+
 @app.route('/refill-stock')
 def refill_stock():
     """Serve the refill stock page"""
