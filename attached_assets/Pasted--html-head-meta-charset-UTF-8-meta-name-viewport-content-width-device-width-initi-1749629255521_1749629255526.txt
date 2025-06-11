@@ -1,0 +1,307 @@
+<html><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script> window.FontAwesomeConfig = { autoReplaceSvg: 'nest'};</script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <style>::-webkit-scrollbar { display: none;}</style>
+    
+    <script>tailwind.config = {
+  "theme": {
+    "extend": {
+      "colors": {
+        "primary": "#2563eb",
+        "secondary": "#64748b",
+        "accent": "#f59e0b",
+        "success": "#10b981",
+        "danger": "#ef4444",
+        "dark": "#1e293b",
+        "light": "#f8fafc"
+      },
+      "fontFamily": {
+        "inter": [
+          "Inter",
+          "sans-serif"
+        ],
+        "sans": [
+          "Inter",
+          "sans-serif"
+        ]
+      }
+    }
+  }
+};</script>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin=""><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;500;600;700;800;900&amp;display=swap"><style>
+      body {
+        font-family: 'Inter', sans-serif !important;
+      }
+      
+      /* Preserve Font Awesome icons */
+      .fa, .fas, .far, .fal, .fab {
+        font-family: "Font Awesome 6 Free", "Font Awesome 6 Brands" !important;
+      }
+    </style><style>
+  .highlighted-section {
+    outline: 2px solid #3F20FB;
+    background-color: rgba(63, 32, 251, 0.1);
+  }
+
+  .edit-button {
+    position: absolute;
+    z-index: 1000;
+  }
+
+  ::-webkit-scrollbar {
+    display: none;
+  }
+
+  html, body {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  </style></head>
+<body class="font-inter bg-gray-100">
+    <!-- Header Section -->
+    <header id="header" class="bg-white border-b border-gray-200 fixed top-0 left-0 right-0 z-10">
+        <div class="flex items-center justify-between px-4 py-3">
+            <button class="p-2 hover:bg-gray-100 rounded-lg">
+                <i class="fa-solid fa-arrow-left text-gray-600 text-lg"></i>
+            </button>
+            <div class="text-center">
+                <h1 class="text-lg font-semibold text-dark">Manage Staff</h1>
+                <p class="text-xs text-gray-500">Kirana Konnect</p>
+            </div>
+            <button class="p-2 hover:bg-gray-100 rounded-lg">
+                <i class="fa-solid fa-plus text-primary text-lg"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main id="main-content" class="pt-16 pb-20 bg-gray-100">
+        <!-- Staff Overview Cards -->
+        <div id="staff-overview" class="bg-white px-4 py-4">
+            <div class="grid grid-cols-3 gap-3">
+                <div class="bg-blue-50 p-3 rounded-lg text-center">
+                    <p class="text-xl font-bold text-blue-600">5</p>
+                    <p class="text-xs text-blue-500">Total Staff</p>
+                </div>
+                <div class="bg-green-50 p-3 rounded-lg text-center">
+                    <p class="text-xl font-bold text-green-600">3</p>
+                    <p class="text-xs text-green-500">Present Today</p>
+                </div>
+                <div class="bg-orange-50 p-3 rounded-lg text-center">
+                    <p class="text-xl font-bold text-orange-600">2</p>
+                    <p class="text-xs text-orange-500">Absent</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Attendance Section -->
+        <div id="attendance-section" class="bg-white mt-2 px-4 py-4">
+            <div class="flex items-center justify-between mb-3">
+                <h3 class="text-lg font-semibold text-dark">Today's Attendance</h3>
+                <span class="text-sm text-gray-500">Dec 4, 2024</span>
+            </div>
+            <div class="space-y-3">
+                <div class="flex items-center justify-between p-3 bg-green-50 rounded-lg">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center">
+                            <span class="text-white font-medium text-sm">AK</span>
+                        </div>
+                        <div>
+                            <p class="font-medium text-dark">Anil Kumar</p>
+                            <p class="text-sm text-gray-500">Cashier</p>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-sm font-medium text-green-600">Present</p>
+                        <p class="text-xs text-gray-500">In: 9:00 AM</p>
+                    </div>
+                </div>
+                <div class="flex items-center justify-between p-3 bg-green-50 rounded-lg">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center">
+                            <span class="text-white font-medium text-sm">PS</span>
+                        </div>
+                        <div>
+                            <p class="font-medium text-dark">Priya Sharma</p>
+                            <p class="text-sm text-gray-500">Assistant</p>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-sm font-medium text-green-600">Present</p>
+                        <p class="text-xs text-gray-500">In: 9:15 AM</p>
+                    </div>
+                </div>
+                <div class="flex items-center justify-between p-3 bg-red-50 rounded-lg">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-10 h-10 bg-red-500 rounded-full flex items-center justify-center">
+                            <span class="text-white font-medium text-sm">RV</span>
+                        </div>
+                        <div>
+                            <p class="font-medium text-dark">Ravi Verma</p>
+                            <p class="text-sm text-gray-500">Helper</p>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-sm font-medium text-red-600">Absent</p>
+                        <p class="text-xs text-gray-500">-</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- All Staff Section -->
+        <div id="all-staff" class="bg-white mt-2 px-4 py-4">
+            <div class="flex items-center justify-between mb-3">
+                <h3 class="text-lg font-semibold text-dark">All Staff Members</h3>
+                <button class="text-primary text-sm font-medium">View All</button>
+            </div>
+            <div class="space-y-3">
+                <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                    <div class="flex items-center space-x-3">
+                        <img src="https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-2.jpg" alt="Avatar" class="w-10 h-10 rounded-full">
+                        <div>
+                            <p class="font-medium text-dark">Anil Kumar</p>
+                            <p class="text-sm text-gray-500">Cashier • +91 98765 43210</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <span class="w-2 h-2 bg-green-500 rounded-full"></span>
+                        <i class="fa-solid fa-chevron-right text-gray-400"></i>
+                    </div>
+                </div>
+                <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                    <div class="flex items-center space-x-3">
+                        <img src="https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-5.jpg" alt="Avatar" class="w-10 h-10 rounded-full">
+                        <div>
+                            <p class="font-medium text-dark">Priya Sharma</p>
+                            <p class="text-sm text-gray-500">Assistant • +91 87654 32109</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <span class="w-2 h-2 bg-green-500 rounded-full"></span>
+                        <i class="fa-solid fa-chevron-right text-gray-400"></i>
+                    </div>
+                </div>
+                <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                    <div class="flex items-center space-x-3">
+                        <img src="https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-3.jpg" alt="Avatar" class="w-10 h-10 rounded-full">
+                        <div>
+                            <p class="font-medium text-dark">Ravi Verma</p>
+                            <p class="text-sm text-gray-500">Helper • +91 76543 21098</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <span class="w-2 h-2 bg-red-500 rounded-full"></span>
+                        <i class="fa-solid fa-chevron-right text-gray-400"></i>
+                    </div>
+                </div>
+                <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                    <div class="flex items-center space-x-3">
+                        <img src="https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-8.jpg" alt="Avatar" class="w-10 h-10 rounded-full">
+                        <div>
+                            <p class="font-medium text-dark">Suresh Patel</p>
+                            <p class="text-sm text-gray-500">Manager • +91 65432 10987</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <span class="w-2 h-2 bg-green-500 rounded-full"></span>
+                        <i class="fa-solid fa-chevron-right text-gray-400"></i>
+                    </div>
+                </div>
+                <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                    <div class="flex items-center space-x-3">
+                        <img src="https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-6.jpg" alt="Avatar" class="w-10 h-10 rounded-full">
+                        <div>
+                            <p class="font-medium text-dark">Meera Singh</p>
+                            <p class="text-sm text-gray-500">Accountant • +91 54321 09876</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <span class="w-2 h-2 bg-red-500 rounded-full"></span>
+                        <i class="fa-solid fa-chevron-right text-gray-400"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div id="quick-actions" class="bg-white mt-2 px-4 py-4">
+            <h3 class="text-lg font-semibold text-dark mb-3">Quick Actions</h3>
+            <div class="grid grid-cols-2 gap-3">
+                <button class="flex flex-col items-center p-4 bg-blue-50 rounded-lg hover:bg-blue-100">
+                    <i class="fa-solid fa-user-plus text-blue-600 text-2xl mb-2"></i>
+                    <span class="text-sm font-medium text-blue-600">Add Staff</span>
+                </button>
+                <button class="flex flex-col items-center p-4 bg-green-50 rounded-lg hover:bg-green-100">
+                    <i class="fa-solid fa-clock text-green-600 text-2xl mb-2"></i>
+                    <span class="text-sm font-medium text-green-600">Attendance</span>
+                </button>
+                <button class="flex flex-col items-center p-4 bg-orange-50 rounded-lg hover:bg-orange-100">
+                    <i class="fa-solid fa-chart-line text-orange-600 text-2xl mb-2"></i>
+                    <span class="text-sm font-medium text-orange-600">Performance</span>
+                </button>
+                <button class="flex flex-col items-center p-4 bg-purple-50 rounded-lg hover:bg-purple-100">
+                    <i class="fa-solid fa-cog text-purple-600 text-2xl mb-2"></i>
+                    <span class="text-sm font-medium text-purple-600">Settings</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Permissions Section -->
+        <div id="permissions-section" class="bg-white mt-2 px-4 py-4">
+            <h3 class="text-lg font-semibold text-dark mb-3">Role Permissions</h3>
+            <div class="space-y-3">
+                <div class="p-3 bg-gray-50 rounded-lg">
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="font-medium text-dark">Manager</span>
+                        <span class="text-xs bg-blue-100 text-blue-600 px-2 py-1 rounded">Full Access</span>
+                    </div>
+                    <p class="text-sm text-gray-600">Can manage inventory, billing, staff, and reports</p>
+                </div>
+                <div class="p-3 bg-gray-50 rounded-lg">
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="font-medium text-dark">Cashier</span>
+                        <span class="text-xs bg-green-100 text-green-600 px-2 py-1 rounded">Billing Only</span>
+                    </div>
+                    <p class="text-sm text-gray-600">Can create bills and view inventory</p>
+                </div>
+                <div class="p-3 bg-gray-50 rounded-lg">
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="font-medium text-dark">Helper</span>
+                        <span class="text-xs bg-orange-100 text-orange-600 px-2 py-1 rounded">Limited Access</span>
+                    </div>
+                    <p class="text-sm text-gray-600">Can view inventory and assist customers</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Bottom Navigation -->
+    <nav id="footer" class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200">
+        <div class="flex justify-around items-end py-2">
+            <button class="flex flex-col items-center py-1 px-3">
+                <i class="fa-solid fa-home text-gray-400 text-lg"></i>
+                <span class="text-xs mt-1 text-gray-400">Home</span>
+            </button>
+            <button class="flex flex-col items-center py-1 px-3">
+                <i class="fa-solid fa-box text-gray-400 text-lg"></i>
+                <span class="text-xs mt-1 text-gray-400">Inventory</span>
+            </button>
+            <button class="relative -top-3 bg-primary rounded-full p-3 shadow-lg">
+                <i class="fa-solid fa-barcode text-white text-lg"></i>
+            </button>
+            <button class="flex flex-col items-center py-1 px-3">
+                <i class="fa-solid fa-shopping-cart text-gray-400 text-lg"></i>
+                <span class="text-xs mt-1 text-gray-400">Cart</span>
+            </button>
+            <button class="flex flex-col items-center py-1 px-3">
+                <i class="fa-solid fa-user text-gray-400 text-lg"></i>
+                <span class="text-xs mt-1 text-gray-400">Profile</span>
+            </button>
+        </div>
+    </nav>
+
+</body></html>

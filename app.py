@@ -70,5 +70,10 @@ def refill_stock():
     """Serve the refill stock page"""
     return render_template('refill_stock.html')
 
+@app.route('/staff')
+def staff():
+    """Serve the staff management page"""
+    return render_template('staff.html')
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)

@@ -1,0 +1,410 @@
+<html><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script> window.FontAwesomeConfig = { autoReplaceSvg: 'nest'};</script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <style>::-webkit-scrollbar { display: none;}</style>
+    
+    <script>tailwind.config = {
+  "theme": {
+    "extend": {
+      "colors": {
+        "primary": "#2563eb",
+        "secondary": "#64748b",
+        "accent": "#f59e0b",
+        "success": "#10b981",
+        "danger": "#ef4444",
+        "dark": "#1e293b",
+        "light": "#f8fafc"
+      },
+      "fontFamily": {
+        "inter": [
+          "Inter",
+          "sans-serif"
+        ],
+        "sans": [
+          "Inter",
+          "sans-serif"
+        ]
+      }
+    }
+  }
+};</script>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin=""><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;500;600;700;800;900&amp;display=swap"><style>
+      body {
+        font-family: 'Inter', sans-serif !important;
+      }
+      
+      /* Preserve Font Awesome icons */
+      .fa, .fas, .far, .fal, .fab {
+        font-family: "Font Awesome 6 Free", "Font Awesome 6 Brands" !important;
+      }
+    </style><style>
+  .highlighted-section {
+    outline: 2px solid #3F20FB;
+    background-color: rgba(63, 32, 251, 0.1);
+  }
+
+  .edit-button {
+    position: absolute;
+    z-index: 1000;
+  }
+
+  ::-webkit-scrollbar {
+    display: none;
+  }
+
+  html, body {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  </style></head>
+<body class="font-inter bg-gray-100">
+    <!-- Header Section -->
+    <header id="header" class="bg-white border-b border-gray-200 fixed top-0 left-0 right-0 z-10">
+        <div class="flex items-center justify-between px-4 py-3">
+            <button class="p-2 hover:bg-gray-100 rounded-lg">
+                <i class="fa-solid fa-arrow-left text-gray-600 text-lg"></i>
+            </button>
+            <div class="text-center">
+                <h1 class="text-lg font-semibold text-dark">Staff Profile</h1>
+                <p class="text-xs text-gray-500">Kirana Konnect</p>
+            </div>
+            <button class="p-2 hover:bg-gray-100 rounded-lg">
+                <i class="fa-solid fa-edit text-primary text-lg"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main id="main-content" class="pt-16 pb-20 bg-gray-100">
+        <!-- Profile Header -->
+        <div id="profile-header" class="bg-white px-4 py-6">
+            <div class="flex items-center space-x-4">
+                <img src="https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-2.jpg" alt="Profile" class="w-20 h-20 rounded-full border-4 border-blue-100">
+                <div class="flex-1">
+                    <h2 class="text-xl font-bold text-dark">Anil Kumar</h2>
+                    <p class="text-sm text-gray-500 mb-1">Cashier</p>
+                    <div class="flex items-center space-x-2">
+                        <span class="w-2 h-2 bg-green-500 rounded-full"></span>
+                        <span class="text-xs text-green-600 font-medium">Present Today</span>
+                    </div>
+                </div>
+                <div class="text-right">
+                    <p class="text-xs text-gray-500">Employee ID</p>
+                    <p class="text-sm font-medium text-dark">#EMP001</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Contact Information -->
+        <div id="contact-info" class="bg-white mt-2 px-4 py-4">
+            <h3 class="text-lg font-semibold text-dark mb-3">Contact Information</h3>
+            <div class="space-y-3">
+                <div class="flex items-center space-x-3">
+                    <div class="w-8 h-8 bg-blue-50 rounded-lg flex items-center justify-center">
+                        <i class="fa-solid fa-phone text-blue-600 text-sm"></i>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-500">Phone</p>
+                        <p class="font-medium text-dark">+91 98765 43210</p>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-3">
+                    <div class="w-8 h-8 bg-green-50 rounded-lg flex items-center justify-center">
+                        <i class="fa-solid fa-envelope text-green-600 text-sm"></i>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-500">Email</p>
+                        <p class="font-medium text-dark">anil.kumar@gmail.com</p>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-3">
+                    <div class="w-8 h-8 bg-orange-50 rounded-lg flex items-center justify-center">
+                        <i class="fa-solid fa-map-marker-alt text-orange-600 text-sm"></i>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-500">Address</p>
+                        <p class="font-medium text-dark">123 Main Street, Delhi - 110001</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Work Details -->
+        <div id="work-details" class="bg-white mt-2 px-4 py-4">
+            <h3 class="text-lg font-semibold text-dark mb-3">Work Details</h3>
+            <div class="grid grid-cols-2 gap-4">
+                <div class="bg-gray-50 p-3 rounded-lg">
+                    <p class="text-xs text-gray-500 mb-1">Join Date</p>
+                    <p class="font-medium text-dark">15 Jan 2024</p>
+                </div>
+                <div class="bg-gray-50 p-3 rounded-lg">
+                    <p class="text-xs text-gray-500 mb-1">Department</p>
+                    <p class="font-medium text-dark">Sales</p>
+                </div>
+                <div class="bg-gray-50 p-3 rounded-lg">
+                    <p class="text-xs text-gray-500 mb-1">Working Hours</p>
+                    <p class="font-medium text-dark">9 AM - 6 PM</p>
+                </div>
+                <div class="bg-gray-50 p-3 rounded-lg">
+                    <p class="text-xs text-gray-500 mb-1">Working Days</p>
+                    <p class="font-medium text-dark">Mon - Sat</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Payment Structure -->
+        <div id="payment-structure" class="bg-white mt-2 px-4 py-4">
+            <h3 class="text-lg font-semibold text-dark mb-3">Payment Structure</h3>
+            <div class="space-y-4">
+                <div class="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
+                            <i class="fa-solid fa-calendar text-white text-xs"></i>
+                        </div>
+                        <div>
+                            <p class="font-medium text-dark">Payment Type</p>
+                            <p class="text-sm text-gray-500">Monthly salary</p>
+                        </div>
+                    </div>
+                    <span class="text-sm font-medium text-blue-600">Monthly</span>
+                </div>
+                <div class="flex items-center justify-between p-3 bg-green-50 rounded-lg">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
+                            <i class="fa-solid fa-rupee-sign text-white text-xs"></i>
+                        </div>
+                        <div>
+                            <p class="font-medium text-dark">Base Salary</p>
+                            <p class="text-sm text-gray-500">Fixed monthly amount</p>
+                        </div>
+                    </div>
+                    <span class="text-sm font-medium text-green-600">₹15,000</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Penalty & Bonus Settings -->
+        <div id="penalty-bonus" class="bg-white mt-2 px-4 py-4">
+            <h3 class="text-lg font-semibold text-dark mb-3">Penalty &amp; Bonus Settings</h3>
+            <div class="space-y-3">
+                <div class="flex items-center justify-between p-3 bg-red-50 rounded-lg">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-8 h-8 bg-red-500 rounded-full flex items-center justify-center">
+                            <i class="fa-solid fa-clock text-white text-xs"></i>
+                        </div>
+                        <div>
+                            <p class="font-medium text-dark">Late Penalty</p>
+                            <p class="text-sm text-gray-500">Per minute deduction</p>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <span class="text-sm font-medium text-red-600">₹5/min</span>
+                        <p class="text-xs text-gray-500">Enabled</p>
+                    </div>
+                </div>
+                <div class="flex items-center justify-between p-3 bg-orange-50 rounded-lg">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-8 h-8 bg-orange-500 rounded-full flex items-center justify-center">
+                            <i class="fa-solid fa-gift text-white text-xs"></i>
+                        </div>
+                        <div>
+                            <p class="font-medium text-dark">Performance Bonus</p>
+                            <p class="text-sm text-gray-500">Monthly incentive</p>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <span class="text-sm font-medium text-orange-600">₹2,000</span>
+                        <p class="text-xs text-gray-500">Enabled</p>
+                    </div>
+                </div>
+                <div class="flex items-center justify-between p-3 bg-purple-50 rounded-lg">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-8 h-8 bg-purple-500 rounded-full flex items-center justify-center">
+                            <i class="fa-solid fa-target text-white text-xs"></i>
+                        </div>
+                        <div>
+                            <p class="font-medium text-dark">Sales Target Bonus</p>
+                            <p class="text-sm text-gray-500">Above ₹50,000 monthly</p>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <span class="text-sm font-medium text-purple-600">5%</span>
+                        <p class="text-xs text-gray-500">Enabled</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Payment Details -->
+        <div id="payment-details" class="bg-white mt-2 px-4 py-4">
+            <h3 class="text-lg font-semibold text-dark mb-3">Payment Details</h3>
+            <div class="space-y-3">
+                <div class="flex items-center space-x-3">
+                    <div class="w-8 h-8 bg-indigo-50 rounded-lg flex items-center justify-center">
+                        <i class="fa-solid fa-university text-indigo-600 text-sm"></i>
+                    </div>
+                    <div class="flex-1">
+                        <p class="text-sm text-gray-500">Bank Account</p>
+                        <p class="font-medium text-dark">HDFC Bank - ****1234</p>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-3">
+                    <div class="w-8 h-8 bg-blue-50 rounded-lg flex items-center justify-center">
+                        <i class="fa-solid fa-credit-card text-blue-600 text-sm"></i>
+                    </div>
+                    <div class="flex-1">
+                        <p class="text-sm text-gray-500">UPI ID</p>
+                        <p class="font-medium text-dark">anil.kumar@paytm</p>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-3">
+                    <div class="w-8 h-8 bg-green-50 rounded-lg flex items-center justify-center">
+                        <i class="fa-solid fa-calendar-check text-green-600 text-sm"></i>
+                    </div>
+                    <div class="flex-1">
+                        <p class="text-sm text-gray-500">Last Payment</p>
+                        <p class="font-medium text-dark">₹15,000 - Nov 30, 2024</p>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-3">
+                    <div class="w-8 h-8 bg-yellow-50 rounded-lg flex items-center justify-center">
+                        <i class="fa-solid fa-calendar-plus text-yellow-600 text-sm"></i>
+                    </div>
+                    <div class="flex-1">
+                        <p class="text-sm text-gray-500">Next Payment Due</p>
+                        <p class="font-medium text-dark">Dec 31, 2024</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Today's Activity -->
+        <div id="today-activity" class="bg-white mt-2 px-4 py-4">
+            <h3 class="text-lg font-semibold text-dark mb-3">Today's Activity</h3>
+            <div class="space-y-3">
+                <div class="flex items-center justify-between p-3 bg-green-50 rounded-lg">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
+                            <i class="fa-solid fa-clock text-white text-xs"></i>
+                        </div>
+                        <div>
+                            <p class="font-medium text-dark">Clock In</p>
+                            <p class="text-sm text-gray-500">Morning shift started</p>
+                        </div>
+                    </div>
+                    <span class="text-sm font-medium text-green-600">9:00 AM</span>
+                </div>
+                <div class="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
+                            <i class="fa-solid fa-receipt text-white text-xs"></i>
+                        </div>
+                        <div>
+                            <p class="font-medium text-dark">Bills Generated</p>
+                            <p class="text-sm text-gray-500">Total sales handled</p>
+                        </div>
+                    </div>
+                    <span class="text-sm font-medium text-blue-600">23 Bills</span>
+                </div>
+                <div class="flex items-center justify-between p-3 bg-orange-50 rounded-lg">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-8 h-8 bg-orange-500 rounded-full flex items-center justify-center">
+                            <i class="fa-solid fa-rupee-sign text-white text-xs"></i>
+                        </div>
+                        <div>
+                            <p class="font-medium text-dark">Sales Amount</p>
+                            <p class="text-sm text-gray-500">Revenue generated</p>
+                        </div>
+                    </div>
+                    <span class="text-sm font-medium text-orange-600">₹8,450</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Permissions -->
+        <div id="permissions" class="bg-white mt-2 px-4 py-4">
+            <h3 class="text-lg font-semibold text-dark mb-3">Access Permissions</h3>
+            <div class="space-y-3">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-3">
+                        <i class="fa-solid fa-receipt text-green-600"></i>
+                        <span class="font-medium text-dark">Billing</span>
+                    </div>
+                    <span class="text-xs bg-green-100 text-green-600 px-2 py-1 rounded">Full Access</span>
+                </div>
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-3">
+                        <i class="fa-solid fa-box text-blue-600"></i>
+                        <span class="font-medium text-dark">Inventory</span>
+                    </div>
+                    <span class="text-xs bg-blue-100 text-blue-600 px-2 py-1 rounded">View Only</span>
+                </div>
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-3">
+                        <i class="fa-solid fa-users text-orange-600"></i>
+                        <span class="font-medium text-dark">Customers</span>
+                    </div>
+                    <span class="text-xs bg-orange-100 text-orange-600 px-2 py-1 rounded">View Only</span>
+                </div>
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-3">
+                        <i class="fa-solid fa-chart-line text-red-600"></i>
+                        <span class="font-medium text-dark">Reports</span>
+                    </div>
+                    <span class="text-xs bg-red-100 text-red-600 px-2 py-1 rounded">No Access</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div id="action-buttons" class="bg-white mt-2 px-4 py-4">
+            <div class="grid grid-cols-2 gap-3">
+                <button class="flex items-center justify-center space-x-2 p-3 bg-blue-50 rounded-lg hover:bg-blue-100">
+                    <i class="fa-solid fa-edit text-blue-600"></i>
+                    <span class="text-sm font-medium text-blue-600">Edit Profile</span>
+                </button>
+                <button class="flex items-center justify-center space-x-2 p-3 bg-green-50 rounded-lg hover:bg-green-100">
+                    <i class="fa-solid fa-key text-green-600"></i>
+                    <span class="text-sm font-medium text-green-600">Reset Password</span>
+                </button>
+                <button class="flex items-center justify-center space-x-2 p-3 bg-orange-50 rounded-lg hover:bg-orange-100">
+                    <i class="fa-solid fa-clock text-orange-600"></i>
+                    <span class="text-sm font-medium text-orange-600">View Schedule</span>
+                </button>
+                <button class="flex items-center justify-center space-x-2 p-3 bg-red-50 rounded-lg hover:bg-red-100">
+                    <i class="fa-solid fa-user-slash text-red-600"></i>
+                    <span class="text-sm font-medium text-red-600">Deactivate</span>
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <!-- Bottom Navigation -->
+    <nav id="footer" class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200">
+        <div class="flex justify-around items-end py-2">
+            <button class="flex flex-col items-center py-1 px-3">
+                <i class="fa-solid fa-home text-gray-400 text-lg"></i>
+                <span class="text-xs mt-1 text-gray-400">Home</span>
+            </button>
+            <button class="flex flex-col items-center py-1 px-3">
+                <i class="fa-solid fa-box text-gray-400 text-lg"></i>
+                <span class="text-xs mt-1 text-gray-400">Inventory</span>
+            </button>
+            <button class="relative -top-3 bg-primary rounded-full p-3 shadow-lg">
+                <i class="fa-solid fa-barcode text-white text-lg"></i>
+            </button>
+            <button class="flex flex-col items-center py-1 px-3">
+                <i class="fa-solid fa-shopping-cart text-gray-400 text-lg"></i>
+                <span class="text-xs mt-1 text-gray-400">Cart</span>
+            </button>
+            <button class="flex flex-col items-center py-1 px-3">
+                <i class="fa-solid fa-user text-primary text-lg"></i>
+                <span class="text-xs mt-1 text-primary">Profile</span>
+            </button>
+        </div>
+    </nav>
+
+</body></html>
