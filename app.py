@@ -311,25 +311,33 @@ def search_customers():
 @app.route('/api/customers', methods=['POST'])
 def create_customer():
     """Create a new customer"""
-    data = request.get_json()
-    
-    customer = Customer(
-        name=data['name'],
-        phone=data['phone'],
-        address=data.get('address', ''),
-        aadhar_number=data.get('aadhar_number', ''),
-        email=data.get('email', '')
-    )
-    
-    db.session.add(customer)
-    db.session.commit()
-    
-    return jsonify({
-        'id': customer.id,
-        'name': customer.name,
-        'phone': customer.phone,
-        'message': 'Customer created successfully'
-    })
+    try:
+        data = request.get_json()
+        
+        if not data or not data.get('name') or not data.get('phone'):
+            return jsonify({'error': 'Name and phone are required'}), 400
+        
+        customer = Customer(
+            name=data['name'],
+            phone=data['phone'],
+            address=data.get('address', ''),
+            aadhar_number=data.get('aadhar_number', ''),
+            email=data.get('email', '')
+        )
+        
+        db.session.add(customer)
+        db.session.commit()
+        
+        return jsonify({
+            'id': customer.id,
+            'name': customer.name,
+            'phone': customer.phone,
+            'message': 'Customer created successfully'
+        })
+    except Exception as e:
+        db.session.rollback()
+        print(f"Error creating customer: {e}")
+        return jsonify({'error': 'Failed to create customer'}), 500
 
 @app.route('/api/bills', methods=['POST'])
 def create_bill():
