@@ -1,86 +1,102 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
+<html><head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Attendance - Kirana Konnect</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script> window.FontAwesomeConfig = { autoReplaceSvg: 'nest'};</script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <style>::-webkit-scrollbar { display: none;}</style>
     
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        primary: '#2563eb',
-                        secondary: '#64748b',
-                        accent: '#f59e0b',
-                        success: '#10b981',
-                        danger: '#ef4444',
-                        dark: '#1e293b',
-                        light: '#f8fafc'
-                    },
-                    fontFamily: {
-                        inter: ['Inter', 'sans-serif'],
-                        sans: ['Inter', 'sans-serif']
-                    }
-                }
-            }
-        };
-    </script>
-    
-    <style>
-        body {
-            font-family: 'Inter', sans-serif;
-        }
-        ::-webkit-scrollbar {
-            display: none;
-        }
-        html, body {
-            -ms-overflow-style: none;
-            scrollbar-width: none;
-        }
-    </style>
-</head>
+    <script>tailwind.config = {
+  "theme": {
+    "extend": {
+      "colors": {
+        "primary": "#2563eb",
+        "secondary": "#64748b",
+        "accent": "#f59e0b",
+        "success": "#10b981",
+        "danger": "#ef4444",
+        "dark": "#1e293b",
+        "light": "#f8fafc"
+      },
+      "fontFamily": {
+        "inter": [
+          "Inter",
+          "sans-serif"
+        ],
+        "sans": [
+          "Inter",
+          "sans-serif"
+        ]
+      }
+    }
+  }
+};</script>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin=""><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;500;600;700;800;900&amp;display=swap"><style>
+      body {
+        font-family: 'Inter', sans-serif !important;
+      }
+      
+      /* Preserve Font Awesome icons */
+      .fa, .fas, .far, .fal, .fab {
+        font-family: "Font Awesome 6 Free", "Font Awesome 6 Brands" !important;
+      }
+    </style><style>
+  .highlighted-section {
+    outline: 2px solid #3F20FB;
+    background-color: rgba(63, 32, 251, 0.1);
+  }
 
+  .edit-button {
+    position: absolute;
+    z-index: 1000;
+  }
+
+  ::-webkit-scrollbar {
+    display: none;
+  }
+
+  html, body {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  </style></head>
 <body class="font-inter bg-gray-100">
     <!-- Header Section -->
-    <header class="bg-white border-b border-gray-200 fixed top-0 left-0 right-0 z-10">
+    <header id="header" class="bg-white border-b border-gray-200 fixed top-0 left-0 right-0 z-10">
         <div class="flex items-center justify-between px-4 py-3">
-            <button onclick="goBack()" class="p-2 hover:bg-gray-100 rounded-lg">
+            <button class="p-2 hover:bg-gray-100 rounded-lg">
                 <i class="fa-solid fa-arrow-left text-gray-600 text-lg"></i>
             </button>
             <div class="text-center">
                 <h1 class="text-lg font-semibold text-dark">Attendance</h1>
                 <p class="text-xs text-gray-500">Kirana Konnect</p>
             </div>
-            <button onclick="showFilterModal()" class="p-2 hover:bg-gray-100 rounded-lg">
+            <button class="p-2 hover:bg-gray-100 rounded-lg">
                 <i class="fa-solid fa-filter text-primary text-lg"></i>
             </button>
         </div>
     </header>
 
     <!-- Main Content -->
-    <main class="pt-16 pb-20 bg-gray-100">
+    <main id="main-content" class="pt-16 pb-20 bg-gray-100">
         <!-- Date Selector -->
-        <div class="bg-white px-4 py-3 border-b border-gray-100">
+        <div id="date-selector" class="bg-white px-4 py-3 border-b border-gray-100">
             <div class="flex items-center justify-between">
-                <button onclick="previousDate()" class="p-2 hover:bg-gray-100 rounded-lg">
+                <button class="p-2 hover:bg-gray-100 rounded-lg">
                     <i class="fa-solid fa-chevron-left text-gray-600"></i>
                 </button>
                 <div class="text-center">
-                    <p class="text-lg font-semibold text-dark" id="current-date">December 15, 2024</p>
-                    <p class="text-sm text-gray-500" id="current-day">Sunday</p>
+                    <p class="text-lg font-semibold text-dark">December 4, 2024</p>
+                    <p class="text-sm text-gray-500">Wednesday</p>
                 </div>
-                <button onclick="nextDate()" class="p-2 hover:bg-gray-100 rounded-lg">
+                <button class="p-2 hover:bg-gray-100 rounded-lg">
                     <i class="fa-solid fa-chevron-right text-gray-600"></i>
                 </button>
             </div>
         </div>
 
         <!-- Summary Cards -->
-        <div class="bg-white px-4 py-4">
+        <div id="attendance-summary" class="bg-white px-4 py-4">
             <div class="grid grid-cols-4 gap-3">
                 <div class="bg-blue-50 p-3 rounded-lg text-center">
                     <p class="text-xl font-bold text-blue-600">5</p>
@@ -102,13 +118,13 @@
         </div>
 
         <!-- Quick Actions -->
-        <div class="bg-white mt-2 px-4 py-3">
+        <div id="quick-actions" class="bg-white mt-2 px-4 py-3">
             <div class="flex space-x-3">
-                <button onclick="markAttendance()" class="flex-1 bg-primary text-white py-2 px-4 rounded-lg text-sm font-medium">
+                <button class="flex-1 bg-primary text-white py-2 px-4 rounded-lg text-sm font-medium">
                     <i class="fa-solid fa-clock mr-2"></i>
                     Mark Attendance
                 </button>
-                <button onclick="showMonthlyView()" class="flex-1 bg-gray-100 text-gray-700 py-2 px-4 rounded-lg text-sm font-medium">
+                <button class="flex-1 bg-gray-100 text-gray-700 py-2 px-4 rounded-lg text-sm font-medium">
                     <i class="fa-solid fa-calendar mr-2"></i>
                     Monthly View
                 </button>
@@ -116,10 +132,10 @@
         </div>
 
         <!-- Staff Attendance List -->
-        <div class="bg-white mt-2 px-4 py-4">
+        <div id="staff-attendance" class="bg-white mt-2 px-4 py-4">
             <div class="flex items-center justify-between mb-4">
                 <h3 class="text-lg font-semibold text-dark">Staff Attendance</h3>
-                <button onclick="exportAttendance()" class="text-primary text-sm font-medium">
+                <button class="text-primary text-sm font-medium">
                     <i class="fa-solid fa-download mr-1"></i>
                     Export
                 </button>
@@ -221,7 +237,7 @@
         </div>
 
         <!-- Attendance Statistics -->
-        <div class="bg-white mt-2 px-4 py-4">
+        <div id="attendance-stats" class="bg-white mt-2 px-4 py-4">
             <h3 class="text-lg font-semibold text-dark mb-3">This Week Summary</h3>
             <div class="space-y-3">
                 <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
@@ -244,19 +260,19 @@
         </div>
 
         <!-- Clock In/Out Section -->
-        <div class="bg-white mt-2 px-4 py-4">
+        <div id="clock-section" class="bg-white mt-2 px-4 py-4">
             <h3 class="text-lg font-semibold text-dark mb-3">Quick Clock In/Out</h3>
             <div class="bg-blue-50 p-4 rounded-lg">
                 <div class="text-center mb-4">
-                    <div class="text-2xl font-bold text-blue-600 mb-1" id="current-time">5:30 PM</div>
+                    <div class="text-2xl font-bold text-blue-600 mb-1">5:30 PM</div>
                     <div class="text-sm text-gray-600">Current Time</div>
                 </div>
                 <div class="grid grid-cols-2 gap-3">
-                    <button onclick="clockIn()" class="bg-green-500 text-white py-3 px-4 rounded-lg font-medium">
+                    <button class="bg-green-500 text-white py-3 px-4 rounded-lg font-medium">
                         <i class="fa-solid fa-clock mr-2"></i>
                         Clock In
                     </button>
-                    <button onclick="clockOut()" class="bg-red-500 text-white py-3 px-4 rounded-lg font-medium">
+                    <button class="bg-red-500 text-white py-3 px-4 rounded-lg font-medium">
                         <i class="fa-solid fa-clock mr-2"></i>
                         Clock Out
                     </button>
@@ -266,107 +282,28 @@
     </main>
 
     <!-- Bottom Navigation -->
-    <nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200">
+    <nav id="footer" class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200">
         <div class="flex justify-around items-end py-2">
-            <button onclick="window.location.href='/dashboard'" class="flex flex-col items-center py-1 px-3">
+            <button class="flex flex-col items-center py-1 px-3">
                 <i class="fa-solid fa-home text-gray-400 text-lg"></i>
                 <span class="text-xs mt-1 text-gray-400">Home</span>
             </button>
-            <button onclick="window.location.href='/inventory'" class="flex flex-col items-center py-1 px-3">
+            <button class="flex flex-col items-center py-1 px-3">
                 <i class="fa-solid fa-box text-gray-400 text-lg"></i>
                 <span class="text-xs mt-1 text-gray-400">Inventory</span>
             </button>
             <button class="relative -top-3 bg-primary rounded-full p-3 shadow-lg">
                 <i class="fa-solid fa-barcode text-white text-lg"></i>
             </button>
-            <button onclick="window.location.href='/cart'" class="flex flex-col items-center py-1 px-3">
+            <button class="flex flex-col items-center py-1 px-3">
                 <i class="fa-solid fa-shopping-cart text-gray-400 text-lg"></i>
                 <span class="text-xs mt-1 text-gray-400">Cart</span>
             </button>
-            <button onclick="window.location.href='/profile'" class="flex flex-col items-center py-1 px-3">
+            <button class="flex flex-col items-center py-1 px-3">
                 <i class="fa-solid fa-user text-gray-400 text-lg"></i>
                 <span class="text-xs mt-1 text-gray-400">Profile</span>
             </button>
         </div>
     </nav>
 
-    <script>
-        function goBack() {
-            window.history.back();
-        }
-
-        function showFilterModal() {
-            alert('Filter options: Today, This Week, This Month');
-        }
-
-        function previousDate() {
-            alert('Previous date functionality would be implemented here');
-        }
-
-        function nextDate() {
-            alert('Next date functionality would be implemented here');
-        }
-
-        function markAttendance() {
-            alert('Mark attendance functionality would show staff checklist');
-        }
-
-        function showMonthlyView() {
-            alert('Monthly attendance view would be displayed');
-        }
-
-        function exportAttendance() {
-            alert('Export attendance data to Excel/PDF');
-        }
-
-        function clockIn() {
-            const now = new Date();
-            const timeString = now.toLocaleTimeString('en-US', {
-                hour: 'numeric',
-                minute: '2-digit',
-                hour12: true
-            });
-            alert(`Clock In recorded at ${timeString}`);
-        }
-
-        function clockOut() {
-            const now = new Date();
-            const timeString = now.toLocaleTimeString('en-US', {
-                hour: 'numeric',
-                minute: '2-digit',
-                hour12: true
-            });
-            alert(`Clock Out recorded at ${timeString}`);
-        }
-
-        // Update current time
-        function updateCurrentTime() {
-            const now = new Date();
-            const timeElement = document.getElementById('current-time');
-            if (timeElement) {
-                timeElement.textContent = now.toLocaleTimeString('en-US', {
-                    hour: 'numeric',
-                    minute: '2-digit',
-                    hour12: true
-                });
-            }
-
-            // Update date
-            const dateElement = document.getElementById('current-date');
-            const dayElement = document.getElementById('current-day');
-            if (dateElement && dayElement) {
-                dateElement.textContent = now.toLocaleDateString('en-US', {
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric'
-                });
-                dayElement.textContent = now.toLocaleDateString('en-US', { weekday: 'long' });
-            }
-        }
-
-        // Initialize
-        updateCurrentTime();
-        setInterval(updateCurrentTime, 60000); // Update every minute
-    </script>
-</body>
-</html>
+</body></html>
