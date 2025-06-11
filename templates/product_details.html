@@ -288,22 +288,49 @@
                     purchasePrice: Math.round(product.price * 0.8),
                     sellingPrice: product.price,
                     unit: product.unit,
-            stock: 5,
-            size: "10 Kg",
-            threshold: 5,
-            mfgDate: "01/05/2025",
-            expDate: "01/09/2025",
-            barcode: "8901030875466",
-            image: "https://storage.googleapis.com/uxpilot-auth.appspot.com/dd29a1f85f-469e6193e37489fc8c43.png"
-        };
+                    stock: product.stock,
+                    size: product.size || `${product.stock} ${product.stockUnit}`,
+                    threshold: Math.round(product.stock * 0.2),
+                    mfgDate: "01/05/2025",
+                    expDate: "01/09/2025",
+                    barcode: `890103${Math.floor(Math.random() * 1000000)}`,
+                    image: product.image
+                };
+                updateUI();
+            } else {
+                // Fallback to default data if no product in localStorage
+                productData = getDefaultProductData();
+                updateUI();
+            }
+        }
+        
+        function getDefaultProductData() {
+            return {
+                id: 1,
+                name: "Product",
+                description: "Product description",
+                category: "Grocery",
+                type: "Unit-Based",
+                purchasePrice: 90,
+                sellingPrice: 120,
+                unit: "Piece",
+                stock: 10,
+                size: "Standard",
+                threshold: 5,
+                mfgDate: "01/05/2025",
+                expDate: "01/09/2025",
+                barcode: "8901030875466",
+                image: "https://storage.googleapis.com/uxpilot-auth.appspot.com/dd29a1f85f-469e6193e37489fc8c43.png"
+            };
+        }
 
-        // Load product data on page load
-        function loadProductData() {
-            // Get product ID from URL parameters (in real app)
-            const urlParams = new URLSearchParams(window.location.search);
-            const productId = urlParams.get('id') || '1';
-            
-            // Update UI with product data
+        // Initialize page
+        function initializePage() {
+            loadProductFromInventory();
+        }
+
+        // Update UI with current product data
+        function updateUI() {
             document.getElementById('product-name').textContent = productData.name;
             document.getElementById('product-description').textContent = productData.description;
             document.getElementById('product-category').textContent = productData.category;
@@ -462,7 +489,9 @@
         });
 
         // Initialize page
-        loadProductData();
+        window.addEventListener('load', function() {
+            initializePage();
+        });
     </script>
 </body>
 </html>
