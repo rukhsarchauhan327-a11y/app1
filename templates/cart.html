@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cart - Kirana Konnect</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script> window.FontAwesomeConfig = { autoReplaceSvg: 'nest'};</script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <style>::-webkit-scrollbar { display: none;}</style>
+    
+    <script>tailwind.config = {
+  "theme": {
+    "extend": {
+      "colors": {
+        "primary": "#4CAF50",
+        "secondary": "#2196F3",
+        "accent": "#FF9800",
+        "danger": "#F44336",
+        "dark": "#333333",
+        "light": "#F5F5F5"
+      },
+      "fontFamily": {
+        "poppins": [
+          "Poppins",
+          "sans-serif"
+        ],
+        "sans": [
+          "Inter",
+          "sans-serif"
+        ]
+      }
+    }
+  }
+};</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;500;600;700;800;900&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap">
+<style>
+      body {
+        font-family: 'Inter', sans-serif !important;
+      }
+      
+      /* Preserve Font Awesome icons */
+      .fa, .fas, .far, .fal, .fab {
+        font-family: "Font Awesome 6 Free", "Font Awesome 6 Brands" !important;
+      }
+    </style>
+<style>
+  .highlighted-section {
+    outline: 2px solid #3F20FB;
+    background-color: rgba(63, 32, 251, 0.1);
+  }
+
+  .edit-button {
+    position: absolute;
+    z-index: 1000;
+  }
+
+  ::-webkit-scrollbar {
+    display: none;
+  }
+
+  html, body {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+</style>
+</head>
+<body class="font-poppins bg-gray-50">
+    <!-- Header Section -->
+    <header id="header" class="bg-white shadow-sm fixed top-0 left-0 right-0 z-20">
+        <div class="flex items-center justify-between p-4">
+            <button class="p-2 rounded-full hover:bg-gray-100" onclick="goBack()">
+                <i class="fa-solid fa-arrow-left text-dark text-lg"></i>
+            </button>
+            <h1 class="text-lg font-bold text-dark">Cart</h1>
+            <div class="w-10"></div>
+        </div>
+    </header>
+
+    <!-- Shop Info Section -->
+    <div id="shop-info" class="bg-white shadow-sm mt-16 p-3 border-b">
+        <div class="text-center">
+            <h2 class="text-base font-bold text-dark">Kirana Konnect</h2>
+            <h3 class="text-sm font-semibold text-dark mt-1">Sharma Kirana Store</h3>
+            <p class="text-xs text-gray-600 mt-1">GST: 24ABCDE1234F1Z5</p>
+            <p class="text-xs text-gray-600">UDYAM: UDYAM-UP-12-0012345</p>
+        </div>
+    </div>
+
+    <!-- Bill Type Selection -->
+    <div id="bill-type-section" class="px-4 py-3">
+        <div class="bg-white rounded-xl shadow-sm p-3">
+            <div class="flex justify-center">
+                <div class="flex bg-gray-100 rounded-full p-1 w-full max-w-md">
+                    <button id="billing-tab" class="flex-1 py-2 px-2 rounded-full bg-primary text-white font-medium text-xs text-center" onclick="showBillingTab()">
+                        Billing
+                    </button>
+                    <button id="customer-tab" class="flex-1 py-2 px-2 rounded-full text-gray-600 font-medium text-xs text-center" onclick="showCustomerTab()">
+                        Customer
+                    </button>
+                    <button id="new-customer-tab" class="flex-1 py-2 px-2 rounded-full text-gray-600 font-medium text-xs text-center" onclick="showNewCustomerTab()">
+                        New Customer
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Bill Number Section -->
+            <div id="bill-section" class="mt-3">
+                <div class="text-center mb-3">
+                    <p class="text-xs text-gray-600">Bill No:</p>
+                    <p class="text-lg font-bold text-primary" id="bill-number">#KK-2025-001</p>
+                </div>
+                <div class="border-t pt-3">
+                    <p class="text-xs text-gray-600 mb-2">Add name to bill (optional):</p>
+                    <input type="text" id="bill-customer-name" placeholder="Enter customer name for bill" class="w-full p-2 border border-gray-200 rounded-lg text-sm">
+                </div>
+            </div>
+
+            <!-- Customer Search Section -->
+            <div id="customer-section" class="mt-3 hidden">
+                <div class="relative">
+                    <input type="text" placeholder="Search customer..." class="w-full p-2 border border-gray-200 rounded-lg pr-10 text-sm">
+                    <i class="fa-solid fa-search absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                </div>
+                <div class="mt-2 space-y-2">
+                    <div class="p-2 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100" onclick="selectCustomer('Rajesh Kumar')">
+                        <p class="font-medium text-dark text-sm">Rajesh Kumar</p>
+                        <p class="text-xs text-gray-600">+91 9876543210</p>
+                    </div>
+                    <div class="p-2 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100" onclick="selectCustomer('Priya Sharma')">
+                        <p class="font-medium text-dark text-sm">Priya Sharma</p>
+                        <p class="text-xs text-gray-600">+91 9876543211</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- New Customer Section -->
+            <div id="new-customer-section" class="mt-3 hidden">
+                <div class="space-y-2">
+                    <input type="text" id="new-customer-name" placeholder="Customer Name" class="w-full p-2 border border-gray-200 rounded-lg text-sm">
+                    <input type="tel" id="new-customer-phone" placeholder="Contact Number" class="w-full p-2 border border-gray-200 rounded-lg text-sm">
+                    <button class="w-full bg-primary text-white py-2 rounded-lg font-medium text-sm" onclick="saveNewCustomer()">Save Customer</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cart Items List -->
+    <div id="cart-items" class="px-4 space-y-2 mb-4">
+        <div class="bg-white rounded-xl shadow-sm p-3" id="cart-item-1">
+            <div class="flex items-start justify-between">
+                <div class="flex-1">
+                    <h3 class="font-semibold text-dark text-sm">Aashirvaad Atta</h3>
+                    <div class="flex justify-between items-center mt-1">
+                        <span class="text-sm text-gray-700 font-medium">10 Kg</span>
+                        <span class="text-lg font-bold text-primary">₹450</span>
+                    </div>
+                    <div class="mt-2 space-y-1">
+                        <div class="flex items-center text-xs text-gray-500">
+                            <i class="fa-solid fa-calendar mr-1"></i>
+                            <span>MFG: 01/05/2025</span>
+                        </div>
+                        <div class="flex items-center text-xs text-gray-500">
+                            <i class="fa-solid fa-clock mr-1"></i>
+                            <span>EXP: 01/09/2025</span>
+                        </div>
+                        <button class="text-xs text-danger hover:underline flex items-center mt-1" onclick="removeDates(1)">
+                            <i class="fa-solid fa-times mr-1"></i>
+                            Remove Dates
+                        </button>
+                    </div>
+                </div>
+                <button class="text-danger text-sm ml-3 p-1" onclick="removeItem(1)">
+                    <i class="fa-solid fa-trash"></i>
+                </button>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-xl shadow-sm p-3" id="cart-item-2">
+            <div class="flex items-start justify-between">
+                <div class="flex-1">
+                    <h3 class="font-semibold text-dark text-sm">Real Fruit Juice</h3>
+                    <div class="flex justify-between items-center mt-1">
+                        <span class="text-sm text-gray-700 font-medium">2 Bottles</span>
+                        <span class="text-lg font-bold text-primary">₹120</span>
+                    </div>
+                    <div class="mt-2 space-y-1">
+                        <div class="flex items-center text-xs text-gray-500">
+                            <i class="fa-solid fa-calendar mr-1"></i>
+                            <span>MFG: 12/05/2025</span>
+                        </div>
+                        <div class="flex items-center text-xs text-gray-500">
+                            <i class="fa-solid fa-clock mr-1"></i>
+                            <span>EXP: 25/07/2025</span>
+                        </div>
+                        <button class="text-xs text-danger hover:underline flex items-center mt-1" onclick="removeDates(2)">
+                            <i class="fa-solid fa-times mr-1"></i>
+                            Remove Dates
+                        </button>
+                    </div>
+                </div>
+                <button class="text-danger text-sm ml-3 p-1" onclick="removeItem(2)">
+                    <i class="fa-solid fa-trash"></i>
+                </button>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-xl shadow-sm p-3" id="cart-item-3">
+            <div class="flex items-start justify-between">
+                <div class="flex-1">
+                    <h3 class="font-semibold text-dark text-sm">Colgate Paste</h3>
+                    <div class="flex justify-between items-center mt-1">
+                        <span class="text-sm text-gray-700 font-medium">3 Pieces</span>
+                        <span class="text-lg font-bold text-primary">₹90</span>
+                    </div>
+                </div>
+                <button class="text-danger text-sm ml-3 p-1" onclick="removeItem(3)">
+                    <i class="fa-solid fa-trash"></i>
+                </button>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-xl shadow-sm p-3" id="cart-item-4">
+            <div class="flex items-start justify-between">
+                <div class="flex-1">
+                    <h3 class="font-semibold text-dark text-sm">Good Day Biscuits</h3>
+                    <div class="flex justify-between items-center mt-1">
+                        <span class="text-sm text-gray-700 font-medium">5 Packets</span>
+                        <span class="text-lg font-bold text-primary">₹60</span>
+                    </div>
+                    <div class="mt-2 space-y-1">
+                        <div class="flex items-center text-xs text-gray-500">
+                            <i class="fa-solid fa-calendar mr-1"></i>
+                            <span>MFG: 10/04/2025</span>
+                        </div>
+                        <div class="flex items-center text-xs text-gray-500">
+                            <i class="fa-solid fa-clock mr-1"></i>
+                            <span>EXP: 10/08/2025</span>
+                        </div>
+                        <button class="text-xs text-danger hover:underline flex items-center mt-1" onclick="removeDates(4)">
+                            <i class="fa-solid fa-times mr-1"></i>
+                            Remove Dates
+                        </button>
+                    </div>
+                </div>
+                <button class="text-danger text-sm ml-3 p-1" onclick="removeItem(4)">
+                    <i class="fa-solid fa-trash"></i>
+                </button>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-xl shadow-sm p-3" id="cart-item-5">
+            <div class="flex items-start justify-between">
+                <div class="flex-1">
+                    <h3 class="font-semibold text-dark text-sm">Surf Excel (500gm)</h3>
+                    <div class="flex justify-between items-center mt-1">
+                        <span class="text-sm text-gray-700 font-medium">1 Packet</span>
+                        <span class="text-lg font-bold text-primary">₹55</span>
+                    </div>
+                </div>
+                <button class="text-danger text-sm ml-3 p-1" onclick="removeItem(5)">
+                    <i class="fa-solid fa-trash"></i>
+                </button>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-xl shadow-sm p-3" id="cart-item-6">
+            <div class="flex items-start justify-between">
+                <div class="flex-1">
+                    <h3 class="font-semibold text-dark text-sm">Dabur Honey</h3>
+                    <div class="flex justify-between items-center mt-1">
+                        <span class="text-sm text-gray-700 font-medium">1 Bottle</span>
+                        <span class="text-lg font-bold text-primary">₹180</span>
+                    </div>
+                    <div class="mt-2 space-y-1">
+                        <div class="flex items-center text-xs text-gray-500">
+                            <i class="fa-solid fa-calendar mr-1"></i>
+                            <span>MFG: 05/03/2025</span>
+                        </div>
+                        <div class="flex items-center text-xs text-gray-500">
+                            <i class="fa-solid fa-clock mr-1"></i>
+                            <span>EXP: 05/01/2026</span>
+                        </div>
+                        <button class="text-xs text-danger hover:underline flex items-center mt-1" onclick="removeDates(6)">
+                            <i class="fa-solid fa-times mr-1"></i>
+                            Remove Dates
+                        </button>
+                    </div>
+                </div>
+                <button class="text-danger text-sm ml-3 p-1" onclick="removeItem(6)">
+                    <i class="fa-solid fa-trash"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add More Items Section -->
+    <div id="add-items-section" class="px-4 mb-3">
+        <div class="bg-white rounded-xl shadow-sm p-3">
+            <div class="flex justify-center">
+                <button id="add-items-btn" class="flex items-center justify-center bg-secondary text-white rounded-full px-6 py-3 font-medium text-sm" onclick="addMoreItems()">
+                    <i class="fa-solid fa-plus mr-2"></i>
+                    Add More Items to Cart
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tax & Offer Section -->
+    <div id="tax-offer-section" class="px-4 mb-3">
+        <div class="bg-white rounded-xl shadow-sm p-3">
+            <div class="grid grid-cols-2 gap-3">
+                <button id="tax-btn" class="p-3 border-2 border-primary bg-primary/10 rounded-xl text-center" onclick="toggleTax()">
+                    <i class="fa-solid fa-percentage text-primary text-lg mb-1"></i>
+                    <p class="text-xs font-medium text-primary">Add Tax</p>
+                </button>
+                <button id="offer-btn" class="p-3 border-2 border-gray-200 rounded-xl text-center hover:border-accent hover:bg-accent/10" onclick="toggleOffer()">
+                    <i class="fa-solid fa-tag text-gray-600 text-lg mb-1"></i>
+                    <p class="text-xs font-medium text-gray-600">Add Offer</p>
+                </button>
+            </div>
+            
+            <!-- Tax Section -->
+            <div id="tax-section" class="mt-3">
+                <div class="space-y-1">
+                    <div class="flex justify-between">
+                        <span class="text-gray-600 text-sm">Subtotal</span>
+                        <span class="font-medium text-sm" id="subtotal">₹955</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-gray-600 text-sm">GST (18%)</span>
+                        <span class="font-medium text-sm" id="gst-amount">₹171.90</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Offer Section -->
+            <div id="offer-section" class="mt-3 hidden">
+                <div class="grid grid-cols-2 gap-2">
+                    <input type="number" placeholder="Discount ₹" class="p-2 border border-gray-200 rounded-lg text-sm" onchange="calculateDiscount()" id="discount-amount">
+                    <input type="number" placeholder="Discount %" class="p-2 border border-gray-200 rounded-lg text-sm" onchange="calculateDiscount()" id="discount-percent">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Total Amount -->
+    <div id="total-section" class="px-4 mb-3">
+        <div class="bg-white rounded-xl shadow-sm p-3">
+            <div class="flex justify-between items-center">
+                <span class="text-lg font-bold text-dark">Total Amount</span>
+                <span class="text-xl font-bold text-primary" id="total-amount">₹1,126.90</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bill Generated By -->
+    <div id="generated-by-section" class="px-4 mb-3">
+        <div class="bg-white rounded-xl shadow-sm p-3">
+            <div class="flex items-center justify-between">
+                <span class="text-gray-600 font-medium text-sm">Bill Generated By:</span>
+                <select id="bill-generator" class="p-2 border border-gray-200 rounded-lg bg-white text-sm min-w-0 flex-1 ml-2">
+                    <option>Anil Kumar (Cashier)</option>
+                    <option>Rajesh Sharma (Owner)</option>
+                    <option>Priya Singh (Manager)</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <!-- Payment Method -->
+    <div id="payment-section" class="px-4 mb-3">
+        <div class="bg-white rounded-xl shadow-sm p-3">
+            <div class="flex justify-center mb-3">
+                <div class="flex bg-gray-100 rounded-full p-1 w-full max-w-xs">
+                    <button id="cash-payment" class="flex-1 py-2 px-2 rounded-full bg-primary text-white font-medium text-xs" onclick="selectPayment('cash')">
+                        Cash
+                    </button>
+                    <button id="online-payment" class="flex-1 py-2 px-2 rounded-full text-gray-600 font-medium text-xs" onclick="selectPayment('online')">
+                        Online
+                    </button>
+                    <button id="split-payment" class="flex-1 py-2 px-2 rounded-full text-gray-600 font-medium text-xs" onclick="selectPayment('split')">
+                        Split
+                    </button>
+                </div>
+            </div>
+
+            <!-- Online Payment Section -->
+            <div id="online-payment-section" class="hidden">
+                <div class="space-y-2">
+                    <div class="grid grid-cols-2 gap-2">
+                        <button class="p-2 border border-gray-200 rounded-lg text-sm bg-blue-50 text-blue-600">UPI</button>
+                        <button class="p-2 border border-gray-200 rounded-lg text-sm bg-green-50 text-green-600">Card</button>
+                    </div>
+                    <input type="text" placeholder="UPI ID or Transaction Reference" class="w-full p-2 border border-gray-200 rounded-lg text-sm">
+                </div>
+            </div>
+
+            <!-- Split Payment Section -->
+            <div id="split-payment-section" class="hidden">
+                <div class="space-y-2">
+                    <div class="flex items-center space-x-2">
+                        <input type="number" id="split-amount" placeholder="Enter amount" class="flex-1 p-2 border border-gray-200 rounded-lg text-sm">
+                        <button id="apply-split" class="bg-primary text-white px-3 py-2 rounded-lg text-xs font-medium" onclick="applySplit()">Apply</button>
+                    </div>
+                    <div id="remaining-amount" class="hidden">
+                        <p class="text-sm text-gray-600 mb-2">Remaining: <span id="remaining-value" class="font-bold">₹0</span></p>
+                        <div class="grid grid-cols-3 gap-2">
+                            <button id="remaining-cash" class="py-2 px-3 border border-gray-300 rounded-lg text-xs" onclick="selectRemaining('cash')">Cash</button>
+                            <button id="remaining-online" class="py-2 px-3 border border-gray-300 rounded-lg text-xs" onclick="selectRemaining('online')">Online</button>
+                            <button id="remaining-credit" class="py-2 px-3 border border-gray-300 rounded-lg text-xs" onclick="selectRemaining('credit')">Credit</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Generate Bill Button -->
+    <div id="generate-bill-section" class="px-4 pb-24">
+        <button class="w-full bg-primary text-white py-3 rounded-xl font-bold text-base shadow-md" onclick="generateBill()">
+            Generate Bill
+        </button>
+    </div>
+
+    <script>
+        let currentTab = 'billing';
+        let taxEnabled = true;
+        let offerEnabled = false;
+        let subtotal = 955;
+        let gstRate = 0.18;
+        let discountAmount = 0;
+        let paymentMode = 'cash';
+
+        function goBack() {
+            window.history.back();
+        }
+
+        // Tab switching functions
+        function showBillingTab() {
+            switchTab('billing');
+        }
+
+        function showCustomerTab() {
+            switchTab('customer');
+        }
+
+        function showNewCustomerTab() {
+            switchTab('new-customer');
+        }
+
+        function switchTab(tab) {
+            currentTab = tab;
+            
+            // Reset all tabs
+            document.getElementById('billing-tab').className = 'flex-1 py-2 px-2 rounded-full text-gray-600 font-medium text-xs text-center';
+            document.getElementById('customer-tab').className = 'flex-1 py-2 px-2 rounded-full text-gray-600 font-medium text-xs text-center';
+            document.getElementById('new-customer-tab').className = 'flex-1 py-2 px-2 rounded-full text-gray-600 font-medium text-xs text-center';
+            
+            // Hide all sections
+            document.getElementById('bill-section').classList.add('hidden');
+            document.getElementById('customer-section').classList.add('hidden');
+            document.getElementById('new-customer-section').classList.add('hidden');
+            
+            // Show active tab
+            if (tab === 'billing') {
+                document.getElementById('billing-tab').className = 'flex-1 py-2 px-2 rounded-full bg-primary text-white font-medium text-xs text-center';
+                document.getElementById('bill-section').classList.remove('hidden');
+            } else if (tab === 'customer') {
+                document.getElementById('customer-tab').className = 'flex-1 py-2 px-2 rounded-full bg-primary text-white font-medium text-xs text-center';
+                document.getElementById('customer-section').classList.remove('hidden');
+            } else if (tab === 'new-customer') {
+                document.getElementById('new-customer-tab').className = 'flex-1 py-2 px-2 rounded-full bg-primary text-white font-medium text-xs text-center';
+                document.getElementById('new-customer-section').classList.remove('hidden');
+            }
+        }
+
+        function selectCustomer(name) {
+            document.getElementById('bill-customer-name').value = name;
+            showBillingTab();
+        }
+
+        function saveNewCustomer() {
+            const name = document.getElementById('new-customer-name').value;
+            const phone = document.getElementById('new-customer-phone').value;
+            
+            if (name && phone) {
+                document.getElementById('bill-customer-name').value = name;
+                alert(`Customer ${name} saved successfully!`);
+                showBillingTab();
+            } else {
+                alert('Please fill in both name and phone number.');
+            }
+        }
+
+        function removeItem(itemId) {
+            const item = document.getElementById(`cart-item-${itemId}`);
+            if (item) {
+                item.remove();
+                calculateTotals();
+            }
+        }
+
+        function removeDates(itemId) {
+            const item = document.getElementById(`cart-item-${itemId}`);
+            const datesSection = item.querySelector('.mt-2.space-y-1');
+            if (datesSection) {
+                datesSection.remove();
+            }
+        }
+
+        function addMoreItems() {
+            alert('Add Items feature will redirect to inventory selection.');
+        }
+
+        function toggleTax() {
+            taxEnabled = !taxEnabled;
+            const btn = document.getElementById('tax-btn');
+            const section = document.getElementById('tax-section');
+            
+            if (taxEnabled) {
+                btn.className = 'p-3 border-2 border-primary bg-primary/10 rounded-xl text-center';
+                btn.innerHTML = '<i class="fa-solid fa-percentage text-primary text-lg mb-1"></i><p class="text-xs font-medium text-primary">Add Tax</p>';
+                section.classList.remove('hidden');
+            } else {
+                btn.className = 'p-3 border-2 border-gray-200 rounded-xl text-center hover:border-primary hover:bg-primary/10';
+                btn.innerHTML = '<i class="fa-solid fa-percentage text-gray-600 text-lg mb-1"></i><p class="text-xs font-medium text-gray-600">Add Tax</p>';
+                section.classList.add('hidden');
+            }
+            calculateTotals();
+        }
+
+        function toggleOffer() {
+            offerEnabled = !offerEnabled;
+            const btn = document.getElementById('offer-btn');
+            const section = document.getElementById('offer-section');
+            
+            if (offerEnabled) {
+                btn.className = 'p-3 border-2 border-accent bg-accent/10 rounded-xl text-center';
+                btn.innerHTML = '<i class="fa-solid fa-tag text-accent text-lg mb-1"></i><p class="text-xs font-medium text-accent">Add Offer</p>';
+                section.classList.remove('hidden');
+            } else {
+                btn.className = 'p-3 border-2 border-gray-200 rounded-xl text-center hover:border-accent hover:bg-accent/10';
+                btn.innerHTML = '<i class="fa-solid fa-tag text-gray-600 text-lg mb-1"></i><p class="text-xs font-medium text-gray-600">Add Offer</p>';
+                section.classList.add('hidden');
+                discountAmount = 0;
+            }
+            calculateTotals();
+        }
+
+        function calculateDiscount() {
+            const discountAmountInput = document.getElementById('discount-amount').value;
+            const discountPercentInput = document.getElementById('discount-percent').value;
+            
+            if (discountAmountInput) {
+                discountAmount = parseFloat(discountAmountInput);
+            } else if (discountPercentInput) {
+                discountAmount = subtotal * (parseFloat(discountPercentInput) / 100);
+            } else {
+                discountAmount = 0;
+            }
+            
+            calculateTotals();
+        }
+
+        function selectPayment(mode) {
+            paymentMode = mode;
+            
+            // Reset payment buttons
+            document.getElementById('cash-payment').className = 'flex-1 py-2 px-2 rounded-full text-gray-600 font-medium text-xs';
+            document.getElementById('online-payment').className = 'flex-1 py-2 px-2 rounded-full text-gray-600 font-medium text-xs';
+            document.getElementById('split-payment').className = 'flex-1 py-2 px-2 rounded-full text-gray-600 font-medium text-xs';
+            
+            // Hide payment sections
+            document.getElementById('online-payment-section').classList.add('hidden');
+            document.getElementById('split-payment-section').classList.add('hidden');
+            
+            // Show active payment method
+            if (mode === 'cash') {
+                document.getElementById('cash-payment').className = 'flex-1 py-2 px-2 rounded-full bg-primary text-white font-medium text-xs';
+            } else if (mode === 'online') {
+                document.getElementById('online-payment').className = 'flex-1 py-2 px-2 rounded-full bg-primary text-white font-medium text-xs';
+                document.getElementById('online-payment-section').classList.remove('hidden');
+            } else if (mode === 'split') {
+                document.getElementById('split-payment').className = 'flex-1 py-2 px-2 rounded-full bg-primary text-white font-medium text-xs';
+                document.getElementById('split-payment-section').classList.remove('hidden');
+            }
+        }
+
+        function applySplit() {
+            const splitAmount = parseFloat(document.getElementById('split-amount').value);
+            const total = calculateFinalTotal();
+            
+            if (splitAmount && splitAmount < total) {
+                const remaining = total - splitAmount;
+                document.getElementById('remaining-value').textContent = `₹${remaining.toFixed(2)}`;
+                document.getElementById('remaining-amount').classList.remove('hidden');
+            }
+        }
+
+        function selectRemaining(method) {
+            // Reset remaining buttons
+            document.getElementById('remaining-cash').className = 'py-2 px-3 border border-gray-300 rounded-lg text-xs';
+            document.getElementById('remaining-online').className = 'py-2 px-3 border border-gray-300 rounded-lg text-xs';
+            document.getElementById('remaining-credit').className = 'py-2 px-3 border border-gray-300 rounded-lg text-xs';
+            
+            // Highlight selected method
+            document.getElementById(`remaining-${method}`).className = 'py-2 px-3 border border-primary bg-primary/10 text-primary rounded-lg text-xs';
+        }
+
+        function calculateTotals() {
+            const gstAmount = taxEnabled ? subtotal * gstRate : 0;
+            const finalTotal = subtotal + gstAmount - discountAmount;
+            
+            document.getElementById('subtotal').textContent = `₹${subtotal}`;
+            document.getElementById('gst-amount').textContent = `₹${gstAmount.toFixed(2)}`;
+            document.getElementById('total-amount').textContent = `₹${finalTotal.toFixed(2)}`;
+        }
+
+        function calculateFinalTotal() {
+            const gstAmount = taxEnabled ? subtotal * gstRate : 0;
+            return subtotal + gstAmount - discountAmount;
+        }
+
+        function generateBill() {
+            const customerName = document.getElementById('bill-customer-name').value;
+            const billGenerator = document.getElementById('bill-generator').value;
+            const billNumber = document.getElementById('bill-number').textContent;
+            const total = document.getElementById('total-amount').textContent;
+            
+            alert(`Bill Generated Successfully!\n\nBill No: ${billNumber}\nCustomer: ${customerName || 'Guest'}\nTotal: ${total}\nGenerated by: ${billGenerator}\nPayment: ${paymentMode.toUpperCase()}`);
+            
+            // Redirect to dashboard or print bill
+            window.location.href = '/dashboard';
+        }
+
+        // Initialize
+        calculateTotals();
+    </script>
+
+</body>
+</html>

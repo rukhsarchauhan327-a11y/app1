@@ -35,5 +35,10 @@ def dashboard():
     """Serve the main dashboard page"""
     return render_template('dashboard.html')
 
+@app.route('/cart')
+def cart():
+    """Serve the cart/billing page"""
+    return render_template('cart.html')
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
