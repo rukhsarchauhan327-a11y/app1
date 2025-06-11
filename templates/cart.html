@@ -418,6 +418,15 @@
                             <button id="remaining-online" class="py-2 px-3 border border-gray-300 rounded-lg text-xs" onclick="selectRemaining('online')">Online</button>
                             <button id="remaining-credit" class="py-2 px-3 border border-gray-300 rounded-lg text-xs" onclick="selectRemaining('credit')">Credit</button>
                         </div>
+                        
+                        <!-- Remaining Online Payment Options -->
+                        <div id="remaining-online-section" class="hidden mt-2">
+                            <div class="grid grid-cols-2 gap-2 mb-2">
+                                <button id="remaining-upi-btn" class="p-2 border border-gray-200 rounded-lg text-sm bg-blue-50 text-blue-600" onclick="selectRemainingOnlineMethod('upi')">UPI</button>
+                                <button id="remaining-card-btn" class="p-2 border border-gray-200 rounded-lg text-sm bg-green-50 text-green-600" onclick="selectRemainingOnlineMethod('card')">Card</button>
+                            </div>
+                            <input type="text" id="remaining-transaction-reference" placeholder="UPI Transaction ID" class="w-full p-2 border border-gray-300 rounded-lg text-sm">
+                        </div>
                     </div>
                 </div>
             </div>
@@ -817,8 +826,32 @@
             document.getElementById('remaining-online').className = 'py-2 px-3 border border-gray-300 rounded-lg text-xs';
             document.getElementById('remaining-credit').className = 'py-2 px-3 border border-gray-300 rounded-lg text-xs';
             
-            // Highlight selected method
+            // Hide online section
+            document.getElementById('remaining-online-section').classList.add('hidden');
+            
+            // Highlight selected method and show options if online
             document.getElementById(`remaining-${method}`).className = 'py-2 px-3 border border-primary bg-primary/10 text-primary rounded-lg text-xs';
+            
+            if (method === 'online') {
+                document.getElementById('remaining-online-section').classList.remove('hidden');
+                selectRemainingOnlineMethod('upi'); // Default to UPI
+            }
+        }
+
+        function selectRemainingOnlineMethod(method) {
+            // Reset button styles
+            document.getElementById('remaining-upi-btn').className = 'p-2 border border-gray-200 rounded-lg text-sm bg-blue-50 text-blue-600';
+            document.getElementById('remaining-card-btn').className = 'p-2 border border-gray-200 rounded-lg text-sm bg-green-50 text-green-600';
+            
+            // Update placeholder text and highlight selected button
+            const referenceInput = document.getElementById('remaining-transaction-reference');
+            if (method === 'upi') {
+                document.getElementById('remaining-upi-btn').className = 'p-2 border-2 border-blue-500 rounded-lg text-sm bg-blue-100 text-blue-700 font-medium';
+                referenceInput.placeholder = 'Enter UPI Transaction ID';
+            } else if (method === 'card') {
+                document.getElementById('remaining-card-btn').className = 'p-2 border-2 border-green-500 rounded-lg text-sm bg-green-100 text-green-700 font-medium';
+                referenceInput.placeholder = 'Enter Card Transaction Reference';
+            }
         }
 
         function calculateTotals() {
