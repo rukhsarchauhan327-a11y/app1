@@ -647,52 +647,29 @@
                 const result = await response.json();
                 
                 if (response.ok) {
+                    // Set customer as selected
                     selectedCustomerId = result.id;
+                    
+                    // Update the bill customer field
                     const billCustomerField = document.getElementById('bill-customer-name');
                     const clearButton = document.getElementById('clear-customer');
                     
-                    billCustomerField.value = name;
+                    billCustomerField.value = `${name} (${phone})`;
                     billCustomerField.readOnly = true;
                     billCustomerField.classList.add('bg-blue-50', 'text-blue-700', 'font-medium');
                     clearButton.classList.remove('hidden');
                     
+                    // Clear the form
                     document.getElementById('new-customer-name').value = '';
                     document.getElementById('new-customer-phone').value = '';
-                    showNotification(`Customer ${name} saved successfully!`, 'success');
                     
-                    // Switch to customer tab and show the newly added customer
-                    switchTab('customer');
+                    // Show success message
+                    showNotification(`Customer ${name} saved and selected for billing!`, 'success');
                     
-                    // Add the new customer to the customer list
-                    const customerList = document.getElementById('customer-list');
-                    const customerItem = document.createElement('div');
-                    customerItem.className = 'flex items-center justify-between p-3 border-b border-gray-100 hover:bg-gray-50 cursor-pointer';
-                    customerItem.onclick = () => selectCustomer(result.id, name, phone);
-                    customerItem.innerHTML = `
-                        <div class="flex-1">
-                            <p class="font-medium text-dark text-sm">${name}</p>
-                            <p class="text-gray-600 text-xs">${phone}</p>
-                        </div>
-                        <div class="text-right">
-                            <p class="text-green-600 font-bold text-sm">₹0.00</p>
-                            <p class="text-gray-500 text-xs">Balance</p>
-                        </div>
-                    `;
-                    
-                    // Insert at the top of the customer list
-                    if (customerList.firstChild) {
-                        customerList.insertBefore(customerItem, customerList.firstChild);
-                    } else {
-                        customerList.appendChild(customerItem);
-                    }
-                    
-                    // Hide the no search message if it's visible
-                    const noSearchMessage = document.getElementById('no-search-message');
-                    if (noSearchMessage) {
-                        noSearchMessage.classList.add('hidden');
-                    }
-                    
+                    // Show the bill section
                     document.getElementById('bill-section').classList.remove('hidden');
+                    
+                    // Stay on new customer tab - customer is already selected for billing
                 } else {
                     showNotification('Error saving customer. Please try again.', 'error');
                 }
