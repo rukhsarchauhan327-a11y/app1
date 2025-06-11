@@ -279,10 +279,19 @@
 
         // Calculate selling price based on mode
         function updateSellingPriceCalculations() {
-            const sellingPrice = parseFloat(document.getElementById('selling-price').value) || 0;
-            const sellingMode = document.getElementById('selling-mode').value;
-            const quantity = parseFloat(document.getElementById('quantity-input').value) || 0;
-            const unit = document.getElementById('unit-select').value;
+            const sellingPriceInput = document.getElementById('selling-price');
+            const sellingModeSelect = document.getElementById('selling-mode');
+            const quantityInput = document.getElementById('quantity-input');
+            const unitSelect = document.getElementById('unit-select');
+            
+            if (!sellingPriceInput || !sellingModeSelect || !quantityInput || !unitSelect) {
+                return; // Exit if elements don't exist
+            }
+            
+            const sellingPrice = parseFloat(sellingPriceInput.value) || 0;
+            const sellingMode = sellingModeSelect.value;
+            const quantity = parseFloat(quantityInput.value) || 0;
+            const unit = unitSelect.value;
             
             let quantityInKg = quantity;
             if (unit === 'gm') {
@@ -308,9 +317,13 @@
                 perGramPrice = perKgPrice / 1000;
             }
             
-            document.getElementById('calculated-per-kg').textContent = `₹${perKgPrice.toFixed(2)}/Kg`;
-            document.getElementById('calculated-per-gram').textContent = `₹${perGramPrice.toFixed(3)}/Gram`;
-            document.getElementById('calculated-total-revenue').textContent = `₹${totalRevenue.toFixed(2)}`;
+            const perKgElement = document.getElementById('calculated-per-kg');
+            const perGramElement = document.getElementById('calculated-per-gram');
+            const totalRevenueElement = document.getElementById('calculated-total-revenue');
+            
+            if (perKgElement) perKgElement.textContent = `₹${perKgPrice.toFixed(2)}/Kg`;
+            if (perGramElement) perGramElement.textContent = `₹${perGramPrice.toFixed(3)}/Gram`;
+            if (totalRevenueElement) totalRevenueElement.textContent = `₹${totalRevenue.toFixed(2)}`;
         }
 
         function addStock() {
@@ -344,12 +357,18 @@
             }
         }
 
-        // Add event listeners
-        document.getElementById('quantity-input').addEventListener('input', updateCalculations);
-        document.getElementById('purchase-price').addEventListener('input', updateCalculations);
-        document.getElementById('unit-select').addEventListener('change', updateCalculations);
-        document.getElementById('selling-price').addEventListener('input', updateSellingPriceCalculations);
-        document.getElementById('selling-mode').addEventListener('change', updateSellingPriceCalculations);
+        // Add event listeners with error checking
+        const quantityInput = document.getElementById('quantity-input');
+        const purchasePriceInput = document.getElementById('purchase-price');
+        const unitSelectElement = document.getElementById('unit-select');
+        const sellingPriceInput = document.getElementById('selling-price');
+        const sellingModeSelect = document.getElementById('selling-mode');
+
+        if (quantityInput) quantityInput.addEventListener('input', updateCalculations);
+        if (purchasePriceInput) purchasePriceInput.addEventListener('input', updateCalculations);
+        if (unitSelectElement) unitSelectElement.addEventListener('change', updateCalculations);
+        if (sellingPriceInput) sellingPriceInput.addEventListener('input', updateSellingPriceCalculations);
+        if (sellingModeSelect) sellingModeSelect.addEventListener('change', updateSellingPriceCalculations);
 
         // Initialize the page
         initializePage();
