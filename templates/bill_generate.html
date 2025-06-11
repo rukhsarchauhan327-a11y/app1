@@ -74,9 +74,11 @@
                         <label class="block text-sm font-medium text-gray-700 mb-1">Select Customer</label>
                         <select id="customer-select" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                             <option value="">Walk-in Customer</option>
-                            <option value="rajesh">Rajesh Kumar (+91 98765 43210)</option>
-                            <option value="priya">Priya Sharma (+91 98765 43211)</option>
-                            <option value="amit">Amit Singh (+91 98765 43212)</option>
+                            <option value="rajesh" data-name="Rajesh Kumar" data-phone="+91 98765 43210" data-outstanding="2150">Rajesh Kumar - Outstanding: ₹2,150</option>
+                            <option value="priya" data-name="Priya Sharma" data-phone="+91 98765 43211" data-outstanding="850">Priya Sharma - Outstanding: ₹850</option>
+                            <option value="amit" data-name="Amit Singh" data-phone="+91 98765 43212" data-outstanding="0">Amit Singh - No Outstanding</option>
+                            <option value="sunita" data-name="Sunita Devi" data-phone="+91 98765 43213" data-outstanding="1200">Sunita Devi - Outstanding: ₹1,200</option>
+                            <option value="ravi" data-name="Ravi Patel" data-phone="+91 98765 43214" data-outstanding="500">Ravi Patel - Outstanding: ₹500</option>
                         </select>
                     </div>
                     <div id="customer-info" class="hidden bg-blue-50 p-3 rounded-lg">
@@ -206,10 +208,20 @@
                                 <input type="number" id="split-cash" placeholder="0" class="w-full pl-8 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                             </div>
                         </div>
-                        <div class="bg-yellow-50 p-3 rounded-lg">
-                            <div class="flex justify-between">
-                                <span class="text-sm text-gray-600">Remaining (Credit):</span>
-                                <span id="split-credit" class="text-sm font-bold text-yellow-600">₹0.00</span>
+                        <div class="bg-blue-50 p-3 rounded-lg">
+                            <div class="flex justify-between mb-2">
+                                <span class="text-sm text-gray-600">Remaining Amount:</span>
+                                <span id="split-remaining" class="text-sm font-bold text-blue-600">₹0.00</span>
+                            </div>
+                            <div class="grid grid-cols-2 gap-2">
+                                <button class="split-method-btn active bg-blue-500 text-white p-2 rounded text-sm font-medium" data-method="online">
+                                    <i class="fa-solid fa-credit-card block mb-1 text-xs"></i>
+                                    Online
+                                </button>
+                                <button class="split-method-btn bg-gray-200 text-gray-700 p-2 rounded text-sm font-medium" data-method="cash-remaining">
+                                    <i class="fa-solid fa-money-bill block mb-1 text-xs"></i>
+                                    Cash
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -430,8 +442,8 @@
             document.getElementById('change-amount').textContent = `₹${changeAmount.toFixed(2)}`;
             
             const splitCash = parseFloat(document.getElementById('split-cash')?.value || 0);
-            const splitCredit = Math.max(0, total - splitCash);
-            document.getElementById('split-credit').textContent = `₹${splitCredit.toFixed(2)}`;
+            const splitRemaining = Math.max(0, total - splitCash);
+            document.getElementById('split-remaining').textContent = `₹${splitRemaining.toFixed(2)}`;
         }
 
         // Update calculations when payment amounts change
@@ -460,6 +472,48 @@
             // Navigate to receipt page
             window.location.href = `/receipt?bill=${billData.billNumber}`;
         }
+
+        // Handle split payment method selection
+        document.addEventListener('click', function(e) {
+            if (e.target.classList.contains('split-method-btn')) {
+                document.querySelectorAll('.split-method-btn').forEach(btn => {
+                    btn.classList.remove('active', 'bg-blue-500', 'text-white');
+                    btn.classList.add('bg-gray-200', 'text-gray-700');
+                });
+                e.target.classList.add('active', 'bg-blue-500', 'text-white');
+                e.target.classList.remove('bg-gray-200', 'text-gray-700');
+            }
+        });
+
+        // Handle customer selection
+        document.getElementById('customer-select').addEventListener('change', function() {
+            const customerInfo = document.getElementById('customer-info');
+            const selectedOption = this.options[this.selectedIndex];
+            
+            if (this.value) {
+                const name = selectedOption.dataset.name;
+                const phone = selectedOption.dataset.phone;
+                const outstanding = selectedOption.dataset.outstanding;
+                
+                // Update customer info display
+                const initials = name.split(' ').map(n => n[0]).join('');
+                customerInfo.innerHTML = `
+                    <div class="flex items-center space-x-3">
+                        <div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
+                            <span class="text-white font-bold text-sm">${initials}</span>
+                        </div>
+                        <div class="flex-1">
+                            <p class="font-medium text-dark">${name}</p>
+                            <p class="text-xs text-gray-600">${phone}</p>
+                            <p class="text-xs text-gray-600">Outstanding: ₹${parseInt(outstanding).toLocaleString()}</p>
+                        </div>
+                    </div>
+                `;
+                customerInfo.classList.remove('hidden');
+            } else {
+                customerInfo.classList.add('hidden');
+            }
+        });
 
         // Initialize page
         document.addEventListener('DOMContentLoaded', function() {
