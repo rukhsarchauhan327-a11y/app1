@@ -50,5 +50,10 @@ def add_item():
     """Serve the add new item page"""
     return render_template('add_item.html')
 
+@app.route('/profile')
+def profile():
+    """Serve the user profile page"""
+    return render_template('profile.html')
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)

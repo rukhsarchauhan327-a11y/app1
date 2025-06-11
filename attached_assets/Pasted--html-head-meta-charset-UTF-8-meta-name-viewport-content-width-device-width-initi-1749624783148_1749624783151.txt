@@ -1,0 +1,251 @@
+<html><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script> window.FontAwesomeConfig = { autoReplaceSvg: 'nest'};</script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <style>::-webkit-scrollbar { display: none;}</style>
+    
+    <script>tailwind.config = {
+  "theme": {
+    "extend": {
+      "colors": {
+        "primary": "#2563eb",
+        "secondary": "#64748b",
+        "accent": "#f59e0b",
+        "success": "#10b981",
+        "danger": "#ef4444",
+        "dark": "#1e293b",
+        "light": "#f8fafc"
+      },
+      "fontFamily": {
+        "inter": [
+          "Inter",
+          "sans-serif"
+        ],
+        "sans": [
+          "Inter",
+          "sans-serif"
+        ]
+      }
+    }
+  }
+};</script>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin=""><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;500;600;700;800;900&amp;display=swap"><style>
+      body {
+        font-family: 'Inter', sans-serif !important;
+      }
+      
+      /* Preserve Font Awesome icons */
+      .fa, .fas, .far, .fal, .fab {
+        font-family: "Font Awesome 6 Free", "Font Awesome 6 Brands" !important;
+      }
+    </style><style>
+  .highlighted-section {
+    outline: 2px solid #3F20FB;
+    background-color: rgba(63, 32, 251, 0.1);
+  }
+
+  .edit-button {
+    position: absolute;
+    z-index: 1000;
+  }
+
+  ::-webkit-scrollbar {
+    display: none;
+  }
+
+  html, body {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  </style></head>
+<body class="font-inter bg-gray-100">
+    <!-- Header Section -->
+    <header id="header" class="bg-white border-b border-gray-200 fixed top-0 left-0 right-0 z-10">
+        <div class="flex items-center justify-between px-4 py-3">
+            <button class="p-2 hover:bg-gray-100 rounded-lg">
+                <i class="fa-solid fa-arrow-left text-gray-600 text-lg"></i>
+            </button>
+            <div class="text-center">
+                <h1 class="text-lg font-semibold text-dark">Profile</h1>
+                <p class="text-xs text-gray-500">Kirana Konnect</p>
+            </div>
+            <button class="p-2 hover:bg-gray-100 rounded-lg">
+                <i class="fa-solid fa-cog text-gray-600 text-lg"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main id="main-content" class="pt-16 pb-20 bg-gray-100">
+        <!-- Profile Header -->
+        <div id="profile-header" class="bg-white px-4 py-6">
+            <div class="flex items-center space-x-4">
+                <div class="w-16 h-16 bg-primary rounded-full flex items-center justify-center">
+                    <span class="text-white font-bold text-xl">RS</span>
+                </div>
+                <div class="flex-1">
+                    <h2 class="text-xl font-semibold text-dark">Rajesh Sharma</h2>
+                    <p class="text-sm text-gray-500">Shop Owner</p>
+                    <p class="text-sm text-gray-500">+91 98765 43210</p>
+                </div>
+                <button class="p-2 text-primary">
+                    <i class="fa-solid fa-edit text-lg"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Shop Details -->
+        <div id="shop-details" class="bg-white mt-2 px-4 py-4">
+            <h3 class="text-lg font-semibold text-dark mb-3">Shop Information</h3>
+            <div class="space-y-3">
+                <div class="flex justify-between items-center">
+                    <span class="text-gray-600">Shop Name</span>
+                    <span class="font-medium text-dark">Sharma Kirana Store</span>
+                </div>
+                <div class="flex justify-between items-center">
+                    <span class="text-gray-600">GST Number</span>
+                    <span class="font-medium text-dark">27ABCDE1234F1Z5</span>
+                </div>
+                <div class="flex justify-between items-center">
+                    <span class="text-gray-600">Udyam Certificate</span>
+                    <span class="font-medium text-dark">UDYAM-MH-06-0012345</span>
+                </div>
+                <div class="flex justify-between items-center">
+                    <span class="text-gray-600">Address</span>
+                    <span class="font-medium text-dark text-right">Shop No. 15, Market Road<br>Mumbai, Maharashtra</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Business Stats -->
+        <div id="business-stats" class="bg-white mt-2 px-4 py-4">
+            <h3 class="text-lg font-semibold text-dark mb-3">Business Overview</h3>
+            <div class="grid grid-cols-2 gap-4">
+                <div class="bg-blue-50 p-3 rounded-lg text-center">
+                    <p class="text-2xl font-bold text-blue-600">₹45,280</p>
+                    <p class="text-xs text-blue-500">Total Sales</p>
+                </div>
+                <div class="bg-green-50 p-3 rounded-lg text-center">
+                    <p class="text-2xl font-bold text-green-600">₹8,450</p>
+                    <p class="text-xs text-green-500">This Month</p>
+                </div>
+                <div class="bg-orange-50 p-3 rounded-lg text-center">
+                    <p class="text-2xl font-bold text-orange-600">1,247</p>
+                    <p class="text-xs text-orange-500">Total Orders</p>
+                </div>
+                <div class="bg-purple-50 p-3 rounded-lg text-center">
+                    <p class="text-2xl font-bold text-purple-600">85</p>
+                    <p class="text-xs text-purple-500">Regular Customers</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div id="quick-actions" class="bg-white mt-2 px-4 py-4">
+            <h3 class="text-lg font-semibold text-dark mb-3">Quick Actions</h3>
+            <div class="space-y-3">
+                <button class="w-full flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100">
+                    <div class="flex items-center space-x-3">
+                        <i class="fa-solid fa-file-export text-primary text-lg"></i>
+                        <span class="font-medium text-dark">Export Data</span>
+                    </div>
+                    <i class="fa-solid fa-chevron-right text-gray-400"></i>
+                </button>
+                <button class="w-full flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100">
+                    <div class="flex items-center space-x-3">
+                        <i class="fa-solid fa-backup text-primary text-lg"></i>
+                        <span class="font-medium text-dark">Backup Data</span>
+                    </div>
+                    <i class="fa-solid fa-chevron-right text-gray-400"></i>
+                </button>
+                <button class="w-full flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100">
+                    <div class="flex items-center space-x-3">
+                        <i class="fa-solid fa-users text-primary text-lg"></i>
+                        <span class="font-medium text-dark">Manage Staff</span>
+                    </div>
+                    <i class="fa-solid fa-chevron-right text-gray-400"></i>
+                </button>
+                <button class="w-full flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100">
+                    <div class="flex items-center space-x-3">
+                        <i class="fa-solid fa-bell text-primary text-lg"></i>
+                        <span class="font-medium text-dark">Notification Settings</span>
+                    </div>
+                    <i class="fa-solid fa-chevron-right text-gray-400"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- App Settings -->
+        <div id="app-settings" class="bg-white mt-2 px-4 py-4">
+            <h3 class="text-lg font-semibold text-dark mb-3">App Settings</h3>
+            <div class="space-y-3">
+                <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                    <div class="flex items-center space-x-3">
+                        <i class="fa-solid fa-language text-primary text-lg"></i>
+                        <span class="font-medium text-dark">Language</span>
+                    </div>
+                    <span class="text-gray-600">English</span>
+                </div>
+                <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                    <div class="flex items-center space-x-3">
+                        <i class="fa-solid fa-moon text-primary text-lg"></i>
+                        <span class="font-medium text-dark">Dark Mode</span>
+                    </div>
+                    <div class="w-12 h-6 bg-gray-300 rounded-full relative">
+                        <div class="w-5 h-5 bg-white rounded-full absolute top-0.5 left-0.5 transition-transform"></div>
+                    </div>
+                </div>
+                <button class="w-full flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100">
+                    <div class="flex items-center space-x-3">
+                        <i class="fa-solid fa-question-circle text-primary text-lg"></i>
+                        <span class="font-medium text-dark">Help &amp; Support</span>
+                    </div>
+                    <i class="fa-solid fa-chevron-right text-gray-400"></i>
+                </button>
+                <button class="w-full flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100">
+                    <div class="flex items-center space-x-3">
+                        <i class="fa-solid fa-info-circle text-primary text-lg"></i>
+                        <span class="font-medium text-dark">About App</span>
+                    </div>
+                    <i class="fa-solid fa-chevron-right text-gray-400"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Logout Button -->
+        <div id="logout-section" class="px-4 py-4">
+            <button class="w-full bg-red-500 text-white py-3 rounded-lg font-medium hover:bg-red-600">
+                <i class="fa-solid fa-sign-out-alt mr-2"></i>
+                Logout
+            </button>
+        </div>
+    </main>
+
+    <!-- Bottom Navigation -->
+    <nav id="footer" class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200">
+        <div class="flex justify-around items-end py-2">
+            <button class="flex flex-col items-center py-1 px-3">
+                <i class="fa-solid fa-home text-gray-400 text-lg"></i>
+                <span class="text-xs mt-1 text-gray-400">Home</span>
+            </button>
+            <button class="flex flex-col items-center py-1 px-3">
+                <i class="fa-solid fa-box text-gray-400 text-lg"></i>
+                <span class="text-xs mt-1 text-gray-400">Inventory</span>
+            </button>
+            <button class="relative -top-3 bg-primary rounded-full p-3 shadow-lg">
+                <i class="fa-solid fa-barcode text-white text-lg"></i>
+            </button>
+            <button class="flex flex-col items-center py-1 px-3">
+                <i class="fa-solid fa-shopping-cart text-gray-400 text-lg"></i>
+                <span class="text-xs mt-1 text-gray-400">Cart</span>
+            </button>
+            <button class="flex flex-col items-center py-1 px-3">
+                <i class="fa-solid fa-user text-primary text-lg"></i>
+                <span class="text-xs mt-1 text-primary">Profile</span>
+            </button>
+        </div>
+    </nav>
+
+</body></html>

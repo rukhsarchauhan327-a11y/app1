@@ -417,7 +417,7 @@
                 <span class="text-xs mt-1 text-gray-400">Cart</span>
                 <span class="absolute -top-1 -right-1 bg-danger text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold">7</span>
             </button>
-            <button class="flex flex-col items-center py-1 px-3">
+            <button class="flex flex-col items-center py-1 px-3" onclick="goToProfile()">
                 <i class="fa-solid fa-user text-gray-400 text-xl"></i>
                 <span class="text-xs mt-1 text-gray-400">Profile</span>
             </button>
@@ -501,6 +501,10 @@
 
         function goToInventory() {
             window.location.href = '/inventory';
+        }
+
+        function goToProfile() {
+            window.location.href = '/profile';
         }
 
         // Report and ledger button handlers
