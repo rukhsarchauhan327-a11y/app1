@@ -47,190 +47,79 @@
     </style>
 </head>
 <body class="font-inter bg-gray-100">
-    <!-- Header Section -->
-    <header class="bg-white border-b border-gray-200 fixed top-0 left-0 right-0 z-10">
-        <div class="flex items-center justify-between px-4 py-3">
-            <button class="p-2 hover:bg-gray-100 rounded-lg" onclick="window.history.back()">
-                <i class="fa-solid fa-arrow-left text-gray-600 text-lg"></i>
-            </button>
-            <div class="text-center">
-                <h1 class="text-lg font-semibold text-dark">Refill Stock</h1>
-                <p class="text-xs text-gray-500">Kirana Konnect</p>
-            </div>
-            <div class="w-10"></div>
-        </div>
-    </header>
-
-    <!-- Main Content -->
-    <main class="pt-16 pb-32 bg-gray-100">
-        <!-- Product Summary Section -->
-        <div class="bg-white mx-4 mt-4 p-4 rounded-lg shadow-sm">
-            <div class="flex items-center space-x-3 mb-4">
-                <img id="product-image" class="w-16 h-16 rounded-lg object-cover border border-gray-200" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/9307613d34-298d7bee124789ba3905.png" alt="Product image">
-                <div class="flex-1">
-                    <h2 id="product-name" class="text-lg font-bold text-dark">Frooti Mango Drink</h2>
-                    <p id="product-size" class="text-sm text-gray-600">200 ml Bottle</p>
-                    <div class="flex items-center space-x-2 mt-1">
-                        <span id="product-category" class="bg-blue-100 text-blue-600 px-2 py-1 rounded-full text-xs font-medium">Beverages</span>
-                        <span id="product-type" class="bg-green-100 text-green-600 px-2 py-1 rounded-full text-xs font-medium">Bottle-Based</span>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Current Stock Info -->
-            <div class="bg-orange-50 p-3 rounded-lg mb-4">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <p class="text-sm text-orange-600 font-medium">Current Stock</p>
-                        <p id="current-stock" class="text-2xl font-bold text-orange-700">24 Bottles</p>
-                    </div>
-                    <div class="text-right">
-                        <p class="text-sm text-gray-500">Low Stock Threshold</p>
-                        <p id="stock-threshold" class="text-lg font-semibold text-gray-700">6 Bottles</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Refill Form Section -->
-        <div class="bg-white mx-4 mt-4 p-4 rounded-lg shadow-sm">
-            <h3 class="text-lg font-semibold text-dark mb-4">Add New Stock</h3>
-            
-            <!-- Quantity Input -->
-            <div class="mb-4">
-                <label class="block text-sm font-medium text-gray-700 mb-2">Additional Quantity</label>
-                <div class="flex space-x-2">
-                    <div class="flex-1 relative">
-                        <input type="number" id="quantity-input" class="w-full px-4 py-3 border border-gray-300 rounded-lg text-lg font-semibold text-center focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="0" value="25" step="0.001">
-                    </div>
-                    <select id="unit-select" class="px-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                        <option value="kg">Kg</option>
-                        <option value="gm">Gram</option>
-                        <option value="units">Units</option>
-                        <option value="bottles">Bottles</option>
-                        <option value="bags">Bags</option>
-                        <option value="packs">Packs</option>
-                    </select>
-                </div>
-            </div>
-
-            <!-- Purchase Price -->
-            <div class="mb-4">
-                <label class="block text-sm font-medium text-gray-700 mb-2">Total Purchase Price</label>
-                <div class="relative">
-                    <span class="absolute left-3 top-3 text-gray-500 text-lg">₹</span>
-                    <input type="number" id="purchase-price" class="w-full pl-8 pr-4 py-3 border border-gray-300 rounded-lg text-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="0" value="2000">
-                </div>
-            </div>
-
-            <!-- Auto Calculated Fields -->
-            <div class="bg-gray-50 p-4 rounded-lg mb-4">
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <p id="price-label" class="text-xs text-gray-500 mb-1">Price per Unit</p>
-                        <p class="text-lg font-bold text-dark" id="price-per-kg">₹0</p>
-                    </div>
-                    <div>
-                        <p class="text-xs text-gray-500 mb-1">New Total Stock</p>
-                        <p class="text-lg font-bold text-green-600" id="new-total">0 Units</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Selling Price Update -->
-            <div class="mb-4">
-                <label class="block text-sm font-medium text-gray-700 mb-2">Update Selling Price (Optional)</label>
-                <div class="flex space-x-2 mb-2">
-                    <div class="flex-1 relative">
-                        <span class="absolute left-3 top-3 text-gray-500 text-lg">₹</span>
-                        <input type="number" id="selling-price" class="w-full pl-8 pr-4 py-3 border border-gray-300 rounded-lg text-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="90" value="90">
-                    </div>
-                    <select id="selling-mode" class="px-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                        <option value="per-kg">Per Kg</option>
-                        <option value="per-gm">Per Gram</option>
-                        <option value="entire">Entire Amount</option>
-                    </select>
-                </div>
-                <div class="bg-blue-50 p-3 rounded-lg">
-                    <div class="flex justify-between items-center mb-1">
-                        <span class="text-sm text-gray-600">Per Kg Price:</span>
-                        <span id="calculated-per-kg" class="text-sm font-medium text-dark">₹90/Kg</span>
-                    </div>
-                    <div class="flex justify-between items-center mb-1">
-                        <span class="text-sm text-gray-600">Per Gram Price:</span>
-                        <span id="calculated-per-gram" class="text-sm font-medium text-dark">₹0.09/Gram</span>
-                    </div>
-                    <div class="flex justify-between items-center">
-                        <span class="text-sm text-gray-600">Total Revenue:</span>
-                        <span id="calculated-total-revenue" class="text-sm font-medium text-green-600">₹3650</span>
-                    </div>
-                </div>
-                <p class="text-sm text-green-600 mt-1">Current: ₹90/Kg</p>
-            </div>
-
-            <!-- Optional Dates -->
-            <div class="grid grid-cols-2 gap-4 mb-4">
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">MFG Date (Optional)</label>
-                    <input type="date" id="mfg-date" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">EXP Date (Optional)</label>
-                    <input type="date" id="exp-date" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                </div>
-            </div>
-
-            <!-- Barcode -->
-            <div class="mb-6">
-                <label class="block text-sm font-medium text-gray-700 mb-2">Barcode (Optional)</label>
-                <div class="flex space-x-2">
-                    <input type="text" id="barcode" class="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Enter or scan barcode" value="8901030875422">
-                    <button class="px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
-                        <i class="fa-solid fa-barcode"></i>
+    <!-- Refill Modal -->
+    <div class="fixed inset-0 bg-black bg-opacity-50 z-50">
+        <div class="flex items-end justify-center min-h-screen">
+            <div class="bg-white rounded-t-2xl w-full max-w-md mx-auto">
+                <!-- Modal Header -->
+                <div class="flex items-center justify-between p-4 border-b border-gray-200">
+                    <h3 class="text-lg font-bold text-dark">Refill Stock</h3>
+                    <button onclick="goBack()" class="p-1 hover:bg-gray-100 rounded">
+                        <i class="fa-solid fa-times text-gray-600"></i>
                     </button>
                 </div>
+
+                <!-- Modal Content -->
+                <div class="p-4 max-h-96 overflow-y-auto">
+                    <!-- Product Info -->
+                    <div class="flex items-center space-x-3 mb-4 p-3 bg-gray-50 rounded-lg">
+                        <img id="modal-product-image" class="w-12 h-12 rounded object-cover" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/c17cf1f603-c63583a41c10eef051a5.png" alt="Product">
+                        <div class="flex-1">
+                            <h4 id="modal-product-name" class="font-medium text-dark">Product Name</h4>
+                            <p id="modal-product-price" class="text-sm text-gray-600">₹0/Unit</p>
+                            <p id="modal-current-stock" class="text-xs text-blue-600">0 Units in stock</p>
+                        </div>
+                    </div>
+
+                    <!-- Add Stock Section -->
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-dark mb-3">Add Quantity</label>
+                        <div class="flex items-center space-x-3">
+                            <button id="decrease-qty" class="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center hover:bg-gray-200">
+                                <i class="fa-solid fa-minus text-gray-600"></i>
+                            </button>
+                            <input type="number" id="quantity-input" value="" min="0" class="flex-1 px-4 py-3 border border-gray-300 rounded-lg text-center font-medium text-lg" placeholder="0">
+                            <button id="increase-qty" class="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center hover:bg-gray-200">
+                                <i class="fa-solid fa-plus text-gray-600"></i>
+                            </button>
+                        </div>
+                        <p class="text-xs text-gray-500 mt-2 text-center">Enter quantity to add to current stock</p>
+                    </div>
+
+                    <!-- Purchase Cost -->
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-dark mb-2">Purchase Cost (Total)</label>
+                        <div class="relative">
+                            <span class="absolute left-3 top-3 text-gray-500 text-lg">₹</span>
+                            <input type="number" id="purchase-cost" class="w-full pl-8 pr-4 py-3 border border-gray-300 rounded-lg text-lg" placeholder="0">
+                        </div>
+                    </div>
+
+                    <!-- Auto-calculated Display -->
+                    <div class="mb-6 p-4 bg-blue-50 rounded-lg">
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="text-sm text-gray-600">New Total Stock:</span>
+                            <span id="new-total-stock" class="text-sm font-medium text-dark">0 Units</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm text-gray-600">Cost Per Unit:</span>
+                            <span id="cost-per-unit" class="text-lg font-bold text-blue-600">₹0</span>
+                        </div>
+                    </div>
+
+                    <!-- Modal Actions -->
+                    <div class="flex space-x-3">
+                        <button onclick="goBack()" class="flex-1 py-3 px-4 bg-gray-200 text-gray-700 rounded-lg font-medium hover:bg-gray-300 transition-colors">
+                            Cancel
+                        </button>
+                        <button id="confirm-refill" class="flex-1 py-3 px-4 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors">
+                            Add Stock
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
-    </main>
-
-    <!-- Fixed Bottom Actions -->
-    <div class="fixed bottom-16 left-0 right-0 bg-white border-t border-gray-200 p-4">
-        <div class="grid grid-cols-2 gap-3">
-            <button class="flex items-center justify-center space-x-2 bg-gray-600 text-white py-3 px-4 rounded-lg hover:bg-gray-700 transition-colors" onclick="cancelRefill()">
-                <i class="fa-solid fa-times text-sm"></i>
-                <span class="font-medium">Cancel</span>
-            </button>
-            <button class="flex items-center justify-center space-x-2 bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 transition-colors" onclick="addStock()">
-                <i class="fa-solid fa-check text-sm"></i>
-                <span class="font-medium">Add Stock</span>
-            </button>
-        </div>
     </div>
-
-    <!-- Bottom Navigation -->
-    <nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200">
-        <div class="flex justify-around items-end py-2">
-            <button class="flex flex-col items-center py-1 px-3" onclick="window.location.href='/dashboard'">
-                <i class="fa-solid fa-home text-gray-400 text-lg"></i>
-                <span class="text-xs mt-1 text-gray-400">Home</span>
-            </button>
-            <button class="flex flex-col items-center py-1 px-3" onclick="window.location.href='/inventory'">
-                <i class="fa-solid fa-box text-primary text-lg"></i>
-                <span class="text-xs mt-1 text-primary">Inventory</span>
-            </button>
-            <button class="relative -top-3 bg-primary rounded-full p-3 shadow-lg" onclick="window.location.href='/add-item'">
-                <i class="fa-solid fa-barcode text-white text-lg"></i>
-            </button>
-            <button class="flex flex-col items-center py-1 px-3" onclick="window.location.href='/cart'">
-                <i class="fa-solid fa-shopping-cart text-gray-400 text-lg"></i>
-                <span class="text-xs mt-1 text-gray-400">Cart</span>
-            </button>
-            <button class="flex flex-col items-center py-1 px-3" onclick="window.location.href='/profile'">
-                <i class="fa-solid fa-user text-gray-400 text-lg"></i>
-                <span class="text-xs mt-1 text-gray-400">Profile</span>
-            </button>
-        </div>
-    </nav>
 
     <script>
         // Load product data from localStorage
@@ -243,28 +132,19 @@
                 productData = {
                     name: product.name,
                     image: product.image,
-                    size: product.size || 'Premium Quality',
-                    category: 'Grocery',
-                    type: product.type === 'weight-based' ? 'Weight-Based' : 'Unit-Based',
-                    currentStock: product.stock,
-                    threshold: product.type === 'weight-based' ? 1 : 5,
+                    price: product.price,
                     unit: product.stockUnit || product.unit,
-                    unitPlural: product.stockUnit || product.unit,
-                    currentSellingPrice: product.price
+                    stock: product.stock,
+                    type: product.type
                 };
             } else {
-                // Default fallback data
                 productData = {
                     name: 'Product',
                     image: 'https://storage.googleapis.com/uxpilot-auth.appspot.com/c17cf1f603-c63583a41c10eef051a5.png',
-                    size: 'Premium Quality',
-                    category: 'Grocery',
-                    type: 'Unit-Based',
-                    currentStock: 15,
-                    threshold: 5,
+                    price: 50,
                     unit: 'Units',
-                    unitPlural: 'Units',
-                    currentSellingPrice: 50
+                    stock: 10,
+                    type: 'regular'
                 };
             }
         }
@@ -273,187 +153,75 @@
         function initializePage() {
             loadProductData();
             
-            document.getElementById('product-image').src = productData.image;
-            document.getElementById('product-name').textContent = productData.name;
-            document.getElementById('product-size').textContent = productData.size;
-            document.getElementById('product-category').textContent = productData.category;
-            document.getElementById('product-type').textContent = productData.type;
-            document.getElementById('current-stock').textContent = `${productData.currentStock} ${productData.unit}`;
-            document.getElementById('stock-threshold').textContent = `${productData.threshold} ${productData.unit}`;
-            
-            // Set appropriate unit options based on product type
-            setupUnitSelector();
-            
-            // Update price label based on product type
-            const priceLabel = document.getElementById('price-label');
-            if (productData.type === 'Weight-Based') {
-                priceLabel.textContent = 'Price per Kg';
-            } else {
-                priceLabel.textContent = `Price per ${productData.unit}`;
-            }
-            
-            // Clear default values and set appropriate defaults
-            document.getElementById('quantity-input').value = '';
-            document.getElementById('purchase-price').value = '';
+            document.getElementById('modal-product-image').src = productData.image;
+            document.getElementById('modal-product-name').textContent = productData.name;
+            document.getElementById('modal-product-price').textContent = `₹${productData.price}/${productData.unit}`;
+            document.getElementById('modal-current-stock').textContent = `${productData.stock} ${productData.unit} in stock`;
             
             updateCalculations();
         }
 
-        function setupUnitSelector() {
-            const unitSelect = document.getElementById('unit-select');
-            const productUnit = productData.unit.toLowerCase();
-            
-            // Clear existing options
-            unitSelect.innerHTML = '';
-            
-            if (productData.type === 'Weight-Based') {
-                unitSelect.innerHTML = `
-                    <option value="kg">Kg</option>
-                    <option value="gm">Gram</option>
-                `;
-            } else {
-                // For unit-based products, use the actual unit
-                const unitOptions = {
-                    'bottles': 'Bottles',
-                    'bags': 'Bags',
-                    'packs': 'Packs',
-                    'units': 'Units',
-                    'boxes': 'Boxes'
-                };
-                
-                const unitKey = productUnit.replace(/s$/, ''); // Remove 's' if present
-                const displayUnit = unitOptions[unitKey] || 'Units';
-                
-                unitSelect.innerHTML = `<option value="${unitKey}">${displayUnit}</option>`;
-            }
-        }
-
-        // Calculate values based on product type
+        // Calculate values
         function updateCalculations() {
             const quantity = parseFloat(document.getElementById('quantity-input').value) || 0;
-            const purchasePrice = parseFloat(document.getElementById('purchase-price').value) || 0;
-            const unit = document.getElementById('unit-select').value;
+            const purchaseCost = parseFloat(document.getElementById('purchase-cost').value) || 0;
             
-            if (productData.type === 'Weight-Based') {
-                // Weight-based calculations
-                let quantityInKg = quantity;
-                if (unit === 'gm') {
-                    quantityInKg = quantity / 1000;
-                }
-                
-                const pricePerKg = quantityInKg > 0 ? (purchasePrice / quantityInKg).toFixed(0) : 0;
-                const newTotal = productData.currentStock + quantityInKg;
-                
-                document.getElementById('price-per-kg').textContent = `₹${pricePerKg}/Kg`;
-                document.getElementById('new-total').textContent = `${newTotal.toFixed(1)} Kg`;
-            } else {
-                // Unit-based calculations
-                const pricePerUnit = quantity > 0 ? (purchasePrice / quantity).toFixed(0) : 0;
-                const newTotal = productData.currentStock + quantity;
-                
-                document.getElementById('price-per-kg').textContent = `₹${pricePerUnit}/${productData.unit}`;
-                document.getElementById('new-total').textContent = `${newTotal} ${productData.unit}`;
-            }
+            const newTotal = productData.stock + quantity;
+            const costPerUnit = quantity > 0 ? (purchaseCost / quantity).toFixed(2) : 0;
             
-            // Update selling price calculations
-            updateSellingPriceCalculations();
+            document.getElementById('new-total-stock').textContent = `${newTotal} ${productData.unit}`;
+            document.getElementById('cost-per-unit').textContent = `₹${costPerUnit}`;
         }
 
-        // Calculate selling price based on mode
-        function updateSellingPriceCalculations() {
-            const sellingPriceInput = document.getElementById('selling-price');
-            const sellingModeSelect = document.getElementById('selling-mode');
-            const quantityInput = document.getElementById('quantity-input');
-            const unitSelect = document.getElementById('unit-select');
-            
-            if (!sellingPriceInput || !sellingModeSelect || !quantityInput || !unitSelect) {
-                return; // Exit if elements don't exist
-            }
-            
-            const sellingPrice = parseFloat(sellingPriceInput.value) || 0;
-            const sellingMode = sellingModeSelect.value;
-            const quantity = parseFloat(quantityInput.value) || 0;
-            const unit = unitSelect.value;
-            
-            let quantityInKg = quantity;
-            if (unit === 'gm') {
-                quantityInKg = quantity / 1000;
-            }
-            
-            let perKgPrice = 0;
-            let perGramPrice = 0;
-            let totalRevenue = 0;
-            
-            if (sellingMode === 'per-kg') {
-                perKgPrice = sellingPrice;
-                perGramPrice = sellingPrice / 1000;
-                totalRevenue = perKgPrice * (productData.currentStock + quantityInKg);
-            } else if (sellingMode === 'per-gm') {
-                perGramPrice = sellingPrice;
-                perKgPrice = sellingPrice * 1000;
-                totalRevenue = perKgPrice * (productData.currentStock + quantityInKg);
-            } else if (sellingMode === 'entire') {
-                totalRevenue = sellingPrice;
-                const totalStock = productData.currentStock + quantityInKg;
-                perKgPrice = totalStock > 0 ? totalRevenue / totalStock : 0;
-                perGramPrice = perKgPrice / 1000;
-            }
-            
-            const perKgElement = document.getElementById('calculated-per-kg');
-            const perGramElement = document.getElementById('calculated-per-gram');
-            const totalRevenueElement = document.getElementById('calculated-total-revenue');
-            
-            if (perKgElement) perKgElement.textContent = `₹${perKgPrice.toFixed(2)}/Kg`;
-            if (perGramElement) perGramElement.textContent = `₹${perGramPrice.toFixed(3)}/Gram`;
-            if (totalRevenueElement) totalRevenueElement.textContent = `₹${totalRevenue.toFixed(2)}`;
+        // Quantity controls
+        function increaseQuantity() {
+            const input = document.getElementById('quantity-input');
+            const currentValue = parseInt(input.value) || 0;
+            input.value = currentValue + 1;
+            updateCalculations();
         }
 
-        function addStock() {
-            const quantity = document.getElementById('quantity-input').value || 0;
-            const purchasePrice = document.getElementById('purchase-price').value || 0;
-            const sellingPrice = document.getElementById('selling-price').value || 0;
+        function decreaseQuantity() {
+            const input = document.getElementById('quantity-input');
+            const currentValue = parseInt(input.value) || 0;
+            if (currentValue > 0) {
+                input.value = currentValue - 1;
+                updateCalculations();
+            }
+        }
+
+        function goBack() {
+            window.history.back();
+        }
+
+        function confirmRefill() {
+            const quantity = parseFloat(document.getElementById('quantity-input').value) || 0;
+            const cost = parseFloat(document.getElementById('purchase-cost').value) || 0;
             
             if (quantity <= 0) {
-                alert('Please enter a valid quantity.');
+                alert('Please enter a valid quantity');
                 return;
             }
             
-            if (purchasePrice <= 0) {
-                alert('Please enter a valid purchase price.');
+            if (cost <= 0) {
+                alert('Please enter a valid purchase cost');
                 return;
             }
             
-            // Calculate new stock
-            const newStock = parseInt(productData.currentStock) + parseInt(quantity);
-            const totalCost = parseFloat(purchasePrice);
-            
-            alert(`Stock added successfully!\n\n${quantity} ${productData.unitPlural} added\nNew total stock: ${newStock} ${productData.unitPlural}\nTotal cost: ₹${totalCost}\n\nReturning to inventory...`);
-            
-            // Return to inventory page
-            window.location.href = '/inventory';
+            alert(`Stock refilled successfully!\nAdded: ${quantity} ${productData.unit}\nCost: ₹${cost}`);
+            goBack();
         }
 
-        function cancelRefill() {
-            if (confirm('Are you sure you want to cancel? All entered data will be lost.')) {
-                window.history.back();
-            }
-        }
-
-        // Add event listeners with error checking
-        const quantityInput = document.getElementById('quantity-input');
-        const purchasePriceInput = document.getElementById('purchase-price');
-        const unitSelectElement = document.getElementById('unit-select');
-        const sellingPriceInput = document.getElementById('selling-price');
-        const sellingModeSelect = document.getElementById('selling-mode');
-
-        if (quantityInput) quantityInput.addEventListener('input', updateCalculations);
-        if (purchasePriceInput) purchasePriceInput.addEventListener('input', updateCalculations);
-        if (unitSelectElement) unitSelectElement.addEventListener('change', updateCalculations);
-        if (sellingPriceInput) sellingPriceInput.addEventListener('input', updateSellingPriceCalculations);
-        if (sellingModeSelect) sellingModeSelect.addEventListener('change', updateSellingPriceCalculations);
-
-        // Initialize the page
-        initializePage();
+        // Event listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            initializePage();
+            
+            document.getElementById('quantity-input').addEventListener('input', updateCalculations);
+            document.getElementById('purchase-cost').addEventListener('input', updateCalculations);
+            document.getElementById('increase-qty').addEventListener('click', increaseQuantity);
+            document.getElementById('decrease-qty').addEventListener('click', decreaseQuantity);
+            document.getElementById('confirm-refill').addEventListener('click', confirmRefill);
+        });
     </script>
 </body>
 </html>
