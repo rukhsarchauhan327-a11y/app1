@@ -1,0 +1,399 @@
+<html><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script> window.FontAwesomeConfig = { autoReplaceSvg: 'nest'};</script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <style>::-webkit-scrollbar { display: none;}</style>
+    
+    <script>tailwind.config = {
+  "theme": {
+    "extend": {
+      "colors": {
+        "primary": "#10B981",
+        "secondary": "#6366F1",
+        "accent": "#F59E0B",
+        "danger": "#EF4444",
+        "dark": "#1F2937",
+        "light": "#F8FAFC"
+      },
+      "fontFamily": {
+        "inter": [
+          "Inter",
+          "sans-serif"
+        ],
+        "sans": [
+          "Inter",
+          "sans-serif"
+        ]
+      }
+    }
+  }
+};</script>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin=""><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;500;600;700;800;900&amp;display=swap"><style>
+      body {
+        font-family: 'Inter', sans-serif !important;
+      }
+      
+      /* Preserve Font Awesome icons */
+      .fa, .fas, .far, .fal, .fab {
+        font-family: "Font Awesome 6 Free", "Font Awesome 6 Brands" !important;
+      }
+    </style><style>
+  .highlighted-section {
+    outline: 2px solid #3F20FB;
+    background-color: rgba(63, 32, 251, 0.1);
+  }
+
+  .edit-button {
+    position: absolute;
+    z-index: 1000;
+  }
+
+  ::-webkit-scrollbar {
+    display: none;
+  }
+
+  html, body {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  </style></head>
+<body class="font-inter bg-light min-h-screen">
+    <header id="header" class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="flex items-center justify-between px-4 py-3">
+            <button class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center">
+                <i class="fa-solid fa-arrow-left text-gray-600"></i>
+            </button>
+            <h1 class="text-lg font-semibold text-dark">Add New Item</h1>
+            <button class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center">
+                <i class="fa-solid fa-question-circle text-gray-600"></i>
+            </button>
+        </div>
+    </header>
+
+    <main id="main-content" class="px-4 py-6 pb-24">
+        <div id="step-indicator" class="flex items-center justify-center mb-8">
+            <div class="flex items-center space-x-2">
+                <div class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center text-sm font-medium">1</div>
+                <div class="w-12 h-0.5 bg-gray-300"></div>
+                <div class="w-8 h-8 rounded-full bg-gray-300 text-gray-500 flex items-center justify-center text-sm font-medium">2</div>
+                <div class="w-12 h-0.5 bg-gray-300"></div>
+                <div class="w-8 h-8 rounded-full bg-gray-300 text-gray-500 flex items-center justify-center text-sm font-medium">3</div>
+            </div>
+        </div>
+
+        <div id="form-container" class="space-y-6">
+            <div id="category-section" class="bg-white rounded-xl p-5 shadow-sm border border-gray-100">
+                <h3 class="text-base font-semibold text-dark mb-4 flex items-center">
+                    <i class="fa-solid fa-tag text-primary mr-2"></i>
+                    Product Category
+                </h3>
+                <select class="w-full p-3.5 border border-gray-200 rounded-lg bg-white text-dark focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all">
+                    <option value="">Choose Category</option>
+                    <option value="grains">🌾 Grains</option>
+                    <option value="beverages">🥤 Beverages</option>
+                    <option value="snacks">🍿 Snacks</option>
+                    <option value="oils">🫒 Oils</option>
+                    <option value="household">🏠 Household</option>
+                    <option value="medical">💊 Medical</option>
+                    <option value="others">📦 Others</option>
+                </select>
+            </div>
+
+            <div id="product-info" class="bg-white rounded-xl p-5 shadow-sm border border-gray-100">
+                <h3 class="text-base font-semibold text-dark mb-4 flex items-center">
+                    <i class="fa-solid fa-box text-secondary mr-2"></i>
+                    Product Details
+                </h3>
+                
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Product Name *</label>
+                        <input type="text" placeholder="e.g., Aashirvaad Atta" class="w-full p-3.5 border border-gray-200 rounded-lg focus:border-secondary focus:ring-2 focus:ring-secondary/20 transition-all">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Description</label>
+                        <textarea placeholder="Brief description..." rows="2" class="w-full p-3.5 border border-gray-200 rounded-lg focus:border-secondary focus:ring-2 focus:ring-secondary/20 transition-all resize-none"></textarea>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Product Image</label>
+                        <div class="grid grid-cols-2 gap-3">
+                            <button class="p-4 border-2 border-dashed border-gray-300 rounded-lg text-gray-500 hover:border-secondary hover:text-secondary transition-all">
+                                <i class="fa-solid fa-camera text-xl mb-1"></i>
+                                <p class="text-xs">Camera</p>
+                            </button>
+                            <button class="p-4 border-2 border-dashed border-gray-300 rounded-lg text-gray-500 hover:border-secondary hover:text-secondary transition-all">
+                                <i class="fa-solid fa-upload text-xl mb-1"></i>
+                                <p class="text-xs">Upload</p>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="bg-gray-50 rounded-lg p-4">
+                        <h4 class="font-medium text-gray-700 mb-3 flex items-center">
+                            <i class="fa-regular fa-calendar text-accent mr-2"></i>
+                            Dates (Optional)
+                        </h4>
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-xs font-medium text-gray-600 mb-1">MFG Date</label>
+                                <input type="date" class="w-full p-2.5 border border-gray-200 rounded-md focus:border-accent focus:ring-1 focus:ring-accent/20 transition-all text-sm">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-gray-600 mb-1">EXP Date</label>
+                                <input type="date" class="w-full p-2.5 border border-gray-200 rounded-md focus:border-accent focus:ring-1 focus:ring-accent/20 transition-all text-sm">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="quantity-type" class="bg-white rounded-xl p-5 shadow-sm border border-gray-100">
+                <h3 class="text-base font-semibold text-dark mb-4 flex items-center">
+                    <i class="fa-solid fa-balance-scale text-accent mr-2"></i>
+                    Quantity Type
+                </h3>
+                
+                <div class="space-y-4">
+                    <div class="bg-blue-50 rounded-lg p-4 border border-blue-100">
+                        <h4 class="font-medium text-dark mb-3 flex items-center text-sm">
+                            <i class="fa-solid fa-weight text-secondary mr-2"></i>
+                            Weight-Based
+                        </h4>
+                        <div class="grid grid-cols-2 gap-2">
+                            <label class="flex items-center space-x-2 cursor-pointer p-2 rounded-md hover:bg-white/70 transition-all">
+                                <input type="radio" name="quantity_type" value="kg_gram" class="w-4 h-4 text-primary">
+                                <span class="text-sm font-medium">Kg/Gram</span>
+                            </label>
+                            <label class="flex items-center space-x-2 cursor-pointer p-2 rounded-md hover:bg-white/70 transition-all">
+                                <input type="radio" name="quantity_type" value="ltr_ml" class="w-4 h-4 text-primary">
+                                <span class="text-sm font-medium">Ltr/ml</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="bg-green-50 rounded-lg p-4 border border-green-100">
+                        <h4 class="font-medium text-dark mb-3 flex items-center text-sm">
+                            <i class="fa-solid fa-boxes text-primary mr-2"></i>
+                            Unit-Based
+                        </h4>
+                        <div class="grid grid-cols-2 gap-2">
+                            <label class="flex items-center space-x-2 cursor-pointer p-2 rounded-md hover:bg-white/70 transition-all">
+                                <input type="radio" name="quantity_type" value="bottle" class="w-4 h-4 text-primary">
+                                <span class="text-sm font-medium">Bottle</span>
+                            </label>
+                            <label class="flex items-center space-x-2 cursor-pointer p-2 rounded-md hover:bg-white/70 transition-all">
+                                <input type="radio" name="quantity_type" value="packet" class="w-4 h-4 text-primary">
+                                <span class="text-sm font-medium">Packet</span>
+                            </label>
+                            <label class="flex items-center space-x-2 cursor-pointer p-2 rounded-md hover:bg-white/70 transition-all">
+                                <input type="radio" name="quantity_type" value="piece" class="w-4 h-4 text-primary">
+                                <span class="text-sm font-medium">Piece</span>
+                            </label>
+                            <label class="flex items-center space-x-2 cursor-pointer p-2 rounded-md hover:bg-white/70 transition-all">
+                                <input type="radio" name="quantity_type" value="box" class="w-4 h-4 text-primary">
+                                <span class="text-sm font-medium">Box</span>
+                            </label>
+                            <label class="flex items-center space-x-2 cursor-pointer p-2 rounded-md hover:bg-white/70 transition-all">
+                                <input type="radio" name="quantity_type" value="bag" class="w-4 h-4 text-primary">
+                                <span class="text-sm font-medium">Bag</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="pricing-section" class="bg-white rounded-xl p-5 shadow-sm border border-gray-100 hidden">
+                <h3 class="text-base font-semibold text-dark mb-4 flex items-center">
+                    <i class="fa-solid fa-calculator text-danger mr-2"></i>
+                    Quantity &amp; Pricing
+                </h3>
+                
+                <div id="weight-fields" class="space-y-4 hidden">
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Total Quantity</label>
+                            <input type="number" step="0.001" placeholder="55.250" class="w-full p-3 border border-gray-200 rounded-lg focus:border-danger focus:ring-2 focus:ring-danger/20 transition-all">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Unit</label>
+                            <select id="unit-dropdown" class="w-full p-3 border border-gray-200 rounded-lg focus:border-danger focus:ring-2 focus:ring-danger/20 transition-all">
+                                <option value="kg">Kg</option>
+                                <option value="gram">Gram</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Total Purchase Price</label>
+                        <input type="number" placeholder="5000" class="w-full p-3 border border-gray-200 rounded-lg focus:border-danger focus:ring-2 focus:ring-danger/20 transition-all">
+                    </div>
+
+                    <div class="bg-gray-50 p-3 rounded-lg">
+                        <p class="text-sm text-gray-600">Purchase Price per Unit: <span class="font-semibold text-dark">₹0</span></p>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Total Selling Price</label>
+                        <input type="number" placeholder="5500" class="w-full p-3 border border-gray-200 rounded-lg focus:border-danger focus:ring-2 focus:ring-danger/20 transition-all">
+                    </div>
+
+                    <div class="bg-primary/10 p-3 rounded-lg border border-primary/20">
+                        <p class="text-sm font-semibold text-primary">💰 Selling at ₹0 per <span id="weight-unit-display">Unit</span></p>
+                    </div>
+                </div>
+
+                <div id="unit-fields" class="space-y-4 hidden">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Size/Description</label>
+                        <input type="text" placeholder="e.g., 300ml, Large, Medium" class="w-full p-3 border border-gray-200 rounded-lg focus:border-danger focus:ring-2 focus:ring-danger/20 transition-all">
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Total <span id="unit-label">Units</span></label>
+                            <input type="number" placeholder="12" class="w-full p-3 border border-gray-200 rounded-lg focus:border-danger focus:ring-2 focus:ring-danger/20 transition-all">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Purchase Price</label>
+                            <input type="number" placeholder="360" class="w-full p-3 border border-gray-200 rounded-lg focus:border-danger focus:ring-2 focus:ring-danger/20 transition-all">
+                        </div>
+                    </div>
+
+                    <div class="bg-gray-50 p-3 rounded-lg">
+                        <p class="text-sm text-gray-600">Purchase Price per <span id="unit-type-display">Unit</span>: <span class="font-semibold text-dark">₹0</span></p>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Total Selling Price</label>
+                        <input type="number" placeholder="480" class="w-full p-3 border border-gray-200 rounded-lg focus:border-danger focus:ring-2 focus:ring-danger/20 transition-all">
+                    </div>
+
+                    <div class="bg-primary/10 p-3 rounded-lg border border-primary/20">
+                        <p class="text-sm font-semibold text-primary">💰 Selling at ₹0 per <span id="selling-unit-display">Unit</span></p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="additional-info" class="bg-white rounded-xl p-5 shadow-sm border border-gray-100">
+                <h3 class="text-base font-semibold text-dark mb-4 flex items-center">
+                    <i class="fa-solid fa-cog text-purple-500 mr-2"></i>
+                    Additional Settings
+                </h3>
+                
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Barcode</label>
+                        <div class="flex space-x-2">
+                            <input type="text" placeholder="Enter or scan barcode" class="flex-1 p-3 border border-gray-200 rounded-lg focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all">
+                            <button class="px-4 py-3 bg-secondary text-white rounded-lg hover:bg-secondary/90 transition-all">
+                                <i class="fa-solid fa-qrcode"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Low Stock Alert</label>
+                        <div class="bg-gray-50 rounded-lg p-4">
+                            <div class="flex items-center justify-between mb-3">
+                                <span class="text-sm font-medium text-gray-700">Threshold</span>
+                                <span id="threshold-value" class="text-sm font-semibold text-primary">25%</span>
+                            </div>
+                            <div class="relative">
+                                <input type="range" id="threshold-slider" min="5" max="50" value="25" step="5" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider">
+                                <div class="flex justify-between text-xs text-gray-500 mt-2">
+                                    <span>5%</span>
+                                    <span>25%</span>
+                                    <span>50%</span>
+                                </div>
+                            </div>
+                            <p class="text-xs text-gray-500 mt-2">Get notified when stock falls below this percentage</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div id="bottom-actions" class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 z-30">
+        <div class="flex space-x-3">
+            <button class="flex-1 py-3 px-4 border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50 transition-all">
+                Cancel
+            </button>
+            <button class="flex-1 py-3 px-4 bg-primary text-white rounded-lg font-medium hover:bg-primary/90 transition-all shadow-sm">
+                Add Item
+            </button>
+        </div>
+    </div>
+
+    <script>
+        const quantityTypeRadios = document.querySelectorAll('input[name="quantity_type"]');
+        const pricingSection = document.getElementById('pricing-section');
+        const weightFields = document.getElementById('weight-fields');
+        const unitFields = document.getElementById('unit-fields');
+        const unitDropdown = document.getElementById('unit-dropdown');
+        const thresholdSlider = document.getElementById('threshold-slider');
+        const thresholdValue = document.getElementById('threshold-value');
+        const unitLabel = document.getElementById('unit-label');
+        const unitTypeDisplay = document.getElementById('unit-type-display');
+        const sellingUnitDisplay = document.getElementById('selling-unit-display');
+        const weightUnitDisplay = document.getElementById('weight-unit-display');
+
+        quantityTypeRadios.forEach(radio => {
+            radio.addEventListener('change', function() {
+                if (this.checked) {
+                    pricingSection.classList.remove('hidden');
+                    
+                    if (this.value === 'kg_gram') {
+                        weightFields.classList.remove('hidden');
+                        unitFields.classList.add('hidden');
+                        unitDropdown.innerHTML = `
+                            <option value="kg">Kg</option>
+                            <option value="gram">Gram</option>
+                        `;
+                        weightUnitDisplay.textContent = 'Kg';
+                    } else if (this.value === 'ltr_ml') {
+                        weightFields.classList.remove('hidden');
+                        unitFields.classList.add('hidden');
+                        unitDropdown.innerHTML = `
+                            <option value="ltr">Litre</option>
+                            <option value="ml">ml</option>
+                        `;
+                        weightUnitDisplay.textContent = 'Litre';
+                    } else {
+                        weightFields.classList.add('hidden');
+                        unitFields.classList.remove('hidden');
+                        
+                        // Update unit labels based on selection
+                        const unitType = this.value.charAt(0).toUpperCase() + this.value.slice(1);
+                        unitLabel.textContent = `Total ${unitType}s`;
+                        unitTypeDisplay.textContent = unitType;
+                        sellingUnitDisplay.textContent = unitType;
+                    }
+                }
+            });
+        });
+
+        // Update weight unit display when dropdown changes
+        unitDropdown.addEventListener('change', function() {
+            const selectedUnit = this.value.charAt(0).toUpperCase() + this.value.slice(1);
+            weightUnitDisplay.textContent = selectedUnit;
+        });
+
+        thresholdSlider.addEventListener('input', function() {
+            thresholdValue.textContent = this.value + '%';
+        });
+    </script>
+
+    <style>
+        .slider::-webkit-slider-thumb {
+            appearance: none;
+            height: 20px;
+            width: 20px;
+            border-radius: 50%;
+            background: #10B981;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0</style></body></html>
