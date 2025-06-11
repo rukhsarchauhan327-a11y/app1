@@ -114,13 +114,8 @@
                     <p class="text-lg font-bold text-primary" id="bill-number">#KK-2025-001</p>
                 </div>
                 <div class="border-t pt-3">
-                    <p class="text-xs text-gray-600 mb-2">Customer:</p>
-                    <div class="relative">
-                        <input type="text" id="bill-customer-name" placeholder="Select or add customer" class="w-full p-2 pr-8 border border-gray-200 rounded-lg text-sm bg-gray-50" readonly>
-                        <button id="clear-customer" class="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-red-500 hidden" onclick="clearCustomer()">
-                            <i class="fa-solid fa-times text-sm"></i>
-                        </button>
-                    </div>
+                    <p class="text-xs text-gray-600 mb-2">Add name to bill (optional):</p>
+                    <input type="text" id="bill-customer-name" placeholder="Enter customer name for bill" class="w-full p-2 border border-gray-200 rounded-lg text-sm">
                 </div>
             </div>
 
@@ -525,22 +520,11 @@
         function selectCustomer(name, customerId = null) {
             selectedCustomerId = customerId;
             document.getElementById('bill-customer-name').value = name;
-            document.getElementById('bill-customer-name').classList.remove('bg-gray-50');
-            document.getElementById('bill-customer-name').classList.add('bg-blue-50', 'text-blue-700', 'font-medium');
-            document.getElementById('clear-customer').classList.remove('hidden');
             document.getElementById('customer-search-input').value = '';
             document.getElementById('customer-results').classList.add('hidden');
             document.getElementById('customer-results').innerHTML = '';
             document.getElementById('no-search-message').classList.remove('hidden');
             showBillingTab();
-        }
-
-        function clearCustomer() {
-            selectedCustomerId = null;
-            document.getElementById('bill-customer-name').value = '';
-            document.getElementById('bill-customer-name').classList.remove('bg-blue-50', 'text-blue-700', 'font-medium');
-            document.getElementById('bill-customer-name').classList.add('bg-gray-50');
-            document.getElementById('clear-customer').classList.add('hidden');
         }
 
         async function saveNewCustomer() {
@@ -569,9 +553,6 @@
                 if (response.ok) {
                     selectedCustomerId = result.id;
                     document.getElementById('bill-customer-name').value = name;
-                    document.getElementById('bill-customer-name').classList.remove('bg-gray-50');
-                    document.getElementById('bill-customer-name').classList.add('bg-blue-50', 'text-blue-700', 'font-medium');
-                    document.getElementById('clear-customer').classList.remove('hidden');
                     document.getElementById('new-customer-name').value = '';
                     document.getElementById('new-customer-phone').value = '';
                     showNotification(`Customer ${name} saved successfully!`, 'success');
