@@ -265,6 +265,88 @@
         </div>
     </nav>
 
+    <!-- Edit Profile Modal -->
+    <div id="editProfileModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-white rounded-lg w-full max-w-md max-h-screen overflow-y-auto">
+                <div class="flex items-center justify-between p-4 border-b">
+                    <h3 class="text-lg font-semibold text-dark">Edit Profile</h3>
+                    <button onclick="closeEditProfile()" class="p-1 hover:bg-gray-100 rounded">
+                        <i class="fa-solid fa-times text-gray-600"></i>
+                    </button>
+                </div>
+                <div class="p-4 space-y-4">
+                    <!-- Personal Information -->
+                    <div>
+                        <h4 class="font-medium text-dark mb-3">Personal Information</h4>
+                        <div class="space-y-3">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+                                <input type="text" id="editName" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" value="Rajesh Sharma">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
+                                <input type="tel" id="editPhone" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" value="+91 98765 43210">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                                <input type="email" id="editEmail" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" value="rajesh@gmail.com">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Shop Information -->
+                    <div>
+                        <h4 class="font-medium text-dark mb-3">Shop Information</h4>
+                        <div class="space-y-3">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Shop Name</label>
+                                <input type="text" id="editShopName" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" value="Sharma Kirana Store">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">GST Number</label>
+                                <input type="text" id="editGST" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" value="27ABCDE1234F1Z5">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Udyam Certificate</label>
+                                <input type="text" id="editUdyam" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" value="UDYAM-MH-06-0012345">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Shop Address</label>
+                                <textarea id="editAddress" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">Shop No. 15, Market Road, Mumbai, Maharashtra</textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Profile Photo Upload -->
+                    <div>
+                        <h4 class="font-medium text-dark mb-3">Profile Photo</h4>
+                        <div class="flex items-center space-x-4">
+                            <div class="w-16 h-16 bg-primary rounded-full flex items-center justify-center">
+                                <span class="text-white font-bold text-xl">RS</span>
+                            </div>
+                            <div>
+                                <button onclick="selectPhoto()" class="bg-gray-100 text-gray-700 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-200">
+                                    <i class="fa-solid fa-camera mr-2"></i>
+                                    Change Photo
+                                </button>
+                                <p class="text-xs text-gray-500 mt-1">JPG, PNG up to 5MB</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex space-x-3 p-4 border-t">
+                    <button onclick="closeEditProfile()" class="flex-1 px-4 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50">
+                        Cancel
+                    </button>
+                    <button onclick="saveProfile()" class="flex-1 px-4 py-2 bg-primary text-white rounded-lg hover:bg-blue-700">
+                        Save Changes
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
         let darkModeEnabled = false;
 
@@ -277,7 +359,79 @@
         }
 
         function editProfile() {
-            alert('Profile editing form will be implemented in future updates.');
+            document.getElementById('editProfileModal').classList.remove('hidden');
+        }
+
+        function closeEditProfile() {
+            document.getElementById('editProfileModal').classList.add('hidden');
+        }
+
+        function saveProfile() {
+            // Get form values
+            const name = document.getElementById('editName').value.trim();
+            const phone = document.getElementById('editPhone').value.trim();
+            const email = document.getElementById('editEmail').value.trim();
+            const shopName = document.getElementById('editShopName').value.trim();
+            const gst = document.getElementById('editGST').value.trim();
+            const udyam = document.getElementById('editUdyam').value.trim();
+            const address = document.getElementById('editAddress').value.trim();
+
+            // Basic validation
+            if (!name || !phone || !shopName) {
+                alert('Please fill in all required fields (Name, Phone, Shop Name).');
+                return;
+            }
+
+            // Phone validation
+            const phoneRegex = /^[+]?[0-9\s\-()]{10,}$/;
+            if (!phoneRegex.test(phone)) {
+                alert('Please enter a valid phone number.');
+                return;
+            }
+
+            // Email validation (if provided)
+            if (email) {
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailRegex.test(email)) {
+                    alert('Please enter a valid email address.');
+                    return;
+                }
+            }
+
+            // Update the profile display with new values
+            updateProfileDisplay(name, phone, email, shopName, gst, udyam, address);
+            
+            // Close modal and show success message
+            closeEditProfile();
+            alert('Profile updated successfully!');
+        }
+
+        function updateProfileDisplay(name, phone, email, shopName, gst, udyam, address) {
+            // Update profile header
+            const profileHeader = document.querySelector('#profile-header h2');
+            const profilePhone = document.querySelector('#profile-header p:last-child');
+            if (profileHeader) profileHeader.textContent = name;
+            if (profilePhone) profilePhone.textContent = phone;
+
+            // Update shop details
+            const shopDetails = document.querySelectorAll('#shop-details .flex span:last-child');
+            if (shopDetails[0]) shopDetails[0].textContent = shopName;
+            if (shopDetails[1]) shopDetails[1].textContent = gst;
+            if (shopDetails[2]) shopDetails[2].textContent = udyam;
+            if (shopDetails[3]) shopDetails[3].innerHTML = address.replace(/\n/g, '<br>');
+
+            // Update initials in avatar
+            const initials = name.split(' ').map(n => n[0]).join('').toUpperCase();
+            const avatars = document.querySelectorAll('.bg-primary span');
+            avatars.forEach(avatar => {
+                if (avatar.textContent.length <= 3) {
+                    avatar.textContent = initials;
+                }
+            });
+        }
+
+        function selectPhoto() {
+            alert('Photo upload functionality will be implemented with backend integration.');
         }
 
         // Business stats functions
