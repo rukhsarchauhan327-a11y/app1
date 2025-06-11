@@ -394,6 +394,7 @@
         let gstRate = 0.18;
         let discountAmount = 0;
         let paymentMode = 'cash';
+        let onlineMethod = 'upi';
 
         function goBack() {
             window.history.back();
@@ -457,9 +458,28 @@
             } else if (mode === 'online') {
                 document.getElementById('online-payment').className = 'flex-1 py-2 px-2 rounded-full bg-primary text-white font-medium text-xs';
                 document.getElementById('online-payment-section').classList.remove('hidden');
+                selectOnlineMethod('upi'); // Default to UPI
             } else if (mode === 'split') {
                 document.getElementById('split-payment').className = 'flex-1 py-2 px-2 rounded-full bg-primary text-white font-medium text-xs';
                 document.getElementById('split-payment-section').classList.remove('hidden');
+            }
+        }
+
+        function selectOnlineMethod(method) {
+            onlineMethod = method;
+            
+            // Reset button styles
+            document.getElementById('upi-button').className = 'p-2 border border-gray-200 rounded-lg text-sm bg-blue-50 text-blue-600';
+            document.getElementById('card-button').className = 'p-2 border border-gray-200 rounded-lg text-sm bg-green-50 text-green-600';
+            
+            // Update placeholder text and highlight selected button
+            const referenceInput = document.getElementById('transaction-reference');
+            if (method === 'upi') {
+                document.getElementById('upi-button').className = 'p-2 border-2 border-blue-500 rounded-lg text-sm bg-blue-100 text-blue-700 font-medium';
+                referenceInput.placeholder = 'Enter UPI Transaction ID';
+            } else if (method === 'card') {
+                document.getElementById('card-button').className = 'p-2 border-2 border-green-500 rounded-lg text-sm bg-green-100 text-green-700 font-medium';
+                referenceInput.placeholder = 'Enter Card Transaction Reference';
             }
         }
 
