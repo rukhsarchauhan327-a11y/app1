@@ -7,6 +7,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script> window.FontAwesomeConfig = { autoReplaceSvg: 'nest'};</script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://unpkg.com/@zxing/library@latest"></script>
     <style>::-webkit-scrollbar { display: none;}</style>
     
     <script>tailwind.config = {
@@ -424,6 +425,101 @@
         </div>
     </nav>
 
+    <!-- Quick Action Radial Menu -->
+    <div id="radial-menu" class="fixed bottom-20 right-4 z-40">
+        <!-- Main Floating Action Button -->
+        <button id="fab-main" onclick="toggleRadialMenu()" class="w-14 h-14 bg-primary rounded-full shadow-lg flex items-center justify-center text-white transition-transform duration-300 hover:scale-110">
+            <i id="fab-icon" class="fa-solid fa-plus text-xl transition-transform duration-300"></i>
+        </button>
+        
+        <!-- Radial Menu Items -->
+        <div id="radial-items" class="absolute bottom-0 right-0 transition-all duration-300 opacity-0 pointer-events-none">
+            <!-- Add Item -->
+            <button onclick="goToAddItem()" class="absolute w-12 h-12 bg-blue-500 rounded-full shadow-lg flex items-center justify-center text-white transition-all duration-300" 
+                    style="transform: translate(-70px, -10px) scale(0);" data-action="add-item">
+                <i class="fa-solid fa-plus text-sm"></i>
+            </button>
+            
+            <!-- Scan Barcode -->
+            <button onclick="openQuickScanner()" class="absolute w-12 h-12 bg-orange-500 rounded-full shadow-lg flex items-center justify-center text-white transition-all duration-300" 
+                    style="transform: translate(-50px, -50px) scale(0);" data-action="scan">
+                <i class="fa-solid fa-barcode text-sm"></i>
+            </button>
+            
+            <!-- Quick Bill -->
+            <button onclick="goToCart()" class="absolute w-12 h-12 bg-green-500 rounded-full shadow-lg flex items-center justify-center text-white transition-all duration-300" 
+                    style="transform: translate(-10px, -70px) scale(0);" data-action="bill">
+                <i class="fa-solid fa-receipt text-sm"></i>
+            </button>
+            
+            <!-- Customer Search -->
+            <button onclick="openCustomerSearch()" class="absolute w-12 h-12 bg-purple-500 rounded-full shadow-lg flex items-center justify-center text-white transition-all duration-300" 
+                    style="transform: translate(30px, -50px) scale(0);" data-action="customer">
+                <i class="fa-solid fa-users text-sm"></i>
+            </button>
+            
+            <!-- Inventory -->
+            <button onclick="goToInventory()" class="absolute w-12 h-12 bg-indigo-500 rounded-full shadow-lg flex items-center justify-center text-white transition-all duration-300" 
+                    style="transform: translate(50px, -10px) scale(0);" data-action="inventory">
+                <i class="fa-solid fa-boxes text-sm"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Quick Scanner Modal -->
+    <div id="quick-scanner-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-white rounded-lg p-6 w-full max-w-md">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-lg font-semibold">Quick Scan</h3>
+                    <button onclick="closeQuickScanner()" class="text-gray-500 hover:text-gray-700">
+                        <i class="fa-solid fa-times text-xl"></i>
+                    </button>
+                </div>
+                <div class="relative">
+                    <video id="quick-scanner-video" class="w-full h-64 bg-gray-200 rounded-lg object-cover"></video>
+                    <div class="absolute inset-0 flex items-center justify-center">
+                        <div class="w-48 h-32 border-2 border-red-500 bg-transparent"></div>
+                    </div>
+                </div>
+                <div class="mt-4 text-center">
+                    <p class="text-sm text-gray-600 mb-4">Scan to find product details</p>
+                    <button onclick="closeQuickScanner()" class="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600">
+                        Cancel
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Customer Search Modal -->
+    <div id="customer-search-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-white rounded-lg p-6 w-full max-w-md">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-lg font-semibold">Quick Customer Search</h3>
+                    <button onclick="closeCustomerSearch()" class="text-gray-500 hover:text-gray-700">
+                        <i class="fa-solid fa-times text-xl"></i>
+                    </button>
+                </div>
+                <div class="mb-4">
+                    <input type="text" id="customer-search-input" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Search by name or phone">
+                </div>
+                <div id="customer-search-results" class="space-y-2 max-h-64 overflow-y-auto">
+                    <!-- Search results will appear here -->
+                </div>
+                <div class="mt-4 flex space-x-3">
+                    <button onclick="closeCustomerSearch()" class="flex-1 bg-gray-500 text-white py-2 px-4 rounded-lg hover:bg-gray-600">
+                        Cancel
+                    </button>
+                    <button onclick="goToCustomerLedger()" class="flex-1 bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700">
+                        View All
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
         // Update current time and date
         function updateDateTime() {
@@ -513,6 +609,189 @@
                 const title = this.querySelector('p').textContent;
                 alert(`${title} feature coming soon!`);
             });
+        });
+
+        // Radial Menu Functions
+        let isRadialMenuOpen = false;
+
+        function toggleRadialMenu() {
+            const radialItems = document.getElementById('radial-items');
+            const fabIcon = document.getElementById('fab-icon');
+            const menuButtons = radialItems.querySelectorAll('button');
+            
+            if (!isRadialMenuOpen) {
+                // Open menu
+                radialItems.classList.remove('opacity-0', 'pointer-events-none');
+                radialItems.classList.add('opacity-100', 'pointer-events-auto');
+                fabIcon.style.transform = 'rotate(45deg)';
+                
+                // Animate buttons with delay
+                menuButtons.forEach((button, index) => {
+                    setTimeout(() => {
+                        button.style.transform = button.style.transform.replace('scale(0)', 'scale(1)');
+                    }, index * 50);
+                });
+                
+                isRadialMenuOpen = true;
+            } else {
+                // Close menu
+                fabIcon.style.transform = 'rotate(0deg)';
+                
+                // Animate buttons out
+                menuButtons.forEach((button, index) => {
+                    setTimeout(() => {
+                        button.style.transform = button.style.transform.replace('scale(1)', 'scale(0)');
+                    }, index * 30);
+                });
+                
+                // Hide menu after animation
+                setTimeout(() => {
+                    radialItems.classList.add('opacity-0', 'pointer-events-none');
+                    radialItems.classList.remove('opacity-100', 'pointer-events-auto');
+                }, 200);
+                
+                isRadialMenuOpen = false;
+            }
+        }
+
+        // Quick Scanner Functions
+        let quickCodeReader = null;
+        let quickCurrentStream = null;
+
+        function openQuickScanner() {
+            if (isRadialMenuOpen) toggleRadialMenu(); // Close radial menu first
+            const modal = document.getElementById('quick-scanner-modal');
+            const video = document.getElementById('quick-scanner-video');
+            
+            modal.classList.remove('hidden');
+            
+            if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                try {
+                    if (typeof ZXing !== 'undefined') {
+                        quickCodeReader = new ZXing.BrowserMultiFormatReader();
+                        
+                        quickCodeReader.decodeFromVideoDevice(undefined, video, (result, err) => {
+                            if (result) {
+                                const barcodeValue = result.text;
+                                closeQuickScanner();
+                                searchProductByBarcode(barcodeValue);
+                            }
+                        }).then((stream) => {
+                            quickCurrentStream = stream;
+                        }).catch((err) => {
+                            console.error('Camera access error:', err);
+                            closeQuickScanner();
+                        });
+                    } else {
+                        alert('Scanner library not loaded');
+                        closeQuickScanner();
+                    }
+                } catch (error) {
+                    console.error('Scanner error:', error);
+                    closeQuickScanner();
+                }
+            }
+        }
+
+        function closeQuickScanner() {
+            const modal = document.getElementById('quick-scanner-modal');
+            modal.classList.add('hidden');
+            
+            if (quickCurrentStream) {
+                quickCurrentStream.getTracks().forEach(track => track.stop());
+                quickCurrentStream = null;
+            }
+            
+            if (quickCodeReader) {
+                quickCodeReader.reset();
+                quickCodeReader = null;
+            }
+        }
+
+        function searchProductByBarcode(barcode) {
+            window.location.href = `/inventory?search=${barcode}`;
+        }
+
+        // Customer Search Functions
+        function openCustomerSearch() {
+            if (isRadialMenuOpen) toggleRadialMenu(); // Close radial menu first
+            const modal = document.getElementById('customer-search-modal');
+            const input = document.getElementById('customer-search-input');
+            
+            modal.classList.remove('hidden');
+            input.focus();
+            
+            input.addEventListener('input', performCustomerSearch);
+        }
+
+        function closeCustomerSearch() {
+            const modal = document.getElementById('customer-search-modal');
+            const input = document.getElementById('customer-search-input');
+            
+            modal.classList.add('hidden');
+            input.value = '';
+            document.getElementById('customer-search-results').innerHTML = '';
+            
+            input.removeEventListener('input', performCustomerSearch);
+        }
+
+        function performCustomerSearch() {
+            const query = document.getElementById('customer-search-input').value.trim();
+            const resultsContainer = document.getElementById('customer-search-results');
+            
+            if (query.length < 2) {
+                resultsContainer.innerHTML = '';
+                return;
+            }
+            
+            fetch(`/api/search-customers?q=${encodeURIComponent(query)}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.customers && data.customers.length > 0) {
+                        resultsContainer.innerHTML = data.customers.map(customer => `
+                            <div class="p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer" onclick="selectCustomer(${customer.id})">
+                                <div class="flex justify-between items-center">
+                                    <div>
+                                        <p class="font-medium text-gray-900">${customer.name}</p>
+                                        <p class="text-sm text-gray-600">${customer.phone}</p>
+                                    </div>
+                                    <div class="text-right">
+                                        <p class="text-sm ${customer.outstanding_balance > 0 ? 'text-red-600' : customer.outstanding_balance < 0 ? 'text-green-600' : 'text-gray-600'}">
+                                            ${customer.outstanding_balance > 0 ? '+' : ''}₹${Math.abs(customer.outstanding_balance)}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        `).join('');
+                    } else {
+                        resultsContainer.innerHTML = '<p class="text-gray-500 text-center py-4">No customers found</p>';
+                    }
+                })
+                .catch(error => {
+                    console.error('Search error:', error);
+                    resultsContainer.innerHTML = '<p class="text-red-500 text-center py-4">Search failed</p>';
+                });
+        }
+
+        function selectCustomer(customerId) {
+            closeCustomerSearch();
+            window.location.href = `/customer-ledger?id=${customerId}`;
+        }
+
+        function goToAddItem() {
+            window.location.href = '/add-item';
+        }
+
+        function goToCustomerLedger() {
+            window.location.href = '/customer-ledger';
+        }
+
+        // Close radial menu when clicking outside
+        document.addEventListener('click', function(e) {
+            const radialMenu = document.getElementById('radial-menu');
+            if (isRadialMenuOpen && !radialMenu.contains(e.target)) {
+                toggleRadialMenu();
+            }
         });
     </script>
 
