@@ -183,8 +183,8 @@
 
     <!-- Add to Cart Modal -->
     <div id="cart-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden">
-        <div class="flex items-center justify-center min-h-screen p-4">
-            <div class="bg-white rounded-lg w-full max-w-md mx-auto">
+        <div class="flex items-center justify-center min-h-screen p-4 pb-24">
+            <div class="bg-white rounded-lg w-full max-w-sm mx-auto max-h-screen overflow-y-auto">
                 <!-- Modal Header -->
                 <div id="modal-header" class="flex items-center justify-between p-4 border-b border-gray-200">
                     <h3 class="text-lg font-bold text-dark">Add to Cart</h3>
@@ -194,7 +194,7 @@
                 </div>
 
                 <!-- Modal Content -->
-                <div id="modal-content" class="p-4">
+                <div class="p-4">
                     <!-- Product Info -->
                     <div class="flex items-center space-x-3 mb-4 p-3 bg-gray-50 rounded-lg">
                         <img id="modal-product-img" class="w-12 h-12 rounded object-cover" src="" alt="Product">
@@ -205,30 +205,61 @@
                         </div>
                     </div>
 
+                    <!-- Input Method Selection (for weight-based products) -->
+                    <div id="input-method" class="mb-4 hidden">
+                        <label class="block text-sm font-medium text-dark mb-3">Select Input Method</label>
+                        <div class="space-y-2">
+                            <label class="flex items-center space-x-3 cursor-pointer p-3 bg-gray-50 rounded-lg hover:bg-gray-100">
+                                <input type="radio" name="inputMethod" value="quantity" class="text-orange-500 focus:ring-orange-500" checked>
+                                <span class="text-sm font-medium text-dark">Enter Quantity</span>
+                            </label>
+                            <label class="flex items-center space-x-3 cursor-pointer p-3 bg-gray-50 rounded-lg hover:bg-gray-100">
+                                <input type="radio" name="inputMethod" value="price" class="text-orange-500 focus:ring-orange-500">
+                                <span class="text-sm font-medium text-dark">Enter Price</span>
+                            </label>
+                        </div>
+                    </div>
+
                     <!-- Quantity Input Section -->
                     <div id="quantity-section" class="mb-4">
-                        <label id="quantity-label" class="block text-sm font-medium text-dark mb-3">Bags</label>
-                        <div class="flex items-center space-x-3">
-                            <button id="decrease-qty" class="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center hover:bg-gray-200">
-                                <i class="fa-solid fa-minus text-gray-600"></i>
+                        <label id="quantity-label" class="block text-sm font-medium text-dark mb-3">Quantity</label>
+                        <div id="bag-based-input" class="flex items-center space-x-2">
+                            <button id="decrease-qty" class="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center hover:bg-gray-200">
+                                <i class="fa-solid fa-minus text-gray-600 text-sm"></i>
                             </button>
-                            <input type="number" id="quantity-input" value="1" min="1" class="flex-1 px-4 py-3 border border-gray-300 rounded-lg text-center font-medium text-lg">
-                            <button id="increase-qty" class="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center hover:bg-gray-200">
-                                <i class="fa-solid fa-plus text-gray-600"></i>
+                            <input type="number" id="quantity-input" value="1" min="1" class="w-20 px-2 py-2 border border-gray-300 rounded-lg text-center font-medium text-base">
+                            <button id="increase-qty" class="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center hover:bg-gray-200">
+                                <i class="fa-solid fa-plus text-gray-600 text-sm"></i>
                             </button>
                         </div>
-                        <p class="text-xs text-gray-500 mt-2 text-center">Tap + or - to adjust quantity</p>
+                        <div id="weight-based-input" class="flex items-center space-x-2 hidden">
+                            <input type="number" id="weight-quantity-input" value="1" min="0" step="0.001" class="w-20 px-2 py-2 border border-gray-300 rounded-lg text-center font-medium text-base">
+                            <select id="unit-select" class="w-16 px-1 py-2 border border-gray-300 rounded-lg font-medium text-sm">
+                                <option value="kg">Kg</option>
+                                <option value="gm">Gm</option>
+                            </select>
+                        </div>
+                        <p class="text-xs text-gray-500 mt-2 text-center" id="quantity-help">Tap + or - to adjust quantity</p>
+                    </div>
+
+                    <!-- Price Input Section (for weight-based products) -->
+                    <div id="price-section" class="mb-4 hidden">
+                        <label class="block text-sm font-medium text-dark mb-3">Price</label>
+                        <div class="flex items-center space-x-2 mb-3">
+                            <span class="text-lg font-medium text-gray-600 flex-shrink-0">₹</span>
+                            <input type="number" id="price-input" value="110" min="0" step="0.01" class="flex-1 px-3 py-3 border border-orange-300 rounded-lg text-center font-medium text-lg border-2 min-w-0">
+                        </div>
                     </div>
 
                     <!-- Auto-calculated Display -->
                     <div class="mb-6 p-4 bg-blue-50 rounded-lg">
                         <div class="flex justify-between items-center mb-2">
                             <span class="text-sm text-gray-600">Quantity:</span>
-                            <span id="calculated-quantity" class="text-sm font-medium text-dark">1 Bag</span>
+                            <span id="calculated-quantity" class="text-sm font-medium text-dark">1 Unit</span>
                         </div>
                         <div class="flex justify-between items-center">
                             <span class="text-sm text-gray-600">Total Price:</span>
-                            <span id="calculated-price" class="text-lg font-bold text-green-600">₹120</span>
+                            <span id="calculated-price" class="text-lg font-bold text-green-600">₹0</span>
                         </div>
                     </div>
 
@@ -420,40 +451,214 @@
         }
 
         // Add to Cart Modal functionality
-        const addToCartBtn = document.getElementById('add-to-cart-btn');
+        let currentProduct = null;
+
+        function openCartModal() {
+            currentProduct = productData;
+            if (!currentProduct) return;
+
+            const cartModal = document.getElementById('cart-modal');
+            const modalProductImg = document.getElementById('modal-product-img');
+            const modalProductName = document.getElementById('modal-product-name');
+            const modalProductPrice = document.getElementById('modal-product-price');
+            const modalProductStock = document.getElementById('modal-product-stock');
+            const quantityLabel = document.getElementById('quantity-label');
+            const inputMethod = document.getElementById('input-method');
+            const bagBasedInput = document.getElementById('bag-based-input');
+            const weightBasedInput = document.getElementById('weight-based-input');
+            const quantityHelp = document.getElementById('quantity-help');
+
+            // Update modal with product data
+            modalProductImg.src = currentProduct.image;
+            modalProductImg.alt = currentProduct.name;
+            modalProductName.textContent = currentProduct.name;
+            modalProductPrice.textContent = `₹${currentProduct.sellingPrice}/${currentProduct.unit}`;
+            modalProductStock.textContent = `${currentProduct.stock} ${currentProduct.unit}s in stock`;
+
+            // Configure input based on product type
+            if (currentProduct.type === 'weight-based') {
+                quantityLabel.textContent = 'Quantity';
+                inputMethod.classList.remove('hidden');
+                bagBasedInput.classList.add('hidden');
+                weightBasedInput.classList.remove('hidden');
+                quantityHelp.textContent = 'Enter weight in Kg or Grams';
+                
+                // Reset to quantity input mode for weight-based
+                document.querySelector('input[name="inputMethod"][value="quantity"]').checked = true;
+                document.getElementById('quantity-section').classList.remove('hidden');
+                document.getElementById('price-section').classList.add('hidden');
+            } else {
+                // For all non-weight-based products (bag, bottle, pack, box, etc.)
+                quantityLabel.textContent = `${currentProduct.unit}s`;
+                inputMethod.classList.add('hidden');
+                bagBasedInput.classList.remove('hidden');
+                weightBasedInput.classList.add('hidden');
+                quantityHelp.textContent = 'Tap + or - to adjust quantity';
+                
+                // Ensure only quantity section is visible for unit-based products
+                document.getElementById('quantity-section').classList.remove('hidden');
+                document.getElementById('price-section').classList.add('hidden');
+            }
+
+            // Reset quantity input
+            document.getElementById('quantity-input').value = 1;
+            document.getElementById('weight-quantity-input').value = 1;
+
+            // Update calculations
+            updateCalculations();
+
+            cartModal.classList.remove('hidden');
+        }
+
+        // Modal event handlers
         const cartModal = document.getElementById('cart-modal');
         const closeModal = document.getElementById('close-modal');
         const cancelBtn = document.getElementById('cancel-btn');
         const quantityInput = document.getElementById('quantity-input');
+        const weightQuantityInput = document.getElementById('weight-quantity-input');
+        const unitSelect = document.getElementById('unit-select');
+        const priceInput = document.getElementById('price-input');
         const decreaseBtn = document.getElementById('decrease-qty');
         const increaseBtn = document.getElementById('increase-qty');
         const calculatedQuantity = document.getElementById('calculated-quantity');
         const calculatedPrice = document.getElementById('calculated-price');
         const addCartBtn = document.getElementById('add-cart-btn');
+        const inputMethodRadios = document.querySelectorAll('input[name="inputMethod"]');
+        const addToCartBtn = document.getElementById('add-to-cart-btn');
 
-        function openCartModal() {
-            // Update modal with current product data
-            document.getElementById('modal-product-img').src = productData.image;
-            document.getElementById('modal-product-name').textContent = productData.name;
-            document.getElementById('modal-product-price').textContent = `₹${productData.sellingPrice}/${productData.unit}`;
-            document.getElementById('modal-product-stock').textContent = `${productData.stock} ${productData.unit}s in stock`;
-            document.getElementById('quantity-label').textContent = `${productData.unit}s`;
-            
-            // Set max quantity and reset input
-            quantityInput.max = productData.stock;
-            quantityInput.value = 1;
-            updateModalCalculations();
-            
-            cartModal.classList.remove('hidden');
-        }
-
-        addToCartBtn.addEventListener('click', () => {
-            // Navigate to cart instead of opening modal
-            window.location.href = '/cart';
-        });
-
+        // Close modal events
         closeModal.addEventListener('click', () => {
             cartModal.classList.add('hidden');
+        });
+
+        cancelBtn.addEventListener('click', () => {
+            cartModal.classList.add('hidden');
+        });
+
+        cartModal.addEventListener('click', (e) => {
+            if (e.target === cartModal) {
+                cartModal.classList.add('hidden');
+            }
+        });
+
+        // Quantity controls
+        decreaseBtn.addEventListener('click', () => {
+            const currentValue = parseInt(quantityInput.value) || 1;
+            if (currentValue > 1) {
+                quantityInput.value = currentValue - 1;
+                updateCalculations();
+            }
+        });
+
+        increaseBtn.addEventListener('click', () => {
+            const currentValue = parseInt(quantityInput.value) || 1;
+            const maxStock = currentProduct ? currentProduct.stock : 999;
+            if (currentValue < maxStock) {
+                quantityInput.value = currentValue + 1;
+                updateCalculations();
+            }
+        });
+
+        // Input change handlers
+        quantityInput.addEventListener('input', updateCalculations);
+        weightQuantityInput.addEventListener('input', updateCalculations);
+        unitSelect.addEventListener('change', updateCalculations);
+        priceInput.addEventListener('input', updateCalculations);
+
+        // Input method radio change handlers
+        inputMethodRadios.forEach(radio => {
+            radio.addEventListener('change', (e) => {
+                const quantitySection = document.getElementById('quantity-section');
+                const priceSection = document.getElementById('price-section');
+                
+                if (e.target.value === 'quantity') {
+                    quantitySection.classList.remove('hidden');
+                    priceSection.classList.add('hidden');
+                } else {
+                    quantitySection.classList.add('hidden');
+                    priceSection.classList.remove('hidden');
+                }
+                updateCalculations();
+            });
+        });
+
+        function updateCalculations() {
+            if (!currentProduct) return;
+
+            const selectedMethod = document.querySelector('input[name="inputMethod"]:checked')?.value || 'quantity';
+            
+            if (currentProduct.type === 'weight-based') {
+                if (selectedMethod === 'quantity') {
+                    // Calculate from weight
+                    const weight = parseFloat(weightQuantityInput.value) || 0;
+                    const unit = unitSelect.value;
+                    const weightInKg = unit === 'gm' ? weight / 1000 : weight;
+                    const totalPrice = weightInKg * currentProduct.sellingPrice;
+                    
+                    calculatedQuantity.textContent = `${weight} ${unit === 'gm' ? 'Gram' : 'Kg'}`;
+                    calculatedPrice.textContent = `₹${totalPrice.toFixed(2)}`;
+                } else {
+                    // Calculate from price
+                    const price = parseFloat(priceInput.value) || 0;
+                    const weightInKg = price / currentProduct.sellingPrice;
+                    const weightInGrams = weightInKg * 1000;
+                    
+                    calculatedQuantity.textContent = `${weightInKg.toFixed(3)} Kg (${weightInGrams.toFixed(0)} gm)`;
+                    calculatedPrice.textContent = `₹${price.toFixed(2)}`;
+                }
+            } else {
+                // Regular unit-based products
+                const quantity = parseInt(quantityInput.value) || 1;
+                const totalPrice = quantity * currentProduct.sellingPrice;
+                
+                calculatedQuantity.textContent = `${quantity} ${currentProduct.unit}${quantity > 1 ? 's' : ''}`;
+                calculatedPrice.textContent = `₹${totalPrice.toFixed(2)}`;
+            }
+        }
+
+        // Add to cart button functionality
+        addCartBtn.addEventListener('click', () => {
+            if (!currentProduct) return;
+            
+            const selectedMethod = document.querySelector('input[name="inputMethod"]:checked')?.value || 'quantity';
+            let cartItem = {
+                id: currentProduct.id || 'current-product',
+                name: currentProduct.name,
+                image: currentProduct.image,
+                price: currentProduct.sellingPrice,
+                unit: currentProduct.unit
+            };
+
+            if (currentProduct.type === 'weight-based') {
+                if (selectedMethod === 'quantity') {
+                    const weight = parseFloat(weightQuantityInput.value) || 0;
+                    const unit = unitSelect.value;
+                    const weightInKg = unit === 'gm' ? weight / 1000 : weight;
+                    
+                    cartItem.quantity = weight;
+                    cartItem.quantityUnit = unit;
+                    cartItem.totalPrice = weightInKg * currentProduct.sellingPrice;
+                } else {
+                    const price = parseFloat(priceInput.value) || 0;
+                    const weightInKg = price / currentProduct.sellingPrice;
+                    
+                    cartItem.quantity = weightInKg;
+                    cartItem.quantityUnit = 'kg';
+                    cartItem.totalPrice = price;
+                }
+            } else {
+                const quantity = parseInt(quantityInput.value) || 1;
+                cartItem.quantity = quantity;
+                cartItem.totalPrice = quantity * currentProduct.sellingPrice;
+            }
+
+            showNotification(`Added ${cartItem.name} to cart. Total: ₹${cartItem.totalPrice.toFixed(2)}`, 'success');
+            cartModal.classList.add('hidden');
+        });
+
+        // Connect main add to cart button to modal
+        addToCartBtn.addEventListener('click', () => {
+            openCartModal();
         });
 
         cancelBtn.addEventListener('click', () => {
