@@ -313,12 +313,14 @@
             const currentPriceElement = document.getElementById('current-price');
             
             if (sellingPrice > 0 && quantity > 0) {
+                const totalUnits = productData.currentStock + quantity; // Include existing stock
+                
                 if (priceMode === 'per-unit') {
-                    // User entered price per unit - current shows total price for all units
-                    const totalForAddedStock = sellingPrice * quantity;
-                    currentPriceElement.textContent = `Current: Total for ${quantity} ${productData.unit}s = ₹${totalForAddedStock.toFixed(2)}`;
+                    // User entered price per unit - current shows total value of all units (existing + new)
+                    const totalValueAllUnits = sellingPrice * totalUnits;
+                    currentPriceElement.textContent = `Current: ₹${totalValueAllUnits.toFixed(2)} / ${totalUnits} ${productData.unit}s`;
                 } else {
-                    // User entered total price - current shows per unit price
+                    // User entered total price for new stock - current shows per unit price
                     const pricePerUnit = (sellingPrice / quantity).toFixed(2);
                     currentPriceElement.textContent = `Current: ₹${pricePerUnit} per ${productData.unit}`;
                 }
