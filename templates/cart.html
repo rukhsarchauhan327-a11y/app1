@@ -159,8 +159,12 @@
                 <div class="flex-1">
                     <h3 class="font-semibold text-dark text-sm">Aashirvaad Atta</h3>
                     <div class="flex justify-between items-center mt-1">
-                        <span class="text-sm text-gray-700 font-medium">10 Kg</span>
-                        <span class="text-lg font-bold text-primary">₹450</span>
+                        <div class="flex items-center space-x-2">
+                            <button class="w-7 h-7 border border-gray-300 rounded text-sm flex items-center justify-center hover:bg-gray-100" onclick="decreaseQuantity(1)">-</button>
+                            <span class="text-sm text-gray-700 font-medium min-w-[40px] text-center" id="quantity-1">10 Kg</span>
+                            <button class="w-7 h-7 border border-gray-300 rounded text-sm flex items-center justify-center hover:bg-gray-100" onclick="increaseQuantity(1)">+</button>
+                        </div>
+                        <span class="text-lg font-bold text-primary" id="price-1">₹450</span>
                     </div>
                     <div class="mt-2 space-y-1">
                         <div class="flex items-center text-xs text-gray-500">
@@ -171,10 +175,16 @@
                             <i class="fa-solid fa-clock mr-1"></i>
                             <span>EXP: 01/09/2025</span>
                         </div>
-                        <button class="text-xs text-danger hover:underline flex items-center mt-1" onclick="removeDates(1)">
-                            <i class="fa-solid fa-times mr-1"></i>
-                            Remove Dates
-                        </button>
+                        <div class="flex items-center space-x-2 mt-1">
+                            <button class="text-xs text-primary hover:underline flex items-center" onclick="editItem(1)">
+                                <i class="fa-solid fa-edit mr-1"></i>
+                                Edit
+                            </button>
+                            <button class="text-xs text-danger hover:underline flex items-center" onclick="removeDates(1)">
+                                <i class="fa-solid fa-times mr-1"></i>
+                                Remove Dates
+                            </button>
+                        </div>
                     </div>
                 </div>
                 <button class="text-danger text-sm ml-3 p-1" onclick="removeItem(1)">
@@ -988,6 +998,184 @@
         // Initialize UPI as selected by default
         selectOnlineMethod('upi');
 
+        // Cart Item Management Functions
+        let currentEditingItem = null;
+        const cartItems = {
+            1: { name: 'Aashirvaad Atta', price: 45, quantity: 10, unit: 'Kg', unitPrice: 45, type: 'quantity' },
+            2: { name: 'Real Fruit Juice', price: 60, quantity: 2, unit: 'Bottles', unitPrice: 60, type: 'quantity' },
+            3: { name: 'Colgate Paste', price: 30, quantity: 3, unit: 'Pieces', unitPrice: 30, type: 'quantity' },
+            4: { name: 'Good Day Biscuits', price: 12, quantity: 5, unit: 'Packets', unitPrice: 12, type: 'quantity' },
+            5: { name: 'Surf Excel (500gm)', price: 55, quantity: 1, unit: 'Packet', unitPrice: 55, type: 'quantity' },
+            6: { name: 'Dabur Honey', price: 180, quantity: 1, unit: 'Bottle', unitPrice: 180, type: 'quantity' }
+        };
+
+        function decreaseQuantity(itemId) {
+            const item = cartItems[itemId];
+            if (item && item.quantity > 1) {
+                item.quantity--;
+                updateCartDisplay(itemId);
+                calculateTotals();
+                showNotification(`${item.name} quantity decreased`, 'info');
+            }
+        }
+
+        function increaseQuantity(itemId) {
+            const item = cartItems[itemId];
+            if (item) {
+                item.quantity++;
+                updateCartDisplay(itemId);
+                calculateTotals();
+                showNotification(`${item.name} quantity increased`, 'info');
+            }
+        }
+
+        function updateCartDisplay(itemId) {
+            const item = cartItems[itemId];
+            if (item) {
+                const quantityElement = document.getElementById(`quantity-${itemId}`);
+                const priceElement = document.getElementById(`price-${itemId}`);
+                
+                if (quantityElement && priceElement) {
+                    quantityElement.textContent = `${item.quantity} ${item.unit}`;
+                    priceElement.textContent = `₹${(item.quantity * item.unitPrice).toFixed(2)}`;
+                }
+            }
+        }
+
+        function editItem(itemId) {
+            currentEditingItem = itemId;
+            const item = cartItems[itemId];
+            if (item) {
+                // Populate edit modal with current item data
+                document.getElementById('edit-product-name').textContent = item.name;
+                document.getElementById('edit-product-price').textContent = `₹${item.unitPrice}/${item.unit.toLowerCase()}`;
+                document.getElementById('edit-quantity-input').value = item.quantity;
+                
+                // Show/hide unit selection for weight-based items
+                const unitSection = document.getElementById('edit-unit-section');
+                if (item.type === 'weight') {
+                    unitSection.classList.remove('hidden');
+                    document.getElementById('edit-unit-select').value = item.unit.toLowerCase();
+                } else {
+                    unitSection.classList.add('hidden');
+                }
+                
+                updateEditTotal();
+                document.getElementById('edit-item-modal').classList.remove('hidden');
+                document.body.style.overflow = 'hidden';
+            }
+        }
+
+        function closeEditModal() {
+            document.getElementById('edit-item-modal').classList.add('hidden');
+            document.body.style.overflow = 'auto';
+            currentEditingItem = null;
+        }
+
+        function editDecreaseQuantity() {
+            const input = document.getElementById('edit-quantity-input');
+            const current = parseInt(input.value) || 1;
+            if (current > 1) {
+                input.value = current - 1;
+                updateEditTotal();
+            }
+        }
+
+        function editIncreaseQuantity() {
+            const input = document.getElementById('edit-quantity-input');
+            const current = parseInt(input.value) || 1;
+            input.value = current + 1;
+            updateEditTotal();
+        }
+
+        function updateEditTotal() {
+            if (currentEditingItem) {
+                const item = cartItems[currentEditingItem];
+                const quantity = parseInt(document.getElementById('edit-quantity-input').value) || 1;
+                const total = quantity * item.unitPrice;
+                document.getElementById('edit-total-price').textContent = `₹${total.toFixed(2)}`;
+            }
+        }
+
+        function saveItemChanges() {
+            if (currentEditingItem) {
+                const item = cartItems[currentEditingItem];
+                const newQuantity = parseInt(document.getElementById('edit-quantity-input').value) || 1;
+                const mfgDate = document.getElementById('edit-mfg-date').value;
+                const expDate = document.getElementById('edit-exp-date').value;
+                
+                // Update item data
+                item.quantity = newQuantity;
+                item.price = newQuantity * item.unitPrice;
+                
+                // Update manufacturing and expiry dates if provided
+                if (mfgDate) item.mfgDate = mfgDate;
+                if (expDate) item.expDate = expDate;
+                
+                // Update display
+                updateCartDisplay(currentEditingItem);
+                calculateTotals();
+                
+                closeEditModal();
+                showNotification(`${item.name} updated successfully`, 'success');
+            }
+        }
+
+        function removeItem(itemId) {
+            const item = cartItems[itemId];
+            if (item) {
+                const itemElement = document.getElementById(`cart-item-${itemId}`);
+                if (itemElement) {
+                    itemElement.style.transform = 'translateX(-100%)';
+                    itemElement.style.opacity = '0';
+                    setTimeout(() => {
+                        itemElement.remove();
+                        delete cartItems[itemId];
+                        calculateTotals();
+                        showNotification(`${item.name} removed from cart`, 'info');
+                    }, 300);
+                }
+            }
+        }
+
+        function removeDates(itemId) {
+            const item = cartItems[itemId];
+            if (item) {
+                delete item.mfgDate;
+                delete item.expDate;
+                showNotification('Manufacturing and expiry dates removed', 'info');
+            }
+        }
+
+        // Enhanced total calculation
+        function calculateTotals() {
+            let newSubtotal = 0;
+            Object.values(cartItems).forEach(item => {
+                newSubtotal += item.quantity * item.unitPrice;
+            });
+            
+            subtotal = newSubtotal;
+            const gstAmount = taxEnabled ? subtotal * gstRate : 0;
+            const finalTotal = subtotal + gstAmount - discountAmount;
+            
+            document.getElementById('subtotal').textContent = `₹${subtotal.toFixed(2)}`;
+            document.getElementById('gst-amount').textContent = `₹${gstAmount.toFixed(2)}`;
+            document.getElementById('total-amount').textContent = `₹${finalTotal.toFixed(2)}`;
+            
+            // Update credit amount if in credit mode
+            if (paymentMode === 'credit') {
+                document.getElementById('credit-amount').textContent = `₹${finalTotal.toFixed(2)}`;
+            }
+        }
+
+        // Initialize quantity input listeners in edit modal
+        document.addEventListener('DOMContentLoaded', function() {
+            const editQuantityInput = document.getElementById('edit-quantity-input');
+            if (editQuantityInput) {
+                editQuantityInput.addEventListener('input', updateEditTotal);
+            }
+        });
+
         // Staff management with attendance tracking
         function populatePresentStaff() {
             const allStaff = [
@@ -1046,6 +1234,87 @@
             </button>
         </div>
     </nav>
+
+    <!-- Edit Item Modal -->
+    <div id="edit-item-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden">
+        <div class="fixed inset-0 flex items-center justify-center p-4">
+            <div class="bg-white rounded-2xl max-w-md w-full p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="text-lg font-bold text-dark">Edit Item</h2>
+                    <button onclick="closeEditModal()" class="p-1 hover:bg-gray-100 rounded">
+                        <i class="fa-solid fa-times text-gray-600"></i>
+                    </button>
+                </div>
+                
+                <!-- Product Info -->
+                <div class="flex items-center space-x-3 mb-4 p-3 bg-gray-50 rounded-lg">
+                    <div class="w-12 h-12 bg-primary rounded-lg flex items-center justify-center">
+                        <i class="fa-solid fa-box text-white"></i>
+                    </div>
+                    <div class="flex-1">
+                        <h4 id="edit-product-name" class="font-medium text-dark">Product Name</h4>
+                        <p id="edit-product-price" class="text-sm text-gray-600">₹0/unit</p>
+                    </div>
+                </div>
+
+                <!-- Quantity Input -->
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-dark mb-2">Quantity</label>
+                    <div class="flex items-center space-x-3">
+                        <button class="w-10 h-10 border border-gray-300 rounded-lg flex items-center justify-center hover:bg-gray-100" onclick="editDecreaseQuantity()">
+                            <i class="fa-solid fa-minus text-sm"></i>
+                        </button>
+                        <input type="number" id="edit-quantity-input" class="flex-1 p-3 border border-gray-200 rounded-lg text-center" min="1" value="1">
+                        <button class="w-10 h-10 border border-gray-300 rounded-lg flex items-center justify-center hover:bg-gray-100" onclick="editIncreaseQuantity()">
+                            <i class="fa-solid fa-plus text-sm"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Unit Selection (for weight-based items) -->
+                <div id="edit-unit-section" class="mb-4 hidden">
+                    <label class="block text-sm font-medium text-dark mb-2">Unit</label>
+                    <select id="edit-unit-select" class="w-full p-3 border border-gray-200 rounded-lg">
+                        <option value="kg">Kg</option>
+                        <option value="gm">Grams</option>
+                    </select>
+                </div>
+
+                <!-- Manufacturing/Expiry Dates -->
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-dark mb-2">Dates (Optional)</label>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs text-gray-600 mb-1">Manufacturing</label>
+                            <input type="date" id="edit-mfg-date" class="w-full p-2 border border-gray-200 rounded-lg text-sm">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-gray-600 mb-1">Expiry</label>
+                            <input type="date" id="edit-exp-date" class="w-full p-2 border border-gray-200 rounded-lg text-sm">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Total Price Display -->
+                <div class="mb-4 p-3 bg-gray-50 rounded-lg">
+                    <div class="flex justify-between items-center">
+                        <span class="text-sm text-gray-600">Total Price:</span>
+                        <span class="text-lg font-bold text-primary" id="edit-total-price">₹0</span>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="flex space-x-3">
+                    <button onclick="closeEditModal()" class="flex-1 px-4 py-3 border border-gray-200 text-gray-700 rounded-lg font-medium">
+                        Cancel
+                    </button>
+                    <button onclick="saveItemChanges()" class="flex-1 px-4 py-3 bg-primary text-white rounded-lg font-medium">
+                        Save Changes
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- Search Modal -->
     <div id="search-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden">
