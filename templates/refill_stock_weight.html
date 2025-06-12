@@ -572,7 +572,7 @@
             
             if (newBarcode) {
                 document.getElementById('barcode-input').value = newBarcode;
-                showSuccessPopup('Barcode updated successfully!');
+                showSuccessPopup('Barcode added successfully!');
             }
             
             popup.classList.add('hidden');
@@ -607,21 +607,27 @@
         }
 
         // Success/Error popup functions
-        function showSuccessPopup(message) {
+        function showSuccessPopup(message, shouldRedirect = false) {
             const popup = document.getElementById('success-popup');
             const messageElement = document.getElementById('success-message');
             messageElement.textContent = message;
             popup.classList.remove('hidden');
+            
+            // Store redirect preference for when popup closes
+            popup.setAttribute('data-should-redirect', shouldRedirect);
         }
 
         function closeSuccessPopup() {
             const popup = document.getElementById('success-popup');
+            const shouldRedirect = popup.getAttribute('data-should-redirect') === 'true';
             popup.classList.add('hidden');
             
-            // Redirect back to inventory after closing popup
-            setTimeout(() => {
-                goToInventory();
-            }, 300);
+            // Only redirect if explicitly requested (for stock added, not barcode added)
+            if (shouldRedirect) {
+                setTimeout(() => {
+                    goToInventory();
+                }, 300);
+            }
         }
 
         function showErrorPopup(message) {
@@ -756,7 +762,7 @@
                 priceInfo = ` with total value ₹${sellingPriceInput}`;
             }
             
-            showSuccessPopup(`Successfully added ${quantity} ${unitDisplay} to stock${priceInfo}!`);
+            showSuccessPopup(`Successfully added ${quantity} ${unitDisplay} to stock${priceInfo}!`, true);
         }
 
         // Event listeners
