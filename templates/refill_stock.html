@@ -657,21 +657,27 @@
             }
         }
 
-        function showSuccessPopup(message) {
+        function showSuccessPopup(message, shouldRedirect = false) {
             const popup = document.getElementById('success-popup');
             const messageElement = document.getElementById('success-message');
             messageElement.textContent = message;
             popup.classList.remove('hidden');
+            
+            // Store redirect preference for when popup closes
+            popup.setAttribute('data-should-redirect', shouldRedirect);
         }
 
         function closeSuccessPopup() {
             const popup = document.getElementById('success-popup');
+            const shouldRedirect = popup.getAttribute('data-should-redirect') === 'true';
             popup.classList.add('hidden');
             
-            // Redirect back to inventory after closing popup
-            setTimeout(() => {
-                goToInventory();
-            }, 300);
+            // Only redirect if explicitly requested (for stock added, not barcode added)
+            if (shouldRedirect) {
+                setTimeout(() => {
+                    goToInventory();
+                }, 300);
+            }
         }
 
         function showErrorPopup(message) {
@@ -826,7 +832,7 @@
                                 if (result) {
                                     document.getElementById('barcode-input').value = result.text;
                                     closeCameraScanner();
-                                    showSuccessPopup(`Barcode scanned: ${result.text}`);
+                                    showSuccessPopup(`Barcode added successfully: ${result.text}`);
                                 }
                             });
                             updateScannerStatus('Scanner active - Point at barcode', 'green');
@@ -911,7 +917,7 @@
             if (newBarcode) {
                 barcodeInput.value = newBarcode;
                 closeManualBarcodeModal();
-                showSuccessPopup(`Barcode set: ${newBarcode}`);
+                showSuccessPopup(`Barcode added successfully: ${newBarcode}`);
             } else {
                 showErrorPopup('Please enter a valid barcode');
             }
@@ -925,7 +931,7 @@
             if (newBarcode) {
                 barcodeInput.value = newBarcode;
                 closeCameraScanner();
-                showSuccessPopup(`Barcode set: ${newBarcode}`);
+                showSuccessPopup(`Barcode added successfully: ${newBarcode}`);
             } else {
                 showErrorPopup('Please enter a valid barcode');
             }
