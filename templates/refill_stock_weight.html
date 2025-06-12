@@ -267,11 +267,22 @@
                         <div class="w-48 h-32 border-2 border-red-500 bg-transparent"></div>
                     </div>
                 </div>
-                <div class="mt-4 text-center">
-                    <p class="text-sm text-gray-600 mb-4">Position the barcode within the red frame</p>
-                    <button onclick="closeCameraScanner()" class="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600">
-                        Cancel
-                    </button>
+                <div class="mt-4">
+                    <div id="scanner-status" class="text-center mb-4">
+                        <span class="bg-blue-500 text-white px-3 py-1 rounded-full text-sm">Starting camera...</span>
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Or enter barcode manually:</label>
+                        <input type="text" id="scanner-manual-input" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Enter barcode number">
+                    </div>
+                    <div class="flex space-x-2">
+                        <button onclick="useScannerManualInput()" class="flex-1 bg-primary text-white px-4 py-2 rounded-lg hover:bg-blue-700">
+                            Use Manual Input
+                        </button>
+                        <button onclick="closeCameraScanner()" class="flex-1 bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600">
+                            Cancel
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -280,7 +291,7 @@
     <!-- Confirmation Popup -->
     <div id="confirm-popup" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
         <div class="bg-white rounded-lg p-6 max-w-sm mx-4">
-            <h3 class="text-lg font-semibold text-gray-900 mb-4">Confirm Action</h3>
+            <h3 id="confirm-title" class="text-lg font-semibold text-gray-900 mb-4">Confirm Action</h3>
             <p id="confirm-message" class="text-gray-600 mb-6">Are you sure you want to proceed?</p>
             <div class="flex space-x-3">
                 <button onclick="cancelAction()" class="flex-1 bg-gray-500 text-white py-2 px-4 rounded-lg hover:bg-gray-600 transition-colors">
@@ -478,65 +489,140 @@
 
         // Barcode scanning functions
         function scanBarcode() {
+            console.log('scanBarcode() called');
             const barcodeInput = document.getElementById('barcode-input');
             const currentBarcode = barcodeInput.value.trim();
             
-            // If product already has a barcode, ask for confirmation before overwriting
-            if (currentBarcode && productData && productData.barcode) {
-                showBarcodeConfirmPopup();
+            console.log('Current barcode:', currentBarcode);
+            console.log('Product has barcode:', productData.barcode);
+            
+            // If product already has a barcode, show confirmation modal
+            if (currentBarcode && productData.barcode) {
+                console.log('Showing confirmation modal for barcode replacement');
+                showConfirmationModal(
+                    'Replace Barcode?',
+                    'This product already has a barcode. Do you want to scan a new one to replace it?',
+                    () => {
+                        console.log('User confirmed barcode replacement');
+                        // User confirmed, proceed with scanning
+                        proceedWithScanning();
+                    }
+                );
                 return;
             }
             
+            console.log('No existing barcode, proceeding directly with scanning');
+            proceedWithScanning();
+        }
+
+        function proceedWithScanning() {
+            console.log('Proceeding with scanning...');
+            console.log('Navigator.mediaDevices available:', !!navigator.mediaDevices);
+            console.log('getUserMedia available:', !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia));
+            
             // Try camera scanner first, fallback to manual entry
             if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                console.log('Opening camera scanner...');
                 openCameraScanner();
             } else {
-                // Fallback to manual entry - show custom input popup
-                showManualBarcodeInput(currentBarcode || '');
+                console.log('Camera not available, showing manual entry...');
+                // Show manual entry modal instead of prompt
+                showManualBarcodeModal();
             }
         }
 
         function openCameraScanner() {
+            console.log('openCameraScanner() called');
             const modal = document.getElementById('scanner-modal');
             const video = document.getElementById('scanner-video');
+            const statusElement = document.getElementById('scanner-status');
+            const manualInput = document.getElementById('scanner-manual-input');
+            
+            console.log('Modal element:', modal);
+            console.log('Video element:', video);
+            console.log('Status element:', statusElement);
             
             modal.classList.remove('hidden');
+            manualInput.value = '';
             
-            // Check if ZXing is loaded
-            if (typeof ZXing === 'undefined') {
-                showErrorPopup('Barcode scanner library not loaded. Please enter barcode manually.');
-                closeCameraScanner();
-                return;
-            }
+            // Update status
+            updateScannerStatus('Starting camera...', 'blue');
             
-            try {
-                // Initialize ZXing barcode reader
-                codeReader = new ZXing.BrowserMultiFormatReader();
+            console.log('Requesting camera access...');
+            
+            // Try to access camera directly first
+            navigator.mediaDevices.getUserMedia({
+                video: {
+                    facingMode: 'environment', // Use back camera
+                    width: { ideal: 1280 },
+                    height: { ideal: 720 }
+                }
+            }).then((stream) => {
+                console.log('Camera access granted, stream:', stream);
+                video.srcObject = stream;
+                currentStream = stream;
                 
-                // Start camera and scanning
-                codeReader.decodeFromVideoDevice(undefined, video, (result, err) => {
-                    if (result) {
-                        // Barcode detected
-                        const barcodeValue = result.text;
-                        document.getElementById('barcode-input').value = barcodeValue;
-                        closeCameraScanner();
-                        showSuccessPopup(`Barcode scanned: ${barcodeValue}`);
-                    }
-                    if (err && !(err instanceof ZXing.NotFoundException)) {
-                        console.error('Scanning error:', err);
-                    }
-                }).then((stream) => {
-                    currentStream = stream;
-                }).catch((err) => {
-                    console.error('Camera access error:', err);
-                    showErrorPopup('Camera access denied or not available. Please enter barcode manually.');
-                    closeCameraScanner();
+                video.addEventListener('loadedmetadata', () => {
+                    console.log('Video metadata loaded, starting playback');
+                    video.play().then(() => {
+                        console.log('Video playing successfully');
+                        updateScannerStatus('Camera ready - Scan barcode or enter manually', 'green');
+                        
+                        // Check if ZXing is available for barcode detection
+                        console.log('ZXing available:', typeof ZXing !== 'undefined');
+                        if (typeof ZXing !== 'undefined') {
+                            try {
+                                // Initialize ZXing barcode reader
+                                codeReader = new ZXing.BrowserMultiFormatReader();
+                                console.log('ZXing code reader initialized');
+                                
+                                updateScannerStatus('Scanner active - Point camera at barcode', 'green');
+                                
+                                // Start scanning
+                                codeReader.decodeFromVideoDevice(undefined, video, (result, err) => {
+                                    if (result) {
+                                        console.log('Barcode detected:', result.text);
+                                        // Barcode detected
+                                        const barcodeValue = result.text;
+                                        document.getElementById('barcode-input').value = barcodeValue;
+                                        closeCameraScanner();
+                                        showSuccessPopup('Barcode added successfully');
+                                    }
+                                    if (err && !(err instanceof ZXing.NotFoundException)) {
+                                        console.error('Scanning error:', err);
+                                    }
+                                });
+                            } catch (error) {
+                                console.error('ZXing initialization error:', error);
+                                updateScannerStatus('Auto-scan unavailable - Enter barcode manually', 'orange');
+                            }
+                        } else {
+                            console.log('ZXing not available');
+                            updateScannerStatus('Auto-scan unavailable - Enter barcode manually', 'orange');
+                        }
+                    }).catch((playError) => {
+                        console.error('Video play error:', playError);
+                        updateScannerStatus('Camera error - Enter barcode manually', 'red');
+                    });
                 });
-            } catch (error) {
-                console.error('Scanner initialization error:', error);
-                showErrorPopup('Scanner not available. Please enter barcode manually.');
-                closeCameraScanner();
-            }
+                
+            }).catch((err) => {
+                console.error('Camera access error:', err);
+                updateScannerStatus('Camera access denied - Enter barcode manually', 'red');
+                // Don't close the modal, allow manual entry
+            });
+        }
+
+        function updateScannerStatus(message, color) {
+            const statusElement = document.getElementById('scanner-status');
+            const colorClasses = {
+                'blue': 'bg-blue-500',
+                'green': 'bg-green-500', 
+                'orange': 'bg-orange-500',
+                'red': 'bg-red-500'
+            };
+            
+            statusElement.innerHTML = `<span class="${colorClasses[color]} text-white px-3 py-1 rounded-full text-sm">${message}</span>`;
         }
 
         function closeCameraScanner() {
@@ -554,6 +640,53 @@
                 codeReader.reset();
                 codeReader = null;
             }
+        }
+
+        function useScannerManualInput() {
+            const manualInput = document.getElementById('scanner-manual-input');
+            const barcodeValue = manualInput.value.trim();
+            
+            if (barcodeValue) {
+                document.getElementById('barcode-input').value = barcodeValue;
+                closeCameraScanner();
+                showSuccessPopup('Barcode added successfully');
+            } else {
+                updateScannerStatus('Please enter a barcode number', 'red');
+            }
+        }
+
+        // Confirmation modal functions
+        function showConfirmationModal(title, message, onConfirm) {
+            console.log('showConfirmationModal called with:', title, message);
+            const modal = document.getElementById('confirm-popup');
+            const titleElement = document.getElementById('confirm-title');
+            const messageElement = document.getElementById('confirm-message');
+            
+            titleElement.textContent = title;
+            messageElement.textContent = message;
+            modal.classList.remove('hidden');
+            
+            console.log('Callback set:', typeof onConfirm);
+            // Store the callback for later use
+            window.confirmCallback = onConfirm;
+            console.log('Confirmation modal shown');
+        }
+
+        function confirmAction() {
+            console.log('Confirm button clicked');
+            const popup = document.getElementById('confirm-popup');
+            popup.classList.add('hidden');
+            if (window.confirmCallback) {
+                console.log('Executing callback');
+                window.confirmCallback();
+                window.confirmCallback = null;
+            }
+        }
+
+        function cancelAction() {
+            const popup = document.getElementById('confirm-popup');
+            popup.classList.add('hidden');
+            window.confirmCallback = null;
         }
 
         // Manual barcode input function
