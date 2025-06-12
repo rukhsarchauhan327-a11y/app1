@@ -562,8 +562,37 @@
 
         // Refill stock function
         function refillStock() {
-            const productId = productData.id || 1;
-            window.location.href = `/refill-stock?id=${productId}`;
+            // Get product data from localStorage
+            const productDataStr = localStorage.getItem('currentProduct');
+            const currentProductId = localStorage.getItem('currentProductId') || '1';
+            
+            let productData = {
+                id: currentProductId,
+                name: 'Basmati Rice Premium',
+                type: 'weight-based',
+                unit: 'kg',
+                price: 110,
+                stock: 25.5
+            };
+            
+            if (productDataStr) {
+                const product = JSON.parse(productDataStr);
+                productData = {
+                    id: currentProductId,
+                    name: product.name,
+                    type: 'weight-based',
+                    unit: product.unit || 'kg',
+                    price: product.price || 110,
+                    stock: product.stock || 25.5,
+                    image: product.image
+                };
+            }
+            
+            // Store product data for refill page to access
+            localStorage.setItem('refillProductData', JSON.stringify(productData));
+            
+            // Navigate to weight-based refill stock page
+            window.location.href = `/refill-stock-weight?id=${currentProductId}`;
         }
 
         // Initialize on page load

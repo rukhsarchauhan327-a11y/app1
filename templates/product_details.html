@@ -418,8 +418,18 @@
         }
 
         function refillStock() {
-            // Navigate to refill stock page
-            window.location.href = '/refill-stock';
+            // Get current product ID from localStorage or productData
+            const currentProductId = localStorage.getItem('currentProductId') || productData.id || '1';
+            
+            // Store product data for refill page to access
+            localStorage.setItem('refillProductData', JSON.stringify(productData));
+            
+            // Navigate to appropriate refill stock page based on product type
+            if (productData.type === 'Weight-Based' || productData.type === 'weight-based') {
+                window.location.href = `/refill-stock-weight?id=${currentProductId}`;
+            } else {
+                window.location.href = `/refill-stock?id=${currentProductId}`;
+            }
         }
 
         function addToCart() {

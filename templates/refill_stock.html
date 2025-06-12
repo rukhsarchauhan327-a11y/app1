@@ -343,10 +343,20 @@
             }
         };
         
-        // Get product from URL or default to product 1
+        // Get product from localStorage or URL parameters
         const urlParams = new URLSearchParams(window.location.search);
         const productId = urlParams.get('id') || '1';
-        let productData = sampleProducts[productId] || sampleProducts[1];
+        
+        // Load product data from localStorage if available
+        const storedProductData = localStorage.getItem('refillProductData');
+        let productData;
+        
+        if (storedProductData) {
+            productData = JSON.parse(storedProductData);
+        } else {
+            // Fallback to sample data
+            productData = sampleProducts[productId] || sampleProducts[1];
+        }
 
         // Price mode: 'per-unit' or 'all-units'
         let priceMode = 'per-unit';
