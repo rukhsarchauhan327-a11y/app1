@@ -1130,35 +1130,53 @@
             }
         };
 
-        // Load cart items from localStorage
+        // Load cart items from localStorage and merge with existing cart
         function loadCartItems() {
             const cartData = localStorage.getItem('kiranakonnect_cart');
             const storedItems = cartData ? JSON.parse(cartData) : [];
             
-            // Clear existing cart items
-            cartItems = {};
+            // Don't clear existing cart items - merge instead
+            let nextItemId = Math.max(...Object.keys(cartItems).map(k => parseInt(k)), 0) + 1;
             
-            // Convert stored items to cart format
-            storedItems.forEach((item, index) => {
-                const itemId = index + 1;
-                cartItems[itemId] = {
-                    id: item.id,
-                    name: item.name,
-                    price: item.totalPrice,
-                    quantity: item.quantity,
-                    unit: item.unit,
-                    unitPrice: item.unitPrice,
-                    type: item.type === 'weight-based' ? 'weight' : 'unit',
-                    minQty: item.type === 'weight-based' ? 0.1 : 1,
-                    step: item.type === 'weight-based' ? 0.1 : 1,
-                    mfgDate: item.mfgDate,
-                    expDate: item.expDate,
-                    datesHidden: false,
-                    quantityDisplay: item.quantityDisplay,
-                    pricePerKg: item.pricePerKg,
-                    image: item.image
-                };
+            // Convert stored items to cart format and add to existing cart
+            storedItems.forEach((item) => {
+                // Check if item already exists in cart
+                const existingItem = Object.values(cartItems).find(cartItem => 
+                    cartItem.name === item.name && cartItem.unitPrice === item.unitPrice
+                );
+                
+                if (existingItem) {
+                    // Update quantity of existing item
+                    existingItem.quantity += item.quantity;
+                    existingItem.price = existingItem.quantity * existingItem.unitPrice;
+                } else {
+                    // Add new item to cart
+                    cartItems[nextItemId] = {
+                        id: item.id || nextItemId,
+                        name: item.name,
+                        price: item.totalPrice || (item.quantity * item.unitPrice),
+                        quantity: item.quantity,
+                        unit: item.unit,
+                        unitPrice: item.unitPrice,
+                        type: item.type === 'weight-based' ? 'weight' : 'unit',
+                        minQty: item.type === 'weight-based' ? 0.1 : 1,
+                        step: item.type === 'weight-based' ? 0.1 : 1,
+                        mfgDate: item.mfgDate,
+                        expDate: item.expDate,
+                        datesHidden: false,
+                        quantityDisplay: item.quantityDisplay,
+                        pricePerKg: item.pricePerKg,
+                        image: item.image
+                    };
+                    nextItemId++;
+                }
             });
+            
+            // Clear localStorage after merging
+            if (storedItems.length > 0) {
+                localStorage.removeItem('kiranakonnect_cart');
+                console.log(`Merged ${storedItems.length} items from localStorage into cart`);
+            }
             
             return cartItems;
         }
@@ -1218,56 +1236,82 @@
             }
         }
 
-        // Create HTML for individual cart item
+        // Render only new cart items that aren't in the HTML yet
+        function renderNewCartItems() {
+            const cartContainer = document.getElementById('cart-items');
+            const existingItemIds = Array.from(document.querySelectorAll('#cart-items > div[id^="cart-item-"]'))
+                .map(div => parseInt(div.id.replace('cart-item-', '')));
+            
+            Object.keys(cartItems).forEach(itemId => {
+                const numericId = parseInt(itemId);
+                if (!existingItemIds.includes(numericId)) {
+                    const item = cartItems[itemId];
+                    const cartItemHTML = createCartItemHTML(itemId, item);
+                    
+                    // Insert before the "Add More Items" section if it exists
+                    const addMoreSection = document.getElementById('add-items-section');
+                    if (addMoreSection) {
+                        addMoreSection.insertAdjacentHTML('beforebegin', cartItemHTML);
+                    } else {
+                        cartContainer.insertAdjacentHTML('beforeend', cartItemHTML);
+                    }
+                    
+                    console.log(`Added new cart item: ${item.name}`);
+                }
+            });
+        }
+
+        // Create HTML for individual cart item matching existing structure
         function createCartItemHTML(itemId, item) {
             const hasDate = item.mfgDate && item.expDate;
             const dateSection = hasDate ? `
-                <div class="mt-2 space-y-1 date-info ${item.datesHidden ? 'hidden' : ''}">
-                    <div class="flex justify-between text-xs text-gray-600">
-                        <span>Mfg: ${item.mfgDate}</span>
-                        <span>Exp: ${item.expDate}</span>
-                    </div>
+                <div class="flex items-center text-xs text-gray-500 date-info">
+                    <i class="fa-solid fa-calendar mr-1"></i>
+                    <span>MFG: ${item.mfgDate}</span>
+                </div>
+                <div class="flex items-center text-xs text-gray-500 date-info">
+                    <i class="fa-solid fa-clock mr-1"></i>
+                    <span>EXP: ${item.expDate}</span>
                 </div>
             ` : '';
             
             const dateToggleButton = hasDate ? `
-                <button id="date-toggle-${itemId}" class="text-xs px-2 py-1 rounded ${item.datesHidden ? 'text-success' : 'text-danger'}" onclick="toggleDates(${itemId})">
-                    <i class="fa-solid fa-${item.datesHidden ? 'plus' : 'minus'} mr-1"></i>
-                    ${item.datesHidden ? 'Add' : 'Remove'} Dates
+                <button id="date-toggle-${itemId}" class="text-xs text-danger hover:underline flex items-center" onclick="toggleProductDates(${itemId})">
+                    <i class="fa-solid fa-times mr-1"></i>
+                    Remove Dates
                 </button>
             ` : '';
 
+            const quantityDisplay = item.quantityDisplay || `${item.quantity} ${item.unit}`;
+
             return `
-                <div class="bg-white rounded-xl shadow-sm p-3" id="cart-item-${itemId}">
-                    <div class="flex items-start justify-between">
-                        <div class="flex-1">
-                            <h3 class="font-semibold text-dark text-sm">${item.name}</h3>
-                            <p class="text-xs text-gray-600 mt-1">₹${item.unitPrice}/${item.unit}</p>
-                            ${dateSection}
-                        </div>
-                        <div class="flex items-center space-x-2">
-                            <button class="w-6 h-6 rounded-full bg-gray-200 flex items-center justify-center" onclick="decreaseQuantity(${itemId})">
-                                <i class="fa-solid fa-minus text-xs text-gray-600"></i>
-                            </button>
-                            <span id="quantity-${itemId}" class="text-sm font-medium px-2">${item.quantityDisplay || item.quantity}</span>
-                            <button class="w-6 h-6 rounded-full bg-primary flex items-center justify-center" onclick="increaseQuantity(${itemId})">
-                                <i class="fa-solid fa-plus text-xs text-white"></i>
-                            </button>
-                        </div>
+        <div class="bg-white rounded-xl shadow-sm p-3" id="cart-item-${itemId}">
+            <div class="flex items-start justify-between">
+                <div class="flex-1">
+                    <h3 class="font-semibold text-dark text-sm">${item.name}</h3>
+                    <div class="flex justify-between items-center mt-1">
+                        <span class="text-sm text-gray-700 font-medium" id="quantity-${itemId}">${quantityDisplay}</span>
+                        <span class="text-lg font-bold text-primary" id="price-${itemId}">₹${item.price}</span>
                     </div>
-                    <div class="flex items-center justify-between mt-2">
-                        <div class="flex space-x-2">
-                            <button class="text-xs text-blue-600 hover:underline" onclick="editItem(${itemId})">
-                                <i class="fa-solid fa-edit mr-1"></i>Edit
+                    ${hasDate ? `<div class="mt-2 space-y-1">${dateSection}<div class="flex items-center space-x-2 mt-1">
+                            <button class="text-xs text-primary hover:underline flex items-center" onclick="editItem(${itemId})">
+                                <i class="fa-solid fa-edit mr-1"></i>
+                                Edit
                             </button>
                             ${dateToggleButton}
-                            <button class="text-xs text-red-600 hover:underline" onclick="removeItem(${itemId})">
-                                <i class="fa-solid fa-trash mr-1"></i>Remove
-                            </button>
-                        </div>
-                        <span id="price-${itemId}" class="text-sm font-bold text-primary">₹${item.price.toFixed(2)}</span>
-                    </div>
+                        </div></div>` : `<div class="mt-2">
+                        <button class="text-xs text-primary hover:underline flex items-center" onclick="editItem(${itemId})">
+                            <i class="fa-solid fa-edit mr-1"></i>
+                            Edit
+                        </button>
+                        ${dateToggleButton}
+                    </div>`}
                 </div>
+                <button class="text-danger text-sm ml-3 p-1" onclick="removeItem(${itemId})">
+                    <i class="fa-solid fa-trash"></i>
+                </button>
+            </div>
+        </div>
             `;
         }
 
@@ -1798,6 +1842,18 @@
                             5: { id: 5, name: 'Surf Excel (500gm)', quantity: 1, unitPrice: 55, price: 55, unit: 'Packet', type: 'unit' },
                             6: { id: 6, name: 'Dabur Honey', quantity: 1, unitPrice: 180, price: 180, unit: 'Bottle', type: 'unit', mfgDate: '01/01/2025', expDate: '01/01/2027', datesHidden: false }
                         };
+                    }
+                    
+                    // Load and merge any new items from inventory
+                    loadCartItems();
+                    
+                    // Check if new items were added and need to be rendered
+                    const currentCartItemCount = document.querySelectorAll('#cart-items > div[id^="cart-item-"]').length;
+                    const cartDataCount = Object.keys(cartItems).length;
+                    
+                    if (cartDataCount > currentCartItemCount) {
+                        console.log(`New items detected: ${cartDataCount - currentCartItemCount} items need to be rendered`);
+                        renderNewCartItems();
                     }
                     
                     calculateTotals();
