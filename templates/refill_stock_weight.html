@@ -260,6 +260,22 @@
         </div>
     </div>
 
+    <!-- Confirmation Popup -->
+    <div id="confirm-popup" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-lg p-6 max-w-sm mx-4">
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">Confirm Action</h3>
+            <p id="confirm-message" class="text-gray-600 mb-6">Are you sure you want to proceed?</p>
+            <div class="flex space-x-3">
+                <button onclick="cancelAction()" class="flex-1 bg-gray-500 text-white py-2 px-4 rounded-lg hover:bg-gray-600 transition-colors">
+                    Cancel
+                </button>
+                <button onclick="confirmAction()" class="flex-1 bg-red-600 text-white py-2 px-4 rounded-lg hover:bg-red-700 transition-colors">
+                    Confirm
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Success Popup Modal -->
     <div id="success-popup" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden">
         <div class="flex items-center justify-center min-h-screen p-4">
@@ -602,9 +618,32 @@
         }
 
         function cancelRefill() {
-            if (confirm('Are you sure you want to cancel? All changes will be lost.')) {
-                goBack();
+            showConfirmPopup('Are you sure you want to cancel? All changes will be lost.', goBack);
+        }
+
+        function showConfirmPopup(message, onConfirm) {
+            const popup = document.getElementById('confirm-popup');
+            const messageElement = document.getElementById('confirm-message');
+            messageElement.textContent = message;
+            popup.classList.remove('hidden');
+            
+            // Store the callback for later use
+            window.confirmCallback = onConfirm;
+        }
+
+        function confirmAction() {
+            const popup = document.getElementById('confirm-popup');
+            popup.classList.add('hidden');
+            if (window.confirmCallback) {
+                window.confirmCallback();
+                window.confirmCallback = null;
             }
+        }
+
+        function cancelAction() {
+            const popup = document.getElementById('confirm-popup');
+            popup.classList.add('hidden');
+            window.confirmCallback = null;
         }
 
         function addStock() {
