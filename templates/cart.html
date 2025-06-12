@@ -113,25 +113,10 @@
         </div>
     </header>
 
-    <!-- Date Toggle Section - Fixed Top Position -->
-    <div class="fixed top-16 left-0 right-0 z-30 px-4 py-3 bg-orange-500 border-b-2 border-orange-600 shadow-lg">
-        <div class="flex items-center justify-between max-w-md mx-auto">
-            <div class="flex items-center space-x-2">
-                <i class="fa-solid fa-calendar text-white text-lg"></i>
-                <span class="text-white font-bold text-base">Include Dates on Receipt</span>
-            </div>
-            <div class="flex items-center space-x-3">
-                <span class="text-sm font-bold text-white" id="toggle-status-top">ON</span>
-                <button id="include-dates-toggle-top" onclick="toggleDatesOnReceipt()" class="relative inline-flex h-8 w-14 items-center rounded-full bg-white transition-colors duration-200 shadow-lg">
-                    <span class="sr-only">Toggle dates</span>
-                    <span id="toggle-circle-top" class="inline-block h-6 w-6 transform rounded-full bg-orange-500 transition duration-200 translate-x-7 shadow-md"></span>
-                </button>
-            </div>
-        </div>
-    </div>
+
 
     <!-- Shop Info Section -->
-    <div id="shop-info" class="bg-white shadow-sm mt-28 p-3 border-b">
+    <div id="shop-info" class="bg-white shadow-sm mt-16 p-3 border-b">
         <div class="text-center">
             <h2 class="text-base font-bold text-dark">Kirana Konnect</h2>
             <h3 class="text-sm font-semibold text-dark mt-1">Sharma Kirana Store</h3>
@@ -211,11 +196,11 @@
                         <span class="text-lg font-bold text-primary" id="price-1">₹450</span>
                     </div>
                     <div class="mt-2 space-y-1">
-                        <div class="flex items-center text-xs text-gray-500">
+                        <div class="flex items-center text-xs text-gray-500 date-info">
                             <i class="fa-solid fa-calendar mr-1"></i>
                             <span>MFG: 01/05/2025</span>
                         </div>
-                        <div class="flex items-center text-xs text-gray-500">
+                        <div class="flex items-center text-xs text-gray-500 date-info">
                             <i class="fa-solid fa-clock mr-1"></i>
                             <span>EXP: 01/09/2025</span>
                         </div>
@@ -224,7 +209,7 @@
                                 <i class="fa-solid fa-edit mr-1"></i>
                                 Edit
                             </button>
-                            <button class="text-xs text-danger hover:underline flex items-center" onclick="removeDates(1)">
+                            <button id="date-toggle-1" class="text-xs text-danger hover:underline flex items-center" onclick="toggleProductDates(1)">
                                 <i class="fa-solid fa-times mr-1"></i>
                                 Remove Dates
                             </button>
@@ -246,11 +231,11 @@
                         <span class="text-lg font-bold text-primary">₹120</span>
                     </div>
                     <div class="mt-2 space-y-1">
-                        <div class="flex items-center text-xs text-gray-500">
+                        <div class="flex items-center text-xs text-gray-500 date-info">
                             <i class="fa-solid fa-calendar mr-1"></i>
                             <span>MFG: 12/05/2025</span>
                         </div>
-                        <div class="flex items-center text-xs text-gray-500">
+                        <div class="flex items-center text-xs text-gray-500 date-info">
                             <i class="fa-solid fa-clock mr-1"></i>
                             <span>EXP: 25/07/2025</span>
                         </div>
@@ -259,7 +244,7 @@
                                 <i class="fa-solid fa-edit mr-1"></i>
                                 Edit
                             </button>
-                            <button class="text-xs text-danger hover:underline flex items-center" onclick="removeDates(2)">
+                            <button id="date-toggle-2" class="text-xs text-danger hover:underline flex items-center" onclick="toggleProductDates(2)">
                                 <i class="fa-solid fa-times mr-1"></i>
                                 Remove Dates
                             </button>
@@ -459,24 +444,7 @@
         </div>
     </div>
 
-    <!-- Date Toggle Section -->
-    <div class="px-4 mb-3" style="display: block !important; visibility: visible !important;">
-        <div class="bg-orange-50 border-2 border-orange-200 rounded-xl shadow-sm p-4">
-            <div class="flex items-center justify-between">
-                <div class="flex items-center space-x-2">
-                    <i class="fa-solid fa-calendar text-orange-600 text-lg"></i>
-                    <span class="text-gray-800 font-semibold text-base">Include Dates on Receipt</span>
-                </div>
-                <div class="flex items-center space-x-3">
-                    <span class="text-sm font-bold text-orange-600" id="toggle-status">ON</span>
-                    <button id="include-dates-toggle" onclick="toggleDatesOnReceipt()" class="relative inline-flex h-8 w-14 items-center rounded-full bg-orange-500 transition-colors duration-200 shadow-lg">
-                        <span class="sr-only">Toggle dates</span>
-                        <span id="toggle-circle" class="inline-block h-6 w-6 transform rounded-full bg-white transition duration-200 translate-x-7 shadow-md"></span>
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
+
 
     <!-- Payment Method -->
     <div id="payment-section" class="px-4 mb-3">
@@ -1489,12 +1457,37 @@
             }
         }
 
-        function removeDates(itemId) {
+        function toggleProductDates(itemId) {
             const item = cartItems[itemId];
+            const button = document.getElementById(`date-toggle-${itemId}`);
+            const icon = button.querySelector('i');
+            
             if (item) {
-                delete item.mfgDate;
-                delete item.expDate;
-                showNotification('Manufacturing and expiry dates removed', 'info');
+                if (item.datesHidden) {
+                    // Show dates
+                    item.datesHidden = false;
+                    button.innerHTML = '<i class="fa-solid fa-times mr-1"></i>Remove Dates';
+                    button.classList.remove('text-success');
+                    button.classList.add('text-danger');
+                    
+                    // Show date elements
+                    const dateElements = document.querySelectorAll(`#cart-item-${itemId} .date-info`);
+                    dateElements.forEach(el => el.classList.remove('hidden'));
+                    
+                    showNotification(`Dates shown for ${item.name}`, 'info');
+                } else {
+                    // Hide dates
+                    item.datesHidden = true;
+                    button.innerHTML = '<i class="fa-solid fa-plus mr-1"></i>Add Dates';
+                    button.classList.remove('text-danger');
+                    button.classList.add('text-success');
+                    
+                    // Hide date elements
+                    const dateElements = document.querySelectorAll(`#cart-item-${itemId} .date-info`);
+                    dateElements.forEach(el => el.classList.add('hidden'));
+                    
+                    showNotification(`Dates hidden for ${item.name}`, 'info');
+                }
             }
         }
 
