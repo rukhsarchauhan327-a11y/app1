@@ -767,12 +767,81 @@
             showSuccessPopup(`Successfully added ${quantity} ${productData.unit}s to stock${priceInfo}!`);
         }
 
-        // Test function to isolate barcode scanner issues
+        // Simplified barcode scanner that works without complex camera setup
         function testBarcodeFunction() {
-            console.log('testBarcodeFunction called');
+            const barcodeInput = document.getElementById('barcode-input');
+            const currentBarcode = barcodeInput.value.trim();
             
-            // Simple test - just show the manual barcode modal directly
-            showManualBarcodeModal();
+            // If there's already a barcode, ask for confirmation
+            if (currentBarcode) {
+                showConfirmationModal(
+                    'Replace Barcode?',
+                    'This will replace the existing barcode. Continue?',
+                    () => {
+                        openSimpleBarcodeScanner();
+                    }
+                );
+            } else {
+                openSimpleBarcodeScanner();
+            }
+        }
+
+        function openSimpleBarcodeScanner() {
+            // Try camera first, fallback to manual entry immediately if it fails
+            if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                // Show camera scanner with immediate fallback
+                showCameraScannerWithFallback();
+            } else {
+                // Direct to manual entry
+                showManualBarcodeModal();
+            }
+        }
+
+        function showCameraScannerWithFallback() {
+            const modal = document.getElementById('scanner-modal');
+            const video = document.getElementById('scanner-video');
+            
+            modal.classList.remove('hidden');
+            updateScannerStatus('Requesting camera access...', 'blue');
+            
+            // Set a timeout to fallback to manual entry if camera takes too long
+            const fallbackTimeout = setTimeout(() => {
+                closeCameraScanner();
+                showManualBarcodeModal();
+            }, 3000);
+            
+            navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
+                .then((stream) => {
+                    clearTimeout(fallbackTimeout);
+                    video.srcObject = stream;
+                    currentStream = stream;
+                    video.play();
+                    updateScannerStatus('Camera ready - Position barcode in frame', 'green');
+                    
+                    // Initialize barcode scanning if ZXing is available
+                    if (typeof ZXing !== 'undefined') {
+                        try {
+                            codeReader = new ZXing.BrowserMultiFormatReader();
+                            codeReader.decodeFromVideoDevice(undefined, video, (result, err) => {
+                                if (result) {
+                                    document.getElementById('barcode-input').value = result.text;
+                                    closeCameraScanner();
+                                    showSuccessPopup(`Barcode scanned: ${result.text}`);
+                                }
+                            });
+                            updateScannerStatus('Scanner active - Point at barcode', 'green');
+                        } catch (error) {
+                            updateScannerStatus('Camera ready - Enter manually below', 'orange');
+                        }
+                    } else {
+                        updateScannerStatus('Camera ready - Enter manually below', 'orange');
+                    }
+                })
+                .catch(() => {
+                    clearTimeout(fallbackTimeout);
+                    closeCameraScanner();
+                    showManualBarcodeModal();
+                });
         }
 
         // Modal functions for barcode scanner
