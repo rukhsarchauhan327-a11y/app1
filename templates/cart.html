@@ -1052,9 +1052,11 @@
         }
 
         function editItem(itemId) {
+            console.log('Edit item clicked:', itemId);
             currentEditingItem = itemId;
             const item = cartItems[itemId];
             if (item) {
+                console.log('Item data:', item);
                 // Populate edit modal with current item data
                 document.getElementById('edit-product-name').textContent = item.name;
                 document.getElementById('edit-product-price').textContent = `₹${item.unitPrice}/${item.unit.toLowerCase()}`;
@@ -1105,7 +1107,10 @@
                 }
                 
                 updateEditTotal();
-                document.getElementById('edit-item-modal').classList.remove('hidden');
+                const modal = document.getElementById('edit-item-modal');
+                console.log('Opening modal:', modal);
+                modal.classList.remove('hidden');
+                console.log('Modal classes after show:', modal.className);
                 document.body.style.overflow = 'hidden';
             }
         }
