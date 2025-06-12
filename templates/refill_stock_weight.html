@@ -378,25 +378,27 @@
                 quantityInKg = quantity / 1000;
             }
             
-            if (sellingPrice > 0) {
+            if (sellingPrice > 0 && quantity > 0) {
                 const priceModeSelect = document.getElementById('price-mode-select');
                 const selectedMode = priceModeSelect.value;
+                const totalWeight = productData.currentStock + quantityInKg;
                 
                 if (selectedMode === 'per-kg') {
-                    currentPriceElement.textContent = `Current: ₹${sellingPrice}/Kg`;
+                    // User entered price per kg - show total value of all weight (existing + new)
+                    const totalValueAllWeight = sellingPrice * totalWeight;
+                    currentPriceElement.textContent = `Current: ₹${totalValueAllWeight.toFixed(2)} / ${totalWeight.toFixed(1)} Kg`;
                 } else if (selectedMode === 'per-gram') {
-                    currentPriceElement.textContent = `Current: ₹${sellingPrice}/Gram`;
+                    // User entered price per gram - convert to total value
+                    const pricePerKg = sellingPrice * 1000;
+                    const totalValueAllWeight = pricePerKg * totalWeight;
+                    currentPriceElement.textContent = `Current: ₹${totalValueAllWeight.toFixed(2)} / ${totalWeight.toFixed(1)} Kg`;
                 } else if (selectedMode === 'total') {
-                    // For total mode, show per kg equivalent
-                    if (quantityInKg > 0) {
-                        const pricePerKg = (sellingPrice / quantityInKg).toFixed(2);
-                        currentPriceElement.textContent = `Current: ₹${pricePerKg}/Kg (Total: ₹${sellingPrice})`;
-                    } else {
-                        currentPriceElement.textContent = `Current: Total ₹${sellingPrice}`;
-                    }
+                    // User entered total price for new stock - show per kg price
+                    const pricePerKg = (sellingPrice / quantityInKg).toFixed(2);
+                    currentPriceElement.textContent = `Current: ₹${pricePerKg} per Kg`;
                 }
             } else {
-                currentPriceElement.textContent = 'Current: ₹90/Kg';
+                currentPriceElement.textContent = '';
             }
         }
 
