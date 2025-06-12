@@ -1191,7 +1191,45 @@
                 (quantity * 1000).toFixed(0) + ' gm' : 
                 quantity.toFixed(currentProduct.type === 'weight-based' ? 3 : 0) + ' ' + currentProduct.unit + (quantity > 1 && currentProduct.type !== 'weight-based' ? 's' : '');
             
+            // Create cart item object
+            const cartItem = {
+                id: currentProduct.id || Date.now().toString(),
+                name: currentProduct.name,
+                image: currentProduct.image,
+                unitPrice: currentProduct.price,
+                quantity: quantity,
+                totalPrice: total,
+                unit: currentProduct.unit,
+                type: currentProduct.type || 'unit',
+                quantityDisplay: displayQty,
+                addedAt: new Date().toISOString()
+            };
+            
+            // Get existing cart from localStorage
+            const existingCart = JSON.parse(localStorage.getItem('kiranakonnect_cart') || '[]');
+            
+            // Check if item already exists
+            const existingItemIndex = existingCart.findIndex(item => 
+                item.name === cartItem.name && item.unitPrice === cartItem.unitPrice
+            );
+            
+            if (existingItemIndex !== -1) {
+                // Update existing item quantity
+                existingCart[existingItemIndex].quantity += cartItem.quantity;
+                existingCart[existingItemIndex].totalPrice += cartItem.totalPrice;
+                existingCart[existingItemIndex].quantityDisplay = currentProduct.type === 'weight-based' && existingCart[existingItemIndex].quantity < 1 ? 
+                    (existingCart[existingItemIndex].quantity * 1000).toFixed(0) + ' gm' : 
+                    existingCart[existingItemIndex].quantity.toFixed(currentProduct.type === 'weight-based' ? 3 : 0) + ' ' + currentProduct.unit + (existingCart[existingItemIndex].quantity > 1 && currentProduct.type !== 'weight-based' ? 's' : '');
+            } else {
+                // Add new item
+                existingCart.push(cartItem);
+            }
+            
+            // Save updated cart to localStorage
+            localStorage.setItem('kiranakonnect_cart', JSON.stringify(existingCart));
+            
             console.log(`Added ${displayQty} of ${currentProduct.name} to cart. Total: ₹${total.toFixed(2)}`);
+            showNotification(`${displayQty} of ${currentProduct.name} added to cart!`, 'success');
             cartModal.classList.add('hidden');
         });
 
