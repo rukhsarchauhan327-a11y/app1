@@ -113,8 +113,25 @@
         </div>
     </header>
 
+    <!-- Date Toggle Section - Fixed Top Position -->
+    <div class="fixed top-16 left-0 right-0 z-30 px-4 py-3 bg-orange-500 border-b-2 border-orange-600 shadow-lg">
+        <div class="flex items-center justify-between max-w-md mx-auto">
+            <div class="flex items-center space-x-2">
+                <i class="fa-solid fa-calendar text-white text-lg"></i>
+                <span class="text-white font-bold text-base">Include Dates on Receipt</span>
+            </div>
+            <div class="flex items-center space-x-3">
+                <span class="text-sm font-bold text-white" id="toggle-status-top">ON</span>
+                <button id="include-dates-toggle-top" onclick="toggleDatesOnReceipt()" class="relative inline-flex h-8 w-14 items-center rounded-full bg-white transition-colors duration-200 shadow-lg">
+                    <span class="sr-only">Toggle dates</span>
+                    <span id="toggle-circle-top" class="inline-block h-6 w-6 transform rounded-full bg-orange-500 transition duration-200 translate-x-7 shadow-md"></span>
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Shop Info Section -->
-    <div id="shop-info" class="bg-white shadow-sm mt-16 p-3 border-b">
+    <div id="shop-info" class="bg-white shadow-sm mt-28 p-3 border-b">
         <div class="text-center">
             <h2 class="text-base font-bold text-dark">Kirana Konnect</h2>
             <h3 class="text-sm font-semibold text-dark mt-1">Sharma Kirana Store</h3>
@@ -1207,26 +1224,57 @@
 
         function toggleDatesOnReceipt() {
             includeDatesOnReceipt = !includeDatesOnReceipt;
+            
+            // Update top toggle button
+            const toggleTop = document.getElementById('include-dates-toggle-top');
+            const circleTop = document.getElementById('toggle-circle-top');
+            const statusTop = document.getElementById('toggle-status-top');
+            
+            // Update bottom toggle button (if exists)
             const toggle = document.getElementById('include-dates-toggle');
             const circle = document.getElementById('toggle-circle');
             const status = document.getElementById('toggle-status');
             
             if (includeDatesOnReceipt) {
-                toggle.classList.add('bg-orange-500');
-                toggle.classList.remove('bg-gray-400');
-                circle.classList.add('translate-x-7');
-                circle.classList.remove('translate-x-1');
-                status.textContent = 'ON';
-                status.classList.add('text-orange-600');
-                status.classList.remove('text-gray-600');
+                // Update top toggle
+                if (toggleTop) {
+                    toggleTop.classList.add('bg-white');
+                    toggleTop.classList.remove('bg-gray-400');
+                    circleTop.classList.add('translate-x-7', 'bg-orange-500');
+                    circleTop.classList.remove('translate-x-1', 'bg-gray-500');
+                    statusTop.textContent = 'ON';
+                }
+                
+                // Update bottom toggle
+                if (toggle) {
+                    toggle.classList.add('bg-orange-500');
+                    toggle.classList.remove('bg-gray-400');
+                    circle.classList.add('translate-x-7');
+                    circle.classList.remove('translate-x-1');
+                    status.textContent = 'ON';
+                    status.classList.add('text-orange-600');
+                    status.classList.remove('text-gray-600');
+                }
             } else {
-                toggle.classList.remove('bg-orange-500');
-                toggle.classList.add('bg-gray-400');
-                circle.classList.remove('translate-x-7');
-                circle.classList.add('translate-x-1');
-                status.textContent = 'OFF';
-                status.classList.remove('text-orange-600');
-                status.classList.add('text-gray-600');
+                // Update top toggle
+                if (toggleTop) {
+                    toggleTop.classList.remove('bg-white');
+                    toggleTop.classList.add('bg-gray-400');
+                    circleTop.classList.remove('translate-x-7', 'bg-orange-500');
+                    circleTop.classList.add('translate-x-1', 'bg-gray-500');
+                    statusTop.textContent = 'OFF';
+                }
+                
+                // Update bottom toggle
+                if (toggle) {
+                    toggle.classList.remove('bg-orange-500');
+                    toggle.classList.add('bg-gray-400');
+                    circle.classList.remove('translate-x-7');
+                    circle.classList.add('translate-x-1');
+                    status.textContent = 'OFF';
+                    status.classList.remove('text-orange-600');
+                    status.classList.add('text-gray-600');
+                }
             }
             
             console.log('Include dates on receipt:', includeDatesOnReceipt);
