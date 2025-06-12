@@ -222,8 +222,8 @@
     <!-- Barcode Overwrite Confirmation Popup -->
     <div id="barcode-confirm-popup" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
         <div class="bg-white rounded-lg p-6 max-w-sm mx-4">
-            <h3 class="text-lg font-semibold text-gray-900 mb-4">Replace Existing Barcode?</h3>
-            <p class="text-gray-600 mb-6">This product already has a barcode. Do you want to scan a new one to replace it?</p>
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">Replace Barcode?</h3>
+            <p class="text-gray-600 mb-6">This will replace the existing barcode. Continue?</p>
             <div class="flex space-x-3">
                 <button onclick="cancelBarcodeOverwrite()" class="flex-1 bg-gray-500 text-white py-2 px-4 rounded-lg hover:bg-gray-600 transition-colors">
                     Cancel
@@ -518,7 +518,7 @@
                 console.log('Showing confirmation modal for barcode replacement');
                 showConfirmationModal(
                     'Replace Barcode?',
-                    'This product already has a barcode. Do you want to scan a new one to replace it?',
+                    'This will replace the existing barcode. Continue?',
                     () => {
                         console.log('User confirmed barcode replacement');
                         // User confirmed, proceed with scanning
