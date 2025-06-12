@@ -46,6 +46,46 @@
       .fa, .fas, .far, .fal, .fab {
         font-family: "Font Awesome 6 Free", "Font Awesome 6 Brands" !important;
       }
+      
+      /* Notification Toggle Styles */
+      .notification-toggle {
+        position: relative;
+        display: inline-block;
+        cursor: pointer;
+      }
+
+      .toggle-track {
+        width: 48px;
+        height: 24px;
+        background-color: #d1d5db;
+        border-radius: 12px;
+        position: relative;
+        transition: background-color 0.3s ease;
+      }
+
+      .toggle-thumb {
+        width: 20px;
+        height: 20px;
+        background-color: white;
+        border-radius: 50%;
+        position: absolute;
+        top: 2px;
+        left: 2px;
+        transition: transform 0.3s ease;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+
+      .notification-toggle.active .toggle-track {
+        background-color: #10B981;
+      }
+
+      .notification-toggle.active .toggle-thumb {
+        transform: translateX(24px);
+      }
+
+      .notification-toggle:hover .toggle-track {
+        opacity: 0.8;
+      }
     </style>
 <style>
   .highlighted-section {
@@ -202,6 +242,215 @@
                         Manage Plan
                     </button>
                 </div>
+            </div>
+        </div>
+
+        <!-- Notification Settings -->
+        <div id="notification-settings" class="bg-white mt-2 px-4 py-4">
+            <h3 class="text-lg font-semibold text-dark mb-3">Notification Settings</h3>
+            
+            <!-- Business Alerts -->
+            <div class="mb-6">
+                <h4 class="font-medium text-dark mb-3">Business Alerts</h4>
+                <div class="space-y-3">
+                    <div class="flex items-center justify-between py-2">
+                        <div>
+                            <div class="font-medium text-dark">Low Stock Alerts</div>
+                            <div class="text-sm text-gray-600">Get notified when products are running low</div>
+                        </div>
+                        <div class="notification-toggle" data-setting="low-stock">
+                            <div class="toggle-track">
+                                <div class="toggle-thumb"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-center justify-between py-2">
+                        <div>
+                            <div class="font-medium text-dark">Expiry Alerts</div>
+                            <div class="text-sm text-gray-600">Notifications for products nearing expiry</div>
+                        </div>
+                        <div class="notification-toggle" data-setting="expiry-alerts">
+                            <div class="toggle-track">
+                                <div class="toggle-thumb"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-center justify-between py-2">
+                        <div>
+                            <div class="font-medium text-dark">Daily Sales Summary</div>
+                            <div class="text-sm text-gray-600">End of day sales and profit summary</div>
+                        </div>
+                        <div class="notification-toggle active" data-setting="daily-summary">
+                            <div class="toggle-track">
+                                <div class="toggle-thumb"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Customer Notifications -->
+            <div class="mb-6">
+                <h4 class="font-medium text-dark mb-3">Customer Notifications</h4>
+                <div class="space-y-3">
+                    <div class="flex items-center justify-between py-2">
+                        <div>
+                            <div class="font-medium text-dark">New Customer Registration</div>
+                            <div class="text-sm text-gray-600">Alert when new customers sign up</div>
+                        </div>
+                        <div class="notification-toggle active" data-setting="new-customer">
+                            <div class="toggle-track">
+                                <div class="toggle-thumb"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-center justify-between py-2">
+                        <div>
+                            <div class="font-medium text-dark">Payment Reminders</div>
+                            <div class="text-sm text-gray-600">Remind customers about pending payments</div>
+                        </div>
+                        <div class="notification-toggle" data-setting="payment-reminders">
+                            <div class="toggle-track">
+                                <div class="toggle-thumb"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-center justify-between py-2">
+                        <div>
+                            <div class="font-medium text-dark">Large Orders</div>
+                            <div class="text-sm text-gray-600">Notify for orders above ₹500</div>
+                        </div>
+                        <div class="notification-toggle active" data-setting="large-orders">
+                            <div class="toggle-track">
+                                <div class="toggle-thumb"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- System Notifications -->
+            <div class="mb-6">
+                <h4 class="font-medium text-dark mb-3">System Notifications</h4>
+                <div class="space-y-3">
+                    <div class="flex items-center justify-between py-2">
+                        <div>
+                            <div class="font-medium text-dark">App Updates</div>
+                            <div class="text-sm text-gray-600">New features and improvements</div>
+                        </div>
+                        <div class="notification-toggle active" data-setting="app-updates">
+                            <div class="toggle-track">
+                                <div class="toggle-thumb"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-center justify-between py-2">
+                        <div>
+                            <div class="font-medium text-dark">Subscription Reminders</div>
+                            <div class="text-sm text-gray-600">Billing and subscription alerts</div>
+                        </div>
+                        <div class="notification-toggle active" data-setting="subscription">
+                            <div class="toggle-track">
+                                <div class="toggle-thumb"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-center justify-between py-2">
+                        <div>
+                            <div class="font-medium text-dark">Security Alerts</div>
+                            <div class="text-sm text-gray-600">Login attempts and security updates</div>
+                        </div>
+                        <div class="notification-toggle active" data-setting="security">
+                            <div class="toggle-track">
+                                <div class="toggle-thumb"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Notification Channels -->
+            <div class="mb-6">
+                <h4 class="font-medium text-dark mb-3">Notification Channels</h4>
+                <div class="space-y-3">
+                    <div class="flex items-center justify-between py-2">
+                        <div>
+                            <div class="font-medium text-dark">WhatsApp Notifications</div>
+                            <div class="text-sm text-gray-600">Receive alerts on WhatsApp</div>
+                        </div>
+                        <div class="notification-toggle active" data-setting="whatsapp">
+                            <div class="toggle-track">
+                                <div class="toggle-thumb"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-center justify-between py-2">
+                        <div>
+                            <div class="font-medium text-dark">SMS Notifications</div>
+                            <div class="text-sm text-gray-600">Important alerts via SMS</div>
+                        </div>
+                        <div class="notification-toggle" data-setting="sms">
+                            <div class="toggle-track">
+                                <div class="toggle-thumb"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-center justify-between py-2">
+                        <div>
+                            <div class="font-medium text-dark">Push Notifications</div>
+                            <div class="text-sm text-gray-600">In-app notification alerts</div>
+                        </div>
+                        <div class="notification-toggle active" data-setting="push">
+                            <div class="toggle-track">
+                                <div class="toggle-thumb"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Notification Timing -->
+            <div class="mb-6">
+                <h4 class="font-medium text-dark mb-3">Notification Timing</h4>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Daily Summary Time</label>
+                        <select class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary">
+                            <option>8:00 PM</option>
+                            <option>9:00 PM</option>
+                            <option>10:00 PM</option>
+                            <option>11:00 PM</option>
+                        </select>
+                    </div>
+                    
+                    <div class="flex items-center justify-between py-2">
+                        <div>
+                            <div class="font-medium text-dark">Do Not Disturb</div>
+                            <div class="text-sm text-gray-600">Pause non-urgent notifications (10 PM - 8 AM)</div>
+                        </div>
+                        <div class="notification-toggle" data-setting="dnd">
+                            <div class="toggle-track">
+                                <div class="toggle-thumb"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Reset Settings Button -->
+            <div class="pt-4 border-t">
+                <button onclick="resetNotificationSettings()" class="w-full bg-gray-100 text-gray-700 py-3 px-4 rounded-lg font-medium hover:bg-gray-200 transition-colors flex items-center justify-center space-x-2">
+                    <i class="fa-solid fa-rotate-left"></i>
+                    <span>Reset to Defaults</span>
+                </button>
             </div>
         </div>
 
@@ -986,6 +1235,109 @@
         function manageStaff() {
             // Navigate to staff management
             window.location.href = '/staff';
+        }
+
+        // Notification Settings Functions
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize notification toggle functionality
+            const toggles = document.querySelectorAll('.notification-toggle');
+            
+            toggles.forEach(toggle => {
+                toggle.addEventListener('click', function() {
+                    const setting = this.dataset.setting;
+                    const isActive = this.classList.contains('active');
+                    
+                    if (isActive) {
+                        this.classList.remove('active');
+                        console.log(`Disabled ${setting} notifications`);
+                        showNotificationFeedback(`${getSettingName(setting)} notifications disabled`);
+                    } else {
+                        this.classList.add('active');
+                        console.log(`Enabled ${setting} notifications`);
+                        showNotificationFeedback(`${getSettingName(setting)} notifications enabled`);
+                    }
+                    
+                    // Save setting to localStorage
+                    saveNotificationSetting(setting, !isActive);
+                });
+            });
+            
+            // Load saved notification settings
+            loadNotificationSettings();
+        });
+
+        function getSettingName(setting) {
+            const settingNames = {
+                'low-stock': 'Low Stock',
+                'expiry-alerts': 'Expiry Alert',
+                'daily-summary': 'Daily Summary',
+                'new-customer': 'New Customer',
+                'payment-reminders': 'Payment Reminder',
+                'large-orders': 'Large Order',
+                'app-updates': 'App Update',
+                'subscription': 'Subscription',
+                'security': 'Security Alert',
+                'whatsapp': 'WhatsApp',
+                'sms': 'SMS',
+                'push': 'Push Notification',
+                'dnd': 'Do Not Disturb'
+            };
+            return settingNames[setting] || setting;
+        }
+
+        function showNotificationFeedback(message) {
+            // Create temporary feedback element
+            const feedback = document.createElement('div');
+            feedback.className = 'fixed top-4 right-4 bg-primary text-white px-4 py-2 rounded-lg shadow-lg z-50 text-sm';
+            feedback.textContent = message;
+            document.body.appendChild(feedback);
+            
+            // Remove after 2 seconds
+            setTimeout(() => {
+                feedback.remove();
+            }, 2000);
+        }
+
+        function saveNotificationSetting(setting, enabled) {
+            const settings = JSON.parse(localStorage.getItem('notificationSettings') || '{}');
+            settings[setting] = enabled;
+            localStorage.setItem('notificationSettings', JSON.stringify(settings));
+        }
+
+        function loadNotificationSettings() {
+            const settings = JSON.parse(localStorage.getItem('notificationSettings') || '{}');
+            
+            Object.keys(settings).forEach(setting => {
+                const toggle = document.querySelector(`[data-setting="${setting}"]`);
+                if (toggle) {
+                    if (settings[setting]) {
+                        toggle.classList.add('active');
+                    } else {
+                        toggle.classList.remove('active');
+                    }
+                }
+            });
+        }
+
+        function resetNotificationSettings() {
+            if (confirm('Reset all notification settings to default? This will enable most notifications.')) {
+                localStorage.removeItem('notificationSettings');
+                
+                // Reset to default states
+                document.querySelectorAll('.notification-toggle').forEach(toggle => {
+                    const setting = toggle.dataset.setting;
+                    // Default enabled settings
+                    const defaultEnabled = ['daily-summary', 'new-customer', 'large-orders', 'app-updates', 'subscription', 'security', 'whatsapp', 'push'];
+                    
+                    if (defaultEnabled.includes(setting)) {
+                        toggle.classList.add('active');
+                    } else {
+                        toggle.classList.remove('active');
+                    }
+                });
+                
+                showNotificationFeedback('Notification settings reset to defaults');
+            }
         }
 
         function notificationSettings() {
