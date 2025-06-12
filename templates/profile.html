@@ -518,7 +518,7 @@
                         </div>
                         
                         <div class="space-y-3">
-                            <button class="w-full flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                            <button onclick="openFAQ()" class="w-full flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
                                 <div class="flex items-center space-x-3">
                                     <i class="fa-solid fa-question-circle text-primary"></i>
                                     <span class="font-medium text-dark">FAQ</span>
@@ -526,15 +526,9 @@
                                 <i class="fa-solid fa-chevron-right text-gray-400"></i>
                             </button>
                             
-                            <button class="w-full flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
-                                <div class="flex items-center space-x-3">
-                                    <i class="fa-solid fa-play-circle text-primary"></i>
-                                    <span class="font-medium text-dark">Video Tutorials</span>
-                                </div>
-                                <i class="fa-solid fa-chevron-right text-gray-400"></i>
-                            </button>
+
                             
-                            <button class="w-full flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                            <button onclick="reportBug()" class="w-full flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
                                 <div class="flex items-center space-x-3">
                                     <i class="fa-solid fa-bug text-primary"></i>
                                     <span class="font-medium text-dark">Report Bug</span>
@@ -542,7 +536,7 @@
                                 <i class="fa-solid fa-chevron-right text-gray-400"></i>
                             </button>
                             
-                            <button class="w-full flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                            <button onclick="featureRequest()" class="w-full flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
                                 <div class="flex items-center space-x-3">
                                     <i class="fa-solid fa-lightbulb text-primary"></i>
                                     <span class="font-medium text-dark">Feature Request</span>
@@ -597,6 +591,123 @@
                         <div class="flex justify-center space-x-4">
                             <a href="#" class="hover:text-primary">Privacy Policy</a>
                             <a href="#" class="hover:text-primary">Terms of Service</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- FAQ Modal -->
+    <div id="faqModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden">
+        <div class="fixed inset-0 flex items-center justify-center p-4">
+            <div class="bg-white rounded-2xl max-w-md w-full max-h-[90vh] overflow-y-auto">
+                <div class="flex items-center justify-between p-6 border-b">
+                    <h2 class="text-xl font-bold text-dark">Frequently Asked Questions</h2>
+                    <button onclick="closeFAQModal()" class="p-2 hover:bg-gray-100 rounded-lg">
+                        <i class="fa-solid fa-times text-gray-600"></i>
+                    </button>
+                </div>
+                
+                <div class="p-6">
+                    <div class="space-y-4">
+                        <div class="border-b pb-4">
+                            <h3 class="font-semibold text-dark mb-2">How do I add new products to inventory?</h3>
+                            <p class="text-sm text-gray-600">Go to Inventory → Add New Item. Fill in product details including name, price, and stock quantity.</p>
+                        </div>
+                        
+                        <div class="border-b pb-4">
+                            <h3 class="font-semibold text-dark mb-2">How to generate bills for customers?</h3>
+                            <p class="text-sm text-gray-600">Use the Cart section to add items, select customer, and generate bill. You can print or share digitally.</p>
+                        </div>
+                        
+                        <div class="border-b pb-4">
+                            <h3 class="font-semibold text-dark mb-2">How to track customer credit payments?</h3>
+                            <p class="text-sm text-gray-600">Customer ledger shows all credit transactions. You can add payments and track outstanding balances.</p>
+                        </div>
+                        
+                        <div class="border-b pb-4">
+                            <h3 class="font-semibold text-dark mb-2">Can I export business data?</h3>
+                            <p class="text-sm text-gray-600">Yes, go to Profile → Export Data to download comprehensive business reports as PDF.</p>
+                        </div>
+                        
+                        <div class="pb-4">
+                            <h3 class="font-semibold text-dark mb-2">How to manage staff accounts?</h3>
+                            <p class="text-sm text-gray-600">Use the Staff section to add team members, set permissions, and track their activities.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Report Bug Modal -->
+    <div id="reportBugModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden">
+        <div class="fixed inset-0 flex items-center justify-center p-4">
+            <div class="bg-white rounded-2xl max-w-md w-full">
+                <div class="flex items-center justify-between p-6 border-b">
+                    <h2 class="text-xl font-bold text-dark">Report Bug</h2>
+                    <button onclick="closeBugModal()" class="p-2 hover:bg-gray-100 rounded-lg">
+                        <i class="fa-solid fa-times text-gray-600"></i>
+                    </button>
+                </div>
+                
+                <div class="p-6">
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-dark mb-2">Bug Title</label>
+                            <input type="text" id="bugTitle" class="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="Brief description of the issue">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-dark mb-2">Detailed Description</label>
+                            <textarea id="bugDescription" rows="4" class="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="Please describe the bug in detail, including steps to reproduce"></textarea>
+                        </div>
+                        
+                        <div class="flex space-x-3">
+                            <button onclick="closeBugModal()" class="flex-1 px-4 py-2 border border-gray-200 text-gray-700 rounded-lg hover:bg-gray-50">
+                                Cancel
+                            </button>
+                            <button onclick="submitBugReport()" class="flex-1 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark">
+                                Submit Report
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Feature Request Modal -->
+    <div id="featureRequestModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden">
+        <div class="fixed inset-0 flex items-center justify-center p-4">
+            <div class="bg-white rounded-2xl max-w-md w-full">
+                <div class="flex items-center justify-between p-6 border-b">
+                    <h2 class="text-xl font-bold text-dark">Feature Request</h2>
+                    <button onclick="closeFeatureModal()" class="p-2 hover:bg-gray-100 rounded-lg">
+                        <i class="fa-solid fa-times text-gray-600"></i>
+                    </button>
+                </div>
+                
+                <div class="p-6">
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-dark mb-2">Feature Title</label>
+                            <input type="text" id="featureTitle" class="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="Name of the feature you'd like">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-dark mb-2">Feature Description</label>
+                            <textarea id="featureDescription" rows="4" class="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="Describe how this feature would help your business"></textarea>
+                        </div>
+                        
+                        <div class="flex space-x-3">
+                            <button onclick="closeFeatureModal()" class="flex-1 px-4 py-2 border border-gray-200 text-gray-700 rounded-lg hover:bg-gray-50">
+                                Cancel
+                            </button>
+                            <button onclick="submitFeatureRequest()" class="flex-1 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark">
+                                Submit Request
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -1573,6 +1684,71 @@
         function closeAboutModal() {
             document.getElementById('aboutAppModal').classList.add('hidden');
             document.body.style.overflow = 'auto';
+        }
+
+        // Help & Support section functions
+        function openFAQ() {
+            document.getElementById('faqModal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeFAQModal() {
+            document.getElementById('faqModal').classList.add('hidden');
+            document.body.style.overflow = 'auto';
+        }
+
+
+
+        function reportBug() {
+            document.getElementById('reportBugModal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeBugModal() {
+            document.getElementById('reportBugModal').classList.add('hidden');
+            document.body.style.overflow = 'auto';
+        }
+
+        function featureRequest() {
+            document.getElementById('featureRequestModal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeFeatureModal() {
+            document.getElementById('featureRequestModal').classList.add('hidden');
+            document.body.style.overflow = 'auto';
+        }
+
+        function submitBugReport() {
+            const title = document.getElementById('bugTitle').value;
+            const description = document.getElementById('bugDescription').value;
+            
+            if (!title || !description) {
+                alert('Please fill in all fields');
+                return;
+            }
+            
+            alert('Bug report submitted successfully! Our team will review it soon.');
+            closeBugModal();
+            // Clear form
+            document.getElementById('bugTitle').value = '';
+            document.getElementById('bugDescription').value = '';
+        }
+
+        function submitFeatureRequest() {
+            const title = document.getElementById('featureTitle').value;
+            const description = document.getElementById('featureDescription').value;
+            
+            if (!title || !description) {
+                alert('Please fill in all fields');
+                return;
+            }
+            
+            alert('Feature request submitted successfully! We appreciate your feedback.');
+            closeFeatureModal();
+            // Clear form
+            document.getElementById('featureTitle').value = '';
+            document.getElementById('featureDescription').value = '';
         }
 
         function logout() {
