@@ -567,28 +567,7 @@
             });
         });
 
-        // Navigation handlers
-        document.querySelectorAll('#footer button').forEach(button => {
-            button.addEventListener('click', function() {
-                // Remove active class from all buttons
-                document.querySelectorAll('#footer button').forEach(btn => {
-                    btn.querySelector('i').className = btn.querySelector('i').className.replace('text-primary', 'text-gray-400');
-                    const span = btn.querySelector('span');
-                    if (span) {
-                        span.className = span.className.replace('text-primary font-semibold', 'text-gray-400');
-                    }
-                });
-                
-                // Add active class to clicked button (except scan button)
-                if (!this.querySelector('.fa-barcode')) {
-                    this.querySelector('i').className = this.querySelector('i').className.replace('text-gray-400', 'text-primary');
-                    const span = this.querySelector('span');
-                    if (span) {
-                        span.className = span.className.replace('text-gray-400', 'text-primary font-semibold');
-                    }
-                }
-            });
-        });
+        // Navigation handlers removed - static styling maintained for consistency
 
         // Navigation functions
         function goToCart() {

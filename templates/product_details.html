@@ -278,25 +278,26 @@
     </div>
 
     <!-- Bottom Navigation -->
-    <nav id="footer" class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200">
+    <nav class="fixed bottom-0 left-0 right-0 bg-white shadow-lg border-t">
         <div class="flex justify-around items-end py-2">
             <button class="flex flex-col items-center py-1 px-3" onclick="goToDashboard()">
-                <i class="fa-solid fa-home text-gray-400 text-lg"></i>
+                <i class="fa-solid fa-home text-gray-400 text-xl"></i>
                 <span class="text-xs mt-1 text-gray-400">Home</span>
             </button>
             <button class="flex flex-col items-center py-1 px-3" onclick="goToInventory()">
-                <i class="fa-solid fa-box text-gray-400 text-lg"></i>
+                <i class="fa-solid fa-box text-gray-400 text-xl"></i>
                 <span class="text-xs mt-1 text-gray-400">Inventory</span>
             </button>
-            <button class="relative -top-3 bg-primary rounded-full p-3 shadow-lg">
-                <i class="fa-solid fa-barcode text-white text-lg"></i>
+            <button onclick="window.location.href='/add-item'" class="relative -top-4 bg-primary rounded-full p-4 shadow-lg">
+                <i class="fa-solid fa-barcode text-white text-xl"></i>
             </button>
-            <button class="flex flex-col items-center py-1 px-3" onclick="goToCart()">
-                <i class="fa-solid fa-shopping-cart text-gray-400 text-lg"></i>
+            <button class="flex flex-col items-center py-1 px-3 relative" onclick="goToCart()">
+                <i class="fa-solid fa-shopping-cart text-gray-400 text-xl"></i>
                 <span class="text-xs mt-1 text-gray-400">Cart</span>
+                <span class="absolute -top-1 -right-1 bg-danger text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold">7</span>
             </button>
             <button class="flex flex-col items-center py-1 px-3" onclick="goToProfile()">
-                <i class="fa-solid fa-user text-gray-400 text-lg"></i>
+                <i class="fa-solid fa-user text-gray-400 text-xl"></i>
                 <span class="text-xs mt-1 text-gray-400">Profile</span>
             </button>
         </div>
