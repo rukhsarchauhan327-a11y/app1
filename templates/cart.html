@@ -1768,13 +1768,18 @@
                 const button1 = document.getElementById('date-toggle-1');
                 const cartItem1 = document.getElementById('cart-item-1');
                 
+                // Debug what elements actually exist
+                const allElements = document.querySelectorAll('[id^="cart-item-"], [id^="date-toggle-"]');
+                console.log('All cart-related elements found:', Array.from(allElements).map(el => el.id));
+                
                 console.log('Elements verification:', {
                     container: !!cartItemsContainer,
                     button1: !!button1,
-                    cartItem1: !!cartItem1
+                    cartItem1: !!cartItem1,
+                    allCartElements: allElements.length
                 });
                 
-                if (cartItemsContainer && button1 && cartItem1) {
+                if (cartItemsContainer) {
                     calculateTotals();
                     initializeDateToggles();
                     populatePresentStaff();
