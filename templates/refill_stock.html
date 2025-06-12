@@ -245,6 +245,47 @@
         </div>
     </div>
 
+    <!-- Confirmation Modal -->
+    <div id="confirmation-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-white rounded-lg p-6 w-full max-w-md">
+                <div class="mb-4">
+                    <h3 id="confirmation-title" class="text-lg font-semibold text-gray-800 mb-2">Confirm Action</h3>
+                    <p id="confirmation-message" class="text-gray-600 text-sm">Are you sure you want to proceed?</p>
+                </div>
+                <div class="flex space-x-3">
+                    <button onclick="closeConfirmationModal()" class="flex-1 bg-gray-500 text-white py-3 px-4 rounded-lg hover:bg-gray-600 transition-colors font-medium">
+                        Cancel
+                    </button>
+                    <button id="confirmation-confirm-btn" class="flex-1 bg-primary text-white py-3 px-4 rounded-lg hover:bg-blue-700 transition-colors font-medium">
+                        Confirm
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Manual Barcode Entry Modal -->
+    <div id="manual-barcode-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-white rounded-lg p-6 w-full max-w-md">
+                <div class="mb-4">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-2">Enter Barcode Manually</h3>
+                    <p class="text-gray-600 text-sm mb-4">Camera not available. Please enter the barcode manually.</p>
+                    <input type="text" id="manual-barcode-input" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Enter barcode">
+                </div>
+                <div class="flex space-x-3">
+                    <button onclick="closeManualBarcodeModal()" class="flex-1 bg-gray-500 text-white py-3 px-4 rounded-lg hover:bg-gray-600 transition-colors font-medium">
+                        Cancel
+                    </button>
+                    <button onclick="setManualBarcode()" class="flex-1 bg-primary text-white py-3 px-4 rounded-lg hover:bg-blue-700 transition-colors font-medium">
+                        Set Barcode
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
         // Sample product data - will be replaced with actual data from URL params or API
         // For demo: products with and without barcodes
@@ -441,24 +482,29 @@
             const barcodeInput = document.getElementById('barcode-input');
             const currentBarcode = barcodeInput.value.trim();
             
-            // If product already has a barcode, ask for confirmation before overwriting
+            // If product already has a barcode, show confirmation modal
             if (currentBarcode && productData.barcode) {
-                const confirmOverwrite = confirm('This product already has a barcode. Do you want to scan a new one to replace it?');
-                if (!confirmOverwrite) {
-                    return;
-                }
+                showConfirmationModal(
+                    'Replace Barcode?',
+                    'This product already has a barcode. Do you want to scan a new one to replace it?',
+                    () => {
+                        // User confirmed, proceed with scanning
+                        proceedWithScanning();
+                    }
+                );
+                return;
             }
             
+            proceedWithScanning();
+        }
+
+        function proceedWithScanning() {
             // Try camera scanner first, fallback to manual entry
             if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
                 openCameraScanner();
             } else {
-                // Fallback to manual entry
-                const newBarcode = prompt('Camera not available. Enter barcode manually:', currentBarcode || '');
-                if (newBarcode !== null && newBarcode.trim()) {
-                    barcodeInput.value = newBarcode.trim();
-                    alert('Barcode updated successfully!');
-                }
+                // Show manual entry modal instead of prompt
+                showManualBarcodeModal();
             }
         }
 
@@ -470,8 +516,8 @@
             
             // Check if ZXing is loaded
             if (typeof ZXing === 'undefined') {
-                alert('Barcode scanner library not loaded. Please enter barcode manually.');
                 closeCameraScanner();
+                showErrorPopup('Barcode scanner library not loaded. Please enter barcode manually.');
                 return;
             }
             
@@ -486,7 +532,7 @@
                         const barcodeValue = result.text;
                         document.getElementById('barcode-input').value = barcodeValue;
                         closeCameraScanner();
-                        alert(`Barcode scanned: ${barcodeValue}`);
+                        showSuccessPopup(`Barcode scanned: ${barcodeValue}`);
                     }
                     if (err && !(err instanceof ZXing.NotFoundException)) {
                         console.error('Scanning error:', err);
@@ -495,13 +541,13 @@
                     currentStream = stream;
                 }).catch((err) => {
                     console.error('Camera access error:', err);
-                    alert('Camera access denied or not available. Please enter barcode manually.');
                     closeCameraScanner();
+                    showManualBarcodeModal();
                 });
             } catch (error) {
                 console.error('Scanner initialization error:', error);
-                alert('Scanner not available. Please enter barcode manually.');
                 closeCameraScanner();
+                showManualBarcodeModal();
             }
         }
 
@@ -630,6 +676,80 @@
                 ` with total value ₹${stockData.totalSellingPrice}`;
             
             showSuccessPopup(`Successfully added ${quantity} ${productData.unit}s to stock${priceInfo}!`);
+        }
+
+        // Modal functions for barcode scanner
+        let confirmationCallback = null;
+
+        function showConfirmationModal(title, message, callback) {
+            const modal = document.getElementById('confirmation-modal');
+            const titleElement = document.getElementById('confirmation-title');
+            const messageElement = document.getElementById('confirmation-message');
+            const confirmBtn = document.getElementById('confirmation-confirm-btn');
+            
+            titleElement.textContent = title;
+            messageElement.textContent = message;
+            confirmationCallback = callback;
+            
+            // Set up confirm button click handler
+            confirmBtn.onclick = () => {
+                closeConfirmationModal();
+                if (confirmationCallback) {
+                    confirmationCallback();
+                }
+            };
+            
+            modal.classList.remove('hidden');
+        }
+
+        function closeConfirmationModal() {
+            const modal = document.getElementById('confirmation-modal');
+            modal.classList.add('hidden');
+            confirmationCallback = null;
+        }
+
+        function showManualBarcodeModal() {
+            const modal = document.getElementById('manual-barcode-modal');
+            const input = document.getElementById('manual-barcode-input');
+            const currentBarcode = document.getElementById('barcode-input').value;
+            
+            input.value = currentBarcode;
+            modal.classList.remove('hidden');
+            
+            // Focus on input
+            setTimeout(() => {
+                input.focus();
+            }, 100);
+        }
+
+        function closeManualBarcodeModal() {
+            const modal = document.getElementById('manual-barcode-modal');
+            modal.classList.add('hidden');
+        }
+
+        function setManualBarcode() {
+            const manualInput = document.getElementById('manual-barcode-input');
+            const barcodeInput = document.getElementById('barcode-input');
+            const newBarcode = manualInput.value.trim();
+            
+            if (newBarcode) {
+                barcodeInput.value = newBarcode;
+                closeManualBarcodeModal();
+                showSuccessPopup(`Barcode set: ${newBarcode}`);
+            } else {
+                showErrorPopup('Please enter a valid barcode');
+            }
+        }
+
+        // Replace confirm() in cancelRefill with modal
+        function cancelRefill() {
+            showConfirmationModal(
+                'Cancel Refill?',
+                'Are you sure you want to cancel? All changes will be lost.',
+                () => {
+                    goBack();
+                }
+            );
         }
 
         // Initialize page when loaded
