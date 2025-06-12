@@ -504,15 +504,21 @@
         let currentStream = null;
 
         function scanBarcode() {
+            console.log('scanBarcode() called');
             const barcodeInput = document.getElementById('barcode-input');
             const currentBarcode = barcodeInput.value.trim();
             
+            console.log('Current barcode:', currentBarcode);
+            console.log('Product has barcode:', productData.barcode);
+            
             // If product already has a barcode, show confirmation modal
             if (currentBarcode && productData.barcode) {
+                console.log('Showing confirmation modal for barcode replacement');
                 showConfirmationModal(
                     'Replace Barcode?',
                     'This product already has a barcode. Do you want to scan a new one to replace it?',
                     () => {
+                        console.log('User confirmed barcode replacement');
                         // User confirmed, proceed with scanning
                         proceedWithScanning();
                     }
@@ -520,6 +526,7 @@
                 return;
             }
             
+            console.log('No existing barcode, proceeding directly with scanning');
             proceedWithScanning();
         }
 
@@ -764,6 +771,7 @@
         let confirmationCallback = null;
 
         function showConfirmationModal(title, message, callback) {
+            console.log('showConfirmationModal called with:', title, message);
             const modal = document.getElementById('confirmation-modal');
             const titleElement = document.getElementById('confirmation-title');
             const messageElement = document.getElementById('confirmation-message');
@@ -773,15 +781,22 @@
             messageElement.textContent = message;
             confirmationCallback = callback;
             
+            console.log('Callback set:', typeof callback);
+            
             // Set up confirm button click handler
             confirmBtn.onclick = () => {
+                console.log('Confirm button clicked');
                 closeConfirmationModal();
                 if (confirmationCallback) {
+                    console.log('Executing callback');
                     confirmationCallback();
+                } else {
+                    console.log('No callback to execute');
                 }
             };
             
             modal.classList.remove('hidden');
+            console.log('Confirmation modal shown');
         }
 
         function closeConfirmationModal() {
