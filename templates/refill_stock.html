@@ -227,6 +227,24 @@
         </div>
     </div>
 
+    <!-- Success Popup Modal -->
+    <div id="success-popup" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-white rounded-lg p-8 w-full max-w-sm text-center">
+                <div class="mb-4">
+                    <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fa-solid fa-check text-green-500 text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-800 mb-2">Stock Added Successfully!</h3>
+                    <p class="text-gray-600 text-sm" id="success-message">Your inventory has been updated with the new stock.</p>
+                </div>
+                <button onclick="closeSuccessPopup(); closeErrorPopup();" class="w-full bg-primary text-white py-3 px-4 rounded-lg hover:bg-blue-700 transition-colors font-medium">
+                    Continue
+                </button>
+            </div>
+        </div>
+    </div>
+
     <script>
         // Sample product data - will be replaced with actual data from URL params or API
         // For demo: products with and without barcodes
@@ -504,6 +522,54 @@
             }
         }
 
+        function showSuccessPopup(message) {
+            const popup = document.getElementById('success-popup');
+            const messageElement = document.getElementById('success-message');
+            messageElement.textContent = message;
+            popup.classList.remove('hidden');
+        }
+
+        function closeSuccessPopup() {
+            const popup = document.getElementById('success-popup');
+            popup.classList.add('hidden');
+            
+            // Redirect back to inventory after closing popup
+            setTimeout(() => {
+                goToInventory();
+            }, 300);
+        }
+
+        function showErrorPopup(message) {
+            // Reuse success popup but change styling for error
+            const popup = document.getElementById('success-popup');
+            const messageElement = document.getElementById('success-message');
+            const icon = popup.querySelector('i');
+            const iconContainer = popup.querySelector('.bg-green-100');
+            const title = popup.querySelector('h3');
+            
+            // Change to error styling
+            iconContainer.className = 'w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4';
+            icon.className = 'fa-solid fa-exclamation-triangle text-red-500 text-2xl';
+            title.textContent = 'Input Required';
+            messageElement.textContent = message;
+            
+            popup.classList.remove('hidden');
+        }
+
+        function closeErrorPopup() {
+            const popup = document.getElementById('success-popup');
+            popup.classList.add('hidden');
+            
+            // Reset to success styling for next use
+            const icon = popup.querySelector('i');
+            const iconContainer = popup.querySelector('.bg-red-100, .bg-green-100');
+            const title = popup.querySelector('h3');
+            
+            iconContainer.className = 'w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4';
+            icon.className = 'fa-solid fa-check text-green-500 text-2xl';
+            title.textContent = 'Stock Added Successfully!';
+        }
+
         function cancelRefill() {
             if (confirm('Are you sure you want to cancel? All changes will be lost.')) {
                 goBack();
@@ -519,17 +585,17 @@
             const barcode = document.getElementById('barcode-input').value;
 
             if (!quantity || quantity <= 0) {
-                alert('Please enter a valid quantity');
+                showErrorPopup('Please enter a valid quantity');
                 return;
             }
 
             if (!purchasePrice || purchasePrice <= 0) {
-                alert('Please enter a valid purchase price');
+                showErrorPopup('Please enter a valid purchase price');
                 return;
             }
 
             if (!sellingPriceInput || sellingPriceInput <= 0) {
-                alert('Please enter a valid selling price');
+                showErrorPopup('Please enter a valid selling price');
                 return;
             }
 
@@ -558,15 +624,12 @@
 
             console.log('Adding stock:', stockData);
             
-            // Show success message with pricing details
+            // Show custom success popup with pricing details
             const priceInfo = priceMode === 'per-unit' ? 
                 ` at ₹${finalSellingPricePerUnit}/${productData.unit}` : 
                 ` with total value ₹${stockData.totalSellingPrice}`;
             
-            alert(`Successfully added ${quantity} ${productData.unit}s to stock${priceInfo}!`);
-            
-            // Redirect back to inventory or product details
-            goToInventory();
+            showSuccessPopup(`Successfully added ${quantity} ${productData.unit}s to stock${priceInfo}!`);
         }
 
         // Initialize page when loaded
