@@ -1064,11 +1064,9 @@
         }
 
         function editItem(itemId) {
-            console.log('Edit item clicked:', itemId);
             currentEditingItem = itemId;
             const item = cartItems[itemId];
             if (item) {
-                console.log('Item data:', item);
                 // Populate edit modal with current item data
                 document.getElementById('edit-product-name').textContent = item.name;
                 document.getElementById('edit-product-price').textContent = `₹${item.unitPrice}/${item.unit.toLowerCase()}`;
@@ -1119,10 +1117,7 @@
                 }
                 
                 updateEditTotal();
-                const modal = document.getElementById('edit-item-modal');
-                console.log('Opening modal:', modal);
-                modal.classList.remove('hidden');
-                console.log('Modal classes after show:', modal.className);
+                document.getElementById('edit-item-modal').classList.remove('hidden');
                 document.body.style.overflow = 'hidden';
             }
         }
@@ -1522,34 +1517,34 @@
 
                 <!-- Price Section (for weight-based items) -->
                 <div id="edit-price-section" class="mb-3 hidden">
-                    <label class="block text-sm font-medium text-dark mb-3">Enter Price Amount</label>
+                    <label class="block text-xs font-medium text-dark mb-2">Enter Price Amount</label>
                     <div class="relative">
                         <span class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 font-medium">₹</span>
-                        <input type="number" id="edit-price-input" class="w-full pl-8 pr-4 py-3 border border-gray-200 rounded-lg text-lg font-medium" placeholder="0.00" step="0.01">
+                        <input type="number" id="edit-price-input" class="w-full pl-8 pr-4 py-2 border border-gray-200 rounded-lg text-base font-medium" placeholder="0.00" step="0.01">
                     </div>
-                    <p class="text-xs text-gray-500 mt-1">System will calculate quantity based on price per kg</p>
+                    <p class="text-xs text-gray-500 mt-1">System calculates quantity based on price per kg</p>
                 </div>
 
 
 
                 <!-- Summary -->
-                <div class="bg-gray-50 p-4 rounded-lg mb-4">
-                    <div class="flex justify-between items-center mb-2">
-                        <span class="text-sm text-gray-600">Quantity:</span>
-                        <span id="edit-calculated-quantity" class="text-sm font-medium text-dark">1 Unit</span>
+                <div class="bg-gray-50 p-2 rounded-lg mb-3">
+                    <div class="flex justify-between items-center mb-1">
+                        <span class="text-xs text-gray-600">Quantity:</span>
+                        <span id="edit-calculated-quantity" class="text-xs font-medium text-dark">1 Unit</span>
                     </div>
                     <div class="flex justify-between items-center">
-                        <span class="text-sm text-gray-600">Total Price:</span>
-                        <span id="edit-calculated-price" class="text-lg font-bold text-green-600">₹0</span>
+                        <span class="text-xs text-gray-600">Total Price:</span>
+                        <span id="edit-calculated-price" class="text-sm font-bold text-green-600">₹0</span>
                     </div>
                 </div>
 
                 <!-- Action Buttons -->
-                <div class="flex space-x-3">
-                    <button onclick="closeEditModal()" class="flex-1 py-3 px-4 bg-gray-200 text-gray-700 rounded-lg font-medium hover:bg-gray-300 transition-colors">
+                <div class="flex space-x-2">
+                    <button onclick="closeEditModal()" class="flex-1 py-2 px-3 bg-gray-200 text-gray-700 rounded-lg font-medium hover:bg-gray-300 transition-colors text-sm">
                         Cancel
                     </button>
-                    <button onclick="saveItemChanges()" class="flex-1 py-3 px-4 bg-orange-500 text-white rounded-lg font-medium hover:bg-orange-600 transition-colors">
+                    <button onclick="saveItemChanges()" class="flex-1 py-2 px-3 bg-orange-500 text-white rounded-lg font-medium hover:bg-orange-600 transition-colors text-sm">
                         Save Changes
                     </button>
                 </div>
