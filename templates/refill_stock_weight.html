@@ -312,7 +312,7 @@
                     <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
                         <i class="fa-solid fa-check text-green-500 text-2xl"></i>
                     </div>
-                    <h3 class="text-xl font-semibold text-gray-800 mb-2">Stock Added Successfully!</h3>
+                    <h3 id="success-title" class="text-xl font-semibold text-gray-800 mb-2">Stock Added Successfully!</h3>
                     <p class="text-gray-600 text-sm" id="success-message">Your inventory has been updated with the new stock.</p>
                 </div>
                 <button onclick="closeSuccessPopup(); closeErrorPopup();" class="w-full bg-primary text-white py-3 px-4 rounded-lg hover:bg-blue-700 transition-colors font-medium">
@@ -486,6 +486,9 @@
         function openScanner() {
             console.log('Opening scanner...');
         }
+
+        let codeReader = null;
+        let currentStream = null;
 
         // Barcode scanning functions
         function scanBarcode() {
@@ -741,8 +744,20 @@
 
         // Success/Error popup functions
         function showSuccessPopup(message, shouldRedirect = false) {
+            // Hide scanner modal completely when showing success popup
+            const scannerModal = document.getElementById('scanner-modal');
+            if (scannerModal) {
+                scannerModal.classList.add('hidden');
+            }
+            
+            // Hide any other notification elements that might be interfering
+            const allNotifications = document.querySelectorAll('.notification, .toast, .alert');
+            allNotifications.forEach(notif => {
+                notif.style.display = 'none';
+            });
+            
             const popup = document.getElementById('success-popup');
-            const titleElement = popup.querySelector('h3');
+            const titleElement = document.getElementById('success-title');
             const messageElement = document.getElementById('success-message');
             
             // Set appropriate title based on message content
