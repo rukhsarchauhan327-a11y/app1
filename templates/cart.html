@@ -1666,22 +1666,10 @@
 
         // Initialize date toggle functionality
         function initializeDateToggles() {
-            console.log('Initializing date toggles...');
-            
             // Check all toggle buttons exist and hide toggle for items without dates
             for (let i = 1; i <= 6; i++) {
                 const button = document.getElementById(`date-toggle-${i}`);
-                const cartItem = document.getElementById(`cart-item-${i}`);
-                const dateElements = document.querySelectorAll(`#cart-item-${i} .date-info`);
                 const item = cartItems[i];
-                
-                console.log(`Item ${i}:`, {
-                    button: !!button,
-                    cartItem: !!cartItem,
-                    dateElements: dateElements.length,
-                    cartItemData: !!item,
-                    hasDates: !!(item && item.mfgDate && item.expDate)
-                });
                 
                 if (button && item) {
                     // Check if item has manufacturing and expiry dates
@@ -1696,7 +1684,6 @@
                     } else {
                         // Hide toggle button for items without dates
                         button.style.display = 'none';
-                        console.log(`Hiding date toggle for ${item.name} - no dates available`);
                     }
                 }
             }
@@ -1802,12 +1789,6 @@
                 option.textContent = `${staff.name} (${staff.position})`;
                 billGeneratorSelect.appendChild(option);
             });
-
-            // Show notification about staff availability
-            const absentCount = allStaff.length - presentStaff.length;
-            if (absentCount > 0) {
-                console.log(`${absentCount} staff member(s) are absent and not shown in bill generator`);
-            }
         }
     </script>
 
