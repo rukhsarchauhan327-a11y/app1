@@ -1428,6 +1428,13 @@
                 }
             }, 4000);
         }
+
+        // Refill item function
+        function refillItem(itemId) {
+            // Extract product ID from itemId (remove 'item-' prefix)
+            const productId = itemId.replace('item-', '');
+            window.location.href = `/refill-stock?id=${productId}`;
+        }
     </script>
 
 </body>

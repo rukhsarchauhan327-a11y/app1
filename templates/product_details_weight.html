@@ -436,6 +436,12 @@
             }
         }
 
+        // Refill stock function
+        function refillStock() {
+            const productId = productData.id || 1;
+            window.location.href = `/refill-stock?id=${productId}`;
+        }
+
         // Initialize on page load
         window.addEventListener('load', function() {
             loadProductData();
