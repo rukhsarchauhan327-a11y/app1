@@ -562,36 +562,94 @@
                     <div class="bg-gray-50 rounded-lg p-4 mb-6">
                         <h4 class="font-semibold text-dark mb-2">Current Payment Method</h4>
                         <div class="flex items-center space-x-3">
-                            <i class="fa-solid fa-credit-card text-primary text-xl"></i>
+                            <i class="fa-solid fa-mobile text-primary text-xl"></i>
                             <div>
-                                <div class="font-medium text-dark">**** **** **** 1234</div>
-                                <div class="text-sm text-gray-600">Expires 12/26</div>
+                                <div class="font-medium text-dark">UPI: user@paytm</div>
+                                <div class="text-sm text-gray-600">Primary payment method</div>
                             </div>
                         </div>
                     </div>
                     
-                    <!-- Add New Payment Method -->
-                    <h4 class="font-semibold text-dark mb-4">Add New Payment Method</h4>
-                    <div class="space-y-4">
+                    <!-- Payment Method Selection -->
+                    <h4 class="font-semibold text-dark mb-4">Choose Payment Method</h4>
+                    <div class="space-y-3 mb-6">
+                        <button onclick="selectPaymentType('upi')" id="upi-option" class="w-full border-2 border-primary bg-blue-50 rounded-lg p-4 flex items-center space-x-3 transition-colors">
+                            <i class="fa-solid fa-mobile text-primary text-xl"></i>
+                            <div class="text-left">
+                                <div class="font-semibold text-dark">UPI Payment</div>
+                                <div class="text-sm text-gray-600">Pay using any UPI app</div>
+                            </div>
+                        </button>
+                        
+                        <button onclick="selectPaymentType('card')" id="card-option" class="w-full border border-gray-300 rounded-lg p-4 flex items-center space-x-3 hover:border-primary transition-colors">
+                            <i class="fa-solid fa-credit-card text-gray-600 text-xl"></i>
+                            <div class="text-left">
+                                <div class="font-semibold text-dark">Credit/Debit Card</div>
+                                <div class="text-sm text-gray-600">Pay using card details</div>
+                            </div>
+                        </button>
+                    </div>
+                    
+                    <!-- UPI Payment Form -->
+                    <div id="upi-form" class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">UPI ID</label>
+                            <input type="text" id="upi-id" placeholder="yourname@paytm" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary">
+                            <p class="text-xs text-gray-500 mt-1">Enter your UPI ID (e.g., 9876543210@paytm, user@googlepay)</p>
+                        </div>
+                        
+                        <div class="bg-blue-50 rounded-lg p-4">
+                            <h5 class="font-semibold text-dark mb-2">Popular UPI Apps</h5>
+                            <div class="grid grid-cols-4 gap-3">
+                                <button onclick="setUPIApp('paytm')" class="flex flex-col items-center p-2 rounded-lg hover:bg-blue-100">
+                                    <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center mb-1">
+                                        <span class="text-white text-xs font-bold">P</span>
+                                    </div>
+                                    <span class="text-xs">Paytm</span>
+                                </button>
+                                <button onclick="setUPIApp('googlepay')" class="flex flex-col items-center p-2 rounded-lg hover:bg-blue-100">
+                                    <div class="w-8 h-8 bg-green-600 rounded-lg flex items-center justify-center mb-1">
+                                        <span class="text-white text-xs font-bold">G</span>
+                                    </div>
+                                    <span class="text-xs">GPay</span>
+                                </button>
+                                <button onclick="setUPIApp('phonepe')" class="flex flex-col items-center p-2 rounded-lg hover:bg-blue-100">
+                                    <div class="w-8 h-8 bg-purple-600 rounded-lg flex items-center justify-center mb-1">
+                                        <span class="text-white text-xs font-bold">P</span>
+                                    </div>
+                                    <span class="text-xs">PhonePe</span>
+                                </button>
+                                <button onclick="setUPIApp('bhim')" class="flex flex-col items-center p-2 rounded-lg hover:bg-blue-100">
+                                    <div class="w-8 h-8 bg-orange-600 rounded-lg flex items-center justify-center mb-1">
+                                        <span class="text-white text-xs font-bold">B</span>
+                                    </div>
+                                    <span class="text-xs">BHIM</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Card Payment Form -->
+                    <div id="card-form" class="space-y-4 hidden">
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-2">Card Number</label>
-                            <input type="text" placeholder="1234 5678 9012 3456" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary">
+                            <input type="text" id="card-number" placeholder="1234 5678 9012 3456" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary">
                         </div>
                         
                         <div class="grid grid-cols-2 gap-4">
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">Expiry</label>
-                                <input type="text" placeholder="MM/YY" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary">
+                                <input type="text" id="card-expiry" placeholder="MM/YY" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary">
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">CVV</label>
-                                <input type="text" placeholder="123" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary">
+                                <input type="text" id="card-cvv" placeholder="123" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary">
                             </div>
                         </div>
                         
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-2">Cardholder Name</label>
-                            <input type="text" placeholder="John Doe" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary">
+                            <input type="text" id="cardholder-name" placeholder="John Doe" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary">
                         </div>
                     </div>
                     
@@ -801,26 +859,112 @@
             document.getElementById('paymentMethodModal').classList.add('hidden');
         }
 
-        function savePaymentMethod() {
-            const cardNumber = document.querySelector('input[placeholder="1234 5678 9012 3456"]').value;
-            const expiry = document.querySelector('input[placeholder="MM/YY"]').value;
-            const cvv = document.querySelector('input[placeholder="123"]').value;
-            const cardholderName = document.querySelector('input[placeholder="John Doe"]').value;
+        let selectedPaymentType = 'upi'; // Default to UPI
 
-            if (!cardNumber || !expiry || !cvv || !cardholderName) {
-                alert('Please fill in all payment details.');
-                return;
-            }
-
-            // Simulate saving payment method
-            alert('Payment method updated successfully!');
-            closePaymentModal();
+        function selectPaymentType(type) {
+            selectedPaymentType = type;
             
-            // Clear form
-            document.querySelector('input[placeholder="1234 5678 9012 3456"]').value = '';
-            document.querySelector('input[placeholder="MM/YY"]').value = '';
-            document.querySelector('input[placeholder="123"]').value = '';
-            document.querySelector('input[placeholder="John Doe"]').value = '';
+            // Update button styles
+            const upiOption = document.getElementById('upi-option');
+            const cardOption = document.getElementById('card-option');
+            const upiForm = document.getElementById('upi-form');
+            const cardForm = document.getElementById('card-form');
+            
+            if (type === 'upi') {
+                upiOption.className = 'w-full border-2 border-primary bg-blue-50 rounded-lg p-4 flex items-center space-x-3 transition-colors';
+                cardOption.className = 'w-full border border-gray-300 rounded-lg p-4 flex items-center space-x-3 hover:border-primary transition-colors';
+                upiForm.classList.remove('hidden');
+                cardForm.classList.add('hidden');
+            } else {
+                cardOption.className = 'w-full border-2 border-primary bg-blue-50 rounded-lg p-4 flex items-center space-x-3 transition-colors';
+                upiOption.className = 'w-full border border-gray-300 rounded-lg p-4 flex items-center space-x-3 hover:border-primary transition-colors';
+                cardForm.classList.remove('hidden');
+                upiForm.classList.add('hidden');
+            }
+        }
+
+        function setUPIApp(appName) {
+            const upiInput = document.getElementById('upi-id');
+            const currentValue = upiInput.value;
+            
+            // Extract the part before @ if it exists
+            const userPart = currentValue.includes('@') ? currentValue.split('@')[0] : currentValue;
+            
+            // Set the UPI ID with the selected app
+            switch(appName) {
+                case 'paytm':
+                    upiInput.value = userPart + '@paytm';
+                    break;
+                case 'googlepay':
+                    upiInput.value = userPart + '@oksbi';
+                    break;
+                case 'phonepe':
+                    upiInput.value = userPart + '@ybl';
+                    break;
+                case 'bhim':
+                    upiInput.value = userPart + '@upi';
+                    break;
+            }
+            
+            // Focus on the input to show the change
+            upiInput.focus();
+        }
+
+        function savePaymentMethod() {
+            if (selectedPaymentType === 'upi') {
+                const upiId = document.getElementById('upi-id').value;
+                
+                if (!upiId) {
+                    alert('Please enter your UPI ID.');
+                    return;
+                }
+                
+                // Basic UPI ID validation
+                if (!upiId.includes('@') || upiId.length < 5) {
+                    alert('Please enter a valid UPI ID (e.g., user@paytm).');
+                    return;
+                }
+                
+                alert('UPI payment method saved successfully!');
+                
+                // Update current payment method display
+                const currentMethod = document.querySelector('.bg-gray-50 .font-medium');
+                if (currentMethod) {
+                    currentMethod.textContent = 'UPI: ' + upiId;
+                }
+                
+                // Clear form
+                document.getElementById('upi-id').value = '';
+                
+            } else {
+                const cardNumber = document.getElementById('card-number').value;
+                const expiry = document.getElementById('card-expiry').value;
+                const cvv = document.getElementById('card-cvv').value;
+                const cardholderName = document.getElementById('cardholder-name').value;
+
+                if (!cardNumber || !expiry || !cvv || !cardholderName) {
+                    alert('Please fill in all card details.');
+                    return;
+                }
+
+                alert('Card payment method saved successfully!');
+                
+                // Update current payment method display
+                const currentMethod = document.querySelector('.bg-gray-50 .font-medium');
+                const currentIcon = document.querySelector('.bg-gray-50 i');
+                if (currentMethod && currentIcon) {
+                    currentMethod.textContent = '**** **** **** ' + cardNumber.slice(-4);
+                    currentIcon.className = 'fa-solid fa-credit-card text-primary text-xl';
+                }
+                
+                // Clear form
+                document.getElementById('card-number').value = '';
+                document.getElementById('card-expiry').value = '';
+                document.getElementById('card-cvv').value = '';
+                document.getElementById('cardholder-name').value = '';
+            }
+            
+            closePaymentModal();
         }
 
         function cancelSubscription() {
