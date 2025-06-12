@@ -1,9 +1,15 @@
 import os
 import logging
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, send_file
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import DeclarativeBase
 from datetime import datetime
+from reportlab.lib.pagesizes import letter, A4
+from reportlab.lib import colors
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, PageBreak
+from reportlab.lib.units import inch
+from io import BytesIO
 
 # Configure logging for debugging
 logging.basicConfig(level=logging.DEBUG)
@@ -472,6 +478,225 @@ def api_get_bill(bill_number):
         })
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)}), 500
+
+@app.route('/export-business-data')
+def export_business_data():
+    """Export comprehensive business data as PDF"""
+    try:
+        # Create PDF buffer
+        buffer = BytesIO()
+        doc = SimpleDocTemplate(buffer, pagesize=A4, rightMargin=inch, leftMargin=inch,
+                              topMargin=inch, bottomMargin=inch)
+        
+        # Define styles
+        styles = getSampleStyleSheet()
+        title_style = ParagraphStyle(
+            'CustomTitle',
+            parent=styles['Heading1'],
+            fontSize=16,
+            spaceAfter=30,
+            alignment=1  # Center alignment
+        )
+        
+        heading_style = ParagraphStyle(
+            'CustomHeading',
+            parent=styles['Heading2'],
+            fontSize=14,
+            spaceAfter=12,
+            textColor=colors.HexColor('#2563eb')
+        )
+        
+        # Story list to hold all content
+        story = []
+        
+        # Title
+        story.append(Paragraph("KIRANA KONNECT - COMPLETE BUSINESS DATA EXPORT", title_style))
+        story.append(Paragraph(f"Generated on: {datetime.now().strftime('%d-%m-%Y %H:%M')}", styles['Normal']))
+        story.append(Spacer(1, 20))
+        
+        # 1. INVENTORY DATA
+        story.append(Paragraph("1. INVENTORY OVERVIEW", heading_style))
+        products = Product.query.all()
+        
+        if products:
+            inventory_data = [['Product Name', 'Category', 'Purchase Price', 'Sell Price', 'Profit/Unit', 'Stock', 'Added Date']]
+            total_investment = 0
+            total_potential_revenue = 0
+            
+            for product in products:
+                purchase_price = product.price_per_kg if product.is_weight_based else product.price
+                sell_price = product.price_per_kg if product.is_weight_based else product.price
+                profit_per_unit = sell_price - purchase_price if purchase_price else 0
+                
+                total_investment += (purchase_price * product.stock_quantity) if purchase_price else 0
+                total_potential_revenue += (sell_price * product.stock_quantity) if sell_price else 0
+                
+                inventory_data.append([
+                    product.name,
+                    product.category or 'N/A',
+                    f"₹{purchase_price:.2f}" if purchase_price else 'N/A',
+                    f"₹{sell_price:.2f}" if sell_price else 'N/A',
+                    f"₹{profit_per_unit:.2f}" if profit_per_unit else 'N/A',
+                    str(product.stock_quantity),
+                    product.created_at.strftime('%d-%m-%Y') if product.created_at else 'N/A'
+                ])
+            
+            inventory_table = Table(inventory_data)
+            inventory_table.setStyle(TableStyle([
+                ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#2563eb')),
+                ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+                ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+                ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+                ('FONTSIZE', (0, 0), (-1, 0), 10),
+                ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+                ('BACKGROUND', (0, 1), (-1, -1), colors.HexColor('#f8f9fa')),
+                ('GRID', (0, 0), (-1, -1), 1, colors.black)
+            ]))
+            story.append(inventory_table)
+            
+            # Investment Summary
+            story.append(Spacer(1, 15))
+            story.append(Paragraph(f"<b>Total Investment:</b> ₹{total_investment:.2f}", styles['Normal']))
+            story.append(Paragraph(f"<b>Potential Revenue:</b> ₹{total_potential_revenue:.2f}", styles['Normal']))
+            story.append(Paragraph(f"<b>Potential Profit:</b> ₹{total_potential_revenue - total_investment:.2f}", styles['Normal']))
+        else:
+            story.append(Paragraph("No inventory data available", styles['Normal']))
+        
+        story.append(PageBreak())
+        
+        # 2. BILLS DATA
+        story.append(Paragraph("2. ALL BILLS GENERATED", heading_style))
+        bills = Bill.query.order_by(Bill.created_at.desc()).all()
+        
+        if bills:
+            bills_data = [['Bill #', 'Customer', 'Amount', 'Payment Mode', 'Status', 'Date']]
+            total_sales = 0
+            
+            for bill in bills:
+                bills_data.append([
+                    bill.bill_number,
+                    bill.customer_name or 'Cash Customer',
+                    f"₹{bill.total_amount:.2f}",
+                    bill.payment_mode.title(),
+                    bill.payment_status.title(),
+                    bill.created_at.strftime('%d-%m-%Y')
+                ])
+                total_sales += bill.total_amount
+            
+            bills_table = Table(bills_data)
+            bills_table.setStyle(TableStyle([
+                ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#2563eb')),
+                ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+                ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+                ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+                ('FONTSIZE', (0, 0), (-1, 0), 10),
+                ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+                ('BACKGROUND', (0, 1), (-1, -1), colors.HexColor('#f8f9fa')),
+                ('GRID', (0, 0), (-1, -1), 1, colors.black)
+            ]))
+            story.append(bills_table)
+            
+            story.append(Spacer(1, 15))
+            story.append(Paragraph(f"<b>Total Sales Revenue:</b> ₹{total_sales:.2f}", styles['Normal']))
+        else:
+            story.append(Paragraph("No bills data available", styles['Normal']))
+        
+        story.append(PageBreak())
+        
+        # 3. CUSTOMER DATA WITH OUTSTANDING BALANCES
+        story.append(Paragraph("3. CUSTOMER LEDGER & OUTSTANDING AMOUNTS", heading_style))
+        customers = Customer.query.all()
+        
+        if customers:
+            customer_data = [['Customer Name', 'Phone', 'Outstanding Balance', 'Total Bills', 'Total Payments', 'Joined Date']]
+            total_outstanding = 0
+            
+            for customer in customers:
+                outstanding = customer.outstanding_balance
+                total_bills_amount = sum([bill.total_amount for bill in customer.bills])
+                total_payments_amount = sum([payment.amount for payment in customer.payments])
+                
+                customer_data.append([
+                    customer.name,
+                    customer.phone,
+                    f"₹{outstanding:.2f}",
+                    f"₹{total_bills_amount:.2f}",
+                    f"₹{total_payments_amount:.2f}",
+                    customer.created_at.strftime('%d-%m-%Y') if customer.created_at else 'N/A'
+                ])
+                total_outstanding += outstanding
+            
+            customer_table = Table(customer_data)
+            customer_table.setStyle(TableStyle([
+                ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#2563eb')),
+                ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+                ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+                ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+                ('FONTSIZE', (0, 0), (-1, 0), 10),
+                ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+                ('BACKGROUND', (0, 1), (-1, -1), colors.HexColor('#f8f9fa')),
+                ('GRID', (0, 0), (-1, -1), 1, colors.black)
+            ]))
+            story.append(customer_table)
+            
+            story.append(Spacer(1, 15))
+            story.append(Paragraph(f"<b>Total Outstanding Amount:</b> ₹{total_outstanding:.2f}", styles['Normal']))
+        else:
+            story.append(Paragraph("No customer data available", styles['Normal']))
+        
+        story.append(PageBreak())
+        
+        # 4. PAYMENT RECORDS
+        story.append(Paragraph("4. ALL PAYMENT RECORDS", heading_style))
+        payments = Payment.query.order_by(Payment.created_at.desc()).all()
+        
+        if payments:
+            payment_data = [['Date', 'Customer', 'Amount', 'Payment Mode', 'Reference', 'Notes']]
+            total_payments = 0
+            
+            for payment in payments:
+                payment_data.append([
+                    payment.created_at.strftime('%d-%m-%Y'),
+                    payment.customer.name if payment.customer else 'N/A',
+                    f"₹{payment.amount:.2f}",
+                    payment.payment_mode.title(),
+                    payment.reference_number or 'N/A',
+                    payment.notes[:30] + '...' if payment.notes and len(payment.notes) > 30 else payment.notes or 'N/A'
+                ])
+                total_payments += payment.amount
+            
+            payment_table = Table(payment_data)
+            payment_table.setStyle(TableStyle([
+                ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#2563eb')),
+                ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+                ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+                ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+                ('FONTSIZE', (0, 0), (-1, 0), 10),
+                ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+                ('BACKGROUND', (0, 1), (-1, -1), colors.HexColor('#f8f9fa')),
+                ('GRID', (0, 0), (-1, -1), 1, colors.black)
+            ]))
+            story.append(payment_table)
+            
+            story.append(Spacer(1, 15))
+            story.append(Paragraph(f"<b>Total Payments Received:</b> ₹{total_payments:.2f}", styles['Normal']))
+        else:
+            story.append(Paragraph("No payment records available", styles['Normal']))
+        
+        # Build PDF
+        doc.build(story)
+        buffer.seek(0)
+        
+        return send_file(
+            buffer,
+            as_attachment=True,
+            download_name=f'kirana_business_data_{datetime.now().strftime("%Y%m%d_%H%M")}.pdf',
+            mimetype='application/pdf'
+        )
+        
+    except Exception as e:
+        logging.error(f"Error generating business data export: {str(e)}")
+        return jsonify({'success': False, 'error': 'Failed to generate export'}), 500
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
