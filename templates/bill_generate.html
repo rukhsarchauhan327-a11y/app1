@@ -17,7 +17,6 @@
         "secondary": "#2196F3",
         "accent": "#FF9800",
         "danger": "#F44336",
-        "success": "#16a34a",
         "dark": "#333333",
         "light": "#F5F5F5"
       },
@@ -199,9 +198,9 @@
                             <i class="fa-solid fa-clock mr-1"></i>
                             <span>EXP: 25/07/2025</span>
                         </div>
-                        <button class="text-xs text-danger hover:underline flex items-center mt-1 date-toggle-btn" onclick="toggleDates(2)">
+                        <button class="text-xs text-danger hover:underline flex items-center mt-1" onclick="removeDates(2)">
                             <i class="fa-solid fa-times mr-1"></i>
-                            <span class="button-text">Remove Dates</span>
+                            Remove Dates
                         </button>
                     </div>
                 </div>
@@ -243,9 +242,9 @@
                             <i class="fa-solid fa-clock mr-1"></i>
                             <span>EXP: 10/08/2025</span>
                         </div>
-                        <button class="text-xs text-danger hover:underline flex items-center mt-1 date-toggle-btn" onclick="toggleDates(4)">
+                        <button class="text-xs text-danger hover:underline flex items-center mt-1" onclick="removeDates(4)">
                             <i class="fa-solid fa-times mr-1"></i>
-                            <span class="button-text">Remove Dates</span>
+                            Remove Dates
                         </button>
                     </div>
                 </div>
@@ -910,7 +909,6 @@
             const items = [];
             const cartItems = document.querySelectorAll('[id^="cart-item-"]');
             cartItems.forEach(item => {
-                const itemId = item.id.split('-')[2];
                 const name = item.querySelector('.font-semibold').textContent;
                 const quantityText = item.querySelector('.text-gray-700').textContent;
                 const priceText = item.querySelector('.font-bold').textContent;
@@ -920,34 +918,12 @@
                 const totalPrice = parseFloat(priceText.replace('₹', '')) || 0;
                 const unitPrice = totalPrice / quantity;
                 
-                // Check for dates if enabled for this item
-                let mfgDate = null;
-                let expDate = null;
-                
-                if (itemDatesEnabled[itemId]) {
-                    const dateElements = item.querySelectorAll('.text-gray-500 span');
-                    dateElements.forEach(span => {
-                        const text = span.textContent;
-                        if (text.startsWith('MFG:')) {
-                            mfgDate = text.replace('MFG: ', '').trim();
-                        } else if (text.startsWith('EXP:')) {
-                            expDate = text.replace('EXP: ', '').trim();
-                        }
-                    });
-                }
-                
-                const itemData = {
+                items.push({
                     name: name,
                     quantity: quantity,
                     unit_price: unitPrice,
                     total_price: totalPrice
-                };
-                
-                // Add dates only if they exist and are enabled
-                if (mfgDate) itemData.mfg_date = mfgDate;
-                if (expDate) itemData.exp_date = expDate;
-                
-                items.push(itemData);
+                });
             });
             
             const billData = {
@@ -985,46 +961,9 @@
             }
         }
 
-        // Track which items should include dates in bill
-        const itemDatesEnabled = {};
-
-        function toggleDates(itemId) {
-            const button = document.querySelector(`#cart-item-${itemId} .date-toggle-btn`);
-            const icon = button.querySelector('i');
-            const text = button.querySelector('.button-text');
-            
-            // Toggle the state
-            itemDatesEnabled[itemId] = !itemDatesEnabled[itemId];
-            
-            if (itemDatesEnabled[itemId]) {
-                // Switch to "Remove Dates" state
-                icon.className = 'fa-solid fa-times mr-1';
-                text.textContent = 'Remove Dates';
-                button.className = 'text-xs text-danger hover:underline flex items-center mt-1 date-toggle-btn';
-            } else {
-                // Switch to "Add Dates" state
-                icon.className = 'fa-solid fa-plus mr-1';
-                text.textContent = 'Add Dates';
-                button.className = 'text-xs text-success hover:underline flex items-center mt-1 date-toggle-btn';
-            }
-        }
-
-        // Initialize all date toggles to enabled (showing "Remove Dates")
-        function initializeDateToggles() {
-            const cartItems = document.querySelectorAll('[id^="cart-item-"]');
-            cartItems.forEach(item => {
-                const itemId = item.id.split('-')[2];
-                const dateButton = item.querySelector('.date-toggle-btn');
-                if (dateButton) {
-                    itemDatesEnabled[itemId] = true; // Start with dates enabled
-                }
-            });
-        }
-
         // Initialize
         calculateTotals();
         populatePresentStaff();
-        initializeDateToggles();
         
         // Hide credit button on page load since billing tab is default
         document.getElementById('credit-payment').classList.add('hidden');
