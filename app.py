@@ -127,62 +127,84 @@ class Product(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow)
 
-# Create tables and seed data
+# Database initialization function
+def init_db():
+    """Initialize database tables and seed data"""
+    try:
+        db.create_all()
+        
+        # Check if customers already exist
+        if Customer.query.count() == 0:
+            # Add sample customers with their records
+            customers_data = [
+                {'name': 'Rajesh Kumar', 'phone': '+91 98765 43210', 'address': 'Shop No. 15, Main Market'},
+                {'name': 'Priya Sharma', 'phone': '+91 98765 43211', 'address': 'House No. 42, Gandhi Nagar'},
+                {'name': 'Amit Singh', 'phone': '+91 98765 43212', 'address': 'Flat 3B, Sunrise Apartments'},
+                {'name': 'Sunita Devi', 'phone': '+91 98765 43213', 'address': 'Village Rampur, Near Temple'},
+                {'name': 'Ravi Patel', 'phone': '+91 98765 43214', 'address': 'Plot 25, Industrial Area'},
+                {'name': 'Meera Gupta', 'phone': '+91 98765 43215', 'address': 'Lane 4, Civil Lines'},
+                {'name': 'Arjun Reddy', 'phone': '+91 98765 43216', 'address': 'House 78, Nehru Colony'},
+                {'name': 'Kavita Jain', 'phone': '+91 98765 43217', 'address': 'Shop 9, Commercial Complex'}
+            ]
+            
+            for customer_data in customers_data:
+                customer = Customer(**customer_data)
+                db.session.add(customer)
+            
+            db.session.commit()
+            
+            # Add some sample bills and payments to create outstanding balances
+            customers = Customer.query.all()
+            
+            # Create bills with outstanding amounts
+            bills_data = [
+                {'customer_id': 1, 'bill_number': 'KK-2024-001', 'subtotal': 2000, 'tax_amount': 360, 'total_amount': 2360, 'payment_mode': 'credit', 'payment_status': 'pending'},
+                {'customer_id': 2, 'bill_number': 'KK-2024-002', 'subtotal': 750, 'tax_amount': 135, 'total_amount': 885, 'payment_mode': 'credit', 'payment_status': 'pending'},
+                {'customer_id': 4, 'bill_number': 'KK-2024-003', 'subtotal': 1100, 'tax_amount': 198, 'total_amount': 1298, 'payment_mode': 'credit', 'payment_status': 'pending'},
+                {'customer_id': 5, 'bill_number': 'KK-2024-004', 'subtotal': 450, 'tax_amount': 81, 'total_amount': 531, 'payment_mode': 'credit', 'payment_status': 'pending'},
+                {'customer_id': 6, 'bill_number': 'KK-2024-005', 'subtotal': 680, 'tax_amount': 122, 'total_amount': 802, 'payment_mode': 'credit', 'payment_status': 'pending'},
+                {'customer_id': 8, 'bill_number': 'KK-2024-006', 'subtotal': 1600, 'tax_amount': 288, 'total_amount': 1888, 'payment_mode': 'credit', 'payment_status': 'pending'}
+            ]
+            
+            for bill_data in bills_data:
+                bill = Bill(
+                    customer_id=bill_data['customer_id'],
+                    bill_number=bill_data['bill_number'],
+                    subtotal=bill_data['subtotal'],
+                    tax_amount=bill_data['tax_amount'],
+                    total_amount=bill_data['total_amount'],
+                    payment_mode=bill_data['payment_mode'],
+                    payment_status=bill_data['payment_status'],
+                    generated_by='System Admin'
+                )
+                db.session.add(bill)
+            
+            # Add partial payments to reduce outstanding amounts
+            payments_data = [
+                {'customer_id': 1, 'amount': 210, 'payment_mode': 'cash'},  # Rajesh: 2360 - 210 = 2150
+                {'customer_id': 2, 'amount': 35, 'payment_mode': 'cash'},   # Priya: 885 - 35 = 850
+                {'customer_id': 4, 'amount': 98, 'payment_mode': 'online'}, # Sunita: 1298 - 98 = 1200
+                {'customer_id': 5, 'amount': 31, 'payment_mode': 'cash'},   # Ravi: 531 - 31 = 500
+                {'customer_id': 6, 'amount': 52, 'payment_mode': 'cash'},   # Meera: 802 - 52 = 750
+                {'customer_id': 8, 'amount': 88, 'payment_mode': 'online'}  # Kavita: 1888 - 88 = 1800
+            ]
+            
+            for payment_data in payments_data:
+                payment = Payment(
+                    customer_id=payment_data['customer_id'],
+                    amount=payment_data['amount'],
+                    payment_mode=payment_data['payment_mode']
+                )
+                db.session.add(payment)
+            
+            db.session.commit()
+    except Exception as e:
+        app.logger.error(f"Database initialization error: {e}")
+        db.session.rollback()
+
+# Initialize database on first run
 with app.app_context():
-    db.create_all()
-    
-    # Check if customers already exist
-    if Customer.query.count() == 0:
-        # Add sample customers with their records
-        customers_data = [
-            {'name': 'Rajesh Kumar', 'phone': '+91 98765 43210', 'address': 'Shop No. 15, Main Market'},
-            {'name': 'Priya Sharma', 'phone': '+91 98765 43211', 'address': 'House No. 42, Gandhi Nagar'},
-            {'name': 'Amit Singh', 'phone': '+91 98765 43212', 'address': 'Flat 3B, Sunrise Apartments'},
-            {'name': 'Sunita Devi', 'phone': '+91 98765 43213', 'address': 'Village Rampur, Near Temple'},
-            {'name': 'Ravi Patel', 'phone': '+91 98765 43214', 'address': 'Plot 25, Industrial Area'},
-            {'name': 'Meera Gupta', 'phone': '+91 98765 43215', 'address': 'Lane 4, Civil Lines'},
-            {'name': 'Arjun Reddy', 'phone': '+91 98765 43216', 'address': 'House 78, Nehru Colony'},
-            {'name': 'Kavita Jain', 'phone': '+91 98765 43217', 'address': 'Shop 9, Commercial Complex'}
-        ]
-        
-        for customer_data in customers_data:
-            customer = Customer(**customer_data)
-            db.session.add(customer)
-        
-        db.session.commit()
-        
-        # Add some sample bills and payments to create outstanding balances
-        customers = Customer.query.all()
-        
-        # Create bills with outstanding amounts
-        bills_data = [
-            {'customer_id': 1, 'bill_number': 'KK-2024-001', 'subtotal': 2000, 'tax_amount': 360, 'total_amount': 2360, 'payment_mode': 'credit', 'payment_status': 'pending'},
-            {'customer_id': 2, 'bill_number': 'KK-2024-002', 'subtotal': 750, 'tax_amount': 135, 'total_amount': 885, 'payment_mode': 'credit', 'payment_status': 'pending'},
-            {'customer_id': 4, 'bill_number': 'KK-2024-003', 'subtotal': 1100, 'tax_amount': 198, 'total_amount': 1298, 'payment_mode': 'credit', 'payment_status': 'pending'},
-            {'customer_id': 5, 'bill_number': 'KK-2024-004', 'subtotal': 450, 'tax_amount': 81, 'total_amount': 531, 'payment_mode': 'credit', 'payment_status': 'pending'},
-            {'customer_id': 6, 'bill_number': 'KK-2024-005', 'subtotal': 680, 'tax_amount': 122, 'total_amount': 802, 'payment_mode': 'credit', 'payment_status': 'pending'},
-            {'customer_id': 8, 'bill_number': 'KK-2024-006', 'subtotal': 1600, 'tax_amount': 288, 'total_amount': 1888, 'payment_mode': 'credit', 'payment_status': 'pending'}
-        ]
-        
-        for bill_data in bills_data:
-            bill = Bill(**bill_data, generated_by='System Admin')
-            db.session.add(bill)
-        
-        # Add partial payments to reduce outstanding amounts
-        payments_data = [
-            {'customer_id': 1, 'amount': 210, 'payment_mode': 'cash'},  # Rajesh: 2360 - 210 = 2150
-            {'customer_id': 2, 'amount': 35, 'payment_mode': 'cash'},   # Priya: 885 - 35 = 850
-            {'customer_id': 4, 'amount': 98, 'payment_mode': 'online'}, # Sunita: 1298 - 98 = 1200
-            {'customer_id': 5, 'amount': 31, 'payment_mode': 'cash'},   # Ravi: 531 - 31 = 500
-            {'customer_id': 6, 'amount': 52, 'payment_mode': 'cash'},   # Meera: 802 - 52 = 750
-            {'customer_id': 8, 'amount': 88, 'payment_mode': 'online'}  # Kavita: 1888 - 88 = 1800
-        ]
-        
-        for payment_data in payments_data:
-            payment = Payment(**payment_data)
-            db.session.add(payment)
-        
-        db.session.commit()
+    init_db()
 
 @app.route('/')
 def index():
