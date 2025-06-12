@@ -78,6 +78,7 @@ class Bill(db.Model):
     # Staff and metadata
     generated_by = db.Column(db.String(100))
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    include_dates = db.Column(db.Boolean, default=True)
     
     # Relationships
     items = db.relationship('BillItem', backref='bill', lazy=True, cascade='all, delete-orphan')
@@ -365,7 +366,8 @@ def create_bill():
         total_amount=data['total_amount'],
         payment_mode=data['payment_mode'],
         payment_status='pending' if data['payment_mode'] == 'credit' else 'paid',
-        generated_by=data.get('generated_by', 'System')
+        generated_by=data.get('generated_by', 'System'),
+        include_dates=data.get('include_dates', True)
     )
     
     db.session.add(bill)
