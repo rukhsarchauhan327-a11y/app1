@@ -261,15 +261,21 @@
                         <i class="fa-solid fa-times text-xl"></i>
                     </button>
                 </div>
-                <div class="relative">
+                <!-- Camera View -->
+                <div class="relative mb-4">
                     <video id="scanner-video" class="w-full h-64 bg-gray-200 rounded-lg object-cover"></video>
-                    <div class="absolute inset-0 flex items-center justify-center">
-                        <div class="w-48 h-32 border-2 border-red-500 bg-transparent"></div>
+                    <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+                        <div class="w-48 h-32 border-2 border-red-500 bg-transparent rounded-lg">
+                            <div class="absolute top-0 left-0 w-4 h-4 border-t-4 border-l-4 border-red-500"></div>
+                            <div class="absolute top-0 right-0 w-4 h-4 border-t-4 border-r-4 border-red-500"></div>
+                            <div class="absolute bottom-0 left-0 w-4 h-4 border-b-4 border-l-4 border-red-500"></div>
+                            <div class="absolute bottom-0 right-0 w-4 h-4 border-b-4 border-r-4 border-red-500"></div>
+                        </div>
                     </div>
-                </div>
-                <!-- Status indicator -->
-                <div id="scanner-status" class="text-center mb-4">
-                    <span class="bg-blue-500 text-white px-3 py-1 rounded-full text-sm">Starting camera...</span>
+                    <!-- Status overlay -->
+                    <div id="scanner-status" class="absolute top-2 left-2 right-2 text-center">
+                        <span class="bg-blue-500 text-white px-3 py-1 rounded-full text-sm">Starting camera...</span>
+                    </div>
                 </div>
                 
                 <!-- Instructions and Actions -->
