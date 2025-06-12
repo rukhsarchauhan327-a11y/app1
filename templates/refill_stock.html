@@ -658,6 +658,16 @@
         }
 
         function showSuccessPopup(message, shouldRedirect = false) {
+            // Hide any existing scanner status notifications first
+            const scannerModal = document.getElementById('scanner-modal');
+            if (scannerModal && !scannerModal.classList.contains('hidden')) {
+                // Don't close scanner if it's open, just hide any status notifications
+                const statusElement = document.getElementById('scanner-status');
+                if (statusElement) {
+                    statusElement.style.display = 'none';
+                }
+            }
+            
             const popup = document.getElementById('success-popup');
             const titleElement = document.getElementById('success-title');
             const messageElement = document.getElementById('success-message');
@@ -696,16 +706,19 @@
             const popup = document.getElementById('success-popup');
             const messageElement = document.getElementById('success-message');
             const icon = popup.querySelector('i');
-            const iconContainer = popup.querySelector('.bg-green-100');
-            const title = popup.querySelector('h3');
+            const iconContainer = popup.querySelector('.bg-green-100, .bg-red-100');
+            const title = document.getElementById('success-title');
             
-            // Change to error styling
-            iconContainer.className = 'w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4';
-            icon.className = 'fa-solid fa-exclamation-triangle text-red-500 text-2xl';
-            title.textContent = 'Input Required';
-            messageElement.textContent = message;
-            
-            popup.classList.remove('hidden');
+            // Ensure elements exist before modifying
+            if (iconContainer && icon && title && messageElement) {
+                // Change to error styling
+                iconContainer.className = 'w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4';
+                icon.className = 'fa-solid fa-exclamation-triangle text-red-500 text-2xl';
+                title.textContent = 'Input Required';
+                messageElement.textContent = message;
+                
+                popup.classList.remove('hidden');
+            }
         }
 
         function closeErrorPopup() {
@@ -715,11 +728,14 @@
             // Reset to success styling for next use
             const icon = popup.querySelector('i');
             const iconContainer = popup.querySelector('.bg-red-100, .bg-green-100');
-            const title = popup.querySelector('h3');
+            const title = document.getElementById('success-title');
             
-            iconContainer.className = 'w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4';
-            icon.className = 'fa-solid fa-check text-green-500 text-2xl';
-            title.textContent = 'Success!';
+            // Ensure elements exist before modifying
+            if (iconContainer && icon && title) {
+                iconContainer.className = 'w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4';
+                icon.className = 'fa-solid fa-check text-green-500 text-2xl';
+                title.textContent = 'Success!';
+            }
         }
 
         function cancelRefill() {
