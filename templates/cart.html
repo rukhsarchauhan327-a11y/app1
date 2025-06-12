@@ -265,11 +265,25 @@
                         <span class="text-sm text-gray-700 font-medium">3 Pieces</span>
                         <span class="text-lg font-bold text-primary">₹90</span>
                     </div>
-                    <div class="mt-2">
-                        <button class="text-xs text-primary hover:underline flex items-center" onclick="editItem(3)">
-                            <i class="fa-solid fa-edit mr-1"></i>
-                            Edit
-                        </button>
+                    <div class="mt-2 space-y-1">
+                        <div class="flex items-center text-xs text-gray-500 date-info">
+                            <i class="fa-solid fa-calendar mr-1"></i>
+                            <span>MFG: 10/04/2025</span>
+                        </div>
+                        <div class="flex items-center text-xs text-gray-500 date-info">
+                            <i class="fa-solid fa-clock mr-1"></i>
+                            <span>EXP: 15/04/2026</span>
+                        </div>
+                        <div class="flex items-center space-x-2 mt-1">
+                            <button class="text-xs text-primary hover:underline flex items-center" onclick="editItem(3)">
+                                <i class="fa-solid fa-edit mr-1"></i>
+                                Edit
+                            </button>
+                            <button id="date-toggle-3" class="text-xs text-danger hover:underline flex items-center" onclick="toggleProductDates(3)">
+                                <i class="fa-solid fa-times mr-1"></i>
+                                Remove Dates
+                            </button>
+                        </div>
                     </div>
                 </div>
                 <button class="text-danger text-sm ml-3 p-1" onclick="removeItem(3)">
@@ -287,20 +301,20 @@
                         <span class="text-lg font-bold text-primary">₹60</span>
                     </div>
                     <div class="mt-2 space-y-1">
-                        <div class="flex items-center text-xs text-gray-500">
+                        <div class="flex items-center text-xs text-gray-500 date-info">
                             <i class="fa-solid fa-calendar mr-1"></i>
-                            <span>MFG: 10/04/2025</span>
+                            <span>MFG: 05/03/2025</span>
                         </div>
-                        <div class="flex items-center text-xs text-gray-500">
+                        <div class="flex items-center text-xs text-gray-500 date-info">
                             <i class="fa-solid fa-clock mr-1"></i>
-                            <span>EXP: 10/08/2025</span>
+                            <span>EXP: 05/09/2025</span>
                         </div>
                         <div class="flex items-center space-x-2 mt-1">
                             <button class="text-xs text-primary hover:underline flex items-center" onclick="editItem(4)">
                                 <i class="fa-solid fa-edit mr-1"></i>
                                 Edit
                             </button>
-                            <button class="text-xs text-danger hover:underline flex items-center" onclick="removeDates(4)">
+                            <button id="date-toggle-4" class="text-xs text-danger hover:underline flex items-center" onclick="toggleProductDates(4)">
                                 <i class="fa-solid fa-times mr-1"></i>
                                 Remove Dates
                             </button>
@@ -321,11 +335,25 @@
                         <span class="text-sm text-gray-700 font-medium">1 Packet</span>
                         <span class="text-lg font-bold text-primary">₹55</span>
                     </div>
-                    <div class="mt-2">
-                        <button class="text-xs text-primary hover:underline flex items-center" onclick="editItem(5)">
-                            <i class="fa-solid fa-edit mr-1"></i>
-                            Edit
-                        </button>
+                    <div class="mt-2 space-y-1">
+                        <div class="flex items-center text-xs text-gray-500 date-info">
+                            <i class="fa-solid fa-calendar mr-1"></i>
+                            <span>MFG: 15/02/2025</span>
+                        </div>
+                        <div class="flex items-center text-xs text-gray-500 date-info">
+                            <i class="fa-solid fa-clock mr-1"></i>
+                            <span>EXP: 15/02/2027</span>
+                        </div>
+                        <div class="flex items-center space-x-2 mt-1">
+                            <button class="text-xs text-primary hover:underline flex items-center" onclick="editItem(5)">
+                                <i class="fa-solid fa-edit mr-1"></i>
+                                Edit
+                            </button>
+                            <button id="date-toggle-5" class="text-xs text-danger hover:underline flex items-center" onclick="toggleProductDates(5)">
+                                <i class="fa-solid fa-times mr-1"></i>
+                                Remove Dates
+                            </button>
+                        </div>
                     </div>
                 </div>
                 <button class="text-danger text-sm ml-3 p-1" onclick="removeItem(5)">
@@ -343,20 +371,20 @@
                         <span class="text-lg font-bold text-primary">₹180</span>
                     </div>
                     <div class="mt-2 space-y-1">
-                        <div class="flex items-center text-xs text-gray-500">
+                        <div class="flex items-center text-xs text-gray-500 date-info">
                             <i class="fa-solid fa-calendar mr-1"></i>
-                            <span>MFG: 05/03/2025</span>
+                            <span>MFG: 01/01/2025</span>
                         </div>
-                        <div class="flex items-center text-xs text-gray-500">
+                        <div class="flex items-center text-xs text-gray-500 date-info">
                             <i class="fa-solid fa-clock mr-1"></i>
-                            <span>EXP: 05/01/2026</span>
+                            <span>EXP: 01/01/2027</span>
                         </div>
                         <div class="flex items-center space-x-2 mt-1">
                             <button class="text-xs text-primary hover:underline flex items-center" onclick="editItem(6)">
                                 <i class="fa-solid fa-edit mr-1"></i>
                                 Edit
                             </button>
-                            <button class="text-xs text-danger hover:underline flex items-center" onclick="removeDates(6)">
+                            <button id="date-toggle-6" class="text-xs text-danger hover:underline flex items-center" onclick="toggleProductDates(6)">
                                 <i class="fa-solid fa-times mr-1"></i>
                                 Remove Dates
                             </button>
@@ -1461,37 +1489,58 @@
         }
 
         function toggleProductDates(itemId) {
+            console.log('Toggling dates for item:', itemId);
+            
             const item = cartItems[itemId];
             const button = document.getElementById(`date-toggle-${itemId}`);
-            const icon = button.querySelector('i');
             
-            if (item) {
-                if (item.datesHidden) {
-                    // Show dates
-                    item.datesHidden = false;
-                    button.innerHTML = '<i class="fa-solid fa-times mr-1"></i>Remove Dates';
-                    button.classList.remove('text-success');
-                    button.classList.add('text-danger');
-                    
-                    // Show date elements
-                    const dateElements = document.querySelectorAll(`#cart-item-${itemId} .date-info`);
-                    dateElements.forEach(el => el.classList.remove('hidden'));
-                    
-                    showNotification(`Dates shown for ${item.name}`, 'info');
-                } else {
-                    // Hide dates
-                    item.datesHidden = true;
-                    button.innerHTML = '<i class="fa-solid fa-plus mr-1"></i>Add Dates';
-                    button.classList.remove('text-danger');
-                    button.classList.add('text-success');
-                    
-                    // Hide date elements
-                    const dateElements = document.querySelectorAll(`#cart-item-${itemId} .date-info`);
-                    dateElements.forEach(el => el.classList.add('hidden'));
-                    
-                    showNotification(`Dates hidden for ${item.name}`, 'info');
-                }
+            if (!button) {
+                console.error('Toggle button NOT found - debugging needed');
+                return;
             }
+            
+            if (!item) {
+                console.error('Item not found in cartItems:', itemId);
+                return;
+            }
+            
+            console.log('Current item state:', item);
+            
+            if (item.datesHidden) {
+                // Show dates
+                item.datesHidden = false;
+                button.innerHTML = '<i class="fa-solid fa-times mr-1"></i>Remove Dates';
+                button.classList.remove('text-success');
+                button.classList.add('text-danger');
+                
+                // Show date elements
+                const dateElements = document.querySelectorAll(`#cart-item-${itemId} .date-info`);
+                console.log('Found date elements:', dateElements.length);
+                dateElements.forEach(el => {
+                    el.classList.remove('hidden');
+                    el.style.display = '';
+                });
+                
+                showNotification(`Dates shown for ${item.name}`, 'info');
+            } else {
+                // Hide dates
+                item.datesHidden = true;
+                button.innerHTML = '<i class="fa-solid fa-plus mr-1"></i>Add Dates';
+                button.classList.remove('text-danger');
+                button.classList.add('text-success');
+                
+                // Hide date elements
+                const dateElements = document.querySelectorAll(`#cart-item-${itemId} .date-info`);
+                console.log('Found date elements to hide:', dateElements.length);
+                dateElements.forEach(el => {
+                    el.classList.add('hidden');
+                    el.style.display = 'none';
+                });
+                
+                showNotification(`Dates hidden for ${item.name}`, 'info');
+            }
+            
+            console.log('Updated item state:', item);
         }
 
         // Enhanced total calculation
