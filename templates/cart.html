@@ -1755,39 +1755,48 @@
         selectOnlineMethod('upi');
 
         // Initialize quantity input listeners in edit modal
-        // Wait for window to fully load including all elements
-        window.addEventListener('load', function() {
-            console.log('Window fully loaded, initializing cart...');
-            
-            // Double check that elements exist
-            const cartItemsContainer = document.getElementById('cart-items');
-            const button1 = document.getElementById('date-toggle-1');
-            const cartItem1 = document.getElementById('cart-item-1');
-            
-            console.log('Elements check:', {
-                container: !!cartItemsContainer,
-                button1: !!button1,
-                cartItem1: !!cartItem1
-            });
-            
-            if (cartItemsContainer && button1) {
-                calculateTotals();
-                initializeDateToggles();
-                populatePresentStaff();
-                console.log('Cart initialization completed successfully');
-            } else {
-                console.error('Required elements not found, initialization failed');
-            }
-        });
-
+        // Initialize when DOM is ready
         document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM loaded, starting cart initialization...');
+            
+            // Set a timeout to ensure all elements are rendered
+            setTimeout(function() {
+                console.log('Delayed initialization starting...');
+                
+                // Check if elements exist
+                const cartItemsContainer = document.getElementById('cart-items');
+                const button1 = document.getElementById('date-toggle-1');
+                const cartItem1 = document.getElementById('cart-item-1');
+                
+                console.log('Elements verification:', {
+                    container: !!cartItemsContainer,
+                    button1: !!button1,
+                    cartItem1: !!cartItem1
+                });
+                
+                if (cartItemsContainer && button1 && cartItem1) {
+                    calculateTotals();
+                    initializeDateToggles();
+                    populatePresentStaff();
+                    console.log('Cart initialization completed successfully');
+                } else {
+                    console.error('Cart elements not found, retrying...');
+                    // Retry after more time
+                    setTimeout(function() {
+                        if (document.getElementById('cart-items') && document.getElementById('date-toggle-1')) {
+                            calculateTotals();
+                            initializeDateToggles();
+                            populatePresentStaff();
+                            console.log('Cart initialization completed on retry');
+                        }
+                    }, 1000);
+                }
+            }, 100);
+            
             const editQuantityInputWeight = document.getElementById('edit-quantity-input-weight');
             const editQuantityInputUnit = document.getElementById('edit-quantity-input-unit');
             const editPriceInput = document.getElementById('edit-price-input');
             const editUnitSelect = document.getElementById('edit-unit-select');
-            
-            // Initialize cart functionality
-            initializeCartPage();
             
             if (editQuantityInputWeight) {
                 editQuantityInputWeight.addEventListener('input', updateEditTotal);
