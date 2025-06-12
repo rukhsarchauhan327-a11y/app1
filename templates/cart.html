@@ -1175,10 +1175,18 @@
                 if (unit === 'gm') {
                     quantity = quantity / 1000; // Convert to kg for calculation
                 }
+                
+                // Update quantity display for weight-based items
+                const displayQuantity = unit === 'kg' ? `${quantity.toFixed(1)} Kg` : `${(quantity * 1000).toFixed(0)} gm`;
+                document.getElementById('edit-calculated-quantity').textContent = displayQuantity;
+            } else {
+                // Update quantity display for unit-based items
+                const unitText = quantity === 1 ? item.unit.slice(0, -1) : item.unit;
+                document.getElementById('edit-calculated-quantity').textContent = `${quantity} ${unitText}`;
             }
             
             const total = quantity * item.unitPrice;
-            document.getElementById('edit-total-price').textContent = `₹${total.toFixed(2)}`;
+            document.getElementById('edit-calculated-price').textContent = `₹${total.toFixed(2)}`;
         }
 
         function updateEditPriceTotal() {
@@ -1458,17 +1466,17 @@
                     </div>
                 </div>
 
-                <!-- Input Method Selection (for weight-based items) -->
+                <!-- Input Method Selection (for weight-based products) -->
                 <div id="edit-input-method" class="mb-4 hidden">
                     <label class="block text-sm font-medium text-dark mb-3">Select Input Method</label>
-                    <div class="flex bg-gray-100 rounded-lg p-1">
-                        <label class="flex-1 text-center">
-                            <input type="radio" name="editInputMethod" value="quantity" class="sr-only" checked>
-                            <span class="block py-2 px-3 rounded-md bg-white text-primary font-medium text-sm cursor-pointer" id="edit-quantity-tab">By Quantity</span>
+                    <div class="space-y-2">
+                        <label class="flex items-center space-x-3 cursor-pointer p-3 bg-gray-50 rounded-lg hover:bg-gray-100">
+                            <input type="radio" name="editInputMethod" value="quantity" class="text-orange-500 focus:ring-orange-500" checked>
+                            <span class="text-sm font-medium text-dark">Enter Quantity</span>
                         </label>
-                        <label class="flex-1 text-center">
-                            <input type="radio" name="editInputMethod" value="price" class="sr-only">
-                            <span class="block py-2 px-3 rounded-md text-gray-600 font-medium text-sm cursor-pointer" id="edit-price-tab">By Price</span>
+                        <label class="flex items-center space-x-3 cursor-pointer p-3 bg-gray-50 rounded-lg hover:bg-gray-100">
+                            <input type="radio" name="editInputMethod" value="price" class="text-orange-500 focus:ring-orange-500">
+                            <span class="text-sm font-medium text-dark">Enter Price</span>
                         </label>
                     </div>
                 </div>
@@ -1508,26 +1516,17 @@
                     <p class="text-xs text-gray-500 mt-1">System will calculate quantity based on price per kg</p>
                 </div>
 
-                <!-- Manufacturing/Expiry Dates -->
-                <div class="mb-4">
-                    <label class="block text-sm font-medium text-dark mb-2">Dates (Optional)</label>
-                    <div class="grid grid-cols-2 gap-3">
-                        <div>
-                            <label class="block text-xs text-gray-600 mb-1">Manufacturing</label>
-                            <input type="date" id="edit-mfg-date" class="w-full p-2 border border-gray-200 rounded-lg text-sm">
-                        </div>
-                        <div>
-                            <label class="block text-xs text-gray-600 mb-1">Expiry</label>
-                            <input type="date" id="edit-exp-date" class="w-full p-2 border border-gray-200 rounded-lg text-sm">
-                        </div>
-                    </div>
-                </div>
 
-                <!-- Total Price Display -->
-                <div class="mb-4 p-3 bg-gray-50 rounded-lg">
+
+                <!-- Summary -->
+                <div class="bg-gray-50 p-4 rounded-lg mb-4">
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="text-sm text-gray-600">Quantity:</span>
+                        <span id="edit-calculated-quantity" class="text-sm font-medium text-dark">1 Unit</span>
+                    </div>
                     <div class="flex justify-between items-center">
                         <span class="text-sm text-gray-600">Total Price:</span>
-                        <span class="text-lg font-bold text-primary" id="edit-total-price">₹0</span>
+                        <span id="edit-calculated-price" class="text-lg font-bold text-green-600">₹0</span>
                     </div>
                 </div>
 
