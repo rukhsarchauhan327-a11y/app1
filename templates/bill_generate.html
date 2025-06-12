@@ -76,7 +76,9 @@
                 <i class="fa-solid fa-arrow-left text-dark text-lg"></i>
             </button>
             <h1 class="text-lg font-bold text-dark">Cart</h1>
-            <div class="w-10"></div>
+            <button class="p-2 hover:bg-gray-100 rounded-lg transition-colors" onclick="openSearch()">
+                <i class="fa-solid fa-search text-gray-600 text-lg"></i>
+            </button>
         </div>
     </header>
 
@@ -1029,6 +1031,233 @@
             </button>
         </div>
     </nav>
+
+    <!-- Search Modal -->
+    <div id="search-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden">
+        <div class="fixed inset-0 flex flex-col">
+            <div class="bg-white p-4">
+                <div class="flex items-center space-x-3">
+                    <button onclick="closeSearch()" class="p-2 hover:bg-gray-100 rounded-lg">
+                        <i class="fa-solid fa-arrow-left text-gray-600"></i>
+                    </button>
+                    <div class="flex-1 relative">
+                        <input type="text" id="search-input" placeholder="Search products to add..." class="w-full px-4 py-3 border border-gray-300 rounded-lg text-sm">
+                        <button onclick="clearSearch()" class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600">
+                            <i class="fa-solid fa-times"></i>
+                        </button>
+                    </div>
+                    <button onclick="openScanner()" class="p-2 bg-primary text-white rounded-lg hover:bg-primary-dark">
+                        <i class="fa-solid fa-barcode"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="flex-1 bg-white px-4 pb-4 overflow-y-auto">
+                <div id="search-results" class="space-y-3">
+                    <!-- Search results will appear here -->
+                </div>
+                <div id="search-empty" class="text-center py-12 hidden">
+                    <i class="fa-solid fa-search text-gray-300 text-4xl mb-4"></i>
+                    <p class="text-gray-500">No products found</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scanner Modal -->
+    <div id="scanner-modal" class="fixed inset-0 bg-black bg-opacity-90 z-50 hidden">
+        <div class="fixed inset-0 flex flex-col">
+            <div class="bg-black text-white p-4">
+                <div class="flex items-center justify-between">
+                    <button onclick="closeScanner()" class="p-2 hover:bg-gray-800 rounded-lg">
+                        <i class="fa-solid fa-times text-white"></i>
+                    </button>
+                    <h2 class="text-lg font-semibold">Scan to Add Product</h2>
+                    <button onclick="toggleFlashlight()" class="p-2 hover:bg-gray-800 rounded-lg">
+                        <i class="fa-solid fa-flashlight text-white"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="flex-1 relative bg-black">
+                <div class="absolute inset-0 flex items-center justify-center">
+                    <div class="relative">
+                        <div class="w-64 h-64 border-2 border-white border-dashed rounded-lg flex items-center justify-center">
+                            <div class="text-center text-white">
+                                <i class="fa-solid fa-barcode text-4xl mb-4"></i>
+                                <p class="text-sm">Point camera at barcode</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="absolute bottom-8 left-1/2 transform -translate-x-1/2">
+                    <button onclick="manualBarcodeEntry()" class="bg-white text-black px-4 py-2 rounded-lg font-medium">
+                        Enter Manually
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Manual Barcode Entry Modal -->
+    <div id="manual-barcode-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-white rounded-lg p-6 w-full max-w-md">
+                <h3 class="text-lg font-semibold mb-4">Enter Barcode</h3>
+                <input type="text" id="manual-barcode-input" placeholder="Enter barcode number" class="w-full px-4 py-3 border border-gray-300 rounded-lg mb-4">
+                <div class="flex space-x-3">
+                    <button onclick="closeManualBarcode()" class="flex-1 bg-gray-500 text-white py-2 px-4 rounded-lg hover:bg-gray-600">
+                        Cancel
+                    </button>
+                    <button onclick="searchByBarcode()" class="flex-1 bg-primary text-white py-2 px-4 rounded-lg hover:bg-primary-dark">
+                        Search
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Search and Scanner functionality
+        function openSearch() {
+            document.getElementById('search-modal').classList.remove('hidden');
+            document.getElementById('search-input').focus();
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeSearch() {
+            document.getElementById('search-modal').classList.add('hidden');
+            document.body.style.overflow = 'auto';
+            clearSearch();
+        }
+
+        function clearSearch() {
+            document.getElementById('search-input').value = '';
+            document.getElementById('search-results').innerHTML = '';
+            document.getElementById('search-empty').classList.add('hidden');
+        }
+
+        function openScanner() {
+            document.getElementById('scanner-modal').classList.remove('hidden');
+            simulateScanning();
+        }
+
+        function closeScanner() {
+            document.getElementById('scanner-modal').classList.add('hidden');
+        }
+
+        function manualBarcodeEntry() {
+            document.getElementById('manual-barcode-modal').classList.remove('hidden');
+            document.getElementById('manual-barcode-input').focus();
+        }
+
+        function closeManualBarcode() {
+            document.getElementById('manual-barcode-modal').classList.add('hidden');
+            document.getElementById('manual-barcode-input').value = '';
+        }
+
+        function searchByBarcode() {
+            const barcode = document.getElementById('manual-barcode-input').value.trim();
+            if (barcode) {
+                performBarcodeSearch(barcode);
+                closeManualBarcode();
+                closeScanner();
+            }
+        }
+
+        function toggleFlashlight() {
+            const button = event.target.closest('button');
+            button.classList.toggle('text-yellow-400');
+        }
+
+        function performBarcodeSearch(barcode) {
+            const barcodeProducts = {
+                '8901030823456': { name: 'Coconut Oil', price: 180, unit: 'Bottle', id: 'coconut-oil' },
+                '8901030834567': { name: 'Aashirvaad Atta', price: 120, unit: 'Bag', id: 'aashirvaad-atta' },
+                '8901030845678': { name: 'Maggi Noodles', price: 15, unit: 'Pack', id: 'maggi-noodles' },
+                '8901030856789': { name: 'Dairy Milk', price: 25, unit: 'Bar', id: 'dairy-milk' },
+                '8901030867890': { name: 'Uncle Chips', price: 10, unit: 'Pack', id: 'uncle-chips' }
+            };
+
+            const product = barcodeProducts[barcode];
+            if (product) {
+                alert(`Found ${product.name} - ₹${product.price}`);
+                // Redirect to product details page
+                setTimeout(() => {
+                    window.location.href = `/product-details?id=${product.id}&name=${encodeURIComponent(product.name)}&price=${product.price}&unit=${encodeURIComponent(product.unit)}`;
+                }, 1000);
+            } else {
+                alert('Product not found');
+            }
+        }
+
+        function simulateScanning() {
+            setTimeout(() => {
+                const randomBarcodes = ['8901030823456', '8901030834567', '8901030845678'];
+                const randomBarcode = randomBarcodes[Math.floor(Math.random() * randomBarcodes.length)];
+                performBarcodeSearch(randomBarcode);
+                closeScanner();
+            }, 3000);
+        }
+
+        // Real-time search functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.getElementById('search-input');
+            if (searchInput) {
+                searchInput.addEventListener('input', function() {
+                    const query = this.value.toLowerCase().trim();
+                    performSearch(query);
+                });
+            }
+        });
+
+        function performSearch(query) {
+            const resultsContainer = document.getElementById('search-results');
+            const emptyState = document.getElementById('search-empty');
+            
+            if (!query) {
+                resultsContainer.innerHTML = '';
+                emptyState.classList.add('hidden');
+                return;
+            }
+
+            const products = [
+                { name: 'Wheat Flour', price: 50, unit: 'Kg', image: 'https://storage.googleapis.com/uxpilot-auth.appspot.com/ad8aa6cee1-b621e3cd72c9ea714c53.png' },
+                { name: 'Coconut Oil', price: 180, unit: 'Bottle', image: 'https://storage.googleapis.com/uxpilot-auth.appspot.com/02cda64d32-ca63fc32eaab87b7db4c.png' },
+                { name: 'Aashirvaad Atta', price: 120, unit: 'Bag', image: 'https://storage.googleapis.com/uxpilot-auth.appspot.com/dd29a1f85f-469e6193e37489fc8c43.png' },
+                { name: 'Maggi Noodles', price: 15, unit: 'Pack', image: 'https://storage.googleapis.com/uxpilot-auth.appspot.com/46dc2aecf3-4ae1d7f8a3bc9c8b21d6.png' },
+                { name: 'Dairy Milk', price: 25, unit: 'Bar', image: 'https://storage.googleapis.com/uxpilot-auth.appspot.com/f12345-chocolate-bar.png' }
+            ];
+
+            const filteredProducts = products.filter(product => 
+                product.name.toLowerCase().includes(query)
+            );
+
+            if (filteredProducts.length > 0) {
+                emptyState.classList.add('hidden');
+                resultsContainer.innerHTML = filteredProducts.map(product => `
+                    <div class="flex items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer" onclick="selectProduct('${product.name}', ${product.price}, '${product.unit}')">
+                        <img src="${product.image}" alt="${product.name}" class="w-12 h-12 rounded-lg object-cover mr-3">
+                        <div class="flex-1">
+                            <h3 class="font-semibold text-dark text-sm">${product.name}</h3>
+                            <p class="text-xs text-gray-600">${product.unit}</p>
+                        </div>
+                        <div class="text-right">
+                            <p class="font-bold text-primary">₹${product.price}</p>
+                        </div>
+                    </div>
+                `).join('');
+            } else {
+                resultsContainer.innerHTML = '';
+                emptyState.classList.remove('hidden');
+            }
+        }
+
+        function selectProduct(name, price, unit) {
+            closeSearch();
+            // Redirect to product details page
+            const productId = name.toLowerCase().replace(/\s+/g, '-');
+            window.location.href = `/product-details?id=${productId}&name=${encodeURIComponent(name)}&price=${price}&unit=${encodeURIComponent(unit)}`;
+        }
+    </script>
 
 </body>
 </html>
