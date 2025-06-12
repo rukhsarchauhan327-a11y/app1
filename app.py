@@ -488,63 +488,95 @@ def export_business_data():
         doc = SimpleDocTemplate(buffer, pagesize=A4, rightMargin=0.75*inch, leftMargin=0.75*inch,
                               topMargin=0.75*inch, bottomMargin=0.75*inch)
         
-        # Define custom styles
+        # Define simple, clean styles
         styles = getSampleStyleSheet()
         
-        # Company header style
+        # Company header style with logo placeholder
         company_style = ParagraphStyle(
             'CompanyHeader',
             parent=styles['Title'],
-            fontSize=24,
-            spaceAfter=8,
-            alignment=1,
-            textColor=colors.HexColor('#1f2937'),
-            fontName='Helvetica-Bold'
-        )
-        
-        # Report title style
-        title_style = ParagraphStyle(
-            'ReportTitle',
-            parent=styles['Heading1'],
-            fontSize=18,
-            spaceAfter=20,
+            fontSize=20,
+            spaceAfter=5,
             alignment=1,
             textColor=colors.HexColor('#2563eb'),
             fontName='Helvetica-Bold'
         )
         
-        # Section heading style
-        heading_style = ParagraphStyle(
-            'SectionHeading',
+        # Simple title style
+        title_style = ParagraphStyle(
+            'ReportTitle',
             parent=styles['Heading2'],
             fontSize=14,
-            spaceAfter=8,
-            spaceBefore=15,
+            spaceAfter=15,
+            alignment=1,
             textColor=colors.HexColor('#1f2937'),
-            fontName='Helvetica-Bold',
-            borderWidth=0,
-            borderColor=colors.HexColor('#e5e7eb'),
-            borderPadding=8,
-            backColor=colors.HexColor('#f9fafb')
+            fontName='Helvetica'
         )
         
-        # Summary box style
+        # Clean section heading
+        heading_style = ParagraphStyle(
+            'SectionHeading',
+            parent=styles['Heading3'],
+            fontSize=12,
+            spaceAfter=10,
+            spaceBefore=20,
+            textColor=colors.HexColor('#1f2937'),
+            fontName='Helvetica-Bold',
+            backColor=colors.HexColor('#f8fafc'),
+            borderWidth=1,
+            borderColor=colors.HexColor('#e2e8f0'),
+            leftIndent=10,
+            rightIndent=10,
+            topPadding=6,
+            bottomPadding=6
+        )
+        
+        # Normal text style
+        normal_style = ParagraphStyle(
+            'Normal',
+            parent=styles['Normal'],
+            fontSize=10,
+            textColor=colors.HexColor('#374151'),
+            fontName='Helvetica'
+        )
+        
+        # Simple summary style
         summary_style = ParagraphStyle(
             'Summary',
             parent=styles['Normal'],
-            fontSize=11,
-            textColor=colors.HexColor('#374151'),
-            fontName='Helvetica'
+            fontSize=9,
+            textColor=colors.HexColor('#6b7280'),
+            fontName='Helvetica',
+            alignment=1
         )
         
         # Story list to hold all content
         story = []
         
-        # Company Header with logo placeholder
-        story.append(Paragraph("KIRANA KONNECT", company_style))
-        story.append(Paragraph("Complete Business Data Report", title_style))
-        story.append(Paragraph(f"Report Generated: {datetime.now().strftime('%d %B %Y at %H:%M')}", summary_style))
-        story.append(Spacer(1, 30))
+        # Professional Header with branding
+        header_table = Table([
+            ['🏪 KIRANA KONNECT', 'Business Report'],
+            ['Your Store Management Solution', f'Generated: {datetime.now().strftime("%d-%m-%Y")}']
+        ], colWidths=[3*inch, 3*inch])
+        header_table.setStyle(TableStyle([
+            ('BACKGROUND', (0, 0), (-1, -1), colors.HexColor('#2563eb')),
+            ('TEXTCOLOR', (0, 0), (-1, -1), colors.white),
+            ('FONTNAME', (0, 0), (0, 0), 'Helvetica-Bold'),
+            ('FONTSIZE', (0, 0), (0, 0), 16),
+            ('FONTNAME', (1, 0), (1, 0), 'Helvetica-Bold'),
+            ('FONTSIZE', (1, 0), (1, 0), 14),
+            ('FONTNAME', (0, 1), (-1, 1), 'Helvetica'),
+            ('FONTSIZE', (0, 1), (-1, 1), 10),
+            ('ALIGN', (0, 0), (0, -1), 'LEFT'),
+            ('ALIGN', (1, 0), (1, -1), 'RIGHT'),
+            ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+            ('TOPPADDING', (0, 0), (-1, -1), 10),
+            ('BOTTOMPADDING', (0, 0), (-1, -1), 10),
+            ('LEFTPADDING', (0, 0), (-1, -1), 15),
+            ('RIGHTPADDING', (0, 0), (-1, -1), 15)
+        ]))
+        story.append(header_table)
+        story.append(Spacer(1, 25))
         
         # Calculate summary metrics first
         products = Product.query.all()
@@ -558,346 +590,191 @@ def export_business_data():
         total_customers = len(customers)
         total_outstanding = sum([c.outstanding_balance for c in customers])
         
-        # Executive Summary Box
+        # Simple Business Summary
+        story.append(Paragraph("BUSINESS SUMMARY", heading_style))
+        
         summary_data = [
-            ['Business Metric', 'Value', 'Status'],
-            ['Total Products', str(total_products), '✓ Active'],
-            ['Total Investment', f'₹{total_investment:,.2f}', '💰 Capital'],
-            ['Total Sales Revenue', f'₹{total_sales:,.2f}', '📈 Revenue'],
-            ['Active Customers', str(total_customers), '👥 Base'],
-            ['Outstanding Amount', f'₹{total_outstanding:,.2f}', '⚠️ Pending']
+            ['Total Products in Store', str(total_products)],
+            ['Money Invested', f'₹{total_investment:,.0f}'],
+            ['Total Sales Made', f'₹{total_sales:,.0f}'],
+            ['Number of Customers', str(total_customers)],
+            ['Money to Collect', f'₹{total_outstanding:,.0f}']
         ]
         
-        summary_table = Table(summary_data, colWidths=[2.5*inch, 1.5*inch, 1.2*inch])
+        summary_table = Table(summary_data, colWidths=[3*inch, 2*inch])
         summary_table.setStyle(TableStyle([
-            ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#2563eb')),
-            ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
-            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
-            ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-            ('FONTSIZE', (0, 0), (-1, 0), 12),
-            ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
-            ('BACKGROUND', (0, 1), (-1, -1), colors.HexColor('#f8fafc')),
-            ('FONTNAME', (0, 1), (-1, -1), 'Helvetica'),
-            ('FONTSIZE', (0, 1), (-1, -1), 10),
-            ('GRID', (0, 0), (-1, -1), 1, colors.HexColor('#e2e8f0')),
+            ('BACKGROUND', (0, 0), (-1, -1), colors.white),
+            ('FONTNAME', (0, 0), (-1, -1), 'Helvetica'),
+            ('FONTSIZE', (0, 0), (-1, -1), 11),
+            ('ALIGN', (0, 0), (0, -1), 'LEFT'),
+            ('ALIGN', (1, 0), (1, -1), 'RIGHT'),
+            ('GRID', (0, 0), (-1, -1), 1, colors.HexColor('#d1d5db')),
             ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
-            ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, colors.HexColor('#f8fafc')])
+            ('TOPPADDING', (0, 0), (-1, -1), 8),
+            ('BOTTOMPADDING', (0, 0), (-1, -1), 8),
+            ('LEFTPADDING', (0, 0), (-1, -1), 12),
+            ('RIGHTPADDING', (0, 0), (-1, -1), 12)
         ]))
         
-        story.append(Paragraph("📊 EXECUTIVE SUMMARY", heading_style))
         story.append(summary_table)
         story.append(Spacer(1, 20))
         
         # 1. INVENTORY DATA
-        story.append(Paragraph("🏪 INVENTORY OVERVIEW", heading_style))
+        story.append(Paragraph("MY PRODUCTS", heading_style))
         
         if products:
-            inventory_data = [['Product Name', 'Category', 'Buy Price', 'Sell Price', 'Profit', 'Stock', 'Added']]
-            inv_total_investment = 0
-            inv_total_potential_revenue = 0
+            inventory_data = [['Product Name', 'Buy Price', 'Sell Price', 'Stock']]
             
-            for product in products:
-                purchase_price = product.price_per_kg if product.is_weight_based else product.price
-                sell_price = product.price_per_kg if product.is_weight_based else product.price
-                profit_per_unit = sell_price - purchase_price if purchase_price else 0
-                
-                inv_total_investment += (purchase_price * product.stock_quantity) if purchase_price else 0
-                inv_total_potential_revenue += (sell_price * product.stock_quantity) if sell_price else 0
-                
-                # Truncate long product names
-                product_name = product.name[:20] + '...' if len(product.name) > 20 else product.name
-                category = product.category[:15] if product.category else 'General'
+            for product in products[:20]:  # Show only first 20 products for simplicity
+                product_name = product.name[:25] + '...' if len(product.name) > 25 else product.name
+                buy_price = product.price if product.price else 0
+                sell_price = product.price if product.price else 0
                 
                 inventory_data.append([
                     product_name,
-                    category,
-                    f"₹{purchase_price:.0f}" if purchase_price else '-',
-                    f"₹{sell_price:.0f}" if sell_price else '-',
-                    f"₹{profit_per_unit:.0f}" if profit_per_unit else '-',
-                    str(product.stock_quantity),
-                    product.created_at.strftime('%d/%m/%y') if product.created_at else '-'
+                    f"₹{buy_price:.0f}",
+                    f"₹{sell_price:.0f}",
+                    str(product.stock_quantity)
                 ])
             
-            inventory_table = Table(inventory_data, colWidths=[1.8*inch, 1*inch, 0.8*inch, 0.8*inch, 0.7*inch, 0.6*inch, 0.8*inch])
+            inventory_table = Table(inventory_data, colWidths=[3*inch, 1.2*inch, 1.2*inch, 1*inch])
             inventory_table.setStyle(TableStyle([
-                ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#1f2937')),
+                ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#2563eb')),
                 ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
                 ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
                 ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-                ('FONTSIZE', (0, 0), (-1, 0), 9),
-                ('FONTSIZE', (0, 1), (-1, -1), 8),
+                ('FONTSIZE', (0, 0), (-1, 0), 10),
+                ('FONTSIZE', (0, 1), (-1, -1), 9),
                 ('BOTTOMPADDING', (0, 0), (-1, 0), 8),
                 ('TOPPADDING', (0, 0), (-1, 0), 8),
                 ('BACKGROUND', (0, 1), (-1, -1), colors.white),
-                ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, colors.HexColor('#f9fafb')]),
-                ('GRID', (0, 0), (-1, -1), 0.5, colors.HexColor('#d1d5db')),
-                ('VALIGN', (0, 0), (-1, -1), 'MIDDLE')
+                ('GRID', (0, 0), (-1, -1), 1, colors.HexColor('#d1d5db')),
+                ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+                ('TOPPADDING', (0, 1), (-1, -1), 6),
+                ('BOTTOMPADDING', (0, 1), (-1, -1), 6)
             ]))
             story.append(inventory_table)
             
-            # Investment Summary Box
-            story.append(Spacer(1, 12))
-            summary_box_data = [
-                ['💰 Total Investment', f'₹{inv_total_investment:,.0f}'],
-                ['💵 Potential Revenue', f'₹{inv_total_potential_revenue:,.0f}'],
-                ['📈 Potential Profit', f'₹{inv_total_potential_revenue - inv_total_investment:,.0f}']
-            ]
-            
-            summary_box = Table(summary_box_data, colWidths=[2.5*inch, 2*inch])
-            summary_box.setStyle(TableStyle([
-                ('BACKGROUND', (0, 0), (-1, -1), colors.HexColor('#ecfdf5')),
-                ('FONTNAME', (0, 0), (-1, -1), 'Helvetica-Bold'),
-                ('FONTSIZE', (0, 0), (-1, -1), 11),
-                ('ALIGN', (0, 0), (0, -1), 'LEFT'),
-                ('ALIGN', (1, 0), (1, -1), 'RIGHT'),
-                ('GRID', (0, 0), (-1, -1), 1, colors.HexColor('#10b981')),
-                ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
-                ('TOPPADDING', (0, 0), (-1, -1), 8),
-                ('BOTTOMPADDING', (0, 0), (-1, -1), 8)
-            ]))
-            story.append(summary_box)
+            if len(products) > 20:
+                story.append(Paragraph(f"Showing 20 out of {len(products)} products", summary_style))
         else:
-            story.append(Paragraph("📦 No inventory items found", summary_style))
+            story.append(Paragraph("No products found", normal_style))
         
         story.append(PageBreak())
         
-        # 2. BILLS DATA
-        story.append(Paragraph("💳 SALES TRANSACTIONS", heading_style))
+        # 2. SALES DATA
+        story.append(Paragraph("MY SALES", heading_style))
         
         if bills:
-            bills_data = [['Bill #', 'Customer', 'Amount', 'Mode', 'Status', 'Date']]
-            bills_total_sales = 0
+            bills_data = [['Bill Number', 'Customer', 'Amount', 'Date']]
             
-            for bill in bills[:50]:  # Limit to recent 50 bills for space
-                customer_name = bill.customer_name or 'Walk-in'
-                if len(customer_name) > 15:
-                    customer_name = customer_name[:12] + '...'
-                
-                status_icon = '✅' if bill.payment_status == 'paid' else '⏳' if bill.payment_status == 'pending' else '🔄'
+            for bill in bills[:15]:  # Show only recent 15 bills
+                customer_name = bill.customer_name or 'Cash Sale'
+                if len(customer_name) > 20:
+                    customer_name = customer_name[:17] + '...'
                 
                 bills_data.append([
-                    bill.bill_number[:8] + '...' if len(bill.bill_number) > 8 else bill.bill_number,
+                    bill.bill_number,
                     customer_name,
                     f"₹{bill.total_amount:,.0f}",
-                    bill.payment_mode.title()[:6],
-                    f"{status_icon} {bill.payment_status.title()}",
-                    bill.created_at.strftime('%d/%m/%y')
+                    bill.created_at.strftime('%d-%m-%Y')
                 ])
-                bills_total_sales += bill.total_amount
             
-            bills_table = Table(bills_data, colWidths=[1.2*inch, 1.5*inch, 1*inch, 0.8*inch, 1.2*inch, 0.8*inch])
+            bills_table = Table(bills_data, colWidths=[1.8*inch, 2*inch, 1.2*inch, 1.4*inch])
             bills_table.setStyle(TableStyle([
-                ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#1f2937')),
+                ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#2563eb')),
                 ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
                 ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
                 ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-                ('FONTSIZE', (0, 0), (-1, 0), 9),
-                ('FONTSIZE', (0, 1), (-1, -1), 8),
+                ('FONTSIZE', (0, 0), (-1, 0), 10),
+                ('FONTSIZE', (0, 1), (-1, -1), 9),
                 ('BOTTOMPADDING', (0, 0), (-1, 0), 8),
                 ('TOPPADDING', (0, 0), (-1, 0), 8),
                 ('BACKGROUND', (0, 1), (-1, -1), colors.white),
-                ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, colors.HexColor('#f9fafb')]),
-                ('GRID', (0, 0), (-1, -1), 0.5, colors.HexColor('#d1d5db')),
-                ('VALIGN', (0, 0), (-1, -1), 'MIDDLE')
+                ('GRID', (0, 0), (-1, -1), 1, colors.HexColor('#d1d5db')),
+                ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+                ('TOPPADDING', (0, 1), (-1, -1), 6),
+                ('BOTTOMPADDING', (0, 1), (-1, -1), 6)
             ]))
             story.append(bills_table)
             
-            if len(bills) > 50:
-                story.append(Paragraph(f"📋 Showing recent 50 bills out of {len(bills)} total transactions", summary_style))
-            
-            # Sales Summary Box
-            story.append(Spacer(1, 12))
-            sales_summary_data = [
-                ['💰 Total Sales Revenue', f'₹{bills_total_sales:,.0f}'],
-                ['📊 Total Transactions', f'{len(bills)} bills'],
-                ['📈 Average Bill Value', f'₹{bills_total_sales/len(bills):,.0f}' if len(bills) > 0 else '₹0']
-            ]
-            
-            sales_summary = Table(sales_summary_data, colWidths=[2.5*inch, 2*inch])
-            sales_summary.setStyle(TableStyle([
-                ('BACKGROUND', (0, 0), (-1, -1), colors.HexColor('#fef3c7')),
-                ('FONTNAME', (0, 0), (-1, -1), 'Helvetica-Bold'),
-                ('FONTSIZE', (0, 0), (-1, -1), 11),
-                ('ALIGN', (0, 0), (0, -1), 'LEFT'),
-                ('ALIGN', (1, 0), (1, -1), 'RIGHT'),
-                ('GRID', (0, 0), (-1, -1), 1, colors.HexColor('#f59e0b')),
-                ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
-                ('TOPPADDING', (0, 0), (-1, -1), 8),
-                ('BOTTOMPADDING', (0, 0), (-1, -1), 8)
-            ]))
-            story.append(sales_summary)
+            if len(bills) > 15:
+                story.append(Paragraph(f"Showing recent 15 out of {len(bills)} total sales", summary_style))
+                
+            story.append(Spacer(1, 15))
+            story.append(Paragraph(f"Total Sales Made: ₹{sum([b.total_amount for b in bills]):,.0f}", normal_style))
         else:
-            story.append(Paragraph("📋 No sales transactions found", summary_style))
+            story.append(Paragraph("No sales found", normal_style))
         
         story.append(PageBreak())
         
-        # 3. CUSTOMER DATA WITH OUTSTANDING BALANCES
-        story.append(Paragraph("👥 CUSTOMER LEDGER", heading_style))
+        # 3. MY CUSTOMERS
+        story.append(Paragraph("MY CUSTOMERS", heading_style))
         
         if customers:
-            customer_data = [['Customer', 'Phone', 'Outstanding', 'Total Bills', 'Payments', 'Since']]
-            cust_total_outstanding = 0
+            customer_data = [['Customer Name', 'Phone', 'Money to Collect']]
             
-            for customer in customers:
+            for customer in customers[:15]:  # Show only first 15 customers
                 outstanding = customer.outstanding_balance
-                total_bills_amount = sum([bill.total_amount for bill in customer.bills])
-                total_payments_amount = sum([payment.amount for payment in customer.payments])
-                
-                customer_name = customer.name[:18] + '...' if len(customer.name) > 18 else customer.name
-                phone_display = customer.phone[-4:] if len(customer.phone) > 4 else customer.phone
+                customer_name = customer.name[:25] + '...' if len(customer.name) > 25 else customer.name
                 
                 customer_data.append([
                     customer_name,
-                    f"***{phone_display}",
-                    f"₹{outstanding:,.0f}",
-                    f"₹{total_bills_amount:,.0f}",
-                    f"₹{total_payments_amount:,.0f}",
-                    customer.created_at.strftime('%m/%y') if customer.created_at else '-'
+                    customer.phone,
+                    f"₹{outstanding:,.0f}" if outstanding > 0 else "Paid"
                 ])
-                cust_total_outstanding += outstanding
             
-            customer_table = Table(customer_data, colWidths=[1.8*inch, 1*inch, 1*inch, 1*inch, 1*inch, 0.7*inch])
+            customer_table = Table(customer_data, colWidths=[2.5*inch, 1.8*inch, 1.5*inch])
             customer_table.setStyle(TableStyle([
-                ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#1f2937')),
+                ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#2563eb')),
                 ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
                 ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
                 ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-                ('FONTSIZE', (0, 0), (-1, 0), 9),
-                ('FONTSIZE', (0, 1), (-1, -1), 8),
+                ('FONTSIZE', (0, 0), (-1, 0), 10),
+                ('FONTSIZE', (0, 1), (-1, -1), 9),
                 ('BOTTOMPADDING', (0, 0), (-1, 0), 8),
                 ('TOPPADDING', (0, 0), (-1, 0), 8),
                 ('BACKGROUND', (0, 1), (-1, -1), colors.white),
-                ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, colors.HexColor('#f9fafb')]),
-                ('GRID', (0, 0), (-1, -1), 0.5, colors.HexColor('#d1d5db')),
-                ('VALIGN', (0, 0), (-1, -1), 'MIDDLE')
+                ('GRID', (0, 0), (-1, -1), 1, colors.HexColor('#d1d5db')),
+                ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+                ('TOPPADDING', (0, 1), (-1, -1), 6),
+                ('BOTTOMPADDING', (0, 1), (-1, -1), 6)
             ]))
             story.append(customer_table)
             
-            # Customer Summary Box
-            story.append(Spacer(1, 12))
-            customer_summary_data = [
-                ['👥 Total Customers', f'{len(customers)} accounts'],
-                ['💳 Outstanding Credit', f'₹{cust_total_outstanding:,.0f}'],
-                ['🔄 Active Accounts', f'{len([c for c in customers if c.outstanding_balance > 0])} customers']
-            ]
-            
-            customer_summary = Table(customer_summary_data, colWidths=[2.5*inch, 2*inch])
-            customer_summary.setStyle(TableStyle([
-                ('BACKGROUND', (0, 0), (-1, -1), colors.HexColor('#fef2f2')),
-                ('FONTNAME', (0, 0), (-1, -1), 'Helvetica-Bold'),
-                ('FONTSIZE', (0, 0), (-1, -1), 11),
-                ('ALIGN', (0, 0), (0, -1), 'LEFT'),
-                ('ALIGN', (1, 0), (1, -1), 'RIGHT'),
-                ('GRID', (0, 0), (-1, -1), 1, colors.HexColor('#ef4444')),
-                ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
-                ('TOPPADDING', (0, 0), (-1, -1), 8),
-                ('BOTTOMPADDING', (0, 0), (-1, -1), 8)
-            ]))
-            story.append(customer_summary)
-        else:
-            story.append(Paragraph("👤 No customer records found", summary_style))
-        
-        story.append(PageBreak())
-        
-        # 4. PAYMENT RECORDS
-        story.append(Paragraph("💰 PAYMENT RECORDS", heading_style))
-        
-        if payments:
-            payment_data = [['Date', 'Customer', 'Amount', 'Mode', 'Reference']]
-            pay_total_payments = 0
-            
-            for payment in payments[:30]:  # Limit to recent 30 payments
-                customer_name = payment.customer.name[:15] + '...' if payment.customer and len(payment.customer.name) > 15 else payment.customer.name if payment.customer else 'Unknown'
-                reference = payment.reference_number[:12] + '...' if payment.reference_number and len(payment.reference_number) > 12 else payment.reference_number or '-'
+            if len(customers) > 15:
+                story.append(Paragraph(f"Showing 15 out of {len(customers)} customers", summary_style))
                 
-                payment_data.append([
-                    payment.created_at.strftime('%d/%m/%y'),
-                    customer_name,
-                    f"₹{payment.amount:,.0f}",
-                    payment.payment_mode.title()[:8],
-                    reference
-                ])
-                pay_total_payments += payment.amount
-            
-            payment_table = Table(payment_data, colWidths=[0.8*inch, 1.8*inch, 1*inch, 1*inch, 1.9*inch])
-            payment_table.setStyle(TableStyle([
-                ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#1f2937')),
-                ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
-                ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
-                ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-                ('FONTSIZE', (0, 0), (-1, 0), 9),
-                ('FONTSIZE', (0, 1), (-1, -1), 8),
-                ('BOTTOMPADDING', (0, 0), (-1, 0), 8),
-                ('TOPPADDING', (0, 0), (-1, 0), 8),
-                ('BACKGROUND', (0, 1), (-1, -1), colors.white),
-                ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, colors.HexColor('#f9fafb')]),
-                ('GRID', (0, 0), (-1, -1), 0.5, colors.HexColor('#d1d5db')),
-                ('VALIGN', (0, 0), (-1, -1), 'MIDDLE')
-            ]))
-            story.append(payment_table)
-            
-            if len(payments) > 30:
-                story.append(Paragraph(f"💳 Showing recent 30 payments out of {len(payments)} total records", summary_style))
-            
-            # Payment Summary Box
-            story.append(Spacer(1, 12))
-            payment_summary_data = [
-                ['💰 Total Payments', f'₹{sum([p.amount for p in payments]):,.0f}'],
-                ['📊 Payment Count', f'{len(payments)} transactions'],
-                ['📈 Average Payment', f'₹{sum([p.amount for p in payments])/len(payments):,.0f}' if len(payments) > 0 else '₹0']
-            ]
-            
-            payment_summary = Table(payment_summary_data, colWidths=[2.5*inch, 2*inch])
-            payment_summary.setStyle(TableStyle([
-                ('BACKGROUND', (0, 0), (-1, -1), colors.HexColor('#f0fdf4')),
-                ('FONTNAME', (0, 0), (-1, -1), 'Helvetica-Bold'),
-                ('FONTSIZE', (0, 0), (-1, -1), 11),
-                ('ALIGN', (0, 0), (0, -1), 'LEFT'),
-                ('ALIGN', (1, 0), (1, -1), 'RIGHT'),
-                ('GRID', (0, 0), (-1, -1), 1, colors.HexColor('#22c55e')),
-                ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
-                ('TOPPADDING', (0, 0), (-1, -1), 8),
-                ('BOTTOMPADDING', (0, 0), (-1, -1), 8)
-            ]))
-            story.append(payment_summary)
+            story.append(Spacer(1, 15))
+            story.append(Paragraph(f"Total Money to Collect: ₹{sum([c.outstanding_balance for c in customers]):,.0f}", normal_style))
         else:
-            story.append(Paragraph("💳 No payment records found", summary_style))
+            story.append(Paragraph("No customers found", normal_style))
         
-        # Final Summary Page
-        story.append(PageBreak())
-        story.append(Paragraph("📋 BUSINESS PERFORMANCE SUMMARY", heading_style))
+        # Add branded footer
+        story.append(Spacer(1, 50))
         
-        # Overall business metrics
-        overall_summary_data = [
-            ['Key Performance Indicator', 'Current Value', 'Performance'],
-            ['Total Business Investment', f'₹{total_investment:,.0f}', '💰 Capital Base'],
-            ['Total Revenue Generated', f'₹{total_sales:,.0f}', '📈 Income Stream'],
-            ['Customer Base Size', f'{total_customers} customers', '👥 Market Reach'],
-            ['Outstanding Receivables', f'₹{total_outstanding:,.0f}', '⚠️ Credit Risk'],
-            ['Product Portfolio', f'{total_products} items', '📦 Inventory Size'],
-            ['Profit Potential', f'₹{sum([(p.price * p.stock_quantity) for p in products if p.price]) - total_investment:,.0f}', '💡 Growth Opportunity']
-        ]
-        
-        overall_table = Table(overall_summary_data, colWidths=[3*inch, 1.5*inch, 1.5*inch])
-        overall_table.setStyle(TableStyle([
-            ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#1e40af')),
-            ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
-            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+        # Footer with company branding
+        footer_table = Table([
+            ['Thank you for using Kirana Konnect', 'Report End'],
+            ['© 2024 Kirana Konnect Inc.', f'Page Generated: {datetime.now().strftime("%d-%m-%Y")}']
+        ], colWidths=[3*inch, 3*inch])
+        footer_table.setStyle(TableStyle([
+            ('BACKGROUND', (0, 0), (-1, -1), colors.HexColor('#f8fafc')),
+            ('TEXTCOLOR', (0, 0), (-1, -1), colors.HexColor('#374151')),
             ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
             ('FONTSIZE', (0, 0), (-1, 0), 11),
-            ('FONTSIZE', (0, 1), (-1, -1), 10),
-            ('BOTTOMPADDING', (0, 0), (-1, 0), 10),
-            ('TOPPADDING', (0, 0), (-1, 0), 10),
-            ('BACKGROUND', (0, 1), (-1, -1), colors.white),
-            ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.HexColor('#f8fafc'), colors.white]),
-            ('GRID', (0, 0), (-1, -1), 1, colors.HexColor('#1e40af')),
-            ('VALIGN', (0, 0), (-1, -1), 'MIDDLE')
+            ('FONTNAME', (0, 1), (-1, 1), 'Helvetica'),
+            ('FONTSIZE', (0, 1), (-1, 1), 8),
+            ('ALIGN', (0, 0), (0, -1), 'LEFT'),
+            ('ALIGN', (1, 0), (1, -1), 'RIGHT'),
+            ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+            ('TOPPADDING', (0, 0), (-1, -1), 8),
+            ('BOTTOMPADDING', (0, 0), (-1, -1), 8),
+            ('LEFTPADDING', (0, 0), (-1, -1), 15),
+            ('RIGHTPADDING', (0, 0), (-1, -1), 15),
+            ('GRID', (0, 0), (-1, -1), 1, colors.HexColor('#e5e7eb'))
         ]))
-        story.append(overall_table)
-        
-        # Footer
-        story.append(Spacer(1, 30))
-        story.append(Paragraph("Generated by Kirana Konnect - Your Complete Business Management Solution", summary_style))
+        story.append(footer_table)
         
         # Build PDF
         doc.build(story)
