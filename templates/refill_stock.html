@@ -123,20 +123,15 @@
             <div class="mb-4">
                 <label class="block text-sm font-medium text-gray-700 mb-2">Update Selling Price (Optional)</label>
                 
-                <!-- Price Type Selection -->
-                <div class="flex space-x-2 mb-3">
-                    <button type="button" id="price-per-unit-btn" class="flex-1 py-2 px-3 text-sm font-medium border border-blue-600 text-blue-600 bg-blue-50 rounded-lg focus:outline-none">
-                        Per <span id="price-unit-text">Unit</span>
-                    </button>
-                    <button type="button" id="price-all-units-btn" class="flex-1 py-2 px-3 text-sm font-medium border border-gray-300 text-gray-700 bg-white rounded-lg focus:outline-none">
-                        All Units
-                    </button>
-                </div>
-                
                 <div class="relative">
                     <span class="absolute left-3 top-3 text-gray-500 text-lg">₹</span>
-                    <input type="number" id="selling-price" class="w-full pl-8 pr-20 py-3 border border-gray-300 rounded-lg text-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="0">
-                    <span id="selling-unit-label" class="absolute right-3 top-3 text-gray-500 text-sm">/Unit</span>
+                    <input type="number" id="selling-price" class="w-full pl-8 pr-24 py-3 border border-gray-300 rounded-lg text-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="0">
+                    <div class="absolute right-3 top-2">
+                        <select id="price-mode-select" class="bg-transparent border-none text-gray-500 text-sm focus:outline-none cursor-pointer">
+                            <option value="per-unit">/Unit</option>
+                            <option value="all-units">/Total</option>
+                        </select>
+                    </div>
                 </div>
                 
                 <!-- Price Display -->
@@ -243,13 +238,11 @@
         }
 
         function initializePriceMode() {
-            const perUnitBtn = document.getElementById('price-per-unit-btn');
-            const allUnitsBtn = document.getElementById('price-all-units-btn');
+            const priceModeSelect = document.getElementById('price-mode-select');
             const sellingPriceInput = document.getElementById('selling-price');
             
-            // Add event listeners for price mode buttons
-            perUnitBtn.addEventListener('click', () => setPriceMode('per-unit'));
-            allUnitsBtn.addEventListener('click', () => setPriceMode('all-units'));
+            // Add event listener for dropdown change
+            priceModeSelect.addEventListener('change', (e) => setPriceMode(e.target.value));
             
             // Add event listener for selling price input
             sellingPriceInput.addEventListener('input', updateSellingPriceCalculations);
@@ -260,28 +253,17 @@
 
         function setPriceMode(mode) {
             priceMode = mode;
-            const perUnitBtn = document.getElementById('price-per-unit-btn');
-            const allUnitsBtn = document.getElementById('price-all-units-btn');
-            const sellingUnitLabel = document.getElementById('selling-unit-label');
-            const priceUnitText = document.getElementById('price-unit-text');
+            const priceModeSelect = document.getElementById('price-mode-select');
             
-            if (mode === 'per-unit') {
-                // Style per-unit button as active
-                perUnitBtn.className = 'flex-1 py-2 px-3 text-sm font-medium border border-blue-600 text-blue-600 bg-blue-50 rounded-lg focus:outline-none';
-                allUnitsBtn.className = 'flex-1 py-2 px-3 text-sm font-medium border border-gray-300 text-gray-700 bg-white rounded-lg focus:outline-none';
-                
-                // Update labels
-                sellingUnitLabel.textContent = `/${productData.unit}`;
-                priceUnitText.textContent = productData.unit;
-            } else {
-                // Style all-units button as active
-                allUnitsBtn.className = 'flex-1 py-2 px-3 text-sm font-medium border border-blue-600 text-blue-600 bg-blue-50 rounded-lg focus:outline-none';
-                perUnitBtn.className = 'flex-1 py-2 px-3 text-sm font-medium border border-gray-300 text-gray-700 bg-white rounded-lg focus:outline-none';
-                
-                // Update labels
-                sellingUnitLabel.textContent = '/Total';
-                priceUnitText.textContent = productData.unit;
-            }
+            // Update dropdown value
+            priceModeSelect.value = mode;
+            
+            // Update the dropdown options to show current unit
+            const perUnitOption = priceModeSelect.querySelector('option[value="per-unit"]');
+            const allUnitsOption = priceModeSelect.querySelector('option[value="all-units"]');
+            
+            perUnitOption.textContent = `/${productData.unit}`;
+            allUnitsOption.textContent = '/Total';
             
             // Clear input and recalculate
             document.getElementById('selling-price').value = '';
