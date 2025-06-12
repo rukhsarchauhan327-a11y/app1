@@ -75,6 +75,19 @@
     transform: translateX(24px);
     background-color: #2563eb;
   }
+
+  .checkbox-custom {
+    transition: all 0.2s ease;
+  }
+
+  .checkbox-custom.checked {
+    background-color: #2563eb;
+    border-color: #2563eb;
+  }
+
+  .checkbox-custom.checked .fa-check {
+    opacity: 1;
+  }
 </style>
 </head>
 <body class="font-inter bg-gray-100">
@@ -147,13 +160,23 @@
                     </div>
                     <i class="fa-solid fa-chevron-right text-gray-400"></i>
                 </button>
-                <button class="w-full flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors" onclick="backupData()">
+                <div class="w-full flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                     <div class="flex items-center space-x-3">
-                        <i class="fa-solid fa-cloud-upload text-primary text-lg"></i>
-                        <span class="font-medium text-dark">Backup Data</span>
+                        <i class="fa-solid fa-envelope text-primary text-lg"></i>
+                        <div class="flex flex-col">
+                            <span class="font-medium text-dark">Email Backup</span>
+                            <span class="text-sm text-gray-500">admin@mystore.com</span>
+                        </div>
                     </div>
-                    <i class="fa-solid fa-chevron-right text-gray-400"></i>
-                </button>
+                    <div class="flex items-center">
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="emailBackup" class="sr-only" checked onchange="toggleEmailBackup()">
+                            <div class="w-6 h-6 bg-white border-2 border-gray-300 rounded-full flex items-center justify-center transition-all duration-200 checkbox-custom">
+                                <i class="fa-solid fa-check text-white text-xs opacity-0 transition-opacity duration-200"></i>
+                            </div>
+                        </label>
+                    </div>
+                </div>
                 <button class="w-full flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors" onclick="manageStaff()">
                     <div class="flex items-center space-x-3">
                         <i class="fa-solid fa-users text-primary text-lg"></i>
@@ -425,13 +448,35 @@
             }
         }
 
-        function backupData() {
-            if (confirm('Create a backup of all your data? This will download a copy for safekeeping.')) {
-                console.log('Backup process initiated');
-                // For now, redirect to the same export function
-                exportBusinessData();
+        function toggleEmailBackup() {
+            const checkbox = document.getElementById('emailBackup');
+            const checkboxVisual = document.querySelector('.checkbox-custom');
+            const isEnabled = checkbox.checked;
+            
+            if (isEnabled) {
+                console.log('Email backup enabled');
+                checkboxVisual.classList.add('checked');
+            } else {
+                console.log('Email backup disabled');
+                if (confirm('Are you sure you want to disable email backup? Your data will not be automatically backed up.')) {
+                    checkboxVisual.classList.remove('checked');
+                } else {
+                    // Re-enable if user cancels
+                    checkbox.checked = true;
+                    checkboxVisual.classList.add('checked');
+                }
             }
         }
+
+        // Initialize checkbox visual state on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            const checkbox = document.getElementById('emailBackup');
+            const checkboxVisual = document.querySelector('.checkbox-custom');
+            
+            if (checkbox && checkbox.checked) {
+                checkboxVisual.classList.add('checked');
+            }
+        });
 
         function manageStaff() {
             // Navigate to staff management
