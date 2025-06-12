@@ -314,13 +314,13 @@
             
             if (sellingPrice > 0 && quantity > 0) {
                 if (priceMode === 'per-unit') {
-                    // User entered price per unit - show total for all added units
+                    // User entered price per unit - current shows total price for all units
                     const totalForAddedStock = sellingPrice * quantity;
-                    currentPriceElement.textContent = `Total for ${quantity} ${productData.unit}s: ₹${totalForAddedStock.toFixed(2)}`;
+                    currentPriceElement.textContent = `Current: Total for ${quantity} ${productData.unit}s = ₹${totalForAddedStock.toFixed(2)}`;
                 } else {
-                    // User entered total price - show per unit price
+                    // User entered total price - current shows per unit price
                     const pricePerUnit = (sellingPrice / quantity).toFixed(2);
-                    currentPriceElement.textContent = `₹${pricePerUnit} per ${productData.unit}`;
+                    currentPriceElement.textContent = `Current: ₹${pricePerUnit} per ${productData.unit}`;
                 }
             } else {
                 currentPriceElement.textContent = '';
