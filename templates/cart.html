@@ -1775,7 +1775,8 @@
                 console.log('All cart-related elements found:', Array.from(allElements).map(el => el.id));
                 console.log('Cart items divs:', allCartItems.length);
                 console.log('Toggle buttons:', allButtons.length);
-                console.log('Cart HTML structure:', cartItemsContainer ? cartItemsContainer.innerHTML.substring(0, 500) : 'Not found');
+                console.log('Cart HTML structure:', cartItemsContainer ? cartItemsContainer.innerHTML.length : 'Not found');
+                console.log('Cart items HTML:', cartItemsContainer ? cartItemsContainer.innerHTML : 'Container not found');
                 
                 console.log('Elements verification:', {
                     container: !!cartItemsContainer,
