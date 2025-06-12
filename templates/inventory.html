@@ -664,15 +664,15 @@
 
             const productId = barcodeProducts[barcode];
             if (productId) {
-                showNotification(`Product found: ${productData[productId]?.name || 'Unknown Product'}`, 'success');
-                // Scroll to product
-                const element = document.getElementById(productId);
-                if (element) {
-                    element.scrollIntoView({ behavior: 'smooth' });
-                    element.style.border = '2px solid #4CAF50';
+                const product = productData[productId];
+                if (product) {
+                    showNotification(`Found ${product.name}`, 'success');
+                    // Navigate to product details page
                     setTimeout(() => {
-                        element.style.border = '';
-                    }, 3000);
+                        viewProductDetails(productId);
+                    }, 1000);
+                } else {
+                    showNotification('Product data not found', 'error');
                 }
             } else {
                 showNotification('Product not found in inventory', 'error');
