@@ -1166,7 +1166,7 @@
         // Initialize cart with localStorage data
         function initializeCart() {
             loadCartItems();
-            renderCartItems();
+            // renderCartItems(); // Disabled to keep hardcoded cart items
             calculateTotals();
         }
 
@@ -1786,6 +1786,7 @@
                 });
                 
                 if (cartItemsContainer) {
+                    // Don't call initializeCart as it clears the hardcoded items
                     calculateTotals();
                     initializeDateToggles();
                     populatePresentStaff();
