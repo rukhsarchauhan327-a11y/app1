@@ -431,8 +431,17 @@
                 }
             }
             
-            // Open camera scanner
-            openCameraScanner();
+            // Try camera scanner first, fallback to manual entry
+            if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                openCameraScanner();
+            } else {
+                // Fallback to manual entry
+                const newBarcode = prompt('Camera not available. Enter barcode manually:', currentBarcode || '');
+                if (newBarcode !== null && newBarcode.trim()) {
+                    barcodeInput.value = newBarcode.trim();
+                    alert('Barcode updated successfully!');
+                }
+            }
         }
 
         function openCameraScanner() {
@@ -441,28 +450,41 @@
             
             modal.classList.remove('hidden');
             
-            // Initialize ZXing barcode reader
-            codeReader = new ZXing.BrowserMultiFormatReader();
-            
-            // Start camera and scanning
-            codeReader.decodeFromVideoDevice(undefined, video, (result, err) => {
-                if (result) {
-                    // Barcode detected
-                    const barcodeValue = result.text;
-                    document.getElementById('barcode-input').value = barcodeValue;
-                    closeCameraScanner();
-                    alert(`Barcode scanned: ${barcodeValue}`);
-                }
-                if (err && !(err instanceof ZXing.NotFoundException)) {
-                    console.error('Scanning error:', err);
-                }
-            }).then((stream) => {
-                currentStream = stream;
-            }).catch((err) => {
-                console.error('Camera access error:', err);
-                alert('Camera access denied or not available. Please enter barcode manually.');
+            // Check if ZXing is loaded
+            if (typeof ZXing === 'undefined') {
+                alert('Barcode scanner library not loaded. Please enter barcode manually.');
                 closeCameraScanner();
-            });
+                return;
+            }
+            
+            try {
+                // Initialize ZXing barcode reader
+                codeReader = new ZXing.BrowserMultiFormatReader();
+                
+                // Start camera and scanning
+                codeReader.decodeFromVideoDevice(undefined, video, (result, err) => {
+                    if (result) {
+                        // Barcode detected
+                        const barcodeValue = result.text;
+                        document.getElementById('barcode-input').value = barcodeValue;
+                        closeCameraScanner();
+                        alert(`Barcode scanned: ${barcodeValue}`);
+                    }
+                    if (err && !(err instanceof ZXing.NotFoundException)) {
+                        console.error('Scanning error:', err);
+                    }
+                }).then((stream) => {
+                    currentStream = stream;
+                }).catch((err) => {
+                    console.error('Camera access error:', err);
+                    alert('Camera access denied or not available. Please enter barcode manually.');
+                    closeCameraScanner();
+                });
+            } catch (error) {
+                console.error('Scanner initialization error:', error);
+                alert('Scanner not available. Please enter barcode manually.');
+                closeCameraScanner();
+            }
         }
 
         function closeCameraScanner() {
