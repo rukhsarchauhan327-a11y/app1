@@ -984,27 +984,18 @@
                 const billGenerator = document.getElementById('bill-generator')?.value || 'Store Staff';
                 const finalTotal = calculateFinalTotal();
                 
-                // Create sample items for now
-                const items = [
-                    {
-                        name: "Aashirvaad Atta",
-                        quantity: 10,
-                        unit_price: 45,
-                        total_price: 450
-                    },
-                    {
-                        name: "Real Fruit Juice", 
-                        quantity: 2,
-                        unit_price: 60,
-                        total_price: 120
-                    },
-                    {
-                        name: "Colgate Paste",
-                        quantity: 3, 
-                        unit_price: 30,
-                        total_price: 90
-                    }
-                ];
+                // Use actual cart items with individual date settings
+                const items = cartItems.map(item => ({
+                    item_name: item.name,
+                    quantity: item.quantity,
+                    unit_price: item.price,
+                    total_price: item.quantity * item.price,
+                    weight: item.weight || null,
+                    price_per_kg: item.pricePerKg || null,
+                    include_dates: !item.datesHidden, // Individual product date setting
+                    mfg_date: item.mfgDate || null,
+                    exp_date: item.expDate || null
+                }));
                 
                 const billData = {
                     customer_id: selectedCustomerId,
@@ -1015,7 +1006,6 @@
                     total_amount: finalTotal,
                     payment_mode: paymentMode,
                     generated_by: billGenerator,
-                    include_dates: includeDatesOnReceipt,
                     items: items
                 };
                 
@@ -1055,12 +1045,84 @@
         // Cart Item Management Functions - Initialize first
         let currentEditingItem = null;
         let cartItems = {
-            1: { name: 'Aashirvaad Atta', price: 450, quantity: 10, unit: 'Kg', unitPrice: 45, type: 'weight', minQty: 0.5, step: 0.5 },
-            2: { name: 'Real Fruit Juice', price: 120, quantity: 2, unit: 'Bottles', unitPrice: 60, type: 'unit', minQty: 1, step: 1 },
-            3: { name: 'Colgate Paste', price: 90, quantity: 3, unit: 'Pieces', unitPrice: 30, type: 'unit', minQty: 1, step: 1 },
-            4: { name: 'Good Day Biscuits', price: 60, quantity: 5, unit: 'Packets', unitPrice: 12, type: 'unit', minQty: 1, step: 1 },
-            5: { name: 'Surf Excel (500gm)', price: 55, quantity: 1, unit: 'Packet', unitPrice: 55, type: 'unit', minQty: 1, step: 1 },
-            6: { name: 'Dabur Honey', price: 180, quantity: 1, unit: 'Bottle', unitPrice: 180, type: 'unit', minQty: 1, step: 1 }
+            1: { 
+                name: 'Aashirvaad Atta', 
+                price: 450, 
+                quantity: 10, 
+                unit: 'Kg', 
+                unitPrice: 45, 
+                type: 'weight', 
+                minQty: 0.5, 
+                step: 0.5,
+                mfgDate: '01/05/2025',
+                expDate: '01/09/2025',
+                datesHidden: false
+            },
+            2: { 
+                name: 'Real Fruit Juice', 
+                price: 120, 
+                quantity: 2, 
+                unit: 'Bottles', 
+                unitPrice: 60, 
+                type: 'unit', 
+                minQty: 1, 
+                step: 1,
+                mfgDate: '12/05/2025',
+                expDate: '25/07/2025',
+                datesHidden: false
+            },
+            3: { 
+                name: 'Colgate Paste', 
+                price: 90, 
+                quantity: 3, 
+                unit: 'Pieces', 
+                unitPrice: 30, 
+                type: 'unit', 
+                minQty: 1, 
+                step: 1,
+                mfgDate: '10/04/2025',
+                expDate: '15/04/2026',
+                datesHidden: false
+            },
+            4: { 
+                name: 'Good Day Biscuits', 
+                price: 60, 
+                quantity: 5, 
+                unit: 'Packets', 
+                unitPrice: 12, 
+                type: 'unit', 
+                minQty: 1, 
+                step: 1,
+                mfgDate: '05/03/2025',
+                expDate: '05/09/2025',
+                datesHidden: false
+            },
+            5: { 
+                name: 'Surf Excel (500gm)', 
+                price: 55, 
+                quantity: 1, 
+                unit: 'Packet', 
+                unitPrice: 55, 
+                type: 'unit', 
+                minQty: 1, 
+                step: 1,
+                mfgDate: '15/02/2025',
+                expDate: '15/02/2027',
+                datesHidden: false
+            },
+            6: { 
+                name: 'Dabur Honey', 
+                price: 180, 
+                quantity: 1, 
+                unit: 'Bottle', 
+                unitPrice: 180, 
+                type: 'unit', 
+                minQty: 1, 
+                step: 1,
+                mfgDate: '01/01/2025',
+                expDate: '01/01/2027',
+                datesHidden: false
+            }
         };
 
         function decreaseQuantity(itemId) {
@@ -1188,66 +1250,7 @@
             currentEditingItem = null;
         }
 
-        let includeDatesOnReceipt = true;
 
-        function toggleDatesOnReceipt() {
-            includeDatesOnReceipt = !includeDatesOnReceipt;
-            
-            // Update top toggle button
-            const toggleTop = document.getElementById('include-dates-toggle-top');
-            const circleTop = document.getElementById('toggle-circle-top');
-            const statusTop = document.getElementById('toggle-status-top');
-            
-            // Update bottom toggle button (if exists)
-            const toggle = document.getElementById('include-dates-toggle');
-            const circle = document.getElementById('toggle-circle');
-            const status = document.getElementById('toggle-status');
-            
-            if (includeDatesOnReceipt) {
-                // Update top toggle
-                if (toggleTop) {
-                    toggleTop.classList.add('bg-white');
-                    toggleTop.classList.remove('bg-gray-400');
-                    circleTop.classList.add('translate-x-7', 'bg-orange-500');
-                    circleTop.classList.remove('translate-x-1', 'bg-gray-500');
-                    statusTop.textContent = 'ON';
-                }
-                
-                // Update bottom toggle
-                if (toggle) {
-                    toggle.classList.add('bg-orange-500');
-                    toggle.classList.remove('bg-gray-400');
-                    circle.classList.add('translate-x-7');
-                    circle.classList.remove('translate-x-1');
-                    status.textContent = 'ON';
-                    status.classList.add('text-orange-600');
-                    status.classList.remove('text-gray-600');
-                }
-            } else {
-                // Update top toggle
-                if (toggleTop) {
-                    toggleTop.classList.remove('bg-white');
-                    toggleTop.classList.add('bg-gray-400');
-                    circleTop.classList.remove('translate-x-7', 'bg-orange-500');
-                    circleTop.classList.add('translate-x-1', 'bg-gray-500');
-                    statusTop.textContent = 'OFF';
-                }
-                
-                // Update bottom toggle
-                if (toggle) {
-                    toggle.classList.remove('bg-orange-500');
-                    toggle.classList.add('bg-gray-400');
-                    circle.classList.remove('translate-x-7');
-                    circle.classList.add('translate-x-1');
-                    status.textContent = 'OFF';
-                    status.classList.remove('text-orange-600');
-                    status.classList.add('text-gray-600');
-                }
-            }
-            
-            console.log('Include dates on receipt:', includeDatesOnReceipt);
-            showNotification(`Date display ${includeDatesOnReceipt ? 'enabled' : 'disabled'} on receipts`, 'info');
-        }
 
         function editDecreaseQuantity() {
             if (!currentEditingItem) return;
