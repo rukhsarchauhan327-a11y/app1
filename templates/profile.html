@@ -601,7 +601,7 @@
                             <div class="flex items-center justify-between py-3">
                                 <div>
                                     <div class="font-medium text-dark">Security Alerts</div>
-                                    <div class="text-sm text-gray-600">Login attempts and security updates</div>
+                                    <div class="text-sm text-gray-600">Important security updates</div>
                                 </div>
                                 <div class="notification-toggle active" data-setting="security">
                                     <div class="toggle-track">
@@ -1029,10 +1029,12 @@
             // Open plan management modal
             console.log('Opening plan management');
             document.getElementById('planManagementModal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
         }
 
         function closePlanModal() {
             document.getElementById('planManagementModal').classList.add('hidden');
+            document.body.style.overflow = 'auto';
         }
 
         function switchToMonthly() {
@@ -1062,10 +1064,12 @@
         function viewBillingHistory() {
             closePlanModal();
             document.getElementById('billingHistoryModal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
         }
 
         function closeBillingModal() {
             document.getElementById('billingHistoryModal').classList.add('hidden');
+            document.body.style.overflow = 'auto';
         }
 
         function downloadInvoice() {
@@ -1080,10 +1084,12 @@
         function updatePaymentMethod() {
             closePlanModal();
             document.getElementById('paymentMethodModal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
         }
 
         function closePaymentModal() {
             document.getElementById('paymentMethodModal').classList.add('hidden');
+            document.body.style.overflow = 'auto';
         }
 
         let selectedPaymentType = 'upi'; // Default to UPI
@@ -1357,10 +1363,12 @@
             // Open notification settings modal
             console.log('Opening notification settings');
             document.getElementById('notificationSettingsModal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden'; // Prevent background scrolling
         }
 
         function closeNotificationModal() {
             document.getElementById('notificationSettingsModal').classList.add('hidden');
+            document.body.style.overflow = 'auto'; // Restore scrolling
         }
 
         // App settings functions
