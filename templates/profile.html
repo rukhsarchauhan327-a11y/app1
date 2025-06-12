@@ -439,6 +439,171 @@
         </div>
     </div>
 
+    <!-- Language Selection Modal -->
+    <div id="languageModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden">
+        <div class="fixed inset-0 flex items-center justify-center p-4">
+            <div class="bg-white rounded-2xl max-w-sm w-full">
+                <div class="flex items-center justify-between p-6 border-b">
+                    <h2 class="text-xl font-bold text-dark">Select Language</h2>
+                    <button onclick="closeLanguageModal()" class="p-2 hover:bg-gray-100 rounded-lg">
+                        <i class="fa-solid fa-times text-gray-600"></i>
+                    </button>
+                </div>
+                
+                <div class="p-6">
+                    <div class="space-y-3">
+                        <button onclick="selectLanguage('English')" class="w-full flex items-center justify-between p-3 bg-blue-50 border border-blue-200 rounded-lg hover:bg-blue-100 transition-colors">
+                            <div class="flex items-center space-x-3">
+                                <span class="text-2xl">🇺🇸</span>
+                                <span class="font-medium text-dark">English</span>
+                            </div>
+                            <i class="fa-solid fa-check text-blue-600"></i>
+                        </button>
+                        
+                        <button onclick="selectLanguage('Hindi')" class="w-full flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                            <div class="flex items-center space-x-3">
+                                <span class="text-2xl">🇮🇳</span>
+                                <span class="font-medium text-dark">हिंदी (Hindi)</span>
+                            </div>
+                        </button>
+                        
+                        <button onclick="selectLanguage('Gujarati')" class="w-full flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                            <div class="flex items-center space-x-3">
+                                <span class="text-2xl">🇮🇳</span>
+                                <span class="font-medium text-dark">ગુજરાતી (Gujarati)</span>
+                            </div>
+                        </button>
+                        
+                        <button onclick="selectLanguage('Tamil')" class="w-full flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                            <div class="flex items-center space-x-3">
+                                <span class="text-2xl">🇮🇳</span>
+                                <span class="font-medium text-dark">தமிழ் (Tamil)</span>
+                            </div>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Help & Support Modal -->
+    <div id="helpSupportModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden">
+        <div class="fixed inset-0 flex items-center justify-center p-4">
+            <div class="bg-white rounded-2xl max-w-md w-full max-h-[90vh] overflow-y-auto">
+                <div class="flex items-center justify-between p-6 border-b">
+                    <h2 class="text-xl font-bold text-dark">Help & Support</h2>
+                    <button onclick="closeHelpModal()" class="p-2 hover:bg-gray-100 rounded-lg">
+                        <i class="fa-solid fa-times text-gray-600"></i>
+                    </button>
+                </div>
+                
+                <div class="p-6">
+                    <div class="space-y-4">
+                        <div class="bg-blue-50 rounded-lg p-4">
+                            <h3 class="font-semibold text-dark mb-2">Contact Support</h3>
+                            <div class="space-y-2 text-sm">
+                                <div class="flex items-center space-x-2">
+                                    <i class="fa-solid fa-phone text-blue-600"></i>
+                                    <span>+91 9876543210</span>
+                                </div>
+                                <div class="flex items-center space-x-2">
+                                    <i class="fa-solid fa-envelope text-blue-600"></i>
+                                    <span>support@kiranakonnect.com</span>
+                                </div>
+                                <div class="flex items-center space-x-2">
+                                    <i class="fa-brands fa-whatsapp text-green-600"></i>
+                                    <span>WhatsApp Support</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="space-y-3">
+                            <button class="w-full flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                                <div class="flex items-center space-x-3">
+                                    <i class="fa-solid fa-question-circle text-primary"></i>
+                                    <span class="font-medium text-dark">FAQ</span>
+                                </div>
+                                <i class="fa-solid fa-chevron-right text-gray-400"></i>
+                            </button>
+                            
+                            <button class="w-full flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                                <div class="flex items-center space-x-3">
+                                    <i class="fa-solid fa-play-circle text-primary"></i>
+                                    <span class="font-medium text-dark">Video Tutorials</span>
+                                </div>
+                                <i class="fa-solid fa-chevron-right text-gray-400"></i>
+                            </button>
+                            
+                            <button class="w-full flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                                <div class="flex items-center space-x-3">
+                                    <i class="fa-solid fa-bug text-primary"></i>
+                                    <span class="font-medium text-dark">Report Bug</span>
+                                </div>
+                                <i class="fa-solid fa-chevron-right text-gray-400"></i>
+                            </button>
+                            
+                            <button class="w-full flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                                <div class="flex items-center space-x-3">
+                                    <i class="fa-solid fa-lightbulb text-primary"></i>
+                                    <span class="font-medium text-dark">Feature Request</span>
+                                </div>
+                                <i class="fa-solid fa-chevron-right text-gray-400"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- About App Modal -->
+    <div id="aboutAppModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden">
+        <div class="fixed inset-0 flex items-center justify-center p-4">
+            <div class="bg-white rounded-2xl max-w-sm w-full">
+                <div class="flex items-center justify-between p-6 border-b">
+                    <h2 class="text-xl font-bold text-dark">About Kirana Konnect</h2>
+                    <button onclick="closeAboutModal()" class="p-2 hover:bg-gray-100 rounded-lg">
+                        <i class="fa-solid fa-times text-gray-600"></i>
+                    </button>
+                </div>
+                
+                <div class="p-6 text-center">
+                    <div class="w-16 h-16 bg-primary rounded-2xl flex items-center justify-center mx-auto mb-4">
+                        <i class="fa-solid fa-store text-white text-2xl"></i>
+                    </div>
+                    
+                    <h3 class="text-xl font-bold text-dark mb-2">Kirana Konnect</h3>
+                    <p class="text-gray-600 text-sm mb-4">Complete business management solution for small retailers</p>
+                    
+                    <div class="bg-gray-50 rounded-lg p-4 mb-4">
+                        <div class="space-y-2 text-sm">
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">Version</span>
+                                <span class="font-medium">2.1.0</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">Build</span>
+                                <span class="font-medium">2024.12.01</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">Developer</span>
+                                <span class="font-medium">Kirana Konnect Team</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="space-y-2 text-xs text-gray-500">
+                        <p>© 2024 Kirana Konnect. All rights reserved.</p>
+                        <div class="flex justify-center space-x-4">
+                            <a href="#" class="hover:text-primary">Privacy Policy</a>
+                            <a href="#" class="hover:text-primary">Terms of Service</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Notification Settings Modal -->
     <div id="notificationSettingsModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden">
         <div class="fixed inset-0 flex items-center justify-center p-4">
@@ -1373,20 +1538,41 @@
 
         // App settings functions
         function changeLanguage() {
-            // Open language selection interface
             console.log('Opening language selection');
+            document.getElementById('languageModal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
         }
 
+        function closeLanguageModal() {
+            document.getElementById('languageModal').classList.add('hidden');
+            document.body.style.overflow = 'auto';
+        }
 
+        function selectLanguage(language) {
+            alert(`Language changed to ${language}`);
+            closeLanguageModal();
+        }
 
         function helpSupport() {
-            // Navigate to help and support section
             console.log('Opening help and support');
+            document.getElementById('helpSupportModal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeHelpModal() {
+            document.getElementById('helpSupportModal').classList.add('hidden');
+            document.body.style.overflow = 'auto';
         }
 
         function aboutApp() {
-            // Show app information
             console.log('Opening about app information');
+            document.getElementById('aboutAppModal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeAboutModal() {
+            document.getElementById('aboutAppModal').classList.add('hidden');
+            document.body.style.overflow = 'auto';
         }
 
         function logout() {
