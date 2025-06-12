@@ -121,9 +121,9 @@
                 
                 <div class="relative">
                     <span class="absolute left-3 top-3 text-gray-500 text-lg">₹</span>
-                    <input type="number" id="selling-price" class="w-full pl-8 pr-28 py-3 border border-gray-300 rounded-lg text-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="0">
-                    <div class="absolute right-3 top-2">
-                        <select id="price-mode-select" class="bg-transparent border-none text-gray-500 text-sm focus:outline-none cursor-pointer">
+                    <input type="number" id="selling-price" class="w-full pl-8 pr-24 py-3 border border-gray-300 rounded-lg text-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="0">
+                    <div class="absolute right-3 top-3">
+                        <select id="price-mode-select" class="bg-white border-none text-gray-600 text-sm focus:outline-none cursor-pointer appearance-none">
                             <option value="per-unit">/Bottle</option>
                             <option value="total">/Total</option>
                         </select>
@@ -132,8 +132,7 @@
                 
                 <!-- Price Display -->
                 <div class="mt-2 space-y-1">
-                    <p id="current-price" class="text-sm text-green-600">Current: ₹0/Bottle</p>
-                    <p id="calculated-price" class="text-sm text-blue-600">For added stock: ₹0</p>
+                    <p id="current-price" class="text-sm text-green-600"></p>
                 </div>
             </div>
 
@@ -254,7 +253,7 @@
             // Update dropdown value
             priceModeSelect.value = mode;
             
-            // Update the dropdown options to show current unit
+            // Update the dropdown options to show current unit dynamically
             const perUnitOption = priceModeSelect.querySelector('option[value="per-unit"]');
             const totalOption = priceModeSelect.querySelector('option[value="total"]');
             
@@ -265,8 +264,7 @@
                 totalOption.textContent = '/Total';
             }
             
-            // Clear input and recalculate
-            document.getElementById('selling-price').value = '';
+            // Recalculate with existing values
             updateSellingPriceCalculations();
         }
 
@@ -313,20 +311,19 @@
             const sellingPrice = parseFloat(document.getElementById('selling-price').value) || 0;
             const quantity = parseFloat(document.getElementById('quantity-input').value) || 0;
             const currentPriceElement = document.getElementById('current-price');
-            const calculatedPriceElement = document.getElementById('calculated-price');
             
-            if (priceMode === 'per-unit') {
-                // User entered price per unit (per bottle/kg etc.)
-                const totalForAddedStock = sellingPrice * quantity;
-                
-                currentPriceElement.textContent = `Current: Total for ${quantity} ${productData.unit}s = ₹${totalForAddedStock.toFixed(2)}`;
-                calculatedPriceElement.textContent = `Per ${productData.unit}: ₹${sellingPrice}`;
+            if (sellingPrice > 0 && quantity > 0) {
+                if (priceMode === 'per-unit') {
+                    // User entered price per unit - show total for all added units
+                    const totalForAddedStock = sellingPrice * quantity;
+                    currentPriceElement.textContent = `Total for ${quantity} ${productData.unit}s: ₹${totalForAddedStock.toFixed(2)}`;
+                } else {
+                    // User entered total price - show per unit price
+                    const pricePerUnit = (sellingPrice / quantity).toFixed(2);
+                    currentPriceElement.textContent = `₹${pricePerUnit} per ${productData.unit}`;
+                }
             } else {
-                // User entered total price for all added units
-                const pricePerUnit = quantity > 0 ? (sellingPrice / quantity).toFixed(2) : 0;
-                
-                currentPriceElement.textContent = `Current: ₹${pricePerUnit} per ${productData.unit}`;
-                calculatedPriceElement.textContent = `Total for added stock: ₹${sellingPrice}`;
+                currentPriceElement.textContent = '';
             }
         }
 
