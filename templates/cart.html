@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cart - Kirana Konnect</title>
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
+    <title>Cart - Kirana Konnect</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script> window.FontAwesomeConfig = { autoReplaceSvg: 'nest'};</script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
@@ -1474,6 +1474,16 @@
         // Initialize
         calculateTotals();
         populatePresentStaff();
+        
+        // Debug: Check if toggle exists
+        setTimeout(() => {
+            const toggle = document.getElementById('include-dates-toggle');
+            if (toggle) {
+                console.log('Toggle button found and loaded successfully');
+            } else {
+                console.error('Toggle button NOT found - debugging needed');
+            }
+        }, 1000);
         
         // Hide credit button on page load since billing tab is default
         document.getElementById('credit-payment').classList.add('hidden');
