@@ -352,7 +352,20 @@
         let productData;
         
         if (storedProductData) {
-            productData = JSON.parse(storedProductData);
+            const stored = JSON.parse(storedProductData);
+            productData = {
+                id: stored.id || productId,
+                name: stored.name || 'Product',
+                size: stored.size || 'Standard',
+                category: stored.category || 'Grocery',
+                isWeightBased: stored.type === 'weight-based' || false,
+                unit: stored.unit || 'Piece',
+                currentStock: stored.stock || 10,
+                reorderLevel: stored.threshold || 5,
+                sellingPrice: stored.sellingPrice || stored.price || 20,
+                barcode: stored.barcode || null,
+                image: stored.image || 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=400'
+            };
         } else {
             // Fallback to sample data
             productData = sampleProducts[productId] || sampleProducts[1];

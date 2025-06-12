@@ -861,51 +861,119 @@
             });
         }
 
-        function refillItem(itemId) {
-            // Navigate to refill stock page with item ID
-            window.location.href = `/refill-stock?id=${itemId}`;
-        }
 
-        // Product data structure
-        const productData = {
-            'item-1': {
+
+        // Comprehensive product data structure with complete inventory items
+        const inventoryItems = [
+            {
+                id: '1',
                 name: 'Wheat Flour',
                 image: 'https://storage.googleapis.com/uxpilot-auth.appspot.com/ad8aa6cee1-b621e3cd72c9ea714c53.png',
                 price: 50,
                 unit: 'Kg',
                 type: 'weight-based',
                 stock: 2.5,
-                stockUnit: 'Kg'
+                stockUnit: 'Kg',
+                category: 'grains',
+                threshold: 1,
+                barcode: '8901030812345'
             },
-            'item-2': {
+            {
+                id: '2',
                 name: 'Coconut Oil',
                 image: 'https://storage.googleapis.com/uxpilot-auth.appspot.com/02cda64d32-ca63fc32eaab87b7db4c.png',
                 price: 180,
                 unit: 'Bottle',
-                type: 'regular',
+                type: 'unit',
                 stock: 8,
                 stockUnit: 'Bottles',
-                size: '500ml'
+                size: '500ml',
+                category: 'oil',
+                threshold: 3,
+                barcode: '8901030823456'
             },
-            'item-3': {
+            {
+                id: '3',
                 name: 'Aashirvaad Atta',
                 image: 'https://storage.googleapis.com/uxpilot-auth.appspot.com/dd29a1f85f-469e6193e37489fc8c43.png',
                 price: 120,
                 unit: 'Bag',
-                type: 'regular',
+                type: 'unit',
                 stock: 3,
                 stockUnit: 'Bags',
-                size: '10 Kg'
+                size: '10 Kg',
+                category: 'grains',
+                threshold: 2,
+                barcode: '8901030834567'
             },
-            'item-4': {
+            {
+                id: '4',
                 name: 'Maggi Noodles',
                 image: 'https://storage.googleapis.com/uxpilot-auth.appspot.com/46dc2aecf3-4ae1d7f8a3bc9c8b21d6.png',
                 price: 15,
                 unit: 'Pack',
-                type: 'regular',
-                stock: 50,
-                stockUnit: 'Packs'
+                type: 'unit',
+                stock: 24,
+                stockUnit: 'Packs',
+                size: '70g',
+                category: 'food',
+                threshold: 10,
+                barcode: '8901030845678'
             },
+            {
+                id: '5',
+                name: 'Dairy Milk',
+                image: 'https://storage.googleapis.com/uxpilot-auth.appspot.com/f12345-chocolate-bar.png',
+                price: 25,
+                unit: 'Bar',
+                type: 'unit',
+                stock: 30,
+                stockUnit: 'Bars',
+                size: '13g',
+                category: 'snacks',
+                threshold: 15,
+                barcode: '8901030856789'
+            },
+            {
+                id: '6',
+                name: 'Uncle Chips',
+                image: 'https://storage.googleapis.com/uxpilot-auth.appspot.com/uncle-chips-image.png',
+                price: 10,
+                unit: 'Pack',
+                type: 'unit',
+                stock: 45,
+                stockUnit: 'Packs',
+                size: '25g',
+                category: 'snacks',
+                threshold: 20,
+                barcode: '8901030867890'
+            },
+            {
+                id: '7',
+                name: 'Paracetamol',
+                image: 'https://storage.googleapis.com/uxpilot-auth.appspot.com/paracetamol-tablets.png',
+                price: 5,
+                unit: 'Strip',
+                type: 'unit',
+                stock: 12,
+                stockUnit: 'Strips',
+                size: '10 tablets',
+                category: 'medical',
+                threshold: 5,
+                barcode: '8901030878901'
+            }
+        ];
+
+        // Legacy product data structure for backward compatibility
+        const productData = {
+            'item-1': inventoryItems[0],
+            'item-2': inventoryItems[1],
+            'item-3': inventoryItems[2],
+            'item-4': inventoryItems[3],
+            'item-5': inventoryItems[4],
+            'item-6': inventoryItems[5],
+            'item-7': inventoryItems[6]
+        };
             'item-5': {
                 name: 'Tata Salt',
                 image: 'https://storage.googleapis.com/uxpilot-auth.appspot.com/e8f1a9b234-salt-package-1kg-white.png',
@@ -1431,7 +1499,39 @@
         function refillItem(itemId) {
             // Extract product ID from itemId (remove 'item-' prefix)
             const productId = itemId.replace('item-', '');
-            window.location.href = `/refill-stock?id=${productId}`;
+            
+            // Find the product data from inventory items
+            const productData = inventoryItems.find(item => item.id == productId);
+            
+            if (productData) {
+                // Store complete product data for refill page
+                const refillData = {
+                    id: productData.id,
+                    name: productData.name,
+                    size: productData.size || 'Standard',
+                    category: productData.category || 'Grocery',
+                    type: productData.type || 'unit',
+                    unit: productData.unit,
+                    stock: productData.stock,
+                    threshold: productData.threshold || Math.round(productData.stock * 0.2),
+                    sellingPrice: productData.price,
+                    price: productData.price,
+                    barcode: productData.barcode || null,
+                    image: productData.image
+                };
+                
+                localStorage.setItem('refillProductData', JSON.stringify(refillData));
+                localStorage.setItem('currentProductId', productData.id);
+                
+                // Navigate to appropriate refill page based on product type
+                if (productData.type === 'weight' || productData.type === 'weight-based') {
+                    window.location.href = `/refill-stock-weight?id=${productId}`;
+                } else {
+                    window.location.href = `/refill-stock?id=${productId}`;
+                }
+            } else {
+                showNotification('Product not found', 'error');
+            }
         }
     </script>
 
