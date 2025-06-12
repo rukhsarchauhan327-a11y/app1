@@ -2010,14 +2010,14 @@
             } else {
                 emptyState.classList.add('hidden');
                 resultsContainer.innerHTML = searchResults.map(product => `
-                    <div class="bg-gray-50 rounded-lg p-3 cursor-pointer hover:bg-gray-100" onclick="openProductDetails('${product.name}', ${product.price}, '${product.unit}')">
-                        <div class="flex items-center space-x-3">
-                            <img src="${product.image}" alt="${product.name}" class="w-12 h-12 rounded-lg object-cover">
-                            <div class="flex-1">
-                                <h3 class="font-semibold text-dark">${product.name}</h3>
-                                <p class="text-sm text-gray-600">₹${product.price}/${product.unit}</p>
-                            </div>
-                            <i class="fa-solid fa-chevron-right text-gray-400"></i>
+                    <div class="flex items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer" onclick="openProductDetails('${product.name}', ${product.price}, '${product.unit}')">
+                        <img src="${product.image}" alt="${product.name}" class="w-12 h-12 rounded-lg object-cover mr-3">
+                        <div class="flex-1">
+                            <h3 class="font-semibold text-dark text-sm">${product.name}</h3>
+                            <p class="text-xs text-gray-600">${product.unit}</p>
+                        </div>
+                        <div class="text-right">
+                            <p class="font-bold text-primary">₹${product.price}</p>
                         </div>
                     </div>
                 `).join('');
