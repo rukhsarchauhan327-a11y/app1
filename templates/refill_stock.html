@@ -376,13 +376,6 @@
 
         // Initialize page with product data
         function initializePage() {
-            // Get product ID from URL parameters
-            const urlParams = new URLSearchParams(window.location.search);
-            const productId = urlParams.get('id');
-            
-            // In a real app, fetch product data from API based on productId
-            // For demo, using sample data
-            
             updateProductDisplay();
             updateCalculations();
             initializePriceMode();
@@ -425,33 +418,63 @@
         }
 
         function updateProductDisplay() {
-            document.getElementById('product-name').textContent = productData.name;
-            document.getElementById('product-size').textContent = productData.size;
-            document.getElementById('product-category').textContent = productData.category;
-            document.getElementById('product-image').src = productData.image;
-            document.getElementById('current-stock').textContent = `${productData.currentStock} ${productData.unit}s`;
-            document.getElementById('reorder-level').textContent = `${productData.reorderLevel} ${productData.unit}s`;
+            // Safely update elements with null checks for real-time data consistency
+            const elements = {
+                'product-name': productData.name || 'Product',
+                'product-size': productData.size || 'Standard',
+                'product-category': productData.category || 'Grocery',
+                'current-stock': `${productData.currentStock || productData.stock || 10} ${productData.unit || 'Units'}`,
+                'reorder-level': `${productData.reorderLevel || productData.threshold || 5} ${productData.unit || 'Units'}`
+            };
+            
+            // Update text content safely
+            Object.keys(elements).forEach(id => {
+                const element = document.getElementById(id);
+                if (element) element.textContent = elements[id];
+            });
+            
+            // Update product image
+            const productImage = document.getElementById('product-image');
+            if (productImage && productData.image) {
+                productImage.src = productData.image;
+                productImage.alt = productData.name || 'Product';
+            }
             
             // Pre-populate barcode if product has one
-            if (productData.barcode) {
-                document.getElementById('barcode-input').value = productData.barcode;
+            const barcodeInput = document.getElementById('barcode-input');
+            if (barcodeInput && productData.barcode) {
+                barcodeInput.value = productData.barcode;
+            }
+            
+            // Update selling price placeholder
+            const sellingPriceInput = document.getElementById('selling-price');
+            if (sellingPriceInput) {
+                sellingPriceInput.placeholder = productData.sellingPrice || productData.price || '0';
+                sellingPriceInput.value = productData.sellingPrice || productData.price || '';
             }
             
             // Update labels based on product type
-            const unitLabel = productData.isWeightBased ? 'kg' : productData.unit + 's';
-            document.getElementById('unit-label').textContent = unitLabel;
-            document.getElementById('new-total').textContent = `${productData.currentStock} ${unitLabel}`;
+            const unitLabel = productData.isWeightBased ? 'kg' : (productData.unit || 'Unit') + 's';
+            const unitLabelEl = document.getElementById('unit-label');
+            if (unitLabelEl) unitLabelEl.textContent = unitLabel;
+            
+            const newTotalEl = document.getElementById('new-total');
+            if (newTotalEl) newTotalEl.textContent = `${productData.currentStock || productData.stock || 10} ${unitLabel}`;
             
             const pricePerUnitLabel = document.getElementById('price-per-unit-label');
             if (pricePerUnitLabel) {
-                pricePerUnitLabel.textContent = `Price per ${productData.unit}`;
+                pricePerUnitLabel.textContent = `Price per ${productData.unit || 'Unit'}`;
             }
             
-            document.getElementById('selling-price').placeholder = productData.sellingPrice;
-            
             // Update product type badge
-            const typeText = productData.isWeightBased ? 'Weight-Based' : 'Unit-Based';
-            document.getElementById('product-type').textContent = typeText;
+            const productTypeEl = document.getElementById('product-type');
+            if (productTypeEl) {
+                const typeText = productData.isWeightBased || productData.type === 'weight-based' ? 'Weight-Based' : 'Unit-Based';
+                productTypeEl.textContent = typeText;
+            }
+            
+            // Update page title for better UX
+            document.title = `Refill ${productData.name || 'Product'} - Kirana Konnect`;
         }
 
         // Auto calculate price per unit and new total

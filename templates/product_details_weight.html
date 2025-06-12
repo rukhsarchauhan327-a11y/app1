@@ -562,34 +562,41 @@
 
         // Refill stock function
         function refillStock() {
-            // Get product data from localStorage
+            // Get current product data
             const productDataStr = localStorage.getItem('currentProduct');
             const currentProductId = localStorage.getItem('currentProductId') || '1';
             
-            let productData = {
-                id: currentProductId,
-                name: 'Basmati Rice Premium',
-                type: 'weight-based',
-                unit: 'kg',
-                price: 110,
-                stock: 25.5
-            };
-            
+            let productData;
             if (productDataStr) {
-                const product = JSON.parse(productDataStr);
+                productData = JSON.parse(productDataStr);
+            } else {
+                // Get from page elements if localStorage is empty
                 productData = {
-                    id: currentProductId,
-                    name: product.name,
-                    type: 'weight-based',
-                    unit: product.unit || 'kg',
-                    price: product.price || 110,
-                    stock: product.stock || 25.5,
-                    image: product.image
+                    name: document.getElementById('product-name').textContent,
+                    price: parseFloat(document.getElementById('price-per-kg').textContent.replace('₹', '')) || 110,
+                    stock: parseFloat(document.getElementById('available-stock').textContent.split(' ')[0]) || 25.5
                 };
             }
             
-            // Store product data for refill page to access
-            localStorage.setItem('refillProductData', JSON.stringify(productData));
+            // Create comprehensive refill data structure
+            const refillData = {
+                id: currentProductId,
+                name: productData.name || 'Weight-Based Product',
+                size: productData.size || 'Premium Quality',
+                category: productData.category || 'Grocery',
+                type: 'weight-based',
+                unit: productData.unit || 'Kg',
+                stock: productData.stock || productData.currentStock || 25.5,
+                threshold: productData.threshold || productData.reorderLevel || Math.round((productData.stock || 25.5) * 0.2),
+                sellingPrice: productData.price || productData.sellingPrice || 110,
+                price: productData.price || productData.sellingPrice || 110,
+                barcode: productData.barcode || null,
+                image: productData.image || 'https://storage.googleapis.com/uxpilot-auth.appspot.com/9307613d34-298d7bee124789ba3905.png'
+            };
+            
+            // Store product data for refill page
+            localStorage.setItem('refillProductData', JSON.stringify(refillData));
+            localStorage.setItem('currentProductId', currentProductId);
             
             // Navigate to weight-based refill stock page
             window.location.href = `/refill-stock-weight?id=${currentProductId}`;

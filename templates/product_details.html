@@ -761,8 +761,31 @@
 
         // Refill stock function
         function refillStock() {
-            const productId = productData.id || 1;
-            window.location.href = `/refill-stock?id=${productId}`;
+            // Store complete product data for refill page
+            const refillData = {
+                id: productData.id || 1,
+                name: productData.name || 'Product',
+                size: productData.size || 'Standard',
+                category: productData.category || 'Grocery',
+                type: productData.type || 'unit',
+                unit: productData.unit || 'Piece',
+                stock: productData.currentStock || productData.stock || 10,
+                threshold: productData.reorderLevel || Math.round((productData.currentStock || 10) * 0.2),
+                sellingPrice: productData.price || productData.sellingPrice || 20,
+                price: productData.price || productData.sellingPrice || 20,
+                barcode: productData.barcode || null,
+                image: productData.image
+            };
+            
+            localStorage.setItem('refillProductData', JSON.stringify(refillData));
+            localStorage.setItem('currentProductId', productData.id || 1);
+            
+            // Navigate to appropriate refill page based on product type
+            if (productData.type === 'weight-based' || productData.isWeightBased) {
+                window.location.href = `/refill-stock-weight?id=${productData.id || 1}`;
+            } else {
+                window.location.href = `/refill-stock?id=${productData.id || 1}`;
+            }
         }
 
         // Initialize page
