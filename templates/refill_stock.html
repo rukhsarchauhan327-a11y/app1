@@ -282,7 +282,11 @@
             const unitLabel = productData.isWeightBased ? 'kg' : productData.unit + 's';
             document.getElementById('unit-label').textContent = unitLabel;
             document.getElementById('new-total').textContent = `${productData.currentStock} ${unitLabel}`;
-            document.getElementById('price-per-unit-label').textContent = `Price per ${productData.unit}`;
+            
+            const pricePerUnitLabel = document.getElementById('price-per-unit-label');
+            if (pricePerUnitLabel) {
+                pricePerUnitLabel.textContent = `Price per ${productData.unit}`;
+            }
             
             document.getElementById('selling-price').placeholder = productData.sellingPrice;
             
