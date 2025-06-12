@@ -122,12 +122,28 @@
             <!-- Selling Price Update -->
             <div class="mb-4">
                 <label class="block text-sm font-medium text-gray-700 mb-2">Update Selling Price (Optional)</label>
+                
+                <!-- Price Type Selection -->
+                <div class="flex space-x-2 mb-3">
+                    <button type="button" id="price-per-unit-btn" class="flex-1 py-2 px-3 text-sm font-medium border border-blue-600 text-blue-600 bg-blue-50 rounded-lg focus:outline-none">
+                        Per <span id="price-unit-text">Unit</span>
+                    </button>
+                    <button type="button" id="price-all-units-btn" class="flex-1 py-2 px-3 text-sm font-medium border border-gray-300 text-gray-700 bg-white rounded-lg focus:outline-none">
+                        All Units
+                    </button>
+                </div>
+                
                 <div class="relative">
                     <span class="absolute left-3 top-3 text-gray-500 text-lg">₹</span>
-                    <input type="number" id="selling-price" class="w-full pl-8 pr-16 py-3 border border-gray-300 rounded-lg text-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="0">
+                    <input type="number" id="selling-price" class="w-full pl-8 pr-20 py-3 border border-gray-300 rounded-lg text-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="0">
                     <span id="selling-unit-label" class="absolute right-3 top-3 text-gray-500 text-sm">/Unit</span>
                 </div>
-                <p id="current-price" class="text-sm text-green-600 mt-1">Current: ₹0/Unit</p>
+                
+                <!-- Price Display -->
+                <div class="mt-2 space-y-1">
+                    <p id="current-price" class="text-sm text-green-600">Current: ₹0/Unit</p>
+                    <p id="calculated-price" class="text-sm text-blue-600">Total for all units: ₹0</p>
+                </div>
             </div>
 
             <!-- Optional Dates -->
@@ -209,6 +225,9 @@
             image: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=400'
         };
 
+        // Price mode: 'per-unit' or 'all-units'
+        let priceMode = 'per-unit';
+
         // Initialize page with product data
         function initializePage() {
             // Get product ID from URL parameters
@@ -220,6 +239,53 @@
             
             updateProductDisplay();
             updateCalculations();
+            initializePriceMode();
+        }
+
+        function initializePriceMode() {
+            const perUnitBtn = document.getElementById('price-per-unit-btn');
+            const allUnitsBtn = document.getElementById('price-all-units-btn');
+            const sellingPriceInput = document.getElementById('selling-price');
+            
+            // Add event listeners for price mode buttons
+            perUnitBtn.addEventListener('click', () => setPriceMode('per-unit'));
+            allUnitsBtn.addEventListener('click', () => setPriceMode('all-units'));
+            
+            // Add event listener for selling price input
+            sellingPriceInput.addEventListener('input', updateSellingPriceCalculations);
+            
+            // Set initial mode
+            setPriceMode('per-unit');
+        }
+
+        function setPriceMode(mode) {
+            priceMode = mode;
+            const perUnitBtn = document.getElementById('price-per-unit-btn');
+            const allUnitsBtn = document.getElementById('price-all-units-btn');
+            const sellingUnitLabel = document.getElementById('selling-unit-label');
+            const priceUnitText = document.getElementById('price-unit-text');
+            
+            if (mode === 'per-unit') {
+                // Style per-unit button as active
+                perUnitBtn.className = 'flex-1 py-2 px-3 text-sm font-medium border border-blue-600 text-blue-600 bg-blue-50 rounded-lg focus:outline-none';
+                allUnitsBtn.className = 'flex-1 py-2 px-3 text-sm font-medium border border-gray-300 text-gray-700 bg-white rounded-lg focus:outline-none';
+                
+                // Update labels
+                sellingUnitLabel.textContent = `/${productData.unit}`;
+                priceUnitText.textContent = productData.unit;
+            } else {
+                // Style all-units button as active
+                allUnitsBtn.className = 'flex-1 py-2 px-3 text-sm font-medium border border-blue-600 text-blue-600 bg-blue-50 rounded-lg focus:outline-none';
+                perUnitBtn.className = 'flex-1 py-2 px-3 text-sm font-medium border border-gray-300 text-gray-700 bg-white rounded-lg focus:outline-none';
+                
+                // Update labels
+                sellingUnitLabel.textContent = '/Total';
+                priceUnitText.textContent = productData.unit;
+            }
+            
+            // Clear input and recalculate
+            document.getElementById('selling-price').value = '';
+            updateSellingPriceCalculations();
         }
 
         function updateProductDisplay() {
@@ -264,8 +330,34 @@
             document.getElementById('new-total').textContent = `${newTotal} ${unitLabel}`;
         }
 
+        function updateSellingPriceCalculations() {
+            const sellingPrice = parseFloat(document.getElementById('selling-price').value) || 0;
+            const quantity = parseFloat(document.getElementById('quantity-input').value) || 0;
+            const currentPriceElement = document.getElementById('current-price');
+            const calculatedPriceElement = document.getElementById('calculated-price');
+            
+            if (priceMode === 'per-unit') {
+                // User entered price per unit
+                const totalForAllUnits = sellingPrice * quantity;
+                const currentPerUnit = productData.sellingPrice;
+                
+                currentPriceElement.textContent = `Current: ₹${currentPerUnit}/${productData.unit}`;
+                calculatedPriceElement.textContent = `Total for ${quantity} ${productData.unit}s: ₹${totalForAllUnits.toFixed(2)}`;
+            } else {
+                // User entered total price for all units
+                const pricePerUnit = quantity > 0 ? (sellingPrice / quantity).toFixed(2) : 0;
+                const currentTotal = productData.sellingPrice * quantity;
+                
+                currentPriceElement.textContent = `Current total for ${quantity} ${productData.unit}s: ₹${currentTotal.toFixed(2)}`;
+                calculatedPriceElement.textContent = `Price per ${productData.unit}: ₹${pricePerUnit}`;
+            }
+        }
+
         // Event listeners
-        document.getElementById('quantity-input').addEventListener('input', updateCalculations);
+        document.getElementById('quantity-input').addEventListener('input', () => {
+            updateCalculations();
+            updateSellingPriceCalculations();
+        });
         document.getElementById('purchase-price').addEventListener('input', updateCalculations);
 
         // Navigation functions
@@ -308,7 +400,7 @@
         function addStock() {
             const quantity = parseFloat(document.getElementById('quantity-input').value);
             const purchasePrice = parseFloat(document.getElementById('purchase-price').value);
-            const sellingPrice = parseFloat(document.getElementById('selling-price').value);
+            const sellingPriceInput = parseFloat(document.getElementById('selling-price').value);
             const mfgDate = document.getElementById('mfg-date').value;
             const expDate = document.getElementById('exp-date').value;
             const barcode = document.getElementById('barcode-input').value;
@@ -323,12 +415,26 @@
                 return;
             }
 
+            // Calculate final selling price per unit based on mode
+            let finalSellingPricePerUnit = productData.sellingPrice;
+            
+            if (sellingPriceInput && sellingPriceInput > 0) {
+                if (priceMode === 'per-unit') {
+                    finalSellingPricePerUnit = sellingPriceInput;
+                } else {
+                    // All units mode - convert to per unit price
+                    finalSellingPricePerUnit = sellingPriceInput / quantity;
+                }
+            }
+
             // Prepare data for submission
             const stockData = {
                 productId: productData.id,
                 quantity: quantity,
                 purchasePrice: purchasePrice,
-                sellingPrice: sellingPrice || productData.sellingPrice,
+                sellingPricePerUnit: finalSellingPricePerUnit,
+                priceMode: priceMode,
+                totalSellingPrice: finalSellingPricePerUnit * quantity,
                 mfgDate: mfgDate,
                 expDate: expDate,
                 barcode: barcode
@@ -336,8 +442,13 @@
 
             console.log('Adding stock:', stockData);
             
-            // Show success message
-            alert(`Successfully added ${quantity} ${productData.unit}s to stock!`);
+            // Show success message with pricing details
+            const priceInfo = sellingPriceInput ? 
+                (priceMode === 'per-unit' ? 
+                    ` at ₹${finalSellingPricePerUnit}/${productData.unit}` : 
+                    ` with total value ₹${stockData.totalSellingPrice}`) : '';
+            
+            alert(`Successfully added ${quantity} ${productData.unit}s to stock${priceInfo}!`);
             
             // Redirect back to inventory or product details
             goToInventory();
