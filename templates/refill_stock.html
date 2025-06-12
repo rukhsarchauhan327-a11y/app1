@@ -202,19 +202,40 @@
 
     <script>
         // Sample product data - will be replaced with actual data from URL params or API
-        let productData = {
-            id: 1,
-            name: 'Frooti Mango Drink',
-            size: '200 ml',
-            category: 'Beverages',
-            isWeightBased: false,
-            unit: 'Bottle',
-            currentStock: 24,
-            reorderLevel: 6,
-            sellingPrice: 20,
-            barcode: '8901030821213',
-            image: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=400'
+        // For demo: products with and without barcodes
+        const sampleProducts = {
+            1: {
+                id: 1,
+                name: 'Frooti Mango Drink',
+                size: '200 ml',
+                category: 'Beverages',
+                isWeightBased: false,
+                unit: 'Bottle',
+                currentStock: 24,
+                reorderLevel: 6,
+                sellingPrice: 20,
+                barcode: '8901030821213',
+                image: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=400'
+            },
+            2: {
+                id: 2,
+                name: 'Local Cookies',
+                size: '100g',
+                category: 'Snacks',
+                isWeightBased: false,
+                unit: 'Pack',
+                currentStock: 15,
+                reorderLevel: 5,
+                sellingPrice: 25,
+                barcode: null, // No barcode for this product
+                image: 'https://images.unsplash.com/photo-1558961363-fa8fdf82db35?w=400'
+            }
         };
+        
+        // Get product from URL or default to product 1
+        const urlParams = new URLSearchParams(window.location.search);
+        const productId = urlParams.get('id') || '1';
+        let productData = sampleProducts[productId] || sampleProducts[1];
 
         // Price mode: 'per-unit' or 'all-units'
         let priceMode = 'per-unit';
@@ -369,8 +390,23 @@
         }
 
         function scanBarcode() {
-            // Barcode scanning functionality
-            console.log('Scanning barcode...');
+            const barcodeInput = document.getElementById('barcode-input');
+            const currentBarcode = barcodeInput.value.trim();
+            
+            // If product already has a barcode, ask for confirmation before overwriting
+            if (currentBarcode && productData.barcode) {
+                const confirmOverwrite = confirm('This product already has a barcode. Do you want to scan a new one to replace it?');
+                if (!confirmOverwrite) {
+                    return;
+                }
+            }
+            
+            // Simulate barcode scanning - in real app, this would open camera
+            const newBarcode = prompt('Enter or scan barcode:', currentBarcode || '');
+            if (newBarcode && newBarcode.trim()) {
+                barcodeInput.value = newBarcode.trim();
+                console.log('Barcode updated:', newBarcode.trim());
+            }
         }
 
         function cancelRefill() {
