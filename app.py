@@ -280,6 +280,11 @@ def refill_stock():
     """Serve the refill stock page"""
     return render_template('refill_stock.html')
 
+@app.route('/refill-stock-weight')
+def refill_stock_weight():
+    """Serve the weight-based refill stock page"""
+    return render_template('refill_stock_weight.html')
+
 @app.route('/staff')
 def staff():
     """Serve the staff management page"""

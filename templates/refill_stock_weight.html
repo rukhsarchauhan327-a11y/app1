@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Refill Stock - Weight Based - Kirana Konnect</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@zxing/library@latest"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#2563eb',
+                        secondary: '#64748b',
+                        accent: '#f59e0b',
+                        success: '#10b981',
+                        danger: '#ef4444',
+                        dark: '#1e293b',
+                        light: '#f8fafc'
+                    },
+                    fontFamily: {
+                        inter: ['Inter', 'sans-serif'],
+                        sans: ['Inter', 'sans-serif']
+                    }
+                }
+            }
+        };
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;500;600;700;800;900&display=swap">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif !important;
+        }
+        
+        .fa, .fas, .far, .fal, .fab {
+            font-family: "Font Awesome 6 Free", "Font Awesome 6 Brands" !important;
+        }
+
+        ::-webkit-scrollbar {
+            display: none;
+        }
+
+        html, body {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+<body class="font-inter bg-gray-100">
+    <!-- Header Section -->
+    <header class="bg-white border-b border-gray-200 fixed top-0 left-0 right-0 z-10">
+        <div class="flex items-center justify-between px-4 py-3">
+            <button onclick="goBack()" class="p-2 hover:bg-gray-100 rounded-lg">
+                <i class="fa-solid fa-arrow-left text-gray-600 text-lg"></i>
+            </button>
+            <div class="text-center">
+                <h1 class="text-lg font-semibold text-dark">Refill Stock</h1>
+                <p class="text-xs text-gray-500">Kirana Konnect</p>
+            </div>
+            <div class="w-10"></div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="pt-16 pb-40 bg-gray-100">
+        <!-- Product Summary Section -->
+        <div class="bg-white mx-4 mt-4 p-4 rounded-lg shadow-sm">
+            <div class="flex items-center space-x-3 mb-4">
+                <img id="product-image" class="w-16 h-16 rounded-lg object-cover border border-gray-200" src="https://images.unsplash.com/photo-1586201375761-83865001e31c?w=400" alt="Product image">
+                <div class="flex-1">
+                    <h2 id="product-name" class="text-lg font-bold text-dark">Rice Basmati</h2>
+                    <p id="product-size" class="text-sm text-gray-600">Per kg</p>
+                    <div class="flex items-center space-x-2 mt-1">
+                        <span id="product-category" class="bg-blue-100 text-blue-600 px-2 py-1 rounded-full text-xs font-medium">Grains</span>
+                        <span class="bg-orange-100 text-orange-600 px-2 py-1 rounded-full text-xs font-medium">Weight-Based</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Current Stock Info -->
+            <div class="bg-orange-50 p-3 rounded-lg mb-4">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm text-orange-600 font-medium">Current Stock</p>
+                        <p id="current-stock" class="text-2xl font-bold text-orange-700">45.5 kg</p>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-sm text-gray-500">Low Stock Threshold</p>
+                        <p id="reorder-level" class="text-lg font-semibold text-gray-700">10 kg</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Refill Form Section -->
+        <div class="bg-white mx-4 mt-4 p-4 rounded-lg shadow-sm">
+            <h3 class="text-lg font-semibold text-dark mb-4">Add New Stock</h3>
+            
+            <!-- Weight Input -->
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Additional Weight</label>
+                <div class="relative">
+                    <input type="number" step="0.1" id="weight-input" class="w-full px-4 py-3 border border-gray-300 rounded-lg text-lg font-semibold text-center focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="0.0">
+                    <span class="absolute right-3 top-3 text-gray-500 text-sm">kg</span>
+                </div>
+            </div>
+
+            <!-- Purchase Price -->
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Total Purchase Price</label>
+                <div class="relative">
+                    <span class="absolute left-3 top-3 text-gray-500 text-lg">₹</span>
+                    <input type="number" id="purchase-price" class="w-full pl-8 pr-4 py-3 border border-gray-300 rounded-lg text-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="0">
+                </div>
+            </div>
+
+            <!-- Auto Calculated Fields -->
+            <div class="bg-gray-50 p-4 rounded-lg mb-4">
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <p class="text-xs text-gray-500 mb-1">Price per kg</p>
+                        <p class="text-lg font-bold text-dark" id="price-per-kg">₹0</p>
+                    </div>
+                    <div>
+                        <p class="text-xs text-gray-500 mb-1">New Total Stock</p>
+                        <p class="text-lg font-bold text-green-600" id="new-total">45.5 kg</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Selling Price Update -->
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Update Selling Price</label>
+                <div class="flex items-center space-x-2 mb-2">
+                    <select id="price-mode-select" class="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        <option value="per-kg">/kg</option>
+                        <option value="total">/Total</option>
+                    </select>
+                </div>
+                <div class="relative">
+                    <span class="absolute left-3 top-3 text-gray-500 text-lg">₹</span>
+                    <input type="number" id="selling-price" class="w-full pl-8 pr-4 py-3 border border-gray-300 rounded-lg text-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="0">
+                </div>
+                <p class="text-sm text-green-600 mt-1" id="current-price"></p>
+            </div>
+
+            <!-- Optional Dates -->
+            <div class="grid grid-cols-2 gap-4 mb-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">MFG Date (Optional)</label>
+                    <input type="date" id="mfg-date" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">EXP Date (Optional)</label>
+                    <input type="date" id="exp-date" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                </div>
+            </div>
+
+            <!-- Barcode -->
+            <div class="mb-8">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Barcode (Optional)</label>
+                <div class="relative">
+                    <input type="text" id="barcode-input" class="w-full pl-4 pr-16 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Enter or scan barcode">
+                    <button onclick="scanBarcode()" class="absolute right-2 top-1/2 transform -translate-y-1/2 px-3 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
+                        <i class="fa-solid fa-barcode"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Fixed Bottom Actions -->
+    <div class="fixed bottom-16 left-0 right-0 bg-white border-t border-gray-200 p-4">
+        <div class="grid grid-cols-2 gap-3">
+            <button onclick="cancelRefill()" class="flex items-center justify-center space-x-2 bg-gray-600 text-white py-3 px-4 rounded-lg hover:bg-gray-700 transition-colors">
+                <i class="fa-solid fa-times text-sm"></i>
+                <span class="font-medium">Cancel</span>
+            </button>
+            <button onclick="addStock()" class="flex items-center justify-center space-x-2 bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 transition-colors">
+                <i class="fa-solid fa-check text-sm"></i>
+                <span class="font-medium">Add Stock</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Bottom Navigation -->
+    <nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200">
+        <div class="flex justify-around items-end py-2">
+            <button onclick="goToDashboard()" class="flex flex-col items-center py-1 px-3">
+                <i class="fa-solid fa-home text-gray-400 text-lg"></i>
+                <span class="text-xs mt-1 text-gray-400">Home</span>
+            </button>
+            <button onclick="goToInventory()" class="flex flex-col items-center py-1 px-3">
+                <i class="fa-solid fa-box text-primary text-lg"></i>
+                <span class="text-xs mt-1 text-primary">Inventory</span>
+            </button>
+            <button onclick="openScanner()" class="relative -top-3 bg-primary rounded-full p-3 shadow-lg">
+                <i class="fa-solid fa-barcode text-white text-lg"></i>
+            </button>
+            <button onclick="goToCart()" class="flex flex-col items-center py-1 px-3">
+                <i class="fa-solid fa-shopping-cart text-gray-400 text-lg"></i>
+                <span class="text-xs mt-1 text-gray-400">Cart</span>
+            </button>
+            <button onclick="goToProfile()" class="flex flex-col items-center py-1 px-3">
+                <i class="fa-solid fa-user text-gray-400 text-lg"></i>
+                <span class="text-xs mt-1 text-gray-400">Profile</span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Camera Scanner Modal -->
+    <div id="scanner-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-white rounded-lg p-6 w-full max-w-md">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-lg font-semibold">Scan Barcode</h3>
+                    <button onclick="closeCameraScanner()" class="text-gray-500 hover:text-gray-700">
+                        <i class="fa-solid fa-times text-xl"></i>
+                    </button>
+                </div>
+                <div class="relative">
+                    <video id="scanner-video" class="w-full h-64 bg-gray-200 rounded-lg object-cover"></video>
+                    <div class="absolute inset-0 flex items-center justify-center">
+                        <div class="w-48 h-32 border-2 border-red-500 bg-transparent"></div>
+                    </div>
+                </div>
+                <div class="mt-4 text-center">
+                    <p class="text-sm text-gray-600 mb-4">Position the barcode within the red frame</p>
+                    <button onclick="closeCameraScanner()" class="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600">
+                        Cancel
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success Popup Modal -->
+    <div id="success-popup" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-white rounded-lg p-8 w-full max-w-sm text-center">
+                <div class="mb-4">
+                    <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fa-solid fa-check text-green-500 text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-800 mb-2">Stock Added Successfully!</h3>
+                    <p class="text-gray-600 text-sm" id="success-message">Your inventory has been updated with the new stock.</p>
+                </div>
+                <button onclick="closeSuccessPopup(); closeErrorPopup();" class="w-full bg-primary text-white py-3 px-4 rounded-lg hover:bg-blue-700 transition-colors font-medium">
+                    Continue
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Sample weight-based product data
+        const sampleProducts = {
+            1: {
+                id: 1,
+                name: 'Rice Basmati',
+                size: 'Per kg',
+                category: 'Grains',
+                isWeightBased: true,
+                unit: 'kg',
+                currentStock: 45.5,
+                reorderLevel: 10,
+                sellingPrice: 120,
+                barcode: '8901030875422',
+                image: 'https://images.unsplash.com/photo-1586201375761-83865001e31c?w=400'
+            },
+            2: {
+                id: 2,
+                name: 'Onions',
+                size: 'Per kg',
+                category: 'Vegetables',
+                isWeightBased: true,
+                unit: 'kg',
+                currentStock: 25.0,
+                reorderLevel: 5,
+                sellingPrice: 40,
+                barcode: null,
+                image: 'https://images.unsplash.com/photo-1518977676601-b53f82aba655?w=400'
+            }
+        };
+        
+        // Get product from URL or default to product 1
+        const urlParams = new URLSearchParams(window.location.search);
+        const productId = urlParams.get('id') || '1';
+        let productData = sampleProducts[productId] || sampleProducts[1];
+
+        // Price mode: 'per-kg' or 'total'
+        let priceMode = 'per-kg';
+
+        // Scanner variables
+        let codeReader = null;
+        let currentStream = null;
+
+        // Initialize page with product data
+        function initializePage() {
+            updateProductDisplay();
+            updateCalculations();
+            initializePriceMode();
+        }
+
+        function initializePriceMode() {
+            const priceModeSelect = document.getElementById('price-mode-select');
+            const sellingPriceInput = document.getElementById('selling-price');
+            
+            // Add event listeners
+            priceModeSelect.addEventListener('change', (e) => setPriceMode(e.target.value));
+            sellingPriceInput.addEventListener('input', updateSellingPriceCalculations);
+            
+            // Set initial mode
+            setPriceMode('per-kg');
+        }
+
+        function setPriceMode(mode) {
+            priceMode = mode;
+            const priceModeSelect = document.getElementById('price-mode-select');
+            
+            // Update dropdown value
+            priceModeSelect.value = mode;
+            
+            // Recalculate with existing values
+            updateSellingPriceCalculations();
+        }
+
+        function updateProductDisplay() {
+            document.getElementById('product-name').textContent = productData.name;
+            document.getElementById('product-size').textContent = productData.size;
+            document.getElementById('product-category').textContent = productData.category;
+            document.getElementById('product-image').src = productData.image;
+            document.getElementById('current-stock').textContent = `${productData.currentStock} ${productData.unit}`;
+            document.getElementById('reorder-level').textContent = `${productData.reorderLevel} ${productData.unit}`;
+            
+            // Pre-populate barcode if product has one
+            if (productData.barcode) {
+                document.getElementById('barcode-input').value = productData.barcode;
+            }
+        }
+
+        function updateCalculations() {
+            const weight = parseFloat(document.getElementById('weight-input').value) || 0;
+            const purchasePrice = parseFloat(document.getElementById('purchase-price').value) || 0;
+            
+            const pricePerKg = weight > 0 ? (purchasePrice / weight).toFixed(2) : 0;
+            const newTotal = (productData.currentStock + weight).toFixed(1);
+            
+            document.getElementById('price-per-kg').textContent = `₹${pricePerKg}`;
+            document.getElementById('new-total').textContent = `${newTotal} kg`;
+        }
+
+        function updateSellingPriceCalculations() {
+            const sellingPrice = parseFloat(document.getElementById('selling-price').value) || 0;
+            const weight = parseFloat(document.getElementById('weight-input').value) || 0;
+            const currentPriceElement = document.getElementById('current-price');
+            
+            if (sellingPrice > 0 && weight > 0) {
+                const totalWeight = productData.currentStock + weight;
+                
+                if (priceMode === 'per-kg') {
+                    // User entered price per kg - show total value of all weight
+                    const totalValueAllWeight = sellingPrice * totalWeight;
+                    currentPriceElement.textContent = `Current: ₹${totalValueAllWeight.toFixed(2)} / ${totalWeight} kg`;
+                } else {
+                    // User entered total price for new stock - show per kg price
+                    const pricePerKg = (sellingPrice / weight).toFixed(2);
+                    currentPriceElement.textContent = `Current: ₹${pricePerKg} per kg`;
+                }
+            } else {
+                currentPriceElement.textContent = '';
+            }
+        }
+
+        // Navigation functions
+        function goBack() {
+            window.history.back();
+        }
+
+        function goToDashboard() {
+            window.location.href = '/dashboard';
+        }
+
+        function goToInventory() {
+            window.location.href = '/inventory';
+        }
+
+        function goToCart() {
+            window.location.href = '/cart';
+        }
+
+        function goToProfile() {
+            window.location.href = '/profile';
+        }
+
+        function openScanner() {
+            console.log('Opening scanner...');
+        }
+
+        // Barcode scanning functions
+        function scanBarcode() {
+            const barcodeInput = document.getElementById('barcode-input');
+            const currentBarcode = barcodeInput.value.trim();
+            
+            // If product already has a barcode, ask for confirmation before overwriting
+            if (currentBarcode && productData.barcode) {
+                const confirmOverwrite = confirm('This product already has a barcode. Do you want to scan a new one to replace it?');
+                if (!confirmOverwrite) {
+                    return;
+                }
+            }
+            
+            // Try camera scanner first, fallback to manual entry
+            if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                openCameraScanner();
+            } else {
+                // Fallback to manual entry
+                const newBarcode = prompt('Camera not available. Enter barcode manually:', currentBarcode || '');
+                if (newBarcode !== null && newBarcode.trim()) {
+                    barcodeInput.value = newBarcode.trim();
+                    alert('Barcode updated successfully!');
+                }
+            }
+        }
+
+        function openCameraScanner() {
+            const modal = document.getElementById('scanner-modal');
+            const video = document.getElementById('scanner-video');
+            
+            modal.classList.remove('hidden');
+            
+            // Check if ZXing is loaded
+            if (typeof ZXing === 'undefined') {
+                alert('Barcode scanner library not loaded. Please enter barcode manually.');
+                closeCameraScanner();
+                return;
+            }
+            
+            try {
+                // Initialize ZXing barcode reader
+                codeReader = new ZXing.BrowserMultiFormatReader();
+                
+                // Start camera and scanning
+                codeReader.decodeFromVideoDevice(undefined, video, (result, err) => {
+                    if (result) {
+                        // Barcode detected
+                        const barcodeValue = result.text;
+                        document.getElementById('barcode-input').value = barcodeValue;
+                        closeCameraScanner();
+                        alert(`Barcode scanned: ${barcodeValue}`);
+                    }
+                    if (err && !(err instanceof ZXing.NotFoundException)) {
+                        console.error('Scanning error:', err);
+                    }
+                }).then((stream) => {
+                    currentStream = stream;
+                }).catch((err) => {
+                    console.error('Camera access error:', err);
+                    alert('Camera access denied or not available. Please enter barcode manually.');
+                    closeCameraScanner();
+                });
+            } catch (error) {
+                console.error('Scanner initialization error:', error);
+                alert('Scanner not available. Please enter barcode manually.');
+                closeCameraScanner();
+            }
+        }
+
+        function closeCameraScanner() {
+            const modal = document.getElementById('scanner-modal');
+            modal.classList.add('hidden');
+            
+            // Stop camera stream
+            if (currentStream) {
+                currentStream.getTracks().forEach(track => track.stop());
+                currentStream = null;
+            }
+            
+            // Reset code reader
+            if (codeReader) {
+                codeReader.reset();
+                codeReader = null;
+            }
+        }
+
+        // Success/Error popup functions
+        function showSuccessPopup(message) {
+            const popup = document.getElementById('success-popup');
+            const messageElement = document.getElementById('success-message');
+            messageElement.textContent = message;
+            popup.classList.remove('hidden');
+        }
+
+        function closeSuccessPopup() {
+            const popup = document.getElementById('success-popup');
+            popup.classList.add('hidden');
+            
+            // Redirect back to inventory after closing popup
+            setTimeout(() => {
+                goToInventory();
+            }, 300);
+        }
+
+        function showErrorPopup(message) {
+            // Reuse success popup but change styling for error
+            const popup = document.getElementById('success-popup');
+            const messageElement = document.getElementById('success-message');
+            const icon = popup.querySelector('i');
+            const iconContainer = popup.querySelector('.bg-green-100');
+            const title = popup.querySelector('h3');
+            
+            // Change to error styling
+            iconContainer.className = 'w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4';
+            icon.className = 'fa-solid fa-exclamation-triangle text-red-500 text-2xl';
+            title.textContent = 'Input Required';
+            messageElement.textContent = message;
+            
+            popup.classList.remove('hidden');
+        }
+
+        function closeErrorPopup() {
+            const popup = document.getElementById('success-popup');
+            popup.classList.add('hidden');
+            
+            // Reset to success styling for next use
+            const icon = popup.querySelector('i');
+            const iconContainer = popup.querySelector('.bg-red-100, .bg-green-100');
+            const title = popup.querySelector('h3');
+            
+            iconContainer.className = 'w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4';
+            icon.className = 'fa-solid fa-check text-green-500 text-2xl';
+            title.textContent = 'Stock Added Successfully!';
+        }
+
+        function cancelRefill() {
+            if (confirm('Are you sure you want to cancel? All changes will be lost.')) {
+                goBack();
+            }
+        }
+
+        function addStock() {
+            const weight = parseFloat(document.getElementById('weight-input').value);
+            const purchasePrice = parseFloat(document.getElementById('purchase-price').value);
+            const sellingPriceInput = parseFloat(document.getElementById('selling-price').value);
+            const mfgDate = document.getElementById('mfg-date').value;
+            const expDate = document.getElementById('exp-date').value;
+            const barcode = document.getElementById('barcode-input').value;
+
+            if (!weight || weight <= 0) {
+                showErrorPopup('Please enter a valid weight');
+                return;
+            }
+
+            if (!purchasePrice || purchasePrice <= 0) {
+                showErrorPopup('Please enter a valid purchase price');
+                return;
+            }
+
+            if (!sellingPriceInput || sellingPriceInput <= 0) {
+                showErrorPopup('Please enter a valid selling price');
+                return;
+            }
+
+            // Calculate final selling price per kg based on mode
+            let finalSellingPricePerKg;
+            
+            if (priceMode === 'per-kg') {
+                finalSellingPricePerKg = sellingPriceInput;
+            } else {
+                // Total mode - convert to per kg price
+                finalSellingPricePerKg = sellingPriceInput / weight;
+            }
+
+            // Prepare data for submission
+            const stockData = {
+                productId: productData.id,
+                weight: weight,
+                purchasePrice: purchasePrice,
+                sellingPricePerKg: finalSellingPricePerKg,
+                priceMode: priceMode,
+                totalSellingPrice: finalSellingPricePerKg * weight,
+                mfgDate: mfgDate,
+                expDate: expDate,
+                barcode: barcode
+            };
+
+            console.log('Adding weight-based stock:', stockData);
+            
+            // Show custom success popup with pricing details
+            const priceInfo = priceMode === 'per-kg' ? 
+                ` at ₹${finalSellingPricePerKg}/kg` : 
+                ` with total value ₹${stockData.totalSellingPrice}`;
+            
+            showSuccessPopup(`Successfully added ${weight} kg to stock${priceInfo}!`);
+        }
+
+        // Event listeners
+        document.getElementById('weight-input').addEventListener('input', () => {
+            updateCalculations();
+            updateSellingPriceCalculations();
+        });
+        document.getElementById('purchase-price').addEventListener('input', updateCalculations);
+
+        // Initialize page when loaded
+        window.addEventListener('load', initializePage);
+    </script>
+</body>
+</html>
