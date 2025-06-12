@@ -524,26 +524,39 @@
         }
 
         function proceedWithScanning() {
+            console.log('Proceeding with scanning...');
+            console.log('Navigator.mediaDevices available:', !!navigator.mediaDevices);
+            console.log('getUserMedia available:', !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia));
+            
             // Try camera scanner first, fallback to manual entry
             if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                console.log('Opening camera scanner...');
                 openCameraScanner();
             } else {
+                console.log('Camera not available, showing manual entry...');
                 // Show manual entry modal instead of prompt
                 showManualBarcodeModal();
             }
         }
 
         function openCameraScanner() {
+            console.log('openCameraScanner() called');
             const modal = document.getElementById('scanner-modal');
             const video = document.getElementById('scanner-video');
             const statusElement = document.getElementById('scanner-status');
             const manualInput = document.getElementById('scanner-manual-input');
+            
+            console.log('Modal element:', modal);
+            console.log('Video element:', video);
+            console.log('Status element:', statusElement);
             
             modal.classList.remove('hidden');
             manualInput.value = '';
             
             // Update status
             updateScannerStatus('Starting camera...', 'blue');
+            
+            console.log('Requesting camera access...');
             
             // Try to access camera directly first
             navigator.mediaDevices.getUserMedia({
@@ -553,40 +566,54 @@
                     height: { ideal: 720 }
                 }
             }).then((stream) => {
+                console.log('Camera access granted, stream:', stream);
                 video.srcObject = stream;
                 currentStream = stream;
-                video.play();
                 
-                updateScannerStatus('Camera ready - Scan barcode or enter manually', 'green');
+                video.addEventListener('loadedmetadata', () => {
+                    console.log('Video metadata loaded, starting playback');
+                    video.play().then(() => {
+                        console.log('Video playing successfully');
+                        updateScannerStatus('Camera ready - Scan barcode or enter manually', 'green');
+                        
+                        // Check if ZXing is available for barcode detection
+                        console.log('ZXing available:', typeof ZXing !== 'undefined');
+                        if (typeof ZXing !== 'undefined') {
+                            try {
+                                // Initialize ZXing barcode reader
+                                codeReader = new ZXing.BrowserMultiFormatReader();
+                                console.log('ZXing code reader initialized');
+                                
+                                updateScannerStatus('Scanner active - Point camera at barcode', 'green');
+                                
+                                // Start scanning
+                                codeReader.decodeFromVideoDevice(undefined, video, (result, err) => {
+                                    if (result) {
+                                        console.log('Barcode detected:', result.text);
+                                        // Barcode detected
+                                        const barcodeValue = result.text;
+                                        document.getElementById('barcode-input').value = barcodeValue;
+                                        closeCameraScanner();
+                                        showSuccessPopup(`Barcode scanned: ${barcodeValue}`);
+                                    }
+                                    if (err && !(err instanceof ZXing.NotFoundException)) {
+                                        console.error('Scanning error:', err);
+                                    }
+                                });
+                            } catch (error) {
+                                console.error('ZXing initialization error:', error);
+                                updateScannerStatus('Auto-scan unavailable - Enter barcode manually', 'orange');
+                            }
+                        } else {
+                            console.log('ZXing not available');
+                            updateScannerStatus('Auto-scan unavailable - Enter barcode manually', 'orange');
+                        }
+                    }).catch((playError) => {
+                        console.error('Video play error:', playError);
+                        updateScannerStatus('Camera error - Enter barcode manually', 'red');
+                    });
+                });
                 
-                // Check if ZXing is available for barcode detection
-                if (typeof ZXing !== 'undefined') {
-                    try {
-                        // Initialize ZXing barcode reader
-                        codeReader = new ZXing.BrowserMultiFormatReader();
-                        
-                        updateScannerStatus('Scanner active - Point camera at barcode', 'green');
-                        
-                        // Start scanning
-                        codeReader.decodeFromVideoDevice(undefined, video, (result, err) => {
-                            if (result) {
-                                // Barcode detected
-                                const barcodeValue = result.text;
-                                document.getElementById('barcode-input').value = barcodeValue;
-                                closeCameraScanner();
-                                showSuccessPopup(`Barcode scanned: ${barcodeValue}`);
-                            }
-                            if (err && !(err instanceof ZXing.NotFoundException)) {
-                                console.error('Scanning error:', err);
-                            }
-                        });
-                    } catch (error) {
-                        console.error('ZXing initialization error:', error);
-                        updateScannerStatus('Auto-scan unavailable - Enter barcode manually', 'orange');
-                    }
-                } else {
-                    updateScannerStatus('Auto-scan unavailable - Enter barcode manually', 'orange');
-                }
             }).catch((err) => {
                 console.error('Camera access error:', err);
                 updateScannerStatus('Camera access denied - Enter barcode manually', 'red');
