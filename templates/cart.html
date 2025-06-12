@@ -265,25 +265,15 @@
                         <span class="text-sm text-gray-700 font-medium">3 Pieces</span>
                         <span class="text-lg font-bold text-primary">₹90</span>
                     </div>
-                    <div class="mt-2 space-y-1">
-                        <div class="flex items-center text-xs text-gray-500 date-info">
-                            <i class="fa-solid fa-calendar mr-1"></i>
-                            <span>MFG: 10/04/2025</span>
-                        </div>
-                        <div class="flex items-center text-xs text-gray-500 date-info">
-                            <i class="fa-solid fa-clock mr-1"></i>
-                            <span>EXP: 15/04/2026</span>
-                        </div>
-                        <div class="flex items-center space-x-2 mt-1">
-                            <button class="text-xs text-primary hover:underline flex items-center" onclick="editItem(3)">
-                                <i class="fa-solid fa-edit mr-1"></i>
-                                Edit
-                            </button>
-                            <button id="date-toggle-3" class="text-xs text-danger hover:underline flex items-center" onclick="toggleProductDates(3)">
-                                <i class="fa-solid fa-times mr-1"></i>
-                                Remove Dates
-                            </button>
-                        </div>
+                    <div class="mt-2">
+                        <button class="text-xs text-primary hover:underline flex items-center" onclick="editItem(3)">
+                            <i class="fa-solid fa-edit mr-1"></i>
+                            Edit
+                        </button>
+                        <button id="date-toggle-3" class="text-xs text-danger hover:underline flex items-center" onclick="toggleProductDates(3)" style="display: none;">
+                            <i class="fa-solid fa-times mr-1"></i>
+                            Remove Dates
+                        </button>
                     </div>
                 </div>
                 <button class="text-danger text-sm ml-3 p-1" onclick="removeItem(3)">
@@ -335,25 +325,15 @@
                         <span class="text-sm text-gray-700 font-medium">1 Packet</span>
                         <span class="text-lg font-bold text-primary">₹55</span>
                     </div>
-                    <div class="mt-2 space-y-1">
-                        <div class="flex items-center text-xs text-gray-500 date-info">
-                            <i class="fa-solid fa-calendar mr-1"></i>
-                            <span>MFG: 15/02/2025</span>
-                        </div>
-                        <div class="flex items-center text-xs text-gray-500 date-info">
-                            <i class="fa-solid fa-clock mr-1"></i>
-                            <span>EXP: 15/02/2027</span>
-                        </div>
-                        <div class="flex items-center space-x-2 mt-1">
-                            <button class="text-xs text-primary hover:underline flex items-center" onclick="editItem(5)">
-                                <i class="fa-solid fa-edit mr-1"></i>
-                                Edit
-                            </button>
-                            <button id="date-toggle-5" class="text-xs text-danger hover:underline flex items-center" onclick="toggleProductDates(5)">
-                                <i class="fa-solid fa-times mr-1"></i>
-                                Remove Dates
-                            </button>
-                        </div>
+                    <div class="mt-2">
+                        <button class="text-xs text-primary hover:underline flex items-center" onclick="editItem(5)">
+                            <i class="fa-solid fa-edit mr-1"></i>
+                            Edit
+                        </button>
+                        <button id="date-toggle-5" class="text-xs text-danger hover:underline flex items-center" onclick="toggleProductDates(5)" style="display: none;">
+                            <i class="fa-solid fa-times mr-1"></i>
+                            Remove Dates
+                        </button>
                     </div>
                 </div>
                 <button class="text-danger text-sm ml-3 p-1" onclick="removeItem(5)">
@@ -1107,10 +1087,7 @@
                 unitPrice: 30, 
                 type: 'unit', 
                 minQty: 1, 
-                step: 1,
-                mfgDate: '10/04/2025',
-                expDate: '15/04/2026',
-                datesHidden: false
+                step: 1
             },
             4: { 
                 name: 'Good Day Biscuits', 
@@ -1133,10 +1110,7 @@
                 unitPrice: 55, 
                 type: 'unit', 
                 minQty: 1, 
-                step: 1,
-                mfgDate: '15/02/2025',
-                expDate: '15/02/2027',
-                datesHidden: false
+                step: 1
             },
             6: { 
                 name: 'Dabur Honey', 
@@ -1556,23 +1530,35 @@
         function initializeDateToggles() {
             console.log('Initializing date toggles...');
             
-            // Check all toggle buttons exist
+            // Check all toggle buttons exist and hide toggle for items without dates
             for (let i = 1; i <= 6; i++) {
                 const button = document.getElementById(`date-toggle-${i}`);
                 const cartItem = document.getElementById(`cart-item-${i}`);
                 const dateElements = document.querySelectorAll(`#cart-item-${i} .date-info`);
+                const item = cartItems[i];
                 
                 console.log(`Item ${i}:`, {
                     button: !!button,
                     cartItem: !!cartItem,
                     dateElements: dateElements.length,
-                    cartItemData: !!cartItems[i]
+                    cartItemData: !!item,
+                    hasDates: !!(item && item.mfgDate && item.expDate)
                 });
                 
-                if (button && cartItems[i]) {
-                    // Ensure the item has the datesHidden property
-                    if (cartItems[i].datesHidden === undefined) {
-                        cartItems[i].datesHidden = false;
+                if (button && item) {
+                    // Check if item has manufacturing and expiry dates
+                    const hasDates = item.mfgDate && item.expDate;
+                    
+                    if (hasDates) {
+                        // Show toggle button for items with dates
+                        button.style.display = '';
+                        if (item.datesHidden === undefined) {
+                            item.datesHidden = false;
+                        }
+                    } else {
+                        // Hide toggle button for items without dates
+                        button.style.display = 'none';
+                        console.log(`Hiding date toggle for ${item.name} - no dates available`);
                     }
                 }
             }
