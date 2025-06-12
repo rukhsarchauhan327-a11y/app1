@@ -438,17 +438,23 @@
                 </select>
             </div>
             
-            <!-- Date Toggle -->
-            <div class="flex items-center justify-between pt-3 border-t border-gray-200">
+
+        </div>
+    </div>
+
+    <!-- Date Toggle Section -->
+    <div class="px-4 mb-3">
+        <div class="bg-white rounded-xl shadow-sm p-4">
+            <div class="flex items-center justify-between">
                 <div class="flex items-center space-x-2">
-                    <i class="fa-solid fa-calendar text-gray-500"></i>
-                    <span class="text-gray-700 font-medium text-sm">Include Dates on Receipt</span>
+                    <i class="fa-solid fa-calendar text-primary"></i>
+                    <span class="text-gray-800 font-medium text-sm">Include Dates on Receipt</span>
                 </div>
-                <div class="flex items-center space-x-2">
-                    <span class="text-xs text-gray-500" id="toggle-status">ON</span>
-                    <button id="include-dates-toggle" onclick="toggleDatesOnReceipt()" class="relative inline-flex h-6 w-11 items-center rounded-full bg-primary transition-colors">
+                <div class="flex items-center space-x-3">
+                    <span class="text-xs font-medium text-gray-600" id="toggle-status">ON</span>
+                    <button id="include-dates-toggle" onclick="toggleDatesOnReceipt()" class="relative inline-flex h-6 w-11 items-center rounded-full bg-primary transition-colors duration-200">
                         <span class="sr-only">Toggle dates</span>
-                        <span id="toggle-circle" class="inline-block h-4 w-4 transform rounded-full bg-white transition translate-x-6"></span>
+                        <span id="toggle-circle" class="inline-block h-4 w-4 transform rounded-full bg-white transition duration-200 translate-x-6"></span>
                     </button>
                 </div>
             </div>
