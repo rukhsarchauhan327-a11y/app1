@@ -398,15 +398,23 @@
 
 
         // Quick actions functions
-        function exportData() {
-            if (confirm('Export all business data? This may take a few minutes.')) {
+        function exportBusinessData() {
+            if (confirm('Export complete business data including inventory, bills, customers, and payments? This may take a few minutes.')) {
                 console.log('Data export started');
-            }
-        }
-
-        function backupData() {
-            if (confirm('Create a backup of all your data?')) {
-                console.log('Backup process initiated');
+                // Create a temporary loading state
+                const button = event.target.closest('button');
+                const originalText = button.querySelector('span').textContent;
+                button.querySelector('span').textContent = 'Exporting...';
+                button.disabled = true;
+                
+                // Open the export URL in a new window for download
+                window.open('/export-business-data', '_blank');
+                
+                // Reset button after a short delay
+                setTimeout(() => {
+                    button.querySelector('span').textContent = originalText;
+                    button.disabled = false;
+                }, 3000);
             }
         }
 
