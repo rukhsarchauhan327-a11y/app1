@@ -1053,7 +1053,6 @@
                 // Populate edit modal with current item data
                 document.getElementById('edit-product-name').textContent = item.name;
                 document.getElementById('edit-product-price').textContent = `₹${item.unitPrice}/${item.unit.toLowerCase()}`;
-                document.getElementById('edit-quantity-input').value = item.quantity;
                 
                 // Configure modal based on item type
                 const inputMethodSection = document.getElementById('edit-input-method');
