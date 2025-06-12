@@ -346,6 +346,14 @@
 
         // Notification system function
         function showNotification(message, type = 'info') {
+            // Remove any existing notifications first
+            const existingNotifications = document.querySelectorAll('.kc-notification');
+            existingNotifications.forEach(notif => {
+                if (notif.parentNode) {
+                    notif.parentNode.removeChild(notif);
+                }
+            });
+
             const notification = document.createElement('div');
             const bgColor = type === 'success' ? 'bg-green-500' : 
                            type === 'error' ? 'bg-red-500' : 
@@ -355,11 +363,15 @@
                         type === 'error' ? 'fa-exclamation-circle' : 
                         type === 'warning' ? 'fa-exclamation-triangle' : 'fa-info-circle';
             
-            notification.className = `fixed top-20 left-1/2 transform -translate-x-1/2 ${bgColor} text-white px-6 py-4 rounded-lg shadow-lg z-50 max-w-sm w-full mx-4`;
+            notification.className = `kc-notification fixed top-4 left-4 right-4 ${bgColor} text-white px-4 py-3 rounded-xl shadow-xl z-[9999] transform transition-all duration-300 ease-out opacity-0 translate-y-[-20px]`;
+            notification.style.maxWidth = 'calc(100vw - 2rem)';
             notification.innerHTML = `
                 <div class="flex items-center space-x-3">
-                    <i class="fa-solid ${icon}"></i>
-                    <span class="text-sm font-medium">${message}</span>
+                    <i class="fa-solid ${icon} text-lg flex-shrink-0"></i>
+                    <span class="text-sm font-medium flex-1">${message}</span>
+                    <button onclick="this.parentElement.parentElement.remove()" class="text-white hover:text-gray-200 ml-2 flex-shrink-0">
+                        <i class="fa-solid fa-times text-sm"></i>
+                    </button>
                 </div>
             `;
             
@@ -367,19 +379,21 @@
             
             // Animate in
             setTimeout(() => {
-                notification.style.transform = 'translateX(-50%) translateY(0)';
-            }, 100);
+                notification.classList.remove('opacity-0', 'translate-y-[-20px]');
+                notification.classList.add('opacity-100', 'translate-y-0');
+            }, 50);
             
-            // Remove after 3 seconds
+            // Auto remove after 4 seconds
             setTimeout(() => {
-                notification.style.opacity = '0';
-                notification.style.transform = 'translateX(-50%) translateY(-20px)';
-                setTimeout(() => {
-                    if (notification.parentNode) {
-                        notification.parentNode.removeChild(notification);
-                    }
-                }, 300);
-            }, 3000);
+                if (notification.parentNode) {
+                    notification.classList.add('opacity-0', 'translate-y-[-20px]');
+                    setTimeout(() => {
+                        if (notification.parentNode) {
+                            notification.parentNode.removeChild(notification);
+                        }
+                    }, 300);
+                }
+            }, 4000);
         }
     </script>
 

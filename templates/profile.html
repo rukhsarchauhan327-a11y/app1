@@ -1749,20 +1749,45 @@
         }
 
         function showPositionChangeSuccess(staffName, oldPosition, newPosition) {
+            // Remove any existing notifications first
+            const existingNotifications = document.querySelectorAll('.kc-notification');
+            existingNotifications.forEach(notif => {
+                if (notif.parentNode) {
+                    notif.parentNode.removeChild(notif);
+                }
+            });
+
             const feedback = document.createElement('div');
-            feedback.className = 'fixed top-20 left-1/2 transform -translate-x-1/2 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-50 text-sm';
+            feedback.className = 'kc-notification fixed top-4 left-4 right-4 bg-green-500 text-white px-4 py-3 rounded-xl shadow-xl z-[9999] transform transition-all duration-300 ease-out opacity-0 translate-y-[-20px]';
+            feedback.style.maxWidth = 'calc(100vw - 2rem)';
             feedback.innerHTML = `
-                <div class="flex items-center space-x-2">
-                    <i class="fa-solid fa-check-circle"></i>
-                    <span><strong>${staffName}</strong> moved from ${oldPosition} to ${newPosition}</span>
+                <div class="flex items-center space-x-3">
+                    <i class="fa-solid fa-check-circle text-lg flex-shrink-0"></i>
+                    <span class="text-sm font-medium flex-1"><strong>${staffName}</strong> moved from ${oldPosition} to ${newPosition}</span>
+                    <button onclick="this.parentElement.parentElement.remove()" class="text-white hover:text-gray-200 ml-2 flex-shrink-0">
+                        <i class="fa-solid fa-times text-sm"></i>
+                    </button>
                 </div>
             `;
             document.body.appendChild(feedback);
             
-            // Remove after 3 seconds
+            // Animate in
             setTimeout(() => {
-                feedback.remove();
-            }, 3000);
+                feedback.classList.remove('opacity-0', 'translate-y-[-20px]');
+                feedback.classList.add('opacity-100', 'translate-y-0');
+            }, 50);
+            
+            // Auto remove after 4 seconds
+            setTimeout(() => {
+                if (feedback.parentNode) {
+                    feedback.classList.add('opacity-0', 'translate-y-[-20px]');
+                    setTimeout(() => {
+                        if (feedback.parentNode) {
+                            feedback.parentNode.removeChild(feedback);
+                        }
+                    }, 300);
+                }
+            }, 4000);
         }
 
         // Notification Settings Functions
@@ -1816,16 +1841,45 @@
         }
 
         function showNotificationFeedback(message) {
-            // Create temporary feedback element
+            // Remove any existing notifications first
+            const existingNotifications = document.querySelectorAll('.kc-notification');
+            existingNotifications.forEach(notif => {
+                if (notif.parentNode) {
+                    notif.parentNode.removeChild(notif);
+                }
+            });
+
             const feedback = document.createElement('div');
-            feedback.className = 'fixed top-4 right-4 bg-primary text-white px-4 py-2 rounded-lg shadow-lg z-50 text-sm';
-            feedback.textContent = message;
+            feedback.className = 'kc-notification fixed top-4 left-4 right-4 bg-primary text-white px-4 py-3 rounded-xl shadow-xl z-[9999] transform transition-all duration-300 ease-out opacity-0 translate-y-[-20px]';
+            feedback.style.maxWidth = 'calc(100vw - 2rem)';
+            feedback.innerHTML = `
+                <div class="flex items-center space-x-3">
+                    <i class="fa-solid fa-bell text-lg flex-shrink-0"></i>
+                    <span class="text-sm font-medium flex-1">${message}</span>
+                    <button onclick="this.parentElement.parentElement.remove()" class="text-white hover:text-gray-200 ml-2 flex-shrink-0">
+                        <i class="fa-solid fa-times text-sm"></i>
+                    </button>
+                </div>
+            `;
             document.body.appendChild(feedback);
             
-            // Remove after 2 seconds
+            // Animate in
             setTimeout(() => {
-                feedback.remove();
-            }, 2000);
+                feedback.classList.remove('opacity-0', 'translate-y-[-20px]');
+                feedback.classList.add('opacity-100', 'translate-y-0');
+            }, 50);
+            
+            // Auto remove after 3 seconds
+            setTimeout(() => {
+                if (feedback.parentNode) {
+                    feedback.classList.add('opacity-0', 'translate-y-[-20px]');
+                    setTimeout(() => {
+                        if (feedback.parentNode) {
+                            feedback.parentNode.removeChild(feedback);
+                        }
+                    }, 300);
+                }
+            }, 3000);
         }
 
         function saveNotificationSetting(setting, enabled) {
