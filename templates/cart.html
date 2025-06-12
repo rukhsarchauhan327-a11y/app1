@@ -1154,17 +1154,20 @@
 
         function performBarcodeSearch(barcode) {
             const barcodeProducts = {
-                '8901030823456': { name: 'Coconut Oil', price: 180, unit: 'Bottle' },
-                '8901030834567': { name: 'Aashirvaad Atta', price: 120, unit: 'Bag' },
-                '8901030845678': { name: 'Maggi Noodles', price: 15, unit: 'Pack' },
-                '8901030856789': { name: 'Dairy Milk', price: 25, unit: 'Bar' },
-                '8901030867890': { name: 'Uncle Chips', price: 10, unit: 'Pack' }
+                '8901030823456': { name: 'Coconut Oil', price: 180, unit: 'Bottle', id: 'coconut-oil' },
+                '8901030834567': { name: 'Aashirvaad Atta', price: 120, unit: 'Bag', id: 'aashirvaad-atta' },
+                '8901030845678': { name: 'Maggi Noodles', price: 15, unit: 'Pack', id: 'maggi-noodles' },
+                '8901030856789': { name: 'Dairy Milk', price: 25, unit: 'Bar', id: 'dairy-milk' },
+                '8901030867890': { name: 'Uncle Chips', price: 10, unit: 'Pack', id: 'uncle-chips' }
             };
 
             const product = barcodeProducts[barcode];
             if (product) {
-                addToCart(product.name, product.price, product.unit, 1);
-                showNotification(`${product.name} added to cart`, 'success');
+                showNotification(`Found ${product.name}`, 'success');
+                // Redirect to product details page
+                setTimeout(() => {
+                    window.location.href = `/product-details?id=${product.id}&name=${encodeURIComponent(product.name)}&price=${product.price}&unit=${encodeURIComponent(product.unit)}`;
+                }, 1000);
             } else {
                 showNotification('Product not found', 'error');
             }

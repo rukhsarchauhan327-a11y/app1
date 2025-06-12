@@ -1236,6 +1236,198 @@
 
         // Initialize filters
         applyFilters();
+
+        // Search and Scanner functionality for Inventory
+        function openSearch() {
+            document.getElementById('search-modal').classList.remove('hidden');
+            document.getElementById('search-input').focus();
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeSearch() {
+            document.getElementById('search-modal').classList.add('hidden');
+            document.body.style.overflow = 'auto';
+            clearSearch();
+        }
+
+        function clearSearch() {
+            document.getElementById('search-input').value = '';
+            document.getElementById('search-results').innerHTML = '';
+            document.getElementById('search-empty').classList.add('hidden');
+        }
+
+        function openScanner() {
+            document.getElementById('scanner-modal').classList.remove('hidden');
+            simulateScanning();
+        }
+
+        function closeScanner() {
+            document.getElementById('scanner-modal').classList.add('hidden');
+        }
+
+        function manualBarcodeEntry() {
+            document.getElementById('manual-barcode-modal').classList.remove('hidden');
+            document.getElementById('manual-barcode-input').focus();
+        }
+
+        function closeManualBarcode() {
+            document.getElementById('manual-barcode-modal').classList.add('hidden');
+            document.getElementById('manual-barcode-input').value = '';
+        }
+
+        function searchByBarcode() {
+            const barcode = document.getElementById('manual-barcode-input').value.trim();
+            if (barcode) {
+                performBarcodeSearch(barcode);
+                closeManualBarcode();
+                closeScanner();
+            }
+        }
+
+        function toggleFlashlight() {
+            const button = event.target.closest('button');
+            button.classList.toggle('text-yellow-400');
+        }
+
+        function performBarcodeSearch(barcode) {
+            const barcodeProducts = {
+                '8901030823456': { name: 'Coconut Oil', price: 180, unit: 'Bottle', id: 'coconut-oil' },
+                '8901030834567': { name: 'Aashirvaad Atta', price: 120, unit: 'Bag', id: 'aashirvaad-atta' },
+                '8901030845678': { name: 'Maggi Noodles', price: 15, unit: 'Pack', id: 'maggi-noodles' },
+                '8901030856789': { name: 'Dairy Milk', price: 25, unit: 'Bar', id: 'dairy-milk' },
+                '8901030867890': { name: 'Uncle Chips', price: 10, unit: 'Pack', id: 'uncle-chips' }
+            };
+
+            const product = barcodeProducts[barcode];
+            if (product) {
+                showNotification(`Found ${product.name}`, 'success');
+                // Redirect to product details page
+                setTimeout(() => {
+                    window.location.href = `/product-details?id=${product.id}&name=${encodeURIComponent(product.name)}&price=${product.price}&unit=${encodeURIComponent(product.unit)}`;
+                }, 1000);
+            } else {
+                showNotification('Product not found', 'error');
+            }
+        }
+
+        function simulateScanning() {
+            setTimeout(() => {
+                const randomBarcodes = ['8901030823456', '8901030834567', '8901030845678'];
+                const randomBarcode = randomBarcodes[Math.floor(Math.random() * randomBarcodes.length)];
+                performBarcodeSearch(randomBarcode);
+                closeScanner();
+            }, 3000);
+        }
+
+        // Real-time search functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.getElementById('search-input');
+            if (searchInput) {
+                searchInput.addEventListener('input', function() {
+                    const query = this.value.toLowerCase().trim();
+                    performSearch(query);
+                });
+            }
+        });
+
+        function performSearch(query) {
+            const resultsContainer = document.getElementById('search-results');
+            const emptyState = document.getElementById('search-empty');
+            
+            if (!query) {
+                resultsContainer.innerHTML = '';
+                emptyState.classList.add('hidden');
+                return;
+            }
+
+            const products = [
+                { name: 'Wheat Flour', price: 50, unit: 'Kg', image: 'https://storage.googleapis.com/uxpilot-auth.appspot.com/ad8aa6cee1-b621e3cd72c9ea714c53.png', id: 'wheat-flour' },
+                { name: 'Coconut Oil', price: 180, unit: 'Bottle', image: 'https://storage.googleapis.com/uxpilot-auth.appspot.com/02cda64d32-ca63fc32eaab87b7db4c.png', id: 'coconut-oil' },
+                { name: 'Aashirvaad Atta', price: 120, unit: 'Bag', image: 'https://storage.googleapis.com/uxpilot-auth.appspot.com/dd29a1f85f-469e6193e37489fc8c43.png', id: 'aashirvaad-atta' },
+                { name: 'Maggi Noodles', price: 15, unit: 'Pack', image: 'https://storage.googleapis.com/uxpilot-auth.appspot.com/46dc2aecf3-4ae1d7f8a3bc9c8b21d6.png', id: 'maggi-noodles' },
+                { name: 'Dairy Milk', price: 25, unit: 'Bar', image: 'https://storage.googleapis.com/uxpilot-auth.appspot.com/f12345-chocolate-bar.png', id: 'dairy-milk' }
+            ];
+
+            const searchResults = products.filter(product => 
+                product.name.toLowerCase().includes(query)
+            );
+
+            if (searchResults.length === 0) {
+                resultsContainer.innerHTML = '';
+                emptyState.classList.remove('hidden');
+            } else {
+                emptyState.classList.add('hidden');
+                resultsContainer.innerHTML = searchResults.map(product => `
+                    <div class="bg-gray-50 rounded-lg p-3 cursor-pointer hover:bg-gray-100" onclick="openProductFromSearch('${product.id}', '${product.name}', ${product.price}, '${product.unit}')">
+                        <div class="flex items-center space-x-3">
+                            <img src="${product.image}" alt="${product.name}" class="w-12 h-12 rounded-lg object-cover">
+                            <div class="flex-1">
+                                <h3 class="font-semibold text-dark">${product.name}</h3>
+                                <p class="text-sm text-gray-600">₹${product.price}/${product.unit}</p>
+                            </div>
+                            <i class="fa-solid fa-external-link-alt text-primary"></i>
+                        </div>
+                    </div>
+                `).join('');
+            }
+        }
+
+        function openProductFromSearch(id, name, price, unit) {
+            showNotification(`Opening ${name} details`, 'success');
+            closeSearch();
+            setTimeout(() => {
+                window.location.href = `/product-details?id=${id}&name=${encodeURIComponent(name)}&price=${price}&unit=${encodeURIComponent(unit)}`;
+            }, 500);
+        }
+
+        // Notification system
+        function showNotification(message, type = 'info') {
+            const existingNotifications = document.querySelectorAll('.kc-notification');
+            existingNotifications.forEach(notif => {
+                if (notif.parentNode) {
+                    notif.parentNode.removeChild(notif);
+                }
+            });
+
+            const notification = document.createElement('div');
+            const bgColor = type === 'success' ? 'bg-green-500' : 
+                           type === 'error' ? 'bg-red-500' : 
+                           type === 'warning' ? 'bg-orange-500' : 'bg-blue-500';
+            
+            const icon = type === 'success' ? 'fa-check-circle' : 
+                        type === 'error' ? 'fa-exclamation-circle' : 
+                        type === 'warning' ? 'fa-exclamation-triangle' : 'fa-info-circle';
+            
+            notification.className = `kc-notification fixed top-4 left-4 right-4 ${bgColor} text-white px-4 py-3 rounded-xl shadow-xl z-[9999] transform transition-all duration-300 ease-out opacity-0 translate-y-[-20px]`;
+            notification.style.maxWidth = 'calc(100vw - 2rem)';
+            notification.innerHTML = `
+                <div class="flex items-center space-x-3">
+                    <i class="fa-solid ${icon} text-lg flex-shrink-0"></i>
+                    <span class="text-sm font-medium flex-1">${message}</span>
+                    <button onclick="this.parentElement.parentElement.remove()" class="text-white hover:text-gray-200 ml-2 flex-shrink-0">
+                        <i class="fa-solid fa-times text-sm"></i>
+                    </button>
+                </div>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.classList.remove('opacity-0', 'translate-y-[-20px]');
+                notification.classList.add('opacity-100', 'translate-y-0');
+            }, 50);
+            
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.classList.add('opacity-0', 'translate-y-[-20px]');
+                    setTimeout(() => {
+                        if (notification.parentNode) {
+                            notification.parentNode.removeChild(notification);
+                        }
+                    }, 300);
+                }
+            }, 4000);
+        }
     </script>
 
 </body>
