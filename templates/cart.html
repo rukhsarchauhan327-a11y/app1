@@ -1059,9 +1059,73 @@
             }
         }
 
-        // Cart Item Management Functions - Initialize first
+        // Global variables
         let currentEditingItem = null;
-        let cartItems = {};
+        let cartItems = {
+            1: {
+                id: 1,
+                name: 'Aashirvaad Atta',
+                quantity: 1,
+                unitPrice: 45,
+                price: 450,
+                unit: 'Kg',
+                type: 'unit',
+                mfgDate: '01/05/2025',
+                expDate: '01/09/2025',
+                datesHidden: false
+            },
+            2: {
+                id: 2,
+                name: 'Real Fruit Juice',
+                quantity: 2,
+                unitPrice: 60,
+                price: 120,
+                unit: 'Bottles',
+                type: 'unit',
+                mfgDate: '12/05/2025',
+                expDate: '25/07/2025',
+                datesHidden: false
+            },
+            3: {
+                id: 3,
+                name: 'Colgate Paste',
+                quantity: 3,
+                unitPrice: 30,
+                price: 90,
+                unit: 'Pieces',
+                type: 'unit'
+            },
+            4: {
+                id: 4,
+                name: 'Good Day Biscuits',
+                quantity: 5,
+                unitPrice: 12,
+                price: 60,
+                unit: 'Packets',
+                type: 'unit',
+                mfgDate: '05/03/2025',
+                expDate: '05/09/2025',
+                datesHidden: false
+            },
+            5: {
+                id: 5,
+                name: 'Surf Excel (500gm)',
+                quantity: 1,
+                unitPrice: 55,
+                price: 55,
+                unit: 'Packet',
+                type: 'unit'
+            },
+            6: {
+                id: 6,
+                name: 'Dabur Honey',
+                quantity: 1,
+                unitPrice: 180,
+                price: 180,
+                unit: 'Bottle',
+                type: 'unit'
+            }
+        };
 
         // Load cart items from localStorage
         function loadCartItems() {
@@ -1560,67 +1624,44 @@
         }
 
         function toggleProductDates(itemId) {
-            console.log('Toggling dates for item:', itemId);
+            const item = cartItems[itemId];
+            const button = document.getElementById(`date-toggle-${itemId}`);
             
-            // Wait for DOM to be ready
-            setTimeout(() => {
-                const item = cartItems[itemId];
-                const button = document.getElementById(`date-toggle-${itemId}`);
+            if (!button || !item) {
+                return;
+            }
+            
+            if (item.datesHidden) {
+                // Show dates
+                item.datesHidden = false;
+                button.innerHTML = '<i class="fa-solid fa-times mr-1"></i>Remove Dates';
+                button.classList.remove('text-success');
+                button.classList.add('text-danger');
                 
-                console.log('Looking for button with ID:', `date-toggle-${itemId}`);
-                console.log('Button found:', button);
-                console.log('Available buttons:', document.querySelectorAll('[id^="date-toggle-"]'));
+                // Show date elements
+                const dateElements = document.querySelectorAll(`#cart-item-${itemId} .date-info`);
+                dateElements.forEach(el => {
+                    el.classList.remove('hidden');
+                    el.style.display = '';
+                });
                 
-                if (!button) {
-                    console.error('Toggle button NOT found - debugging needed');
-                    console.log('All elements with date-toggle:', document.querySelectorAll('[id*="date-toggle"]'));
-                    return;
-                }
+                showNotification(`Dates shown for ${item.name}`, 'success');
+            } else {
+                // Hide dates
+                item.datesHidden = true;
+                button.innerHTML = '<i class="fa-solid fa-plus mr-1"></i>Add Dates';
+                button.classList.remove('text-danger');
+                button.classList.add('text-success');
                 
-                if (!item) {
-                    console.error('Item not found in cartItems:', itemId);
-                    console.log('Available cart items:', Object.keys(cartItems));
-                    return;
-                }
+                // Hide date elements
+                const dateElements = document.querySelectorAll(`#cart-item-${itemId} .date-info`);
+                dateElements.forEach(el => {
+                    el.classList.add('hidden');
+                    el.style.display = 'none';
+                });
                 
-                console.log('Current item state:', item);
-                
-                if (item.datesHidden) {
-                    // Show dates
-                    item.datesHidden = false;
-                    button.innerHTML = '<i class="fa-solid fa-times mr-1"></i>Remove Dates';
-                    button.classList.remove('text-success');
-                    button.classList.add('text-danger');
-                    
-                    // Show date elements
-                    const dateElements = document.querySelectorAll(`#cart-item-${itemId} .date-info`);
-                    console.log('Found date elements:', dateElements.length);
-                    dateElements.forEach(el => {
-                        el.classList.remove('hidden');
-                        el.style.display = '';
-                    });
-                    
-                    showNotification(`Dates shown for ${item.name}`, 'info');
-                } else {
-                    // Hide dates
-                    item.datesHidden = true;
-                    button.innerHTML = '<i class="fa-solid fa-plus mr-1"></i>Add Dates';
-                    button.classList.remove('text-danger');
-                    button.classList.add('text-success');
-                    
-                    // Hide date elements
-                    const dateElements = document.querySelectorAll(`#cart-item-${itemId} .date-info`);
-                    console.log('Found date elements to hide:', dateElements.length);
-                    dateElements.forEach(el => {
-                        el.classList.add('hidden');
-                        el.style.display = 'none';
-                    });
-                    
-                    showNotification(`Dates hidden for ${item.name}`, 'info');
-                }
-                
-                console.log('Updated item state:', item);
-            }, 100);
+                showNotification(`Dates hidden for ${item.name}`, 'info');
+            }
         }
 
         // Initialize date toggle functionality
