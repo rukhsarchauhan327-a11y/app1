@@ -1342,12 +1342,17 @@
 
         // Initialize quantity input listeners in edit modal
         document.addEventListener('DOMContentLoaded', function() {
-            const editQuantityInput = document.getElementById('edit-quantity-input');
+            const editQuantityInputWeight = document.getElementById('edit-quantity-input-weight');
+            const editQuantityInputUnit = document.getElementById('edit-quantity-input-unit');
             const editPriceInput = document.getElementById('edit-price-input');
             const editUnitSelect = document.getElementById('edit-unit-select');
             
-            if (editQuantityInput) {
-                editQuantityInput.addEventListener('input', updateEditTotal);
+            if (editQuantityInputWeight) {
+                editQuantityInputWeight.addEventListener('input', updateEditTotal);
+            }
+            
+            if (editQuantityInputUnit) {
+                editQuantityInputUnit.addEventListener('input', updateEditTotal);
             }
             
             if (editPriceInput) {
@@ -1365,8 +1370,6 @@
                     switchEditInputMethod(e.target.value);
                 });
             });
-            
-            // Tab handlers removed since we now use radio buttons directly
         });
 
         // Staff management with attendance tracking
