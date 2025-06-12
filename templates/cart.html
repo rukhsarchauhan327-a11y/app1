@@ -1682,38 +1682,35 @@
         function initializeDateToggles() {
             console.log('Initializing date toggles...');
             
-            // Force a delay to ensure DOM is fully loaded
-            setTimeout(() => {
-                // Check all toggle buttons exist and hide toggle for items without dates
-                for (let i = 1; i <= 6; i++) {
-                    const button = document.getElementById(`date-toggle-${i}`);
-                    const cartItem = document.getElementById(`cart-item-${i}`);
-                    const dateElements = document.querySelectorAll(`#cart-item-${i} .date-info`);
-                    const item = cartItems[i];
-                    
-                    console.log(`Item ${i}:`, {
-                        button: !!button,
-                        cartItem: !!cartItem,
-                        dateElements: dateElements.length,
-                        cartItemData: !!item,
-                        hasDates: !!(item && (item.mfgDate || item.expDate))
-                    });
-                    
-                    if (button && item) {
-                        if (item.mfgDate || item.expDate) {
-                            // Show toggle button for items with dates
-                            button.style.display = '';
-                            if (item.datesHidden === undefined) {
-                                item.datesHidden = false;
-                            }
-                        } else {
-                            // Hide toggle button for items without dates
-                            button.style.display = 'none';
-                            console.log(`Hiding date toggle for ${item.name} - no dates available`);
+            // Check all toggle buttons exist and hide toggle for items without dates
+            for (let i = 1; i <= 6; i++) {
+                const button = document.getElementById(`date-toggle-${i}`);
+                const cartItem = document.getElementById(`cart-item-${i}`);
+                const dateElements = document.querySelectorAll(`#cart-item-${i} .date-info`);
+                const item = cartItems[i];
+                
+                console.log(`Item ${i}:`, {
+                    button: !!button,
+                    cartItem: !!cartItem,
+                    dateElements: dateElements.length,
+                    cartItemData: !!item,
+                    hasDates: !!(item && (item.mfgDate || item.expDate))
+                });
+                
+                if (button && item) {
+                    if (item.mfgDate || item.expDate) {
+                        // Show toggle button for items with dates
+                        button.style.display = '';
+                        if (item.datesHidden === undefined) {
+                            item.datesHidden = false;
                         }
+                    } else {
+                        // Hide toggle button for items without dates
+                        button.style.display = 'none';
+                        console.log(`Hiding date toggle for ${item.name} - no dates available`);
                     }
                 }
-            }, 100);
+            }
         }
 
         // Enhanced total calculation
@@ -1758,18 +1755,39 @@
         selectOnlineMethod('upi');
 
         // Initialize quantity input listeners in edit modal
+        // Wait for window to fully load including all elements
+        window.addEventListener('load', function() {
+            console.log('Window fully loaded, initializing cart...');
+            
+            // Double check that elements exist
+            const cartItemsContainer = document.getElementById('cart-items');
+            const button1 = document.getElementById('date-toggle-1');
+            const cartItem1 = document.getElementById('cart-item-1');
+            
+            console.log('Elements check:', {
+                container: !!cartItemsContainer,
+                button1: !!button1,
+                cartItem1: !!cartItem1
+            });
+            
+            if (cartItemsContainer && button1) {
+                calculateTotals();
+                initializeDateToggles();
+                populatePresentStaff();
+                console.log('Cart initialization completed successfully');
+            } else {
+                console.error('Required elements not found, initialization failed');
+            }
+        });
+
         document.addEventListener('DOMContentLoaded', function() {
             const editQuantityInputWeight = document.getElementById('edit-quantity-input-weight');
             const editQuantityInputUnit = document.getElementById('edit-quantity-input-unit');
             const editPriceInput = document.getElementById('edit-price-input');
             const editUnitSelect = document.getElementById('edit-unit-select');
             
-            // Wait for all elements to be ready
-            setTimeout(() => {
-                calculateTotals();
-                initializeDateToggles();
-                populatePresentStaff();
-            }, 500);
+            // Initialize cart functionality
+            initializeCartPage();
             
             if (editQuantityInputWeight) {
                 editQuantityInputWeight.addEventListener('input', updateEditTotal);
