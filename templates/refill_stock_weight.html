@@ -383,19 +383,19 @@
                 const selectedMode = priceModeSelect.value;
                 const totalWeight = productData.currentStock + quantityInKg;
                 
-                if (selectedMode === 'per-kg') {
-                    // User entered price per kg - show total value of all weight (existing + new)
-                    const totalValueAllWeight = sellingPrice * totalWeight;
-                    currentPriceElement.textContent = `Current: ₹${totalValueAllWeight.toFixed(2)} / ${totalWeight.toFixed(1)} Kg`;
-                } else if (selectedMode === 'per-gram') {
-                    // User entered price per gram - convert to total value
-                    const pricePerKg = sellingPrice * 1000;
-                    const totalValueAllWeight = pricePerKg * totalWeight;
-                    currentPriceElement.textContent = `Current: ₹${totalValueAllWeight.toFixed(2)} / ${totalWeight.toFixed(1)} Kg`;
-                } else if (selectedMode === 'total') {
-                    // User entered total price for new stock - show per kg price
+                if (selectedMode === 'total') {
+                    // User entered total price for new stock - show calculated per kg price
                     const pricePerKg = (sellingPrice / quantityInKg).toFixed(2);
-                    currentPriceElement.textContent = `Current: ₹${pricePerKg} per Kg`;
+                    currentPriceElement.textContent = `Current: ₹${pricePerKg}/Kg`;
+                } else if (selectedMode === 'per-kg') {
+                    // User entered price per kg - show total value of entire stock (existing + new)
+                    const totalValueAllStock = sellingPrice * totalWeight;
+                    currentPriceElement.textContent = `Current: ₹${totalValueAllStock.toFixed(2)}`;
+                } else if (selectedMode === 'per-gram') {
+                    // User entered price per gram - convert to per kg then show total value of entire stock
+                    const pricePerKg = sellingPrice * 1000;
+                    const totalValueAllStock = pricePerKg * totalWeight;
+                    currentPriceElement.textContent = `Current: ₹${totalValueAllStock.toFixed(2)}`;
                 }
             } else {
                 currentPriceElement.textContent = '';
