@@ -219,11 +219,11 @@
         }
 
         function forgotPassword() {
-            alert('Forgot password feature will be implemented soon.');
+            showNotification('Forgot password feature will be implemented soon.', 'info');
         }
 
         function resendOTP() {
-            alert('OTP resent successfully!');
+            showNotification('OTP resent successfully!', 'success');
         }
 
         // Password visibility toggle
@@ -243,7 +243,7 @@
             const passwordField = document.querySelector('input[type="password"]');
             
             if (!loginField.value.trim() || !passwordField.value.trim()) {
-                alert('Please fill in all required fields.');
+                showNotification('Please fill in all required fields.', 'error');
                 return;
             }
             
@@ -253,9 +253,11 @@
             // Simulate login process
             setTimeout(() => {
                 document.getElementById('loading-overlay').classList.add('hidden');
-                alert('Login successful! Redirecting to dashboard...');
+                showNotification('Login successful! Redirecting to dashboard...', 'success');
                 // Redirect to dashboard
-                window.location.href = '/dashboard';
+                setTimeout(() => {
+                    window.location.href = '/dashboard';
+                }, 1000);
             }, 2000);
         });
 
@@ -263,7 +265,7 @@
         document.getElementById('otp-btn').addEventListener('click', function() {
             const phoneField = document.querySelector('input[placeholder*="phone number or email"]');
             if (!phoneField.value.trim()) {
-                alert('Please enter your phone number first.');
+                showNotification('Please enter your phone number first.', 'error');
                 return;
             }
             document.getElementById('otp-modal').classList.remove('hidden');
@@ -279,7 +281,7 @@
             const otp = Array.from(otpInputs).map(input => input.value).join('');
             
             if (otp.length !== 6) {
-                alert('Please enter the complete 6-digit OTP.');
+                showNotification('Please enter the complete 6-digit OTP.', 'error');
                 return;
             }
             
@@ -288,8 +290,10 @@
             
             setTimeout(() => {
                 document.getElementById('loading-overlay').classList.add('hidden');
-                alert('OTP verified successfully! Welcome to Kirana Konnect.');
-                window.location.href = '/dashboard';
+                showNotification('OTP verified successfully! Welcome to Kirana Konnect.', 'success');
+                setTimeout(() => {
+                    window.location.href = '/dashboard';
+                }, 1000);
             }, 2000);
         });
 
@@ -339,6 +343,44 @@
                 document.getElementById('otp-modal').classList.add('hidden');
             }
         });
+
+        // Notification system function
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            const bgColor = type === 'success' ? 'bg-green-500' : 
+                           type === 'error' ? 'bg-red-500' : 
+                           type === 'warning' ? 'bg-orange-500' : 'bg-blue-500';
+            
+            const icon = type === 'success' ? 'fa-check-circle' : 
+                        type === 'error' ? 'fa-exclamation-circle' : 
+                        type === 'warning' ? 'fa-exclamation-triangle' : 'fa-info-circle';
+            
+            notification.className = `fixed top-20 left-1/2 transform -translate-x-1/2 ${bgColor} text-white px-6 py-4 rounded-lg shadow-lg z-50 max-w-sm w-full mx-4`;
+            notification.innerHTML = `
+                <div class="flex items-center space-x-3">
+                    <i class="fa-solid ${icon}"></i>
+                    <span class="text-sm font-medium">${message}</span>
+                </div>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // Animate in
+            setTimeout(() => {
+                notification.style.transform = 'translateX(-50%) translateY(0)';
+            }, 100);
+            
+            // Remove after 3 seconds
+            setTimeout(() => {
+                notification.style.opacity = '0';
+                notification.style.transform = 'translateX(-50%) translateY(-20px)';
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        notification.parentNode.removeChild(notification);
+                    }
+                }, 300);
+            }, 3000);
+        }
     </script>
 
 </body>
