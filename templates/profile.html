@@ -715,6 +715,119 @@
         </div>
     </div>
 
+    <!-- Manage Staff Modal -->
+    <div id="manageStaffModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden">
+        <div class="fixed inset-0 flex items-center justify-center p-4">
+            <div class="bg-white rounded-2xl max-w-md w-full max-h-[90vh] overflow-y-auto">
+                <div class="flex items-center justify-between p-6 border-b">
+                    <h2 class="text-xl font-bold text-dark">Manage Staff Positions</h2>
+                    <button onclick="closeManageStaffModal()" class="p-2 hover:bg-gray-100 rounded-lg">
+                        <i class="fa-solid fa-times text-gray-600"></i>
+                    </button>
+                </div>
+                
+                <div class="p-6">
+                    <p class="text-sm text-gray-600 mb-4">Change employee positions by clicking on their current role</p>
+                    
+                    <div class="space-y-3">
+                        <!-- Staff Member 1 -->
+                        <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg" data-staff-id="1">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center">
+                                    <span class="text-white font-medium text-sm">RA</span>
+                                </div>
+                                <div>
+                                    <p class="font-medium text-dark">Rahul Sharma</p>
+                                    <p class="text-xs text-gray-500">rahul@store.com</p>
+                                </div>
+                            </div>
+                            <button onclick="changePosition('1', 'Cashier')" class="staff-position text-xs px-2 py-1 rounded-full font-medium bg-blue-100 text-blue-600 hover:bg-blue-200 transition-colors">
+                                Cashier
+                            </button>
+                        </div>
+                        
+                        <!-- Staff Member 2 -->
+                        <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg" data-staff-id="2">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center">
+                                    <span class="text-white font-medium text-sm">PK</span>
+                                </div>
+                                <div>
+                                    <p class="font-medium text-dark">Priya Kumar</p>
+                                    <p class="text-xs text-gray-500">priya@store.com</p>
+                                </div>
+                            </div>
+                            <button onclick="changePosition('2', 'Worker')" class="staff-position text-xs px-2 py-1 rounded-full font-medium bg-green-100 text-green-600 hover:bg-green-200 transition-colors">
+                                Worker
+                            </button>
+                        </div>
+                        
+                        <!-- Staff Member 3 -->
+                        <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg" data-staff-id="3">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-10 h-10 bg-purple-500 rounded-full flex items-center justify-center">
+                                    <span class="text-white font-medium text-sm">AS</span>
+                                </div>
+                                <div>
+                                    <p class="font-medium text-dark">Amit Singh</p>
+                                    <p class="text-xs text-gray-500">amit@store.com</p>
+                                </div>
+                            </div>
+                            <button onclick="changePosition('3', 'Supervisor')" class="staff-position text-xs px-2 py-1 rounded-full font-medium bg-purple-100 text-purple-600 hover:bg-purple-200 transition-colors">
+                                Supervisor
+                            </button>
+                        </div>
+                        
+                        <!-- Staff Member 4 -->
+                        <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg" data-staff-id="4">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-10 h-10 bg-orange-500 rounded-full flex items-center justify-center">
+                                    <span class="text-white font-medium text-sm">SK</span>
+                                </div>
+                                <div>
+                                    <p class="font-medium text-dark">Sunita Kumari</p>
+                                    <p class="text-xs text-gray-500">sunita@store.com</p>
+                                </div>
+                            </div>
+                            <button onclick="changePosition('4', 'Worker')" class="staff-position text-xs px-2 py-1 rounded-full font-medium bg-green-100 text-green-600 hover:bg-green-200 transition-colors">
+                                Worker
+                            </button>
+                        </div>
+                        
+                        <!-- Staff Member 5 -->
+                        <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg" data-staff-id="5">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-10 h-10 bg-red-500 rounded-full flex items-center justify-center">
+                                    <span class="text-white font-medium text-sm">VT</span>
+                                </div>
+                                <div>
+                                    <p class="font-medium text-dark">Vikash Tiwari</p>
+                                    <p class="text-xs text-gray-500">vikash@store.com</p>
+                                </div>
+                            </div>
+                            <button onclick="changePosition('5', 'Assistant Manager')" class="staff-position text-xs px-2 py-1 rounded-full font-medium bg-purple-100 text-purple-600 hover:bg-purple-200 transition-colors">
+                                Assistant Manager
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-6 p-3 bg-blue-50 rounded-lg">
+                        <div class="flex items-start space-x-2">
+                            <i class="fa-solid fa-info-circle text-blue-600 text-sm mt-0.5"></i>
+                            <div class="text-xs text-blue-700">
+                                <p class="font-medium mb-1">Available Positions:</p>
+                                <p>• Worker - Basic store operations</p>
+                                <p>• Cashier - Billing and customer service</p>
+                                <p>• Supervisor - Team management</p>
+                                <p>• Assistant Manager - Store operations</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Notification Settings Modal -->
     <div id="notificationSettingsModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden">
         <div class="fixed inset-0 flex items-center justify-center p-4">
@@ -1493,8 +1606,50 @@
         }
 
         function manageStaff() {
-            // Navigate to staff management
-            window.location.href = '/staff';
+            document.getElementById('manageStaffModal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeManageStaffModal() {
+            document.getElementById('manageStaffModal').classList.add('hidden');
+            document.body.style.overflow = 'auto';
+        }
+
+        function changePosition(staffId, currentPosition) {
+            const positions = ['Worker', 'Cashier', 'Supervisor', 'Assistant Manager'];
+            const currentIndex = positions.indexOf(currentPosition);
+            
+            // Create position selector
+            let options = '';
+            positions.forEach(position => {
+                const selected = position === currentPosition ? 'selected' : '';
+                options += `<option value="${position}" ${selected}>${position}</option>`;
+            });
+            
+            const newPosition = prompt(`Change position for staff member:\n\nCurrent: ${currentPosition}\n\nSelect new position:\n${positions.join(', ')}`);
+            
+            if (newPosition && positions.includes(newPosition) && newPosition !== currentPosition) {
+                // Update the position in the UI
+                const staffCard = document.querySelector(`[data-staff-id="${staffId}"]`);
+                if (staffCard) {
+                    const positionElement = staffCard.querySelector('.staff-position');
+                    if (positionElement) {
+                        positionElement.textContent = newPosition;
+                        
+                        // Update position color based on role
+                        positionElement.className = 'staff-position text-xs px-2 py-1 rounded-full font-medium';
+                        if (newPosition === 'Supervisor' || newPosition === 'Assistant Manager') {
+                            positionElement.classList.add('bg-purple-100', 'text-purple-600');
+                        } else if (newPosition === 'Cashier') {
+                            positionElement.classList.add('bg-blue-100', 'text-blue-600');
+                        } else {
+                            positionElement.classList.add('bg-green-100', 'text-green-600');
+                        }
+                    }
+                }
+                
+                alert(`Position changed successfully!\n${currentPosition} → ${newPosition}`);
+            }
         }
 
         // Notification Settings Functions
