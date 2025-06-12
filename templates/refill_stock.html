@@ -212,6 +212,7 @@
             currentStock: 24,
             reorderLevel: 6,
             sellingPrice: 20,
+            barcode: '8901030821213',
             image: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=400'
         };
 
@@ -275,6 +276,11 @@
             document.getElementById('product-image').src = productData.image;
             document.getElementById('current-stock').textContent = `${productData.currentStock} ${productData.unit}s`;
             document.getElementById('reorder-level').textContent = `${productData.reorderLevel} ${productData.unit}s`;
+            
+            // Pre-populate barcode if product has one
+            if (productData.barcode) {
+                document.getElementById('barcode-input').value = productData.barcode;
+            }
             
             // Update labels based on product type
             const unitLabel = productData.isWeightBased ? 'kg' : productData.unit + 's';
