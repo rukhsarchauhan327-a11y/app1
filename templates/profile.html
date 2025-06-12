@@ -143,7 +143,14 @@
                 <button class="w-full flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors" onclick="exportBusinessData()">
                     <div class="flex items-center space-x-3">
                         <i class="fa-solid fa-download text-primary text-lg"></i>
-                        <span class="font-medium text-dark">Export Business Data</span>
+                        <span class="font-medium text-dark">Export Data</span>
+                    </div>
+                    <i class="fa-solid fa-chevron-right text-gray-400"></i>
+                </button>
+                <button class="w-full flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors" onclick="backupData()">
+                    <div class="flex items-center space-x-3">
+                        <i class="fa-solid fa-cloud-upload text-primary text-lg"></i>
+                        <span class="font-medium text-dark">Backup Data</span>
                     </div>
                     <i class="fa-solid fa-chevron-right text-gray-400"></i>
                 </button>
@@ -415,6 +422,14 @@
                     button.querySelector('span').textContent = originalText;
                     button.disabled = false;
                 }, 3000);
+            }
+        }
+
+        function backupData() {
+            if (confirm('Create a backup of all your data? This will download a copy for safekeeping.')) {
+                console.log('Backup process initiated');
+                // For now, redirect to the same export function
+                exportBusinessData();
             }
         }
 
