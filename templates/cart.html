@@ -70,6 +70,18 @@
   /* Modal specific styles */
   #edit-item-modal {
     backdrop-filter: blur(2px);
+    z-index: 9999 !important;
+  }
+
+  #edit-item-modal select {
+    z-index: 10000 !important;
+    position: relative;
+  }
+
+  /* Ensure modal content is properly contained */
+  #edit-item-modal .bg-white {
+    position: relative;
+    z-index: 10001;
   }
 </style>
 </head>
@@ -1441,9 +1453,9 @@
     </nav>
 
     <!-- Edit Item Modal -->
-    <div id="edit-item-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden">
-        <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-11/12 max-w-sm">
-            <div class="bg-white rounded-lg shadow-xl max-h-[80vh] overflow-y-auto">
+    <div id="edit-item-modal" class="fixed inset-0 bg-black bg-opacity-50 z-[9999] hidden">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-white rounded-lg shadow-xl w-full max-w-sm max-h-[85vh] overflow-y-auto m-4">
                 <!-- Modal Header -->
                 <div class="flex items-center justify-between p-4 border-b border-gray-200">
                     <h3 class="text-lg font-bold text-dark">Edit Item</h3>
