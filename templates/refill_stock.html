@@ -402,10 +402,10 @@
             }
             
             // Simulate barcode scanning - in real app, this would open camera
-            const newBarcode = prompt('Enter or scan barcode:', currentBarcode || '');
-            if (newBarcode && newBarcode.trim()) {
+            const newBarcode = prompt('Enter new barcode:', currentBarcode || '');
+            if (newBarcode !== null && newBarcode.trim()) {
                 barcodeInput.value = newBarcode.trim();
-                console.log('Barcode updated:', newBarcode.trim());
+                alert('Barcode updated successfully!');
             }
         }
 
