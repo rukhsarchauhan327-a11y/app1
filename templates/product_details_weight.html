@@ -288,8 +288,7 @@
         const maxStock = 25.5;
 
         addToCartBtn.addEventListener('click', () => {
-            // Navigate to cart instead of opening modal
-            window.location.href = '/cart';
+            cartModal.classList.remove('hidden');
         });
 
         closeModal.addEventListener('click', () => {
@@ -299,6 +298,131 @@
         cancelBtn.addEventListener('click', () => {
             cartModal.classList.add('hidden');
         });
+
+        // Add to cart functionality for weight-based products
+        const addCartBtn = document.getElementById('add-cart-btn');
+        addCartBtn.addEventListener('click', () => {
+            const productData = {
+                id: 'weight-product-' + Date.now(),
+                name: 'Basmati Rice Premium',
+                image: 'https://images.unsplash.com/photo-1586201375761-83865001e31c?w=300&h=300&fit=crop',
+                sellingPrice: unitPrice,
+                unit: 'kg',
+                type: 'weight-based',
+                stock: maxStock
+            };
+
+            const selectedMethod = document.querySelector('input[name="inputMethod"]:checked')?.value || 'quantity';
+            let cartItem = {
+                id: productData.id,
+                name: productData.name,
+                image: productData.image,
+                unitPrice: productData.sellingPrice,
+                unit: productData.unit,
+                type: productData.type,
+                addedAt: new Date().toISOString()
+            };
+
+            if (selectedMethod === 'quantity') {
+                const weight = parseFloat(quantityInput.value) || 0;
+                const unit = unitSelect.value;
+                const weightInKg = unit === 'gm' ? weight / 1000 : weight;
+                
+                cartItem.quantity = weightInKg;
+                cartItem.quantityDisplay = `${weight} ${unit}`;
+                cartItem.totalPrice = weightInKg * productData.sellingPrice;
+                cartItem.pricePerKg = productData.sellingPrice;
+            } else {
+                const price = parseFloat(priceInput.value) || 0;
+                const weightInKg = price / productData.sellingPrice;
+                
+                cartItem.quantity = weightInKg;
+                cartItem.quantityDisplay = `${weightInKg.toFixed(3)} kg`;
+                cartItem.totalPrice = price;
+                cartItem.pricePerKg = productData.sellingPrice;
+            }
+
+            // Add to cart storage
+            addItemToCart(cartItem);
+            
+            showNotification(`Added ${cartItem.name} to cart. Total: ₹${cartItem.totalPrice.toFixed(2)}`, 'success');
+            cartModal.classList.add('hidden');
+            
+            // Navigate to cart page after adding
+            setTimeout(() => {
+                if (confirm('Item added to cart! Would you like to view your cart?')) {
+                    window.location.href = '/cart';
+                }
+            }, 1500);
+        });
+
+        // Cart management functions
+        function addItemToCart(item) {
+            let cart = getCartItems();
+            
+            // Check if item already exists in cart
+            const existingItemIndex = cart.findIndex(cartItem => 
+                cartItem.id === item.id && cartItem.name === item.name
+            );
+            
+            if (existingItemIndex > -1) {
+                // Update existing item quantity and total
+                cart[existingItemIndex].quantity += item.quantity;
+                cart[existingItemIndex].totalPrice = cart[existingItemIndex].quantity * cart[existingItemIndex].unitPrice;
+                cart[existingItemIndex].quantityDisplay = updateQuantityDisplay(cart[existingItemIndex]);
+            } else {
+                // Add new item to cart
+                cart.push(item);
+            }
+            
+            // Save to localStorage
+            localStorage.setItem('kiranakonnect_cart', JSON.stringify(cart));
+            updateCartBadge();
+        }
+
+        function getCartItems() {
+            const cartData = localStorage.getItem('kiranakonnect_cart');
+            return cartData ? JSON.parse(cartData) : [];
+        }
+
+        function updateQuantityDisplay(item) {
+            if (item.type === 'weight-based') {
+                if (item.quantity >= 1) {
+                    return `${item.quantity.toFixed(1)} kg`;
+                } else {
+                    return `${(item.quantity * 1000).toFixed(0)} gm`;
+                }
+            } else {
+                return `${item.quantity} ${item.unit}${item.quantity > 1 ? 's' : ''}`;
+            }
+        }
+
+        function updateCartBadge() {
+            const cart = getCartItems();
+            const cartCount = cart.reduce((total, item) => total + (item.type === 'weight-based' ? 1 : item.quantity), 0);
+            
+            // Update cart badge in navigation if it exists
+            const cartBadge = document.querySelector('.cart-badge, [class*="cart"] .badge');
+            if (cartBadge) {
+                cartBadge.textContent = cartCount;
+                cartBadge.style.display = cartCount > 0 ? 'flex' : 'none';
+            }
+        }
+
+        // Notification function
+        function showNotification(message, type = 'success') {
+            const notification = document.createElement('div');
+            notification.className = `fixed top-20 left-1/2 transform -translate-x-1/2 px-6 py-3 rounded-lg text-white font-medium z-50 transition-all duration-300 ${
+                type === 'success' ? 'bg-green-500' : 'bg-red-500'
+            }`;
+            notification.textContent = message;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+        }
 
         cartModal.addEventListener('click', (e) => {
             if (e.target === cartModal) {

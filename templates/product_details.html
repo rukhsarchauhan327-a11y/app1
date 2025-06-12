@@ -423,7 +423,7 @@
         }
 
         function addToCart() {
-            // This function will be handled by the modal
+            // Open modal for quantity selection
             openCartModal();
         }
 
@@ -623,11 +623,15 @@
             
             const selectedMethod = document.querySelector('input[name="inputMethod"]:checked')?.value || 'quantity';
             let cartItem = {
-                id: currentProduct.id || 'current-product',
+                id: currentProduct.id || Date.now().toString(),
                 name: currentProduct.name,
                 image: currentProduct.image,
-                price: currentProduct.sellingPrice,
-                unit: currentProduct.unit
+                unitPrice: currentProduct.sellingPrice,
+                unit: currentProduct.unit,
+                type: currentProduct.type || 'unit',
+                mfgDate: currentProduct.mfgDate || null,
+                expDate: currentProduct.expDate || null,
+                addedAt: new Date().toISOString()
             };
 
             if (currentProduct.type === 'weight-based') {
@@ -636,26 +640,92 @@
                     const unit = unitSelect.value;
                     const weightInKg = unit === 'gm' ? weight / 1000 : weight;
                     
-                    cartItem.quantity = weight;
-                    cartItem.quantityUnit = unit;
+                    cartItem.quantity = weightInKg;
+                    cartItem.quantityDisplay = `${weight} ${unit}`;
                     cartItem.totalPrice = weightInKg * currentProduct.sellingPrice;
+                    cartItem.pricePerKg = currentProduct.sellingPrice;
                 } else {
                     const price = parseFloat(priceInput.value) || 0;
                     const weightInKg = price / currentProduct.sellingPrice;
                     
                     cartItem.quantity = weightInKg;
-                    cartItem.quantityUnit = 'kg';
+                    cartItem.quantityDisplay = `${weightInKg.toFixed(3)} kg`;
                     cartItem.totalPrice = price;
+                    cartItem.pricePerKg = currentProduct.sellingPrice;
                 }
             } else {
                 const quantity = parseInt(quantityInput.value) || 1;
                 cartItem.quantity = quantity;
+                cartItem.quantityDisplay = `${quantity} ${currentProduct.unit}${quantity > 1 ? 's' : ''}`;
                 cartItem.totalPrice = quantity * currentProduct.sellingPrice;
             }
 
+            // Add to cart storage
+            addItemToCart(cartItem);
+            
             showNotification(`Added ${cartItem.name} to cart. Total: ₹${cartItem.totalPrice.toFixed(2)}`, 'success');
             cartModal.classList.add('hidden');
+            
+            // Optional: Navigate to cart page after adding
+            setTimeout(() => {
+                if (confirm('Item added to cart! Would you like to view your cart?')) {
+                    window.location.href = '/cart';
+                }
+            }, 1500);
         });
+
+        // Cart management functions
+        function addItemToCart(item) {
+            let cart = getCartItems();
+            
+            // Check if item already exists in cart
+            const existingItemIndex = cart.findIndex(cartItem => 
+                cartItem.id === item.id && cartItem.name === item.name
+            );
+            
+            if (existingItemIndex > -1) {
+                // Update existing item quantity and total
+                cart[existingItemIndex].quantity += item.quantity;
+                cart[existingItemIndex].totalPrice = cart[existingItemIndex].quantity * cart[existingItemIndex].unitPrice;
+                cart[existingItemIndex].quantityDisplay = updateQuantityDisplay(cart[existingItemIndex]);
+            } else {
+                // Add new item to cart
+                cart.push(item);
+            }
+            
+            // Save to localStorage
+            localStorage.setItem('kiranakonnect_cart', JSON.stringify(cart));
+            updateCartBadge();
+        }
+
+        function getCartItems() {
+            const cartData = localStorage.getItem('kiranakonnect_cart');
+            return cartData ? JSON.parse(cartData) : [];
+        }
+
+        function updateQuantityDisplay(item) {
+            if (item.type === 'weight-based') {
+                if (item.quantity >= 1) {
+                    return `${item.quantity.toFixed(1)} kg`;
+                } else {
+                    return `${(item.quantity * 1000).toFixed(0)} gm`;
+                }
+            } else {
+                return `${item.quantity} ${item.unit}${item.quantity > 1 ? 's' : ''}`;
+            }
+        }
+
+        function updateCartBadge() {
+            const cart = getCartItems();
+            const cartCount = cart.reduce((total, item) => total + (item.type === 'weight-based' ? 1 : item.quantity), 0);
+            
+            // Update cart badge in navigation if it exists
+            const cartBadge = document.querySelector('.cart-badge, [class*="cart"] .badge');
+            if (cartBadge) {
+                cartBadge.textContent = cartCount;
+                cartBadge.style.display = cartCount > 0 ? 'flex' : 'none';
+            }
+        }
 
         // Connect main add to cart button to modal
         addToCartBtn.addEventListener('click', () => {
