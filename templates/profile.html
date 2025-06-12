@@ -88,9 +88,7 @@
                 <h1 class="text-lg font-semibold text-dark">Profile</h1>
                 <p class="text-xs text-gray-500">Kirana Konnect</p>
             </div>
-            <button class="p-2 hover:bg-gray-100 rounded-lg" onclick="openSettings()">
-                <i class="fa-solid fa-cog text-gray-600 text-lg"></i>
-            </button>
+            <div class="w-10"></div>
         </div>
     </header>
 
@@ -325,9 +323,7 @@
             window.history.back();
         }
 
-        function openSettings() {
-            window.location.href = '/settings';
-        }
+
 
         function editProfile() {
             document.getElementById('editProfileModal').classList.remove('hidden');
