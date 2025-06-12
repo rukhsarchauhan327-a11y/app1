@@ -828,6 +828,82 @@
         </div>
     </div>
 
+    <!-- Position Selector Modal -->
+    <div id="positionSelectorModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden">
+        <div class="fixed inset-0 flex items-center justify-center p-4">
+            <div class="bg-white rounded-2xl max-w-sm w-full">
+                <div class="flex items-center justify-between p-6 border-b">
+                    <h2 class="text-lg font-bold text-dark">Change Position</h2>
+                    <button onclick="closePositionSelector()" class="p-2 hover:bg-gray-100 rounded-lg">
+                        <i class="fa-solid fa-times text-gray-600"></i>
+                    </button>
+                </div>
+                
+                <div class="p-6">
+                    <div class="text-center mb-6">
+                        <p class="text-sm text-gray-600">Staff Member</p>
+                        <p class="text-lg font-semibold text-dark" id="staffNameDisplay">Rahul Sharma</p>
+                        <p class="text-sm text-gray-500">Current: <span id="currentPositionDisplay">Cashier</span></p>
+                    </div>
+                    
+                    <div class="space-y-3">
+                        <button onclick="selectNewPosition('Worker')" class="w-full flex items-center justify-between p-3 bg-green-50 border border-green-200 rounded-lg hover:bg-green-100 transition-colors">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
+                                    <i class="fa-solid fa-user text-white text-sm"></i>
+                                </div>
+                                <div class="text-left">
+                                    <p class="font-medium text-dark">Worker</p>
+                                    <p class="text-xs text-gray-500">Basic store operations</p>
+                                </div>
+                            </div>
+                            <i class="fa-solid fa-chevron-right text-gray-400"></i>
+                        </button>
+                        
+                        <button onclick="selectNewPosition('Cashier')" class="w-full flex items-center justify-between p-3 bg-blue-50 border border-blue-200 rounded-lg hover:bg-blue-100 transition-colors">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
+                                    <i class="fa-solid fa-cash-register text-white text-sm"></i>
+                                </div>
+                                <div class="text-left">
+                                    <p class="font-medium text-dark">Cashier</p>
+                                    <p class="text-xs text-gray-500">Billing & customer service</p>
+                                </div>
+                            </div>
+                            <i class="fa-solid fa-chevron-right text-gray-400"></i>
+                        </button>
+                        
+                        <button onclick="selectNewPosition('Supervisor')" class="w-full flex items-center justify-between p-3 bg-purple-50 border border-purple-200 rounded-lg hover:bg-purple-100 transition-colors">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-8 h-8 bg-purple-500 rounded-full flex items-center justify-center">
+                                    <i class="fa-solid fa-user-tie text-white text-sm"></i>
+                                </div>
+                                <div class="text-left">
+                                    <p class="font-medium text-dark">Supervisor</p>
+                                    <p class="text-xs text-gray-500">Team management</p>
+                                </div>
+                            </div>
+                            <i class="fa-solid fa-chevron-right text-gray-400"></i>
+                        </button>
+                        
+                        <button onclick="selectNewPosition('Assistant Manager')" class="w-full flex items-center justify-between p-3 bg-orange-50 border border-orange-200 rounded-lg hover:bg-orange-100 transition-colors">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-8 h-8 bg-orange-500 rounded-full flex items-center justify-center">
+                                    <i class="fa-solid fa-crown text-white text-sm"></i>
+                                </div>
+                                <div class="text-left">
+                                    <p class="font-medium text-dark">Assistant Manager</p>
+                                    <p class="text-xs text-gray-500">Store operations</p>
+                                </div>
+                            </div>
+                            <i class="fa-solid fa-chevron-right text-gray-400"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Notification Settings Modal -->
     <div id="notificationSettingsModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden">
         <div class="fixed inset-0 flex items-center justify-center p-4">
@@ -1616,40 +1692,77 @@
         }
 
         function changePosition(staffId, currentPosition) {
-            const positions = ['Worker', 'Cashier', 'Supervisor', 'Assistant Manager'];
-            const currentIndex = positions.indexOf(currentPosition);
+            // Show position selector modal
+            const modal = document.getElementById('positionSelectorModal');
+            const staffName = document.querySelector(`[data-staff-id="${staffId}"] .font-medium`).textContent;
             
-            // Create position selector
-            let options = '';
-            positions.forEach(position => {
-                const selected = position === currentPosition ? 'selected' : '';
-                options += `<option value="${position}" ${selected}>${position}</option>`;
-            });
+            // Update modal content
+            document.getElementById('staffNameDisplay').textContent = staffName;
+            document.getElementById('currentPositionDisplay').textContent = currentPosition;
             
-            const newPosition = prompt(`Change position for staff member:\n\nCurrent: ${currentPosition}\n\nSelect new position:\n${positions.join(', ')}`);
+            // Store current selection data
+            window.currentStaffSelection = { staffId, currentPosition, staffName };
             
-            if (newPosition && positions.includes(newPosition) && newPosition !== currentPosition) {
-                // Update the position in the UI
-                const staffCard = document.querySelector(`[data-staff-id="${staffId}"]`);
-                if (staffCard) {
-                    const positionElement = staffCard.querySelector('.staff-position');
-                    if (positionElement) {
-                        positionElement.textContent = newPosition;
-                        
-                        // Update position color based on role
-                        positionElement.className = 'staff-position text-xs px-2 py-1 rounded-full font-medium';
-                        if (newPosition === 'Supervisor' || newPosition === 'Assistant Manager') {
-                            positionElement.classList.add('bg-purple-100', 'text-purple-600');
-                        } else if (newPosition === 'Cashier') {
-                            positionElement.classList.add('bg-blue-100', 'text-blue-600');
-                        } else {
-                            positionElement.classList.add('bg-green-100', 'text-green-600');
-                        }
-                    }
-                }
-                
-                alert(`Position changed successfully!\n${currentPosition} → ${newPosition}`);
+            // Show modal
+            modal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closePositionSelector() {
+            document.getElementById('positionSelectorModal').classList.add('hidden');
+            document.body.style.overflow = 'auto';
+        }
+
+        function selectNewPosition(newPosition) {
+            const { staffId, currentPosition, staffName } = window.currentStaffSelection;
+            
+            if (newPosition === currentPosition) {
+                closePositionSelector();
+                return;
             }
+            
+            // Update the position in the UI
+            const staffCard = document.querySelector(`[data-staff-id="${staffId}"]`);
+            if (staffCard) {
+                const positionElement = staffCard.querySelector('.staff-position');
+                if (positionElement) {
+                    positionElement.textContent = newPosition;
+                    
+                    // Update position color based on role
+                    positionElement.className = 'staff-position text-xs px-2 py-1 rounded-full font-medium';
+                    if (newPosition === 'Supervisor' || newPosition === 'Assistant Manager') {
+                        positionElement.classList.add('bg-purple-100', 'text-purple-600', 'hover:bg-purple-200');
+                    } else if (newPosition === 'Cashier') {
+                        positionElement.classList.add('bg-blue-100', 'text-blue-600', 'hover:bg-blue-200');
+                    } else {
+                        positionElement.classList.add('bg-green-100', 'text-green-600', 'hover:bg-green-200');
+                    }
+                    
+                    // Update onclick function
+                    positionElement.setAttribute('onclick', `changePosition('${staffId}', '${newPosition}')`);
+                }
+            }
+            
+            // Show success feedback
+            showPositionChangeSuccess(staffName, currentPosition, newPosition);
+            closePositionSelector();
+        }
+
+        function showPositionChangeSuccess(staffName, oldPosition, newPosition) {
+            const feedback = document.createElement('div');
+            feedback.className = 'fixed top-20 left-1/2 transform -translate-x-1/2 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-50 text-sm';
+            feedback.innerHTML = `
+                <div class="flex items-center space-x-2">
+                    <i class="fa-solid fa-check-circle"></i>
+                    <span><strong>${staffName}</strong> moved from ${oldPosition} to ${newPosition}</span>
+                </div>
+            `;
+            document.body.appendChild(feedback);
+            
+            // Remove after 3 seconds
+            setTimeout(() => {
+                feedback.remove();
+            }, 3000);
         }
 
         // Notification Settings Functions
