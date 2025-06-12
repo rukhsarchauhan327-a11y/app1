@@ -1065,7 +1065,7 @@
             1: {
                 id: 1,
                 name: 'Aashirvaad Atta',
-                quantity: 1,
+                quantity: 10,
                 unitPrice: 45,
                 price: 450,
                 unit: 'Kg',
@@ -1123,7 +1123,10 @@
                 unitPrice: 180,
                 price: 180,
                 unit: 'Bottle',
-                type: 'unit'
+                type: 'unit',
+                mfgDate: '01/01/2025',
+                expDate: '01/01/2027',
+                datesHidden: false
             }
         };
 
@@ -1737,8 +1740,10 @@
             const editPriceInput = document.getElementById('edit-price-input');
             const editUnitSelect = document.getElementById('edit-unit-select');
             
-            // Initialize date toggle functionality
+            // Initialize all cart functionality
+            calculateTotals();
             initializeDateToggles();
+            populatePresentStaff();
             
             if (editQuantityInputWeight) {
                 editQuantityInputWeight.addEventListener('input', updateEditTotal);
@@ -1761,6 +1766,15 @@
             inputMethodRadios.forEach(radio => {
                 radio.addEventListener('change', (e) => {
                     switchEditInputMethod(e.target.value);
+                });
+            });
+            
+            // Initialize modals
+            document.querySelectorAll('.modal').forEach(modal => {
+                modal.addEventListener('click', function(e) {
+                    if (e.target === modal) {
+                        modal.classList.add('hidden');
+                    }
                 });
             });
         });
