@@ -2010,30 +2010,33 @@
             } else {
                 emptyState.classList.add('hidden');
                 resultsContainer.innerHTML = searchResults.map(product => `
-                    <div class="bg-gray-50 rounded-lg p-3 cursor-pointer hover:bg-gray-100" onclick="addProductFromSearch('${product.name}', ${product.price}, '${product.unit}')">
+                    <div class="bg-gray-50 rounded-lg p-3 cursor-pointer hover:bg-gray-100" onclick="openProductDetails('${product.name}', ${product.price}, '${product.unit}')">
                         <div class="flex items-center space-x-3">
                             <img src="${product.image}" alt="${product.name}" class="w-12 h-12 rounded-lg object-cover">
                             <div class="flex-1">
                                 <h3 class="font-semibold text-dark">${product.name}</h3>
                                 <p class="text-sm text-gray-600">₹${product.price}/${product.unit}</p>
                             </div>
-                            <i class="fa-solid fa-plus text-primary"></i>
+                            <i class="fa-solid fa-chevron-right text-gray-400"></i>
                         </div>
                     </div>
                 `).join('');
             }
         }
 
-        function addProductFromSearch(name, price, unit) {
-            addToCart(name, price, unit, 1);
-            showNotification(`${name} added to cart`, 'success');
+        function openProductDetails(name, price, unit) {
+            // Create product ID from name for URL
+            const productId = name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+            
+            // Determine if it's weight-based or unit-based product
+            const isWeightBased = unit.toLowerCase().includes('kg') || unit.toLowerCase().includes('gram');
+            const detailsPage = isWeightBased ? '/product-details-weight' : '/product-details';
+            
+            // Close search modal and navigate to product details
             closeSearch();
-        }
-
-        function addToCart(name, price, unit, quantity) {
-            // Add product to cart logic here
-            console.log(`Adding ${name} - ₹${price}/${unit} x${quantity} to cart`);
-            // Update cart display and totals
+            
+            // Navigate to appropriate product details page
+            window.location.href = `${detailsPage}?id=${productId}&name=${encodeURIComponent(name)}&price=${price}&unit=${encodeURIComponent(unit)}`;
         }
 
         // Notification system
