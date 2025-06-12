@@ -1111,6 +1111,8 @@
             currentEditingItem = itemId;
             const item = cartItems[itemId];
             if (item) {
+                console.log('Editing item:', item.name, 'Type:', item.type);
+                
                 // Populate edit modal with current item data
                 document.getElementById('edit-product-name').textContent = item.name;
                 document.getElementById('edit-product-price').textContent = `₹${item.unitPrice}/${item.unit.toLowerCase()}`;
@@ -1122,6 +1124,9 @@
                 const unitBasedInput = document.getElementById('edit-unit-based-input');
                 const weightBasedInput = document.getElementById('edit-weight-based-input');
                 const unitSelect = document.getElementById('edit-unit-select');
+                
+                console.log('Unit-based input element:', unitBasedInput);
+                console.log('Weight-based input element:', weightBasedInput);
                 
                 if (item.type === 'weight') {
                     // Weight-based item configuration
@@ -1149,6 +1154,7 @@
                     }
                 } else {
                     // Unit-based item configuration
+                    console.log('Configuring for unit-based item');
                     inputMethodSection.classList.add('hidden');
                     priceSection.classList.add('hidden');
                     quantityLabel.textContent = item.unit;
@@ -1156,6 +1162,9 @@
                     // Show unit-based input, hide weight-based input
                     unitBasedInput.classList.remove('hidden');
                     weightBasedInput.classList.add('hidden');
+                    
+                    console.log('Unit-based input visibility:', !unitBasedInput.classList.contains('hidden'));
+                    console.log('Weight-based input visibility:', !weightBasedInput.classList.contains('hidden'));
                     
                     document.getElementById('edit-quantity-input-unit').value = item.quantity;
                 }
@@ -1514,7 +1523,7 @@
     <!-- Edit Item Modal -->
     <div id="edit-item-modal" class="fixed inset-0 bg-black bg-opacity-50 z-[9999] hidden">
         <div class="flex items-center justify-center min-h-screen p-4">
-            <div class="bg-white rounded-lg shadow-xl w-full max-w-sm max-h-[85vh] overflow-y-auto m-4">
+            <div class="bg-white rounded-lg shadow-xl w-full max-w-md max-h-[85vh] overflow-y-auto m-4">
                 <!-- Modal Header -->
                 <div class="flex items-center justify-between p-3 border-b border-gray-200">
                     <h3 class="text-base font-bold text-dark">Edit Item</h3>
@@ -1557,13 +1566,13 @@
                     <label id="edit-quantity-label" class="block text-xs font-medium text-dark mb-2">Quantity</label>
                     
                     <!-- Unit-based products (with +/- buttons) -->
-                    <div id="edit-unit-based-input" class="flex items-center space-x-2 mb-3">
-                        <button type="button" class="w-10 h-10 bg-red-50 border-2 border-red-200 rounded-lg flex items-center justify-center hover:bg-red-100 hover:border-red-300 transition-colors" onclick="editDecreaseQuantity()">
-                            <span class="text-red-600 font-bold text-lg">−</span>
+                    <div id="edit-unit-based-input" class="flex items-center gap-3 mb-3">
+                        <button type="button" class="w-12 h-12 bg-red-50 border-2 border-red-200 rounded-lg flex items-center justify-center hover:bg-red-100 hover:border-red-300 transition-colors flex-shrink-0" onclick="editDecreaseQuantity()">
+                            <span class="text-red-600 font-bold text-xl">−</span>
                         </button>
-                        <input type="number" id="edit-quantity-input-unit" class="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-center font-medium" value="1" min="1" step="1">
-                        <button type="button" class="w-10 h-10 bg-green-50 border-2 border-green-200 rounded-lg flex items-center justify-center hover:bg-green-100 hover:border-green-300 transition-colors" onclick="editIncreaseQuantity()">
-                            <span class="text-green-600 font-bold text-lg">+</span>
+                        <input type="number" id="edit-quantity-input-unit" class="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-center font-medium min-w-0" value="1" min="1" step="1">
+                        <button type="button" class="w-12 h-12 bg-green-50 border-2 border-green-200 rounded-lg flex items-center justify-center hover:bg-green-100 hover:border-green-300 transition-colors flex-shrink-0" onclick="editIncreaseQuantity()">
+                            <span class="text-green-600 font-bold text-xl">+</span>
                         </button>
                     </div>
                     
