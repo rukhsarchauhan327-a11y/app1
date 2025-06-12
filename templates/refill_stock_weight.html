@@ -145,9 +145,10 @@
                         <span class="absolute left-3 top-3 text-gray-500 text-lg">₹</span>
                         <input type="number" id="selling-price" class="w-full pl-8 pr-4 py-3 border border-gray-300 rounded-lg text-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="90">
                     </div>
-                    <select id="price-mode-select" class="px-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    <select id="price-mode-select" class="px-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-sm font-medium min-w-20">
                         <option value="per-kg">/Kg</option>
                         <option value="per-gram">/Gram</option>
+                        <option value="total">/Total</option>
                     </select>
                 </div>
                 <p class="text-sm text-green-600 mt-1" id="current-price">Current: ₹120/Kg</p>
@@ -383,11 +384,19 @@
                 
                 if (selectedMode === 'per-kg') {
                     currentPriceElement.textContent = `Current: ₹${sellingPrice}/Kg`;
-                } else {
+                } else if (selectedMode === 'per-gram') {
                     currentPriceElement.textContent = `Current: ₹${sellingPrice}/Gram`;
+                } else if (selectedMode === 'total') {
+                    // For total mode, show per kg equivalent
+                    if (quantityInKg > 0) {
+                        const pricePerKg = (sellingPrice / quantityInKg).toFixed(2);
+                        currentPriceElement.textContent = `Current: ₹${pricePerKg}/Kg (Total: ₹${sellingPrice})`;
+                    } else {
+                        currentPriceElement.textContent = `Current: Total ₹${sellingPrice}`;
+                    }
                 }
             } else {
-                currentPriceElement.textContent = 'Current: ₹120/Kg';
+                currentPriceElement.textContent = 'Current: ₹90/Kg';
             }
         }
 
@@ -594,9 +603,12 @@
             let finalSellingPricePerKg;
             if (selectedPriceMode === 'per-kg') {
                 finalSellingPricePerKg = sellingPriceInput;
-            } else {
+            } else if (selectedPriceMode === 'per-gram') {
                 // Per gram - convert to per kg
                 finalSellingPricePerKg = sellingPriceInput * 1000;
+            } else if (selectedPriceMode === 'total') {
+                // Total price for the quantity - convert to per kg
+                finalSellingPricePerKg = sellingPriceInput / quantityInKg;
             }
 
             // Prepare data for submission
@@ -617,9 +629,14 @@
             
             // Show custom success popup
             const unitDisplay = unit === 'kg' ? 'kg' : 'grams';
-            const priceInfo = selectedPriceMode === 'per-kg' ? 
-                ` at ₹${sellingPriceInput}/kg` : 
-                ` at ₹${sellingPriceInput}/gram`;
+            let priceInfo;
+            if (selectedPriceMode === 'per-kg') {
+                priceInfo = ` at ₹${sellingPriceInput}/kg`;
+            } else if (selectedPriceMode === 'per-gram') {
+                priceInfo = ` at ₹${sellingPriceInput}/gram`;
+            } else {
+                priceInfo = ` with total value ₹${sellingPriceInput}`;
+            }
             
             showSuccessPopup(`Successfully added ${quantity} ${unitDisplay} to stock${priceInfo}!`);
         }
