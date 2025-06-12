@@ -218,6 +218,22 @@
         </div>
     </nav>
 
+    <!-- Manual Barcode Input Popup -->
+    <div id="manual-barcode-popup" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-lg p-6 max-w-sm mx-4">
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">Enter Barcode Manually</h3>
+            <input type="text" id="manual-barcode-input" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent mb-4" placeholder="Enter barcode">
+            <div class="flex space-x-3">
+                <button onclick="cancelManualBarcode()" class="flex-1 bg-gray-500 text-white py-2 px-4 rounded-lg hover:bg-gray-600 transition-colors">
+                    Cancel
+                </button>
+                <button onclick="confirmManualBarcode()" class="flex-1 bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors">
+                    Confirm
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Camera Scanner Modal -->
     <div id="scanner-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden">
         <div class="flex items-center justify-center min-h-screen p-4">
@@ -444,12 +460,8 @@
             if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
                 openCameraScanner();
             } else {
-                // Fallback to manual entry
-                const newBarcode = prompt('Camera not available. Enter barcode manually:', currentBarcode || '');
-                if (newBarcode !== null && newBarcode.trim()) {
-                    barcodeInput.value = newBarcode.trim();
-                    alert('Barcode updated successfully!');
-                }
+                // Fallback to manual entry - show custom input popup
+                showManualBarcodeInput(currentBarcode || '');
             }
         }
 
@@ -461,7 +473,7 @@
             
             // Check if ZXing is loaded
             if (typeof ZXing === 'undefined') {
-                alert('Barcode scanner library not loaded. Please enter barcode manually.');
+                showErrorPopup('Barcode scanner library not loaded. Please enter barcode manually.');
                 closeCameraScanner();
                 return;
             }
@@ -477,7 +489,7 @@
                         const barcodeValue = result.text;
                         document.getElementById('barcode-input').value = barcodeValue;
                         closeCameraScanner();
-                        alert(`Barcode scanned: ${barcodeValue}`);
+                        showSuccessPopup(`Barcode scanned: ${barcodeValue}`);
                     }
                     if (err && !(err instanceof ZXing.NotFoundException)) {
                         console.error('Scanning error:', err);
@@ -486,12 +498,12 @@
                     currentStream = stream;
                 }).catch((err) => {
                     console.error('Camera access error:', err);
-                    alert('Camera access denied or not available. Please enter barcode manually.');
+                    showErrorPopup('Camera access denied or not available. Please enter barcode manually.');
                     closeCameraScanner();
                 });
             } catch (error) {
                 console.error('Scanner initialization error:', error);
-                alert('Scanner not available. Please enter barcode manually.');
+                showErrorPopup('Scanner not available. Please enter barcode manually.');
                 closeCameraScanner();
             }
         }
@@ -511,6 +523,33 @@
                 codeReader.reset();
                 codeReader = null;
             }
+        }
+
+        // Manual barcode input function
+        function showManualBarcodeInput(currentBarcode) {
+            const popup = document.getElementById('manual-barcode-popup');
+            const input = document.getElementById('manual-barcode-input');
+            input.value = currentBarcode;
+            popup.classList.remove('hidden');
+            input.focus();
+        }
+
+        function confirmManualBarcode() {
+            const popup = document.getElementById('manual-barcode-popup');
+            const input = document.getElementById('manual-barcode-input');
+            const newBarcode = input.value.trim();
+            
+            if (newBarcode) {
+                document.getElementById('barcode-input').value = newBarcode;
+                showSuccessPopup('Barcode updated successfully!');
+            }
+            
+            popup.classList.add('hidden');
+        }
+
+        function cancelManualBarcode() {
+            const popup = document.getElementById('manual-barcode-popup');
+            popup.classList.add('hidden');
         }
 
         // Success/Error popup functions
