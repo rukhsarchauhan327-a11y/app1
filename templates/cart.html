@@ -439,12 +439,18 @@
             </div>
             
             <!-- Date Toggle -->
-            <div class="flex items-center justify-between pt-2 border-t border-gray-100">
-                <span class="text-gray-600 font-medium text-sm">Include Dates on Receipt:</span>
-                <label class="relative inline-flex items-center cursor-pointer">
-                    <input type="checkbox" id="include-dates-toggle" class="sr-only peer" checked onchange="toggleDatesOnReceipt()">
-                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-orange-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
-                </label>
+            <div class="flex items-center justify-between pt-3 border-t border-gray-200">
+                <div class="flex items-center space-x-2">
+                    <i class="fa-solid fa-calendar text-gray-500"></i>
+                    <span class="text-gray-700 font-medium text-sm">Include Dates on Receipt</span>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <span class="text-xs text-gray-500" id="toggle-status">ON</span>
+                    <button id="include-dates-toggle" onclick="toggleDatesOnReceipt()" class="relative inline-flex h-6 w-11 items-center rounded-full bg-primary transition-colors">
+                        <span class="sr-only">Toggle dates</span>
+                        <span id="toggle-circle" class="inline-block h-4 w-4 transform rounded-full bg-white transition translate-x-6"></span>
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -1194,8 +1200,25 @@
         let includeDatesOnReceipt = true;
 
         function toggleDatesOnReceipt() {
+            includeDatesOnReceipt = !includeDatesOnReceipt;
             const toggle = document.getElementById('include-dates-toggle');
-            includeDatesOnReceipt = toggle.checked;
+            const circle = document.getElementById('toggle-circle');
+            const status = document.getElementById('toggle-status');
+            
+            if (includeDatesOnReceipt) {
+                toggle.classList.add('bg-primary');
+                toggle.classList.remove('bg-gray-300');
+                circle.classList.add('translate-x-6');
+                circle.classList.remove('translate-x-1');
+                status.textContent = 'ON';
+            } else {
+                toggle.classList.remove('bg-primary');
+                toggle.classList.add('bg-gray-300');
+                circle.classList.remove('translate-x-6');
+                circle.classList.add('translate-x-1');
+                status.textContent = 'OFF';
+            }
+            
             console.log('Include dates on receipt:', includeDatesOnReceipt);
         }
 
