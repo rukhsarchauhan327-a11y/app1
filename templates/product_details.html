@@ -676,45 +676,7 @@
             }, 3000);
         }
 
-        cartModal.addEventListener('click', (e) => {
-            if (e.target === cartModal) {
-                cartModal.classList.add('hidden');
-            }
-        });
 
-        decreaseBtn.addEventListener('click', () => {
-            const current = parseInt(quantityInput.value);
-            if (current > 1) {
-                quantityInput.value = current - 1;
-                updateModalCalculations();
-            }
-        });
-
-        increaseBtn.addEventListener('click', () => {
-            const current = parseInt(quantityInput.value);
-            if (current < productData.stock) {
-                quantityInput.value = current + 1;
-                updateModalCalculations();
-            }
-        });
-
-        quantityInput.addEventListener('input', updateModalCalculations);
-
-        function updateModalCalculations() {
-            const qty = parseInt(quantityInput.value) || 1;
-            const total = qty * productData.sellingPrice;
-            calculatedQuantity.textContent = `${qty} ${productData.unit}${qty > 1 ? 's' : ''}`;
-            calculatedPrice.textContent = `₹${total}`;
-        }
-
-        addCartBtn.addEventListener('click', () => {
-            const quantity = parseInt(quantityInput.value);
-            const total = quantity * productData.sellingPrice;
-            
-            // Add item to cart and close modal
-            console.log(`Added ${quantity} ${productData.unit} of ${productData.name} to cart`);
-            cartModal.classList.add('hidden');
-        });
 
         // Initialize page
         window.addEventListener('load', function() {
