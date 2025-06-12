@@ -469,6 +469,7 @@ def api_get_bill(bill_number):
             'payment_status': bill.payment_status,
             'generated_by': bill.generated_by,
             'created_at': bill.created_at.isoformat(),
+            'include_dates': bill.include_dates,
             'items': [{
                 'item_name': item.item_name,
                 'quantity': item.quantity,
