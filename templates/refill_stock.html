@@ -863,12 +863,14 @@
             // Set up confirm button click handler
             confirmBtn.onclick = () => {
                 console.log('Confirm button clicked');
-                closeConfirmationModal();
                 if (confirmationCallback) {
                     console.log('Executing callback');
-                    confirmationCallback();
+                    const callbackToExecute = confirmationCallback;
+                    closeConfirmationModal();
+                    callbackToExecute();
                 } else {
                     console.log('No callback to execute');
+                    closeConfirmationModal();
                 }
             };
             

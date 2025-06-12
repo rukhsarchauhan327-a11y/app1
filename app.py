@@ -136,19 +136,17 @@ def init_db():
     except Exception as e:
         app.logger.error(f"Database initialization error: {e}")
 
-# Database initialization flag
-_db_initialized = False
+# Initialize database tables once at startup
+try:
+    with app.app_context():
+        db.create_all()
+        app.logger.info("Database initialized successfully")
+except Exception as e:
+    app.logger.error(f"Database initialization failed: {e}")
 
 def ensure_db_initialized():
-    global _db_initialized
-    if not _db_initialized:
-        try:
-            db.create_all()
-            app.logger.info("Database tables created successfully")
-            _db_initialized = True
-        except Exception as e:
-            app.logger.error(f"Database initialization failed: {e}")
-            # Continue without crashing
+    # Database is already initialized at startup
+    pass
 
 @app.route('/')
 def index():
