@@ -986,7 +986,7 @@
 
         // Cart Item Management Functions - Initialize first
         let currentEditingItem = null;
-        const cartItems = {
+        let cartItems = {
             1: { name: 'Aashirvaad Atta', price: 450, quantity: 10, unit: 'Kg', unitPrice: 45, type: 'weight', minQty: 0.5, step: 0.5 },
             2: { name: 'Real Fruit Juice', price: 120, quantity: 2, unit: 'Bottles', unitPrice: 60, type: 'unit', minQty: 1, step: 1 },
             3: { name: 'Colgate Paste', price: 90, quantity: 3, unit: 'Pieces', unitPrice: 30, type: 'unit', minQty: 1, step: 1 },
@@ -1230,27 +1230,56 @@
         }
 
         function saveItemChanges() {
-            if (currentEditingItem) {
-                const item = cartItems[currentEditingItem];
-                const newQuantity = parseInt(document.getElementById('edit-quantity-input').value) || 1;
-                const mfgDate = document.getElementById('edit-mfg-date').value;
-                const expDate = document.getElementById('edit-exp-date').value;
+            if (!currentEditingItem) return;
+            
+            const item = cartItems[currentEditingItem];
+            let newQuantity;
+            let newPrice;
+            
+            if (item.type === 'weight') {
+                const inputMethod = document.querySelector('input[name="editInputMethod"]:checked').value;
                 
-                // Update item data
-                item.quantity = newQuantity;
-                item.price = newQuantity * item.unitPrice;
-                
-                // Update manufacturing and expiry dates if provided
-                if (mfgDate) item.mfgDate = mfgDate;
-                if (expDate) item.expDate = expDate;
-                
-                // Update display
-                updateCartDisplay(currentEditingItem);
-                calculateTotals();
-                
-                closeEditModal();
-                showNotification(`${item.name} updated successfully`, 'success');
+                if (inputMethod === 'quantity') {
+                    // Calculate quantity based on weight input
+                    let qty = parseFloat(document.getElementById('edit-quantity-input').value) || 0.5;
+                    const unit = document.getElementById('edit-unit-select').value;
+                    
+                    if (unit === 'gm') {
+                        qty = qty / 1000; // Convert grams to kg
+                    }
+                    
+                    newQuantity = qty;
+                    newPrice = qty * item.unitPrice;
+                } else {
+                    // Calculate quantity based on price input
+                    const price = parseFloat(document.getElementById('edit-price-input').value) || 0;
+                    newQuantity = price / item.unitPrice;
+                    newPrice = price;
+                }
+            } else {
+                // Unit-based items
+                newQuantity = parseInt(document.getElementById('edit-quantity-input').value) || 1;
+                newPrice = newQuantity * item.unitPrice;
             }
+            
+            // Get dates
+            const mfgDate = document.getElementById('edit-mfg-date').value;
+            const expDate = document.getElementById('edit-exp-date').value;
+            
+            // Update item data
+            item.quantity = newQuantity;
+            item.price = newPrice;
+            
+            // Update manufacturing and expiry dates if provided
+            if (mfgDate) item.mfgDate = mfgDate;
+            if (expDate) item.expDate = expDate;
+            
+            // Update display
+            updateCartDisplay(currentEditingItem);
+            calculateTotals();
+            
+            closeEditModal();
+            showNotification(`${item.name} updated successfully`, 'success');
         }
 
         function removeItem(itemId) {
