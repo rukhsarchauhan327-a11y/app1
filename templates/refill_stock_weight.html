@@ -609,8 +609,23 @@
         // Success/Error popup functions
         function showSuccessPopup(message, shouldRedirect = false) {
             const popup = document.getElementById('success-popup');
+            const titleElement = popup.querySelector('h3');
             const messageElement = document.getElementById('success-message');
-            messageElement.textContent = message;
+            
+            // Set appropriate title based on message content
+            if (message.toLowerCase().includes('barcode')) {
+                titleElement.textContent = 'Barcode Added Successfully';
+                messageElement.textContent = '';
+                messageElement.style.display = 'none';
+            } else if (message.toLowerCase().includes('stock')) {
+                titleElement.textContent = 'Stock Added Successfully';
+                messageElement.textContent = message;
+                messageElement.style.display = 'block';
+            } else {
+                titleElement.textContent = 'Success';
+                messageElement.textContent = message;
+                messageElement.style.display = 'block';
+            }
             popup.classList.remove('hidden');
             
             // Store redirect preference for when popup closes
