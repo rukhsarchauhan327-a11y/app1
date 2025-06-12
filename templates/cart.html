@@ -1146,20 +1146,14 @@
         function switchEditInputMethod(method) {
             const quantitySection = document.getElementById('edit-quantity-section');
             const priceSection = document.getElementById('edit-price-section');
-            const quantityTab = document.getElementById('edit-quantity-tab');
-            const priceTab = document.getElementById('edit-price-tab');
             
             if (method === 'quantity') {
                 quantitySection.classList.remove('hidden');
                 priceSection.classList.add('hidden');
-                quantityTab.className = 'block py-2 px-3 rounded-md bg-white text-primary font-medium text-sm cursor-pointer';
-                priceTab.className = 'block py-2 px-3 rounded-md text-gray-600 font-medium text-sm cursor-pointer';
                 updateEditTotal();
             } else {
                 quantitySection.classList.add('hidden');
                 priceSection.classList.remove('hidden');
-                quantityTab.className = 'block py-2 px-3 rounded-md text-gray-600 font-medium text-sm cursor-pointer';
-                priceTab.className = 'block py-2 px-3 rounded-md bg-white text-primary font-medium text-sm cursor-pointer';
                 updateEditPriceTotal();
             }
         }
@@ -1205,7 +1199,8 @@
                 displayUnit = 'gm';
             }
             
-            document.getElementById('edit-total-price').textContent = `₹${price.toFixed(2)}`;
+            document.getElementById('edit-calculated-quantity').textContent = `${displayQuantity.toFixed(displayUnit === 'Kg' ? 1 : 0)} ${displayUnit}`;
+            document.getElementById('edit-calculated-price').textContent = `₹${price.toFixed(2)}`;
         }
 
         function onEditUnitChange() {
@@ -1270,17 +1265,9 @@
                 newPrice = newQuantity * item.unitPrice;
             }
             
-            // Get dates
-            const mfgDate = document.getElementById('edit-mfg-date').value;
-            const expDate = document.getElementById('edit-exp-date').value;
-            
             // Update item data
             item.quantity = newQuantity;
             item.price = newPrice;
-            
-            // Update manufacturing and expiry dates if provided
-            if (mfgDate) item.mfgDate = mfgDate;
-            if (expDate) item.expDate = expDate;
             
             // Update display
             updateCartDisplay(currentEditingItem);
@@ -1373,16 +1360,7 @@
                 });
             });
             
-            // Add click handlers for tabs
-            document.getElementById('edit-quantity-tab').addEventListener('click', () => {
-                document.querySelector('input[name="editInputMethod"][value="quantity"]').checked = true;
-                switchEditInputMethod('quantity');
-            });
-            
-            document.getElementById('edit-price-tab').addEventListener('click', () => {
-                document.querySelector('input[name="editInputMethod"][value="price"]').checked = true;
-                switchEditInputMethod('price');
-            });
+            // Tab handlers removed since we now use radio buttons directly
         });
 
         // Staff management with attendance tracking
