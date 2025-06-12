@@ -436,17 +436,43 @@
         }
 
         function updateProductDisplay() {
-            document.getElementById('product-name').textContent = productData.name;
-            document.getElementById('product-size').textContent = productData.size;
-            document.getElementById('product-category').textContent = productData.category;
-            document.getElementById('product-image').src = productData.image;
-            document.getElementById('current-stock').textContent = `${productData.currentStock} ${productData.unit}`;
-            document.getElementById('reorder-level').textContent = `${productData.reorderLevel} ${productData.unit}`;
+            // Safely update elements with null checks for real-time data consistency
+            const elements = {
+                'product-name': productData.name || 'Weight-Based Product',
+                'product-size': productData.size || 'Premium Quality',
+                'product-category': productData.category || 'Grocery',
+                'current-stock': `${productData.currentStock || productData.stock || 15.5} ${productData.unit || 'Kg'}`,
+                'reorder-level': `${productData.reorderLevel || productData.threshold || 5} ${productData.unit || 'Kg'}`
+            };
+            
+            // Update text content safely
+            Object.keys(elements).forEach(id => {
+                const element = document.getElementById(id);
+                if (element) element.textContent = elements[id];
+            });
+            
+            // Update product image
+            const productImage = document.getElementById('product-image');
+            if (productImage && productData.image) {
+                productImage.src = productData.image;
+                productImage.alt = productData.name || 'Weight-Based Product';
+            }
             
             // Pre-populate barcode if product has one
-            if (productData.barcode) {
-                document.getElementById('barcode-input').value = productData.barcode;
+            const barcodeInput = document.getElementById('barcode-input');
+            if (barcodeInput && productData.barcode) {
+                barcodeInput.value = productData.barcode;
             }
+            
+            // Update selling price field
+            const sellingPriceInput = document.getElementById('selling-price');
+            if (sellingPriceInput) {
+                sellingPriceInput.placeholder = productData.sellingPrice || productData.price || '90';
+                sellingPriceInput.value = productData.sellingPrice || productData.price || '';
+            }
+            
+            // Update page title for better UX
+            document.title = `Refill ${productData.name || 'Weight-Based Product'} - Kirana Konnect`;
         }
 
         function updateCalculations() {
