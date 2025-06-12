@@ -260,7 +260,7 @@
                     <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
                         <i class="fa-solid fa-check text-green-500 text-2xl"></i>
                     </div>
-                    <h3 class="text-xl font-semibold text-gray-800 mb-2">Stock Added Successfully!</h3>
+                    <h3 id="success-title" class="text-xl font-semibold text-gray-800 mb-2">Success!</h3>
                     <p class="text-gray-600 text-sm" id="success-message">Your inventory has been updated with the new stock.</p>
                 </div>
                 <button onclick="closeSuccessPopup(); closeErrorPopup();" class="w-full bg-primary text-white py-3 px-4 rounded-lg hover:bg-blue-700 transition-colors font-medium">
@@ -601,7 +601,7 @@
                                         const barcodeValue = result.text;
                                         document.getElementById('barcode-input').value = barcodeValue;
                                         closeCameraScanner();
-                                        showSuccessPopup(`Barcode scanned: ${barcodeValue}`);
+                                        showSuccessPopup(`Barcode added successfully: ${barcodeValue}`);
                                     }
                                     if (err && !(err instanceof ZXing.NotFoundException)) {
                                         console.error('Scanning error:', err);
@@ -659,7 +659,18 @@
 
         function showSuccessPopup(message, shouldRedirect = false) {
             const popup = document.getElementById('success-popup');
+            const titleElement = document.getElementById('success-title');
             const messageElement = document.getElementById('success-message');
+            
+            // Set appropriate title based on message content
+            if (message.toLowerCase().includes('barcode')) {
+                titleElement.textContent = 'Barcode Added Successfully!';
+            } else if (message.toLowerCase().includes('stock')) {
+                titleElement.textContent = 'Stock Added Successfully!';
+            } else {
+                titleElement.textContent = 'Success!';
+            }
+            
             messageElement.textContent = message;
             popup.classList.remove('hidden');
             
@@ -708,7 +719,7 @@
             
             iconContainer.className = 'w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4';
             icon.className = 'fa-solid fa-check text-green-500 text-2xl';
-            title.textContent = 'Stock Added Successfully!';
+            title.textContent = 'Success!';
         }
 
         function cancelRefill() {
