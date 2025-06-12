@@ -383,7 +383,7 @@
     <!-- Add to Cart Modal -->
     <div id="cart-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden">
         <div class="flex items-center justify-center min-h-screen p-4 pb-24">
-            <div class="bg-white rounded-lg w-full max-w-md mx-auto max-h-screen overflow-y-auto">
+            <div class="bg-white rounded-lg w-full max-w-sm mx-auto max-h-screen overflow-y-auto">
                 <!-- Modal Header -->
                 <div class="flex items-center justify-between p-4 border-b border-gray-200">
                     <h3 class="text-lg font-bold text-dark">Add to Cart</h3>
@@ -422,20 +422,20 @@
                     <!-- Quantity Input Section -->
                     <div id="quantity-section" class="mb-4">
                         <label id="quantity-label" class="block text-sm font-medium text-dark mb-3">Quantity</label>
-                        <div id="bag-based-input" class="flex items-center space-x-3">
-                            <button id="decrease-qty" class="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center hover:bg-gray-200">
-                                <i class="fa-solid fa-minus text-gray-600"></i>
+                        <div id="bag-based-input" class="flex items-center space-x-2">
+                            <button id="decrease-qty" class="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center hover:bg-gray-200">
+                                <i class="fa-solid fa-minus text-gray-600 text-sm"></i>
                             </button>
-                            <input type="number" id="quantity-input" value="1" min="1" class="w-32 px-3 py-3 border border-gray-300 rounded-lg text-center font-medium text-lg">
-                            <button id="increase-qty" class="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center hover:bg-gray-200">
-                                <i class="fa-solid fa-plus text-gray-600"></i>
+                            <input type="number" id="quantity-input" value="1" min="1" class="w-20 px-2 py-2 border border-gray-300 rounded-lg text-center font-medium text-base">
+                            <button id="increase-qty" class="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center hover:bg-gray-200">
+                                <i class="fa-solid fa-plus text-gray-600 text-sm"></i>
                             </button>
                         </div>
-                        <div id="weight-based-input" class="flex items-center space-x-3 hidden">
-                            <input type="number" id="weight-quantity-input" value="1" min="0" step="0.001" class="w-32 px-3 py-3 border border-gray-300 rounded-lg text-center font-medium text-lg">
-                            <select id="unit-select" class="px-3 py-3 border border-gray-300 rounded-lg font-medium">
+                        <div id="weight-based-input" class="flex items-center space-x-2 hidden">
+                            <input type="number" id="weight-quantity-input" value="1" min="0" step="0.001" class="w-20 px-2 py-2 border border-gray-300 rounded-lg text-center font-medium text-base">
+                            <select id="unit-select" class="w-16 px-1 py-2 border border-gray-300 rounded-lg font-medium text-sm">
                                 <option value="kg">Kg</option>
-                                <option value="gm">Gram</option>
+                                <option value="gm">Gm</option>
                             </select>
                         </div>
                         <p class="text-xs text-gray-500 mt-2 text-center" id="quantity-help">Tap + or - to adjust quantity</p>
