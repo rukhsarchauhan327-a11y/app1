@@ -218,6 +218,22 @@
         </div>
     </nav>
 
+    <!-- Barcode Overwrite Confirmation Popup -->
+    <div id="barcode-confirm-popup" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-lg p-6 max-w-sm mx-4">
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">Replace Existing Barcode?</h3>
+            <p class="text-gray-600 mb-6">This product already has a barcode. Do you want to scan a new one to replace it?</p>
+            <div class="flex space-x-3">
+                <button onclick="cancelBarcodeOverwrite()" class="flex-1 bg-gray-500 text-white py-2 px-4 rounded-lg hover:bg-gray-600 transition-colors">
+                    Cancel
+                </button>
+                <button onclick="confirmBarcodeOverwrite()" class="flex-1 bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors">
+                    Replace
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Manual Barcode Input Popup -->
     <div id="manual-barcode-popup" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
         <div class="bg-white rounded-lg p-6 max-w-sm mx-4">
@@ -466,10 +482,8 @@
             
             // If product already has a barcode, ask for confirmation before overwriting
             if (currentBarcode && productData.barcode) {
-                const confirmOverwrite = confirm('This product already has a barcode. Do you want to scan a new one to replace it?');
-                if (!confirmOverwrite) {
-                    return;
-                }
+                showBarcodeConfirmPopup();
+                return;
             }
             
             // Try camera scanner first, fallback to manual entry
@@ -565,6 +579,29 @@
 
         function cancelManualBarcode() {
             const popup = document.getElementById('manual-barcode-popup');
+            popup.classList.add('hidden');
+        }
+
+        // Barcode confirmation functions
+        function showBarcodeConfirmPopup() {
+            const popup = document.getElementById('barcode-confirm-popup');
+            popup.classList.remove('hidden');
+        }
+
+        function confirmBarcodeOverwrite() {
+            const popup = document.getElementById('barcode-confirm-popup');
+            popup.classList.add('hidden');
+            
+            // Proceed with scanner after confirmation
+            if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                openCameraScanner();
+            } else {
+                showManualBarcodeInput(document.getElementById('barcode-input').value);
+            }
+        }
+
+        function cancelBarcodeOverwrite() {
+            const popup = document.getElementById('barcode-confirm-popup');
             popup.classList.add('hidden');
         }
 
