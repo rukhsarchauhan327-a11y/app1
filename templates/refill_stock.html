@@ -601,7 +601,7 @@
                                         const barcodeValue = result.text;
                                         document.getElementById('barcode-input').value = barcodeValue;
                                         closeCameraScanner();
-                                        showSuccessPopup(`Barcode added successfully: ${barcodeValue}`);
+                                        showSuccessPopup('Barcode added successfully');
                                     }
                                     if (err && !(err instanceof ZXing.NotFoundException)) {
                                         console.error('Scanning error:', err);
@@ -658,15 +658,17 @@
         }
 
         function showSuccessPopup(message, shouldRedirect = false) {
-            // Hide any existing scanner status notifications first
+            // Hide scanner modal completely when showing success popup
             const scannerModal = document.getElementById('scanner-modal');
-            if (scannerModal && !scannerModal.classList.contains('hidden')) {
-                // Don't close scanner if it's open, just hide any status notifications
-                const statusElement = document.getElementById('scanner-status');
-                if (statusElement) {
-                    statusElement.style.display = 'none';
-                }
+            if (scannerModal) {
+                scannerModal.classList.add('hidden');
             }
+            
+            // Hide any other notification elements that might be interfering
+            const allNotifications = document.querySelectorAll('.notification, .toast, .alert');
+            allNotifications.forEach(notif => {
+                notif.style.display = 'none';
+            });
             
             const popup = document.getElementById('success-popup');
             const titleElement = document.getElementById('success-title');
@@ -674,11 +676,11 @@
             
             // Set appropriate title based on message content
             if (message.toLowerCase().includes('barcode')) {
-                titleElement.textContent = 'Barcode Added Successfully!';
+                titleElement.textContent = 'Barcode Added Successfully';
             } else if (message.toLowerCase().includes('stock')) {
-                titleElement.textContent = 'Stock Added Successfully!';
+                titleElement.textContent = 'Stock Added Successfully';
             } else {
-                titleElement.textContent = 'Success!';
+                titleElement.textContent = 'Success';
             }
             
             messageElement.textContent = message;
@@ -944,7 +946,7 @@
             if (newBarcode) {
                 barcodeInput.value = newBarcode;
                 closeManualBarcodeModal();
-                showSuccessPopup(`Barcode added successfully: ${newBarcode}`);
+                showSuccessPopup('Barcode added successfully');
             } else {
                 showErrorPopup('Please enter a valid barcode');
             }
@@ -958,7 +960,7 @@
             if (newBarcode) {
                 barcodeInput.value = newBarcode;
                 closeCameraScanner();
-                showSuccessPopup(`Barcode added successfully: ${newBarcode}`);
+                showSuccessPopup('Barcode added successfully');
             } else {
                 showErrorPopup('Please enter a valid barcode');
             }
