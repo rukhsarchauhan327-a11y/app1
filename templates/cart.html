@@ -1432,14 +1432,16 @@
 
     <!-- Edit Item Modal -->
     <div id="edit-item-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden">
-        <div class="fixed inset-0 flex items-center justify-center p-4">
-            <div class="bg-white rounded-2xl max-w-md w-full p-6">
-                <div class="flex items-center justify-between mb-4">
-                    <h2 class="text-lg font-bold text-dark">Edit Item</h2>
-                    <button onclick="closeEditModal()" class="p-1 hover:bg-gray-100 rounded">
-                        <i class="fa-solid fa-times text-gray-600"></i>
-                    </button>
-                </div>
+        <div class="fixed bottom-0 left-0 right-0 bg-white rounded-t-2xl max-h-[85vh] overflow-y-auto">
+            <div class="flex items-center justify-between p-4 border-b border-gray-200">
+                <h3 class="text-lg font-bold text-dark">Edit Item</h3>
+                <button onclick="closeEditModal()" class="p-1 hover:bg-gray-100 rounded">
+                    <i class="fa-solid fa-times text-gray-600"></i>
+                </button>
+            </div>
+
+            <!-- Modal Content -->
+            <div class="p-4">
                 
                 <!-- Product Info -->
                 <div class="flex items-center space-x-3 mb-4 p-3 bg-gray-50 rounded-lg">
