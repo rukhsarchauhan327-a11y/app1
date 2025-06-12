@@ -370,10 +370,33 @@
             }
         };
         
-        // Get product from URL or default to product 1
+        // Get product from localStorage or URL parameters
         const urlParams = new URLSearchParams(window.location.search);
         const productId = urlParams.get('id') || '1';
-        let productData = sampleProducts[productId] || sampleProducts[1];
+        
+        // Load product data from localStorage if available
+        const storedProductData = localStorage.getItem('refillProductData');
+        let productData;
+        
+        if (storedProductData) {
+            const stored = JSON.parse(storedProductData);
+            productData = {
+                id: stored.id || productId,
+                name: stored.name || 'Weight-Based Product',
+                size: stored.size || 'Premium Quality',
+                category: stored.category || 'Grocery',
+                isWeightBased: true,
+                unit: stored.unit || 'Kg',
+                currentStock: stored.stock || 15.5,
+                reorderLevel: Math.round((stored.stock || 15.5) * 0.2),
+                sellingPrice: stored.price || 90,
+                barcode: stored.barcode || null,
+                image: stored.image || 'https://storage.googleapis.com/uxpilot-auth.appspot.com/9307613d34-298d7bee124789ba3905.png'
+            };
+        } else {
+            // Fallback to sample data
+            productData = sampleProducts[productId] || sampleProducts[1];
+        }
 
         // Price mode: 'per-kg' or 'total'
         let priceMode = 'per-kg';
