@@ -1219,6 +1219,26 @@
             }
         }
 
+        function editDecreaseQuantity() {
+            const input = document.getElementById('edit-quantity-input-unit');
+            if (input) {
+                const current = parseInt(input.value) || 1;
+                if (current > 1) {
+                    input.value = current - 1;
+                    updateEditTotal();
+                }
+            }
+        }
+
+        function editIncreaseQuantity() {
+            const input = document.getElementById('edit-quantity-input-unit');
+            if (input) {
+                const current = parseInt(input.value) || 1;
+                input.value = current + 1;
+                updateEditTotal();
+            }
+        }
+
         function updateEditTotal() {
             if (!currentEditingItem) return;
             
