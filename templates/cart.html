@@ -1770,7 +1770,12 @@
                 
                 // Debug what elements actually exist
                 const allElements = document.querySelectorAll('[id^="cart-item-"], [id^="date-toggle-"]');
+                const allCartItems = document.querySelectorAll('#cart-items > div');
+                const allButtons = document.querySelectorAll('button[onclick*="toggleProductDates"]');
                 console.log('All cart-related elements found:', Array.from(allElements).map(el => el.id));
+                console.log('Cart items divs:', allCartItems.length);
+                console.log('Toggle buttons:', allButtons.length);
+                console.log('Cart HTML structure:', cartItemsContainer ? cartItemsContainer.innerHTML.substring(0, 500) : 'Not found');
                 
                 console.log('Elements verification:', {
                     container: !!cartItemsContainer,
