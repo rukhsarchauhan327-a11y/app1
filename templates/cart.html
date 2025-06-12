@@ -1538,12 +1538,12 @@
                     
                     <!-- Unit-based products (with +/- buttons) -->
                     <div id="edit-unit-based-input" class="flex items-center space-x-2 mb-3">
-                        <button class="w-10 h-10 border border-gray-300 rounded-lg flex items-center justify-center hover:bg-gray-100" onclick="editDecreaseQuantity()">
-                            <i class="fa-solid fa-minus text-gray-600 text-sm"></i>
+                        <button type="button" class="w-10 h-10 bg-red-50 border-2 border-red-200 rounded-lg flex items-center justify-center hover:bg-red-100 hover:border-red-300 transition-colors" onclick="editDecreaseQuantity()">
+                            <span class="text-red-600 font-bold text-lg">−</span>
                         </button>
                         <input type="number" id="edit-quantity-input-unit" class="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-center font-medium" value="1" min="1" step="1">
-                        <button class="w-10 h-10 border border-gray-300 rounded-lg flex items-center justify-center hover:bg-gray-100" onclick="editIncreaseQuantity()">
-                            <i class="fa-solid fa-plus text-gray-600 text-sm"></i>
+                        <button type="button" class="w-10 h-10 bg-green-50 border-2 border-green-200 rounded-lg flex items-center justify-center hover:bg-green-100 hover:border-green-300 transition-colors" onclick="editIncreaseQuantity()">
+                            <span class="text-green-600 font-bold text-lg">+</span>
                         </button>
                     </div>
                     
