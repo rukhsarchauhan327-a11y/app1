@@ -1057,15 +1057,20 @@
                 
                 // Configure modal based on item type
                 const inputMethodSection = document.getElementById('edit-input-method');
-                const unitSelection = document.getElementById('edit-unit-selection');
                 const priceSection = document.getElementById('edit-price-section');
                 const quantityLabel = document.getElementById('edit-quantity-label');
+                const unitBasedInput = document.getElementById('edit-unit-based-input');
+                const weightBasedInput = document.getElementById('edit-weight-based-input');
+                const unitSelect = document.getElementById('edit-unit-select');
                 
                 if (item.type === 'weight') {
                     // Weight-based item configuration
                     inputMethodSection.classList.remove('hidden');
-                    unitSelection.classList.remove('hidden');
                     quantityLabel.textContent = 'Weight';
+                    
+                    // Show weight-based input, hide unit-based input
+                    weightBasedInput.classList.remove('hidden');
+                    unitBasedInput.classList.add('hidden');
                     
                     // Set input method to quantity by default
                     document.querySelector('input[name="editInputMethod"][value="quantity"]').checked = true;
@@ -1074,19 +1079,25 @@
                     document.getElementById('edit-quantity-section').classList.remove('hidden');
                     priceSection.classList.add('hidden');
                     
-                    // Set appropriate unit
-                    document.getElementById('edit-unit-select').value = item.quantity >= 1 ? 'kg' : 'gm';
-                    document.getElementById('edit-quantity-input').step = '0.1';
-                    document.getElementById('edit-quantity-input').min = '0.1';
+                    // Set appropriate unit and input value
+                    if (item.quantity >= 1) {
+                        unitSelect.value = 'kg';
+                        document.getElementById('edit-quantity-input-weight').value = item.quantity.toFixed(1);
+                    } else {
+                        unitSelect.value = 'gm';
+                        document.getElementById('edit-quantity-input-weight').value = (item.quantity * 1000).toFixed(0);
+                    }
                 } else {
                     // Unit-based item configuration
                     inputMethodSection.classList.add('hidden');
-                    unitSelection.classList.add('hidden');
                     priceSection.classList.add('hidden');
                     quantityLabel.textContent = item.unit;
                     
-                    document.getElementById('edit-quantity-input').step = '1';
-                    document.getElementById('edit-quantity-input').min = '1';
+                    // Show unit-based input, hide weight-based input
+                    unitBasedInput.classList.remove('hidden');
+                    weightBasedInput.classList.add('hidden');
+                    
+                    document.getElementById('edit-quantity-input-unit').value = item.quantity;
                 }
                 
                 updateEditTotal();
@@ -1105,40 +1116,32 @@
             if (!currentEditingItem) return;
             
             const item = cartItems[currentEditingItem];
-            const input = document.getElementById('edit-quantity-input');
-            const current = parseFloat(input.value) || item.minQty;
             
-            if (item.type === 'weight') {
-                const unit = document.getElementById('edit-unit-select').value;
-                const step = unit === 'kg' ? 0.1 : 100;
-                const minValue = unit === 'kg' ? 0.1 : 100;
+            // Only for unit-based items (weight-based items don't use +/- buttons)
+            if (item.type !== 'weight') {
+                const input = document.getElementById('edit-quantity-input-unit');
+                const current = parseInt(input.value) || 1;
                 
-                if (current > minValue) {
-                    input.value = Math.max(minValue, current - step).toFixed(unit === 'kg' ? 1 : 0);
-                }
-            } else {
                 if (current > 1) {
                     input.value = current - 1;
+                    updateEditTotal();
                 }
             }
-            updateEditTotal();
         }
 
         function editIncreaseQuantity() {
             if (!currentEditingItem) return;
             
             const item = cartItems[currentEditingItem];
-            const input = document.getElementById('edit-quantity-input');
-            const current = parseFloat(input.value) || 1;
             
-            if (item.type === 'weight') {
-                const unit = document.getElementById('edit-unit-select').value;
-                const step = unit === 'kg' ? 0.1 : 100;
-                input.value = (current + step).toFixed(unit === 'kg' ? 1 : 0);
-            } else {
+            // Only for unit-based items (weight-based items don't use +/- buttons)
+            if (item.type !== 'weight') {
+                const input = document.getElementById('edit-quantity-input-unit');
+                const current = parseInt(input.value) || 1;
+                
                 input.value = current + 1;
+                updateEditTotal();
             }
-            updateEditTotal();
         }
 
         function switchEditInputMethod(method) {
@@ -1160,10 +1163,12 @@
             if (!currentEditingItem) return;
             
             const item = cartItems[currentEditingItem];
-            let quantity = parseFloat(document.getElementById('edit-quantity-input').value) || 1;
+            let quantity;
             
             if (item.type === 'weight') {
+                quantity = parseFloat(document.getElementById('edit-quantity-input-weight').value) || 1;
                 const unit = document.getElementById('edit-unit-select').value;
+                
                 if (unit === 'gm') {
                     quantity = quantity / 1000; // Convert to kg for calculation
                 }
@@ -1172,6 +1177,8 @@
                 const displayQuantity = unit === 'kg' ? `${quantity.toFixed(1)} Kg` : `${(quantity * 1000).toFixed(0)} gm`;
                 document.getElementById('edit-calculated-quantity').textContent = displayQuantity;
             } else {
+                quantity = parseInt(document.getElementById('edit-quantity-input-unit').value) || 1;
+                
                 // Update quantity display for unit-based items
                 const unitText = quantity === 1 ? item.unit.slice(0, -1) : item.unit;
                 document.getElementById('edit-calculated-quantity').textContent = `${quantity} ${unitText}`;
@@ -1205,16 +1212,16 @@
             if (!currentEditingItem) return;
             
             const item = cartItems[currentEditingItem];
-            const unit = document.getElementById('edit-unit-select').value;
-            const input = document.getElementById('edit-quantity-input');
-            
             if (item.type === 'weight') {
+                const unit = document.getElementById('edit-unit-select').value;
+                const input = document.getElementById('edit-quantity-input-weight');
                 const currentValue = parseFloat(input.value) || 1;
                 
                 if (unit === 'kg') {
                     input.step = '0.1';
                     input.min = '0.1';
                     input.placeholder = '0.5';
+                    // Convert from grams to kg if needed
                     if (input.value && currentValue > 10) {
                         input.value = (currentValue / 1000).toFixed(1);
                     }
@@ -1222,6 +1229,7 @@
                     input.step = '100';
                     input.min = '100';
                     input.placeholder = '500';
+                    // Convert from kg to grams if needed
                     if (input.value && currentValue < 10) {
                         input.value = (currentValue * 1000).toFixed(0);
                     }
@@ -1242,7 +1250,7 @@
                 
                 if (inputMethod === 'quantity') {
                     // Calculate quantity based on weight input
-                    let qty = parseFloat(document.getElementById('edit-quantity-input').value) || 0.5;
+                    let qty = parseFloat(document.getElementById('edit-quantity-input-weight').value) || 0.5;
                     const unit = document.getElementById('edit-unit-select').value;
                     
                     if (unit === 'gm') {
@@ -1259,7 +1267,7 @@
                 }
             } else {
                 // Unit-based items
-                newQuantity = parseInt(document.getElementById('edit-quantity-input').value) || 1;
+                newQuantity = parseInt(document.getElementById('edit-quantity-input-unit').value) || 1;
                 newPrice = newQuantity * item.unitPrice;
             }
             
@@ -1457,29 +1465,31 @@
                     </div>
                 </div>
 
-                <!-- Quantity Section -->
+                <!-- Quantity Input Section -->
                 <div id="edit-quantity-section" class="mb-4">
-                    <label class="block text-sm font-medium text-dark mb-3" id="edit-quantity-label">Quantity</label>
-                    <div class="flex items-center space-x-3 mb-3">
+                    <label id="edit-quantity-label" class="block text-sm font-medium text-dark mb-3">Quantity</label>
+                    
+                    <!-- Unit-based products (with +/- buttons) -->
+                    <div id="edit-unit-based-input" class="flex items-center space-x-3 mb-3">
                         <button class="w-12 h-12 border border-gray-300 rounded-lg flex items-center justify-center hover:bg-gray-100" onclick="editDecreaseQuantity()">
-                            <i class="fa-solid fa-minus text-lg"></i>
+                            <i class="fa-solid fa-minus text-gray-600"></i>
                         </button>
-                        <div class="flex-1">
-                            <input type="number" id="edit-quantity-input" class="w-full p-3 border border-gray-200 rounded-lg text-center text-lg font-medium" min="1" step="1" value="1">
-                        </div>
+                        <input type="number" id="edit-quantity-input-unit" class="flex-1 px-4 py-3 border border-gray-300 rounded-lg text-center font-medium" value="1" min="1" step="1">
                         <button class="w-12 h-12 border border-gray-300 rounded-lg flex items-center justify-center hover:bg-gray-100" onclick="editIncreaseQuantity()">
-                            <i class="fa-solid fa-plus text-lg"></i>
+                            <i class="fa-solid fa-plus text-gray-600"></i>
                         </button>
                     </div>
                     
-                    <!-- Unit Selection (for weight-based items) -->
-                    <div id="edit-unit-selection" class="hidden">
-                        <label class="block text-sm font-medium text-dark mb-2">Unit</label>
-                        <select id="edit-unit-select" class="w-full p-3 border border-gray-200 rounded-lg">
+                    <!-- Weight-based products (input + unit dropdown, no +/- buttons) -->
+                    <div id="edit-weight-based-input" class="flex items-center space-x-3 mb-3 hidden">
+                        <input type="number" id="edit-quantity-input-weight" class="flex-1 px-4 py-3 border border-gray-300 rounded-lg text-center font-medium text-lg" value="1" min="0.1" step="0.1">
+                        <select id="edit-unit-select" class="px-4 py-3 border border-gray-300 rounded-lg font-medium" onchange="onEditUnitChange()">
                             <option value="kg">Kg</option>
-                            <option value="gm">Grams</option>
+                            <option value="gm">Gram</option>
                         </select>
                     </div>
+                    
+                    <p id="edit-quantity-help" class="text-xs text-gray-500">Enter the required quantity</p>
                 </div>
 
                 <!-- Price Section (for weight-based items) -->
