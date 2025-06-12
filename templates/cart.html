@@ -1627,58 +1627,78 @@
         }
 
         function toggleProductDates(itemId) {
-            const item = cartItems[itemId];
-            const button = document.getElementById(`date-toggle-${itemId}`);
+            console.log('Toggling dates for item:', itemId);
             
-            if (!button || !item) {
-                return;
-            }
-            
-            if (item.datesHidden) {
-                // Show dates
-                item.datesHidden = false;
-                button.innerHTML = '<i class="fa-solid fa-times mr-1"></i>Remove Dates';
-                button.classList.remove('text-success');
-                button.classList.add('text-danger');
+            // Wait for DOM to be ready
+            setTimeout(() => {
+                const item = cartItems[itemId];
+                const button = document.getElementById(`date-toggle-${itemId}`);
                 
-                // Show date elements
-                const dateElements = document.querySelectorAll(`#cart-item-${itemId} .date-info`);
-                dateElements.forEach(el => {
-                    el.classList.remove('hidden');
-                    el.style.display = '';
-                });
+                if (!button) {
+                    console.error('Toggle button NOT found - debugging needed');
+                    return;
+                }
                 
-                showNotification(`Dates shown for ${item.name}`, 'success');
-            } else {
-                // Hide dates
-                item.datesHidden = true;
-                button.innerHTML = '<i class="fa-solid fa-plus mr-1"></i>Add Dates';
-                button.classList.remove('text-danger');
-                button.classList.add('text-success');
+                if (!item) {
+                    console.error('Item not found in cartItems:', itemId);
+                    return;
+                }
                 
-                // Hide date elements
-                const dateElements = document.querySelectorAll(`#cart-item-${itemId} .date-info`);
-                dateElements.forEach(el => {
-                    el.classList.add('hidden');
-                    el.style.display = 'none';
-                });
-                
-                showNotification(`Dates hidden for ${item.name}`, 'info');
-            }
+                if (item.datesHidden) {
+                    // Show dates
+                    item.datesHidden = false;
+                    button.innerHTML = '<i class="fa-solid fa-times mr-1"></i>Remove Dates';
+                    button.classList.remove('text-success');
+                    button.classList.add('text-danger');
+                    
+                    // Show date elements
+                    const dateElements = document.querySelectorAll(`#cart-item-${itemId} .date-info`);
+                    dateElements.forEach(el => {
+                        el.classList.remove('hidden');
+                        el.style.display = '';
+                    });
+                    
+                    showNotification(`Dates shown for ${item.name}`, 'success');
+                } else {
+                    // Hide dates
+                    item.datesHidden = true;
+                    button.innerHTML = '<i class="fa-solid fa-plus mr-1"></i>Add Dates';
+                    button.classList.remove('text-danger');
+                    button.classList.add('text-success');
+                    
+                    // Hide date elements
+                    const dateElements = document.querySelectorAll(`#cart-item-${itemId} .date-info`);
+                    dateElements.forEach(el => {
+                        el.classList.add('hidden');
+                        el.style.display = 'none';
+                    });
+                    
+                    showNotification(`Dates hidden for ${item.name}`, 'info');
+                }
+            }, 100);
         }
 
         // Initialize date toggle functionality
         function initializeDateToggles() {
+            console.log('Initializing date toggles...');
+            
             // Check all toggle buttons exist and hide toggle for items without dates
             for (let i = 1; i <= 6; i++) {
                 const button = document.getElementById(`date-toggle-${i}`);
+                const cartItem = document.getElementById(`cart-item-${i}`);
+                const dateElements = document.querySelectorAll(`#cart-item-${i} .date-info`);
                 const item = cartItems[i];
                 
+                console.log(`Item ${i}:`, {
+                    button: !!button,
+                    cartItem: !!cartItem,
+                    dateElements: dateElements.length,
+                    cartItemData: !!item,
+                    hasDates: !!(item && (item.mfgDate || item.expDate))
+                });
+                
                 if (button && item) {
-                    // Check if item has manufacturing and expiry dates
-                    const hasDates = item.mfgDate && item.expDate;
-                    
-                    if (hasDates) {
+                    if (item.mfgDate || item.expDate) {
                         // Show toggle button for items with dates
                         button.style.display = '';
                         if (item.datesHidden === undefined) {
@@ -1687,6 +1707,7 @@
                     } else {
                         // Hide toggle button for items without dates
                         button.style.display = 'none';
+                        console.log(`Hiding date toggle for ${item.name} - no dates available`);
                     }
                 }
             }
