@@ -989,7 +989,8 @@ def get_notifications():
         
         return jsonify({
             'notifications': notification_data,
-            'count': len(notification_data)
+            'count': len(notification_data),
+            'unread_count': len(notification_data)
         })
         
     except Exception as e:

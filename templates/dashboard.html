@@ -654,7 +654,7 @@
             document.getElementById('current-time').textContent = now.toLocaleTimeString('en-US', timeOptions);
         }
 
-        // Load real-time notification count and data
+        // Load real-time notification count and data respecting user settings
         function updateNotificationCount() {
             fetch('/api/notifications')
                 .then(function(response) {
@@ -667,27 +667,28 @@
                     
                     var count = data.count || 0;
                     
-                    // Show/hide backup notification in dropdown
+                    // Show backup notification only if backup is disabled
                     if (!backupEnabled) {
                         backupNotification.style.display = 'block';
-                        count += 1; // Add backup notification to count
+                        count += 1;
                     } else {
                         backupNotification.style.display = 'none';
                     }
                     
-                    // Update badge
+                    // Update notification badge
                     notificationBadge.textContent = count;
-                    if (count > 0) {
-                        notificationBadge.style.display = 'flex';
-                    } else {
-                        notificationBadge.style.display = 'none';
-                    }
+                    notificationBadge.style.display = count > 0 ? 'flex' : 'none';
                     
                     // Update dropdown with real notifications
                     updateNotificationDropdown(data.notifications || []);
                 })
                 .catch(function(error) {
                     console.error('Error loading notifications:', error);
+                    // Show fallback count if API fails
+                    const notificationBadge = document.getElementById('notification-count');
+                    const backupEnabled = localStorage.getItem('emailBackupEnabled') === 'true';
+                    notificationBadge.textContent = backupEnabled ? '0' : '1';
+                    notificationBadge.style.display = backupEnabled ? 'none' : 'flex';
                 });
         }
 
@@ -758,43 +759,7 @@
             }
         }
 
-        // Mark all notifications as read
-        function markAllNotificationsRead() {
-            fetch('/api/notifications/mark-all-read', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            })
-            .then(function(response) {
-                return response.json();
-            })
-            .then(function(data) {
-                if (data.success) {
-                    // Update notification count to 0 (except backup if not enabled)
-                    const backupEnabled = localStorage.getItem('emailBackupEnabled') === 'true';
-                    const notificationBadge = document.getElementById('notification-count');
-                    
-                    if (!backupEnabled) {
-                        notificationBadge.textContent = '1'; // Only backup notification remains
-                    } else {
-                        notificationBadge.style.display = 'none'; // Hide badge completely
-                    }
-                    
-                    // Close dropdown
-                    document.getElementById('notification-dropdown').classList.add('hidden');
-                    
-                    // Show success message
-                    showStyledNotification('All notifications marked as read', 'success');
-                } else {
-                    showStyledNotification('Failed to mark notifications as read', 'error');
-                }
-            })
-            .catch(function(error) {
-                console.error('Error marking notifications as read:', error);
-                showStyledNotification('Error updating notifications', 'error');
-            });
-        }
+
 
         // Notification dropdown toggle
         document.getElementById('notification-bell').addEventListener('click', function() {
