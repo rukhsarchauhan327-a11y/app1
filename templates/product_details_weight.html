@@ -299,7 +299,8 @@
             name: productName,
             unitPrice: unitPrice,
             stock: maxStock,
-            id: productId
+            id: productId,
+            rawPriceParam: urlParams.get('price')
         });
 
         // Update page content with product data

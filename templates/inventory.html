@@ -605,6 +605,14 @@
                 return;
             }
 
+            // Debug logging for inventory navigation
+            console.log('Navigating from inventory with product data:', {
+                itemId: itemId,
+                product: product,
+                price: product.price,
+                type: product.type
+            });
+
             // Navigate to appropriate product details page based on product type
             if (product.type === 'weight' || product.type === 'weight-based') {
                 const params = new URLSearchParams({
@@ -616,6 +624,7 @@
                     mfgDate: product.mfgDate || '',
                     expDate: product.expDate || ''
                 });
+                console.log('Weight-based navigation params:', params.toString());
                 window.location.href = `/product-details-weight?${params.toString()}`;
             } else {
                 const params = new URLSearchParams({
