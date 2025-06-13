@@ -1190,6 +1190,8 @@
             if (cartData) {
                 const storedItems = JSON.parse(cartData);
                 if (storedItems.length > 0) {
+                    console.log('Found new items from inventory:', storedItems);
+                    
                     // Add each new item to cartItems
                     storedItems.forEach(item => {
                         const nextItemId = Object.keys(cartItems).length > 0 ? Math.max(...Object.keys(cartItems).map(Number)) + 1 : 1;
@@ -1218,9 +1220,12 @@
                     // Save to persistent storage
                     saveCartToPersistentStorage();
                     
-                    // Re-render entire cart
+                    // Force re-render entire cart
+                    console.log('Re-rendering cart with items:', Object.keys(cartItems).length);
                     renderCartItems();
                     calculateTotals();
+                    
+                    console.log('Cart update complete');
                 }
             }
         }
@@ -1232,7 +1237,13 @@
 
         // Initialize cart with localStorage data
         function initializeCart() {
-            loadCartItems();
+            // First check for new items from inventory
+            checkForNewItems();
+            
+            // Then load any persistent cart items
+            loadPersistentCartItems();
+            
+            // Calculate totals
             calculateTotals();
         }
 
@@ -1967,6 +1978,11 @@
         initializeCart();
         populatePresentStaff();
         
+        // Check for new items from inventory every 2 seconds
+        setInterval(() => {
+            checkForNewItems();
+        }, 2000);
+        
         // Debug: Check if toggle exists
         setTimeout(() => {
             const toggle = document.getElementById('include-dates-toggle');
@@ -2015,8 +2031,9 @@
                 });
                 
                 if (cartItemsContainer) {
-                    // Ensure cartItems data exists for hardcoded HTML elements
-                    if (Object.keys(cartItems).length === 0) {
+                    // Only initialize hardcoded cart items if no persistent data exists
+                    const persistentData = localStorage.getItem('kiranakonnect_persistent_cart');
+                    if (!persistentData && Object.keys(cartItems).length === 0) {
                         console.log('Initializing cartItems data for hardcoded elements');
                         // Initialize the cart data to match HTML
                         cartItems = {
@@ -2030,14 +2047,16 @@
                     }
                     
                     // Load existing cart data from persistent storage if available
-                    const persistentData = localStorage.getItem('kiranakonnect_persistent_cart');
                     if (persistentData) {
                         try {
                             const savedItems = JSON.parse(persistentData);
-                            savedItems.forEach((item, index) => {
-                                const itemId = index + 1;
-                                cartItems[itemId] = {
-                                    id: itemId,
+                            // Clear existing cartItems and rebuild from saved data
+                            cartItems = {};
+                            let nextId = 1;
+                            
+                            savedItems.forEach(item => {
+                                cartItems[nextId] = {
+                                    id: nextId,
                                     name: item.name,
                                     price: item.price,
                                     quantity: item.quantity,
@@ -2049,8 +2068,12 @@
                                     datesHidden: false,
                                     quantityDisplay: item.quantityDisplay
                                 };
+                                nextId++;
                             });
                             console.log('Loaded persistent cart items:', cartItems);
+                            
+                            // Re-render the cart to show loaded items
+                            renderCartItems();
                         } catch (error) {
                             console.error('Error loading persistent cart:', error);
                         }
