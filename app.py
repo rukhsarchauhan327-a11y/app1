@@ -294,10 +294,102 @@ def init_db():
     except Exception as e:
         app.logger.error(f"Database initialization error: {e}")
 
+# Initialize database tables and add sample products
+def ensure_sample_products():
+    """Add sample products with real barcodes for scanner functionality"""
+    try:
+        # Check if products already exist
+        if Product.query.count() > 0:
+            return
+        
+        from datetime import date, timedelta
+        
+        sample_products = [
+            {
+                'name': 'Fortune Sunflower Oil',
+                'barcode': '8901030870391',
+                'category': 'oils',
+                'price': 180.0,
+                'cost_price': 165.0,
+                'is_weight_based': False,
+                'stock_quantity': 25,
+                'reorder_level': 5,
+                'expiry_date': date.today() + timedelta(days=365)
+            },
+            {
+                'name': 'Aashirvaad Atta',
+                'barcode': '8901030827604',
+                'category': 'grains',
+                'price': 120.0,
+                'cost_price': 110.0,
+                'is_weight_based': False,
+                'stock_quantity': 15,
+                'reorder_level': 3,
+                'expiry_date': date.today() + timedelta(days=180)
+            },
+            {
+                'name': 'Basmati Rice',
+                'barcode': '8901030870384',
+                'category': 'grains',
+                'price': 85.0,
+                'price_per_kg': 85.0,
+                'cost_price': 75.0,
+                'is_weight_based': True,
+                'stock_quantity': 50,
+                'reorder_level': 10,
+                'expiry_date': date.today() + timedelta(days=120)
+            },
+            {
+                'name': 'Maggi Noodles',
+                'barcode': '8901030875099',
+                'category': 'snacks',
+                'price': 14.0,
+                'cost_price': 12.0,
+                'is_weight_based': False,
+                'stock_quantity': 100,
+                'reorder_level': 20,
+                'expiry_date': date.today() + timedelta(days=90)
+            },
+            {
+                'name': 'Tata Salt',
+                'barcode': '8901030821015',
+                'category': 'household',
+                'price': 22.0,
+                'cost_price': 20.0,
+                'is_weight_based': False,
+                'stock_quantity': 30,
+                'reorder_level': 8,
+                'expiry_date': date.today() + timedelta(days=730)
+            }
+        ]
+        
+        for product_data in sample_products:
+            product = Product(
+                name=product_data['name'],
+                barcode=product_data['barcode'],
+                category=product_data['category'],
+                price=product_data['price'],
+                price_per_kg=product_data.get('price_per_kg'),
+                cost_price=product_data['cost_price'],
+                is_weight_based=product_data['is_weight_based'],
+                stock_quantity=product_data['stock_quantity'],
+                reorder_level=product_data['reorder_level'],
+                expiry_date=product_data['expiry_date']
+            )
+            db.session.add(product)
+        
+        db.session.commit()
+        app.logger.info("Sample products added to database")
+        
+    except Exception as e:
+        db.session.rollback()
+        app.logger.error(f"Error adding sample products: {e}")
+
 # Initialize database tables once at startup
 try:
     with app.app_context():
         db.create_all()
+        ensure_sample_products()
         app.logger.info("Database initialized successfully")
 except Exception as e:
     app.logger.error(f"Database initialization failed: {e}")
@@ -432,10 +524,10 @@ def get_products():
         is_expired = product.expiry_date and product.expiry_date < datetime.utcnow().date()
         
         results.append({
-            'id': product.id,
+            'id': str(product.id),
             'name': product.name,
             'barcode': product.barcode,
-            'category': product.category,
+            'category': product.category or 'general',
             'price': product.price,
             'price_per_kg': product.price_per_kg,
             'is_weight_based': product.is_weight_based,
@@ -447,7 +539,7 @@ def get_products():
             'unit': 'kg' if product.is_weight_based else 'Piece'
         })
     
-    return jsonify(results)
+    return jsonify({'products': results})
 
 @app.route('/api/dashboard/stats')
 def get_dashboard_stats():
