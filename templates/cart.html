@@ -1040,6 +1040,8 @@
                 .then(result => {
                     console.log('API Response:', result);
                     if (result.bill_number) {
+                        // Clear persistent cart after successful bill generation
+                        localStorage.removeItem('kiranakonnect_persistent_cart');
                         alert(`Bill ${result.bill_number} generated successfully!`);
                         // Redirect to receipt page
                         window.location.href = `/receipt?bill=${result.bill_number}`;
@@ -1132,6 +1134,29 @@
 
         // Direct cart addition function using exact HTML structure
         function addNewItemToCart(newItem) {
+            // Check if item already exists in cart
+            const existingItemId = Object.keys(cartItems).find(id => 
+                cartItems[id].name === newItem.name && 
+                cartItems[id].unitPrice === newItem.unitPrice
+            );
+            
+            if (existingItemId) {
+                // Update existing item quantity instead of adding duplicate
+                const existingItem = cartItems[existingItemId];
+                existingItem.quantity += newItem.quantity;
+                existingItem.price = existingItem.quantity * existingItem.unitPrice;
+                
+                // Update the display
+                const quantityElement = document.getElementById(`quantity-${existingItemId}`);
+                const priceElement = document.getElementById(`price-${existingItemId}`);
+                if (quantityElement) quantityElement.textContent = `${existingItem.quantity} ${existingItem.unit}`;
+                if (priceElement) priceElement.textContent = `₹${existingItem.price}`;
+                
+                calculateTotals();
+                console.log(`Updated existing item ${newItem.name} quantity to ${existingItem.quantity}`);
+                return existingItemId;
+            }
+            
             const nextItemId = Math.max(...Object.keys(cartItems).map(k => parseInt(k)), 0) + 1;
             
             // Add to cartItems data
@@ -1288,7 +1313,23 @@
             }
         }
         
-        // Simple cart loading - add items directly to DOM
+        // Load previously added cart items that should persist across pages
+        function loadPersistentCartItems() {
+            const persistentData = localStorage.getItem('kiranakonnect_persistent_cart');
+            if (!persistentData) return;
+            
+            const persistentItems = JSON.parse(persistentData);
+            if (persistentItems.length === 0) return;
+            
+            // Add each persistent item to the cart
+            persistentItems.forEach(item => {
+                addNewItemToCart(item);
+            });
+            
+            console.log(`Loaded ${persistentItems.length} persistent cart items`);
+        }
+
+        // Persistent cart loading - maintain items across page navigation
         function loadCartItems() {
             const cartData = localStorage.getItem('kiranakonnect_cart');
             if (!cartData) return;
@@ -1301,7 +1342,12 @@
                 addNewItemToCart(item);
             });
             
-            // Clear localStorage after adding
+            // Move processed items to persistent storage instead of clearing
+            const persistentCart = JSON.parse(localStorage.getItem('kiranakonnect_persistent_cart') || '[]');
+            persistentCart.push(...storedItems);
+            localStorage.setItem('kiranakonnect_persistent_cart', JSON.stringify(persistentCart));
+            
+            // Clear only the temporary cart
             localStorage.removeItem('kiranakonnect_cart');
             console.log(`Added ${storedItems.length} items from inventory to cart`);
         }
@@ -1776,6 +1822,17 @@
         function removeItem(itemId) {
             const item = cartItems[itemId];
             if (item) {
+                // Remove from persistent storage
+                const persistentData = localStorage.getItem('kiranakonnect_persistent_cart');
+                if (persistentData) {
+                    let persistentItems = JSON.parse(persistentData);
+                    persistentItems = persistentItems.filter(storedItem => 
+                        !(storedItem.name === item.name && storedItem.unitPrice === item.unitPrice)
+                    );
+                    localStorage.setItem('kiranakonnect_persistent_cart', JSON.stringify(persistentItems));
+                }
+                
+                // Remove from DOM with animation
                 const itemElement = document.getElementById(`cart-item-${itemId}`);
                 if (itemElement) {
                     itemElement.style.transform = 'translateX(-100%)';
@@ -1963,6 +2020,9 @@
                             6: { id: 6, name: 'Dabur Honey', quantity: 1, unitPrice: 180, price: 180, unit: 'Bottle', type: 'unit', mfgDate: '01/01/2025', expDate: '01/01/2027', datesHidden: false }
                         };
                     }
+                    
+                    // Load persistent cart items first
+                    loadPersistentCartItems();
                     
                     // Load and merge any new items from inventory
                     loadCartItems();
