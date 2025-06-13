@@ -177,8 +177,8 @@ def dashboard():
 
 @app.route('/cart')
 def cart():
-    """Redirect cart requests to dashboard"""
-    return redirect(url_for('dashboard'))
+    """Serve the cart/billing page"""
+    return render_template('cart.html')
 
 @app.route('/inventory')
 def inventory():
