@@ -67,11 +67,11 @@
         <!-- Filter Tabs -->
         <div class="bg-white px-4 py-3 border-b">
             <div class="flex space-x-2 overflow-x-auto">
-                <button class="filter-btn bg-primary text-white px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap" data-filter="all" id="filter-all">All</button>
-                <button class="filter-btn bg-gray-100 text-gray-600 px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap" data-filter="critical" id="filter-critical">Critical</button>
-                <button class="filter-btn bg-gray-100 text-gray-600 px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap" data-filter="inventory" id="filter-inventory">Inventory</button>
-                <button class="filter-btn bg-gray-100 text-gray-600 px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap" data-filter="payments" id="filter-payments">Payments</button>
-                <button class="filter-btn bg-gray-100 text-gray-600 px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap" data-filter="system" id="filter-system">System</button>
+                <button class="filter-btn bg-primary text-white px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap" data-filter="all" onclick="filterNotifications('all')">All</button>
+                <button class="filter-btn bg-gray-100 text-gray-600 px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap" data-filter="critical" onclick="filterNotifications('critical')">Critical</button>
+                <button class="filter-btn bg-gray-100 text-gray-600 px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap" data-filter="inventory" onclick="filterNotifications('inventory')">Inventory</button>
+                <button class="filter-btn bg-gray-100 text-gray-600 px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap" data-filter="payments" onclick="filterNotifications('payments')">Payments</button>
+                <button class="filter-btn bg-gray-100 text-gray-600 px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap" data-filter="system" onclick="filterNotifications('system')">System</button>
             </div>
         </div>
 
@@ -296,10 +296,8 @@
 
     <script>
         function goBack() {
-            window.history.back();
+            window.location.href = '/dashboard';
         }
-
-
 
         function markAllAsRead() {
             const notifications = document.querySelectorAll('.notification-item');
@@ -313,6 +311,45 @@
                     notification.style.opacity = '1';
                 });
             }, 500);
+        }
+
+        function filterNotifications(filter) {
+            console.log('Filtering notifications:', filter);
+            
+            // Update button states
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('bg-primary', 'text-white');
+                btn.classList.add('bg-gray-100', 'text-gray-600');
+            });
+            
+            const activeBtn = document.querySelector(`[data-filter="${filter}"]`);
+            if (activeBtn) {
+                activeBtn.classList.remove('bg-gray-100', 'text-gray-600');
+                activeBtn.classList.add('bg-primary', 'text-white');
+            }
+            
+            // Filter notifications
+            const allNotifications = document.querySelectorAll('.notification-item');
+            allNotifications.forEach(notification => {
+                const type = notification.getAttribute('data-type');
+                let shouldShow = false;
+                
+                if (filter === 'all') {
+                    shouldShow = true;
+                } else if (filter === 'critical') {
+                    shouldShow = (type === 'expiry' || type === 'backup');
+                } else if (filter === 'inventory') {
+                    shouldShow = (type === 'expiry' || type === 'inventory');
+                } else if (filter === 'payments') {
+                    shouldShow = (type === 'payment');
+                } else if (filter === 'system') {
+                    shouldShow = (type === 'subscription' || type === 'backup' || type === 'system');
+                } else {
+                    shouldShow = (type === filter);
+                }
+                
+                notification.style.display = shouldShow ? 'block' : 'none';
+            });
         }
 
         function showStyledNotification(message, type = 'info') {
@@ -541,11 +578,8 @@
             }
         }
 
-        // Filter functionality
+        // Initialize page
         document.addEventListener('DOMContentLoaded', function() {
-            const filterBtns = document.querySelectorAll('.filter-btn');
-            console.log('Found filter buttons:', filterBtns.length);
-            
             // Load real notifications on page load
             loadNotifications();
 
@@ -561,46 +595,6 @@
 
             // Refresh notifications every 30 seconds
             setInterval(loadNotifications, 30000);
-
-            filterBtns.forEach((btn, index) => {
-                console.log('Adding click listener to button', index, btn.textContent);
-                btn.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    const filter = this.getAttribute('data-filter');
-                    console.log('Filter button clicked:', filter);
-                    
-                    // Update button states
-                    filterBtns.forEach(b => {
-                        b.classList.remove('bg-primary', 'text-white');
-                        b.classList.add('bg-gray-100', 'text-gray-600');
-                    });
-                    this.classList.remove('bg-gray-100', 'text-gray-600');
-                    this.classList.add('bg-primary', 'text-white');
-
-                    // Filter notifications
-                    const allNotifications = document.querySelectorAll('.notification-item');
-                    allNotifications.forEach(notification => {
-                        const type = notification.getAttribute('data-type');
-                        let shouldShow = false;
-                        
-                        if (filter === 'all') {
-                            shouldShow = true;
-                        } else if (filter === 'critical') {
-                            shouldShow = (type === 'expiry' || type === 'backup');
-                        } else if (filter === 'inventory') {
-                            shouldShow = (type === 'expiry' || type === 'inventory');
-                        } else if (filter === 'payments') {
-                            shouldShow = (type === 'payment');
-                        } else if (filter === 'system') {
-                            shouldShow = (type === 'subscription' || type === 'backup' || type === 'system');
-                        } else {
-                            shouldShow = (type === filter);
-                        }
-                        
-                        notification.style.display = shouldShow ? 'block' : 'none';
-                    });
-                });
-            });
         });
     </script>
 </body>
