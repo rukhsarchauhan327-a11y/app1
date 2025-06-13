@@ -115,6 +115,7 @@ class Product(db.Model):
     
     # Pricing
     price = db.Column(db.Float, nullable=False)
+    cost_price = db.Column(db.Float, default=0)  # Purchase/cost price
     price_per_kg = db.Column(db.Float)  # For weight-based items
     is_weight_based = db.Column(db.Boolean, default=False)
     
@@ -299,10 +300,32 @@ def get_dashboard_stats():
     total_sales = sum(bill.total_amount for bill in today_bills)
     transaction_count = len(today_bills)
     
-    # Calculate cost of goods sold (assuming 65% margin for profit calculation)
-    cost_ratio = 0.65  # 65% cost, 35% profit margin
-    estimated_cost = total_sales * cost_ratio
-    today_profit = total_sales - estimated_cost
+    # Calculate actual cost of goods sold based on products sold today
+    actual_cost = 0
+    total_revenue = 0
+    
+    for bill in today_bills:
+        bill_items = BillItem.query.filter_by(bill_id=bill.id).all()
+        for item in bill_items:
+            # Get product cost from database
+            product = Product.query.filter_by(name=item.item_name).first()
+            if product and product.cost_price > 0:
+                # Use actual cost price from database
+                if product.is_weight_based and item.weight:
+                    # For weight-based items, calculate based on weight
+                    item_cost = (product.cost_price / 1000) * item.weight if product.price_per_kg else product.cost_price * item.quantity
+                else:
+                    # For regular items
+                    item_cost = product.cost_price * item.quantity
+                actual_cost += item_cost
+                total_revenue += item.total_price
+            elif product:
+                # Fallback if cost price not set
+                item_cost = item.unit_price * 0.65 * item.quantity
+                actual_cost += item_cost
+                total_revenue += item.total_price
+    
+    today_profit = total_revenue - actual_cost
     
     # Get yesterday's sales for comparison
     yesterday = today - timedelta(days=1)
@@ -312,7 +335,28 @@ def get_dashboard_stats():
     ).all()
     
     yesterday_sales = sum(bill.total_amount for bill in yesterday_bills)
-    yesterday_profit = yesterday_sales * (1 - cost_ratio)
+    
+    # Calculate yesterday's actual profit using same method
+    yesterday_cost = 0
+    yesterday_revenue = 0
+    
+    for bill in yesterday_bills:
+        bill_items = BillItem.query.filter_by(bill_id=bill.id).all()
+        for item in bill_items:
+            product = Product.query.filter_by(name=item.item_name).first()
+            if product and product.cost_price > 0:
+                if product.is_weight_based and item.weight:
+                    item_cost = (product.cost_price / 1000) * item.weight if product.price_per_kg else product.cost_price * item.quantity
+                else:
+                    item_cost = product.cost_price * item.quantity
+                yesterday_cost += item_cost
+                yesterday_revenue += item.total_price
+            elif product:
+                item_cost = item.unit_price * 0.65 * item.quantity
+                yesterday_cost += item_cost
+                yesterday_revenue += item.total_price
+    
+    yesterday_profit = yesterday_revenue - yesterday_cost
     
     # Calculate profit growth
     profit_growth = 0
