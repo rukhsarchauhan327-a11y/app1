@@ -1135,20 +1135,28 @@
             const cartData = localStorage.getItem('kiranakonnect_cart');
             const storedItems = cartData ? JSON.parse(cartData) : [];
             
+            if (storedItems.length === 0) {
+                return cartItems;
+            }
+            
             // Don't clear existing cart items - merge instead
             let nextItemId = Math.max(...Object.keys(cartItems).map(k => parseInt(k)), 0) + 1;
+            let itemsAdded = 0;
             
             // Convert stored items to cart format and add to existing cart
             storedItems.forEach((item) => {
-                // Check if item already exists in cart
-                const existingItem = Object.values(cartItems).find(cartItem => 
-                    cartItem.name === item.name && cartItem.unitPrice === item.unitPrice
-                );
+                // Check if item already exists in cart (by name and price)
+                const existingItemKey = Object.keys(cartItems).find(key => {
+                    const cartItem = cartItems[key];
+                    return cartItem.name === item.name && cartItem.unitPrice === item.unitPrice;
+                });
                 
-                if (existingItem) {
+                if (existingItemKey) {
                     // Update quantity of existing item
+                    const existingItem = cartItems[existingItemKey];
                     existingItem.quantity += item.quantity;
                     existingItem.price = existingItem.quantity * existingItem.unitPrice;
+                    existingItem.quantityDisplay = item.quantityDisplay || `${existingItem.quantity} ${existingItem.unit}`;
                 } else {
                     // Add new item to cart
                     cartItems[nextItemId] = {
@@ -1169,13 +1177,14 @@
                         image: item.image
                     };
                     nextItemId++;
+                    itemsAdded++;
                 }
             });
             
-            // Clear localStorage after merging
-            if (storedItems.length > 0) {
+            // Only clear localStorage after successful merge
+            if (itemsAdded > 0 || storedItems.length > 0) {
                 localStorage.removeItem('kiranakonnect_cart');
-                console.log(`Merged ${storedItems.length} items from localStorage into cart`);
+                console.log(`Merged ${storedItems.length} items from localStorage into cart (${itemsAdded} new items added)`);
             }
             
             return cartItems;
@@ -1242,6 +1251,8 @@
             const existingItemIds = Array.from(document.querySelectorAll('#cart-items > div[id^="cart-item-"]'))
                 .map(div => parseInt(div.id.replace('cart-item-', '')));
             
+            let itemsRendered = 0;
+            
             Object.keys(cartItems).forEach(itemId => {
                 const numericId = parseInt(itemId);
                 if (!existingItemIds.includes(numericId)) {
@@ -1251,37 +1262,32 @@
                     // Insert before the "Add More Items" section if it exists
                     const addMoreSection = document.getElementById('add-items-section');
                     if (addMoreSection) {
-                        addMoreSection.insertAdjacentHTML('beforebegin', cartItemHTML);
+                        // Create a wrapper div with proper spacing
+                        const wrapperDiv = document.createElement('div');
+                        wrapperDiv.innerHTML = cartItemHTML;
+                        addMoreSection.parentNode.insertBefore(wrapperDiv.firstElementChild, addMoreSection);
                     } else {
-                        cartContainer.insertAdjacentHTML('beforeend', cartItemHTML);
+                        // Add to end of cart container with proper spacing
+                        const wrapperDiv = document.createElement('div');
+                        wrapperDiv.innerHTML = cartItemHTML;
+                        cartContainer.appendChild(wrapperDiv.firstElementChild);
                     }
                     
+                    itemsRendered++;
                     console.log(`Added new cart item: ${item.name}`);
                 }
             });
+            
+            if (itemsRendered > 0) {
+                console.log(`Rendered ${itemsRendered} new cart items`);
+                // Recalculate totals after adding new items
+                calculateTotals();
+            }
         }
 
-        // Create HTML for individual cart item matching existing structure
+        // Create HTML for individual cart item matching existing structure exactly
         function createCartItemHTML(itemId, item) {
             const hasDate = item.mfgDate && item.expDate;
-            const dateSection = hasDate ? `
-                <div class="flex items-center text-xs text-gray-500 date-info">
-                    <i class="fa-solid fa-calendar mr-1"></i>
-                    <span>MFG: ${item.mfgDate}</span>
-                </div>
-                <div class="flex items-center text-xs text-gray-500 date-info">
-                    <i class="fa-solid fa-clock mr-1"></i>
-                    <span>EXP: ${item.expDate}</span>
-                </div>
-            ` : '';
-            
-            const dateToggleButton = hasDate ? `
-                <button id="date-toggle-${itemId}" class="text-xs text-danger hover:underline flex items-center" onclick="toggleProductDates(${itemId})">
-                    <i class="fa-solid fa-times mr-1"></i>
-                    Remove Dates
-                </button>
-            ` : '';
-
             const quantityDisplay = item.quantityDisplay || `${item.quantity} ${item.unit}`;
 
             return `
@@ -1293,26 +1299,39 @@
                         <span class="text-sm text-gray-700 font-medium" id="quantity-${itemId}">${quantityDisplay}</span>
                         <span class="text-lg font-bold text-primary" id="price-${itemId}">₹${item.price}</span>
                     </div>
-                    ${hasDate ? `<div class="mt-2 space-y-1">${dateSection}<div class="flex items-center space-x-2 mt-1">
+                    ${hasDate ? `
+                    <div class="mt-2 space-y-1">
+                        <div class="flex items-center text-xs text-gray-500 date-info">
+                            <i class="fa-solid fa-calendar mr-1"></i>
+                            <span>MFG: ${item.mfgDate}</span>
+                        </div>
+                        <div class="flex items-center text-xs text-gray-500 date-info">
+                            <i class="fa-solid fa-clock mr-1"></i>
+                            <span>EXP: ${item.expDate}</span>
+                        </div>
+                        <div class="flex items-center space-x-2 mt-1">
                             <button class="text-xs text-primary hover:underline flex items-center" onclick="editItem(${itemId})">
                                 <i class="fa-solid fa-edit mr-1"></i>
                                 Edit
                             </button>
-                            ${dateToggleButton}
-                        </div></div>` : `<div class="mt-2">
+                            <button id="date-toggle-${itemId}" class="text-xs text-danger hover:underline flex items-center" onclick="toggleProductDates(${itemId})">
+                                <i class="fa-solid fa-times mr-1"></i>
+                                Remove Dates
+                            </button>
+                        </div>
+                    </div>` : `
+                    <div class="mt-2">
                         <button class="text-xs text-primary hover:underline flex items-center" onclick="editItem(${itemId})">
                             <i class="fa-solid fa-edit mr-1"></i>
                             Edit
                         </button>
-                        ${dateToggleButton}
                     </div>`}
                 </div>
                 <button class="text-danger text-sm ml-3 p-1" onclick="removeItem(${itemId})">
                     <i class="fa-solid fa-trash"></i>
                 </button>
             </div>
-        </div>
-            `;
+        </div>`;
         }
 
         function decreaseQuantity(itemId) {
