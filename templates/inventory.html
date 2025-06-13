@@ -1480,83 +1480,97 @@
             }
         }
 
-        // Modal event handlers
-        const cartModal = document.getElementById('cart-modal');
-        const closeModal = document.getElementById('close-modal');
-        const cancelBtn = document.getElementById('cancel-btn');
-        const quantityInput = document.getElementById('quantity-input');
-        const weightQuantityInput = document.getElementById('weight-quantity-input');
-        const unitSelect = document.getElementById('unit-select');
-        const priceInput = document.getElementById('price-input');
-        const decreaseBtn = document.getElementById('decrease-qty');
-        const increaseBtn = document.getElementById('increase-qty');
-        const calculatedQuantity = document.getElementById('calculated-quantity');
-        const calculatedPrice = document.getElementById('calculated-price');
-        const addCartBtn = document.getElementById('add-cart-btn');
-        const inputMethodRadios = document.querySelectorAll('input[name="inputMethod"]');
+        // Initialize modal event handlers after DOM is loaded
+        function initializeModalHandlers() {
+            const cartModal = document.getElementById('cart-modal');
+            const closeModal = document.getElementById('close-modal');
+            const cancelBtn = document.getElementById('cancel-btn');
+            const quantityInput = document.getElementById('quantity-input');
+            const weightQuantityInput = document.getElementById('weight-quantity-input');
+            const unitSelect = document.getElementById('unit-select');
+            const priceInput = document.getElementById('price-input');
+            const decreaseBtn = document.getElementById('decrease-qty');
+            const increaseBtn = document.getElementById('increase-qty');
+            const calculatedQuantity = document.getElementById('calculated-quantity');
+            const calculatedPrice = document.getElementById('calculated-price');
+            const addCartBtn = document.getElementById('add-cart-btn');
+            const inputMethodRadios = document.querySelectorAll('input[name="inputMethod"]');
 
-        // Close modal events
-        closeModal.addEventListener('click', () => {
-            cartModal.classList.add('hidden');
-        });
-
-        cancelBtn.addEventListener('click', () => {
-            cartModal.classList.add('hidden');
-        });
-
-        cartModal.addEventListener('click', (e) => {
-            if (e.target === cartModal) {
-                cartModal.classList.add('hidden');
+            // Only add event listeners if elements exist
+            if (closeModal && cartModal) {
+                closeModal.addEventListener('click', () => {
+                    cartModal.classList.add('hidden');
+                });
             }
-        });
 
-        // Quantity adjustment for bag-based products
-        decreaseBtn.addEventListener('click', () => {
-            const current = parseInt(quantityInput.value) || 1;
-            if (current > 1) {
-                quantityInput.value = current - 1;
-                updateCalculations();
+            if (cancelBtn && cartModal) {
+                cancelBtn.addEventListener('click', () => {
+                    cartModal.classList.add('hidden');
+                });
             }
-        });
 
-        increaseBtn.addEventListener('click', () => {
-            const current = parseInt(quantityInput.value) || 1;
-            const maxStock = currentProduct ? currentProduct.stock : 999;
-            if (current < maxStock) {
-                quantityInput.value = current + 1;
-                updateCalculations();
+            if (cartModal) {
+                cartModal.addEventListener('click', (e) => {
+                    if (e.target === cartModal) {
+                        cartModal.classList.add('hidden');
+                    }
+                });
             }
-        });
 
-        // Input event listeners
-        quantityInput.addEventListener('input', updateCalculations);
-        weightQuantityInput.addEventListener('input', updateWeightCalculations);
-        unitSelect.addEventListener('change', updateWeightCalculations);
-        priceInput.addEventListener('input', updatePriceCalculations);
+            // Quantity adjustment for bag-based products
+            if (decreaseBtn && quantityInput) {
+                decreaseBtn.addEventListener('click', () => {
+                    const current = parseInt(quantityInput.value) || 1;
+                    if (current > 1) {
+                        quantityInput.value = current - 1;
+                        updateCalculations();
+                    }
+                });
+            }
 
-        // Input method switching for weight-based products only
-        inputMethodRadios.forEach(radio => {
-            radio.addEventListener('change', (e) => {
-                // Only apply this logic for weight-based products
-                if (!currentProduct || currentProduct.type !== 'weight-based') return;
-                
-                const quantitySection = document.getElementById('quantity-section');
-                const priceSection = document.getElementById('price-section');
-                
-                if (e.target.value === 'quantity') {
-                    quantitySection.classList.remove('hidden');
-                    priceSection.classList.add('hidden');
-                    updateWeightCalculations();
-                } else {
-                    quantitySection.classList.add('hidden');
-                    priceSection.classList.remove('hidden');
-                    updatePriceCalculations();
-                }
-            });
-        });
+            if (increaseBtn && quantityInput) {
+                increaseBtn.addEventListener('click', () => {
+                    const current = parseInt(quantityInput.value) || 1;
+                    const maxStock = currentProduct ? currentProduct.stock : 999;
+                    if (current < maxStock) {
+                        quantityInput.value = current + 1;
+                        updateCalculations();
+                    }
+                });
+            }
 
-        // Add to cart button
-        addCartBtn.addEventListener('click', () => {
+            // Input event listeners
+            if (quantityInput) quantityInput.addEventListener('input', updateCalculations);
+            if (weightQuantityInput) weightQuantityInput.addEventListener('input', updateWeightCalculations);
+            if (unitSelect) unitSelect.addEventListener('change', updateWeightCalculations);
+            if (priceInput) priceInput.addEventListener('input', updatePriceCalculations);
+
+            // Input method switching for weight-based products only
+            if (inputMethodRadios.length > 0) {
+                inputMethodRadios.forEach(radio => {
+                    radio.addEventListener('change', (e) => {
+                        // Only apply this logic for weight-based products
+                        if (!currentProduct || currentProduct.type !== 'weight-based') return;
+                        
+                        const quantitySection = document.getElementById('quantity-section');
+                        const priceSection = document.getElementById('price-section');
+                        
+                        if (e.target.value === 'quantity') {
+                            if (quantitySection) quantitySection.classList.remove('hidden');
+                            if (priceSection) priceSection.classList.add('hidden');
+                            updateWeightCalculations();
+                        } else {
+                            if (quantitySection) quantitySection.classList.add('hidden');
+                            if (priceSection) priceSection.classList.remove('hidden');
+                            updatePriceCalculations();
+                        }
+                    });
+                });
+            }
+
+            // Add to cart button
+            if (addCartBtn) {
+                addCartBtn.addEventListener('click', () => {
             if (!currentProduct) return;
             
             let quantity, unit;
@@ -1609,12 +1623,15 @@
             existingCart.push(cartItem);
             
             // Save to localStorage
-            localStorage.setItem('kiranakonnect_cart', JSON.stringify(existingCart))
+            localStorage.setItem('kiranakonnect_cart', JSON.stringify(existingCart));
             
             console.log(`Added ${displayQty} of ${currentProduct.name} to cart. Total: ₹${total.toFixed(2)}`);
             showNotification(`${displayQty} of ${currentProduct.name} added to cart!`, 'success');
-            cartModal.classList.add('hidden');
-        });
+            if (cartModal) cartModal.classList.add('hidden');
+            updateCartCount();
+                });
+            }
+        }
 
         function updateCalculations() {
             if (!currentProduct) return;
@@ -1673,11 +1690,17 @@
             calculatedPrice.textContent = `₹${price.toFixed(2)}`;
         }
 
-        // Initialize filters
-        applyFilters();
-        
-        // Load products when page loads
-        loadProducts();
+        // Initialize page functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize modal handlers
+            initializeModalHandlers();
+            
+            // Initialize filters
+            applyFilters();
+            
+            // Load products from database
+            loadProducts();
+        });
 
         // Search and Scanner functionality for Inventory
         function openSearch() {
