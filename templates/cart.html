@@ -1314,21 +1314,49 @@
             
             // Add single "Add More Items" button at the end
             try {
-                cartContainer.insertAdjacentHTML('beforeend', `
+                const buttonHTML = `
                     <div class="bg-white rounded-xl shadow-sm p-3">
                         <div class="flex justify-center">
-                            <button id="add-items-btn" class="flex items-center justify-center bg-secondary text-white rounded-full px-6 py-3 font-medium text-sm" onclick="goToInventory()">
+                            <button id="add-items-btn" class="flex items-center justify-center bg-secondary text-white rounded-full px-6 py-3 font-medium text-sm">
                                 <i class="fa-solid fa-plus mr-2"></i>
                                 Add More Items to Cart
                             </button>
                         </div>
                     </div>
-                `);
+                `;
+                cartContainer.insertAdjacentHTML('beforeend', buttonHTML);
+                
+                // Add event listener directly to the button
+                setTimeout(() => {
+                    const button = document.getElementById('add-items-btn');
+                    if (button) {
+                        button.addEventListener('click', function() {
+                            console.log('Button clicked - navigating to inventory');
+                            window.location.href = '/inventory';
+                        });
+                        console.log('Event listener added to Add Items button');
+                    } else {
+                        console.error('Could not find Add Items button to attach event listener');
+                    }
+                }, 50);
+                
             } catch (error) {
                 console.error('Error adding Add More Items button:', error);
             }
             
             console.log('Cart rendering complete');
+            
+            // Debug: Check if button was actually added
+            setTimeout(() => {
+                const button = document.getElementById('add-items-btn');
+                console.log('Add Items button found:', !!button);
+                if (button) {
+                    console.log('Button onclick:', button.onclick);
+                    console.log('Button outerHTML:', button.outerHTML);
+                } else {
+                    console.error('Add Items button NOT found in DOM');
+                }
+            }, 100);
         }
 
         // Legacy function for compatibility
