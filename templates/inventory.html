@@ -105,9 +105,9 @@
                 <p class="text-2xl font-bold text-accent" id="low-stock-products">0</p>
                 <p class="text-xs text-gray-500">Low Stock</p>
             </div>
-            <div class="text-center cursor-pointer hover:bg-gray-50 p-2 rounded-lg transition-colors" onclick="filterBy('expired')">
+            <div class="text-center cursor-pointer hover:bg-gray-50 p-2 rounded-lg transition-colors" onclick="filterBy('expiring')">
                 <p class="text-2xl font-bold text-danger" id="expired-products">0</p>
-                <p class="text-xs text-gray-500">Expired</p>
+                <p class="text-xs text-gray-500">Expiring</p>
             </div>
         </div>
     </div>
@@ -249,14 +249,28 @@
                     `${product.stock_quantity} ${product.unit} Available` :
                     `${product.stock_quantity} Pieces Available`;
 
+                // Get product image based on category
+                const getProductImage = (productName, category) => {
+                    const imageMap = {
+                        'Wheat Flour': 'https://storage.googleapis.com/uxpilot-auth.appspot.com/ad8aa6cee1-b621e3cd72c9ea714c53.png',
+                        'Coconut Oil': 'https://storage.googleapis.com/uxpilot-auth.appspot.com/02cda64d32-ca63fc32eaab87b7db4c.png',
+                        'Aashirvaad Atta': 'https://storage.googleapis.com/uxpilot-auth.appspot.com/dd29a1f85f-469e6193e37489fc8c43.png',
+                        'Maggi Noodles': 'https://storage.googleapis.com/uxpilot-auth.appspot.com/46dc2aecf3-4ae1d7f8a3bc9c8b21d6.png',
+                        'Dairy Milk': 'https://storage.googleapis.com/uxpilot-auth.appspot.com/f12345-chocolate-bar.png',
+                        'Uncle Chips': 'https://storage.googleapis.com/uxpilot-auth.appspot.com/uncle-chips-image.png',
+                        'Parle-G Biscuits': 'https://storage.googleapis.com/uxpilot-auth.appspot.com/parle-g-biscuits.png'
+                    };
+                    return imageMap[productName] || `https://via.placeholder.com/150?text=${encodeURIComponent(productName)}`;
+                };
+
                 const productCard = `
                     <div id="product-${product.id}" class="bg-white rounded-xl p-4 shadow-sm border hover:shadow-md transition-shadow cursor-pointer" 
                          data-category="${product.category.toLowerCase()}" 
                          data-status="${product.is_expired ? 'expired' : 'available'}" 
                          onclick="viewProductDetails(${product.id})">
                         <div class="flex items-center space-x-4">
-                            <div class="w-16 h-16 rounded-xl overflow-hidden bg-gray-100 flex items-center justify-center">
-                                <i class="fa-solid fa-box text-gray-400 text-2xl"></i>
+                            <div class="w-16 h-16 rounded-xl overflow-hidden">
+                                <img class="w-full h-full object-cover" src="${getProductImage(product.name, product.category)}" alt="${product.name} product packaging">
                             </div>
                             <div class="flex-1">
                                 <div class="flex items-start justify-between">
@@ -451,7 +465,7 @@
                     matchesStatus = !product.is_expired && !product.is_low_stock;
                 } else if (currentFilter === 'low-stock') {
                     matchesStatus = product.is_low_stock;
-                } else if (currentFilter === 'expired') {
+                } else if (currentFilter === 'expiring') {
                     matchesStatus = product.is_expired;
                 }
 
