@@ -628,6 +628,8 @@
         function saveCartToPersistentStorage() {
             const cartArray = Object.values(cartItems);
             localStorage.setItem('kiranakonnect_persistent_cart', JSON.stringify(cartArray));
+            // Also save to session storage as backup
+            sessionStorage.setItem('kiranakonnect_cart_session', JSON.stringify(cartArray));
             console.log('Cart saved to persistent storage:', cartArray);
         }
 
@@ -2060,9 +2062,20 @@
             }
         }
 
-        // Clear any corrupted persistent storage first
-        localStorage.removeItem('kiranakonnect_persistent_cart');
-        console.log('Cleared corrupted cart storage');
+        // Only clear corrupted storage if it exists and is actually corrupted
+        const existingCart = localStorage.getItem('kiranakonnect_persistent_cart');
+        if (existingCart) {
+            try {
+                const parsed = JSON.parse(existingCart);
+                if (!Array.isArray(parsed)) {
+                    localStorage.removeItem('kiranakonnect_persistent_cart');
+                    console.log('Cleared corrupted cart storage');
+                }
+            } catch (e) {
+                localStorage.removeItem('kiranakonnect_persistent_cart');
+                console.log('Cleared corrupted cart storage');
+            }
+        }
         
         // Initialize cart with localStorage data
         initializeCart();
@@ -2170,6 +2183,70 @@
                             renderCartItems();
                         } catch (error) {
                             console.error('Error loading persistent cart:', error);
+                            
+                            // Try loading from session storage backup
+                            const sessionData = sessionStorage.getItem('kiranakonnect_cart_session');
+                            if (sessionData) {
+                                try {
+                                    const sessionItems = JSON.parse(sessionData);
+                                    cartItems = {};
+                                    let nextId = 1;
+                                    
+                                    sessionItems.forEach(item => {
+                                        cartItems[nextId] = {
+                                            id: nextId,
+                                            name: item.name,
+                                            price: item.price,
+                                            quantity: item.quantity,
+                                            unit: item.unit || 'piece',
+                                            unitPrice: item.unitPrice,
+                                            type: item.type || 'unit',
+                                            mfgDate: item.mfgDate || '',
+                                            expDate: item.expDate || '',
+                                            datesHidden: false,
+                                            quantityDisplay: item.quantityDisplay
+                                        };
+                                        nextId++;
+                                    });
+                                    console.log('Loaded cart from session storage:', cartItems);
+                                    renderCartItems();
+                                    saveCartToPersistentStorage(); // Save back to localStorage
+                                } catch (sessionError) {
+                                    console.error('Error loading session cart:', sessionError);
+                                }
+                            }
+                        }
+                    } else {
+                        // No localStorage data, try session storage
+                        const sessionData = sessionStorage.getItem('kiranakonnect_cart_session');
+                        if (sessionData) {
+                            try {
+                                const sessionItems = JSON.parse(sessionData);
+                                cartItems = {};
+                                let nextId = 1;
+                                
+                                sessionItems.forEach(item => {
+                                    cartItems[nextId] = {
+                                        id: nextId,
+                                        name: item.name,
+                                        price: item.price,
+                                        quantity: item.quantity,
+                                        unit: item.unit || 'piece',
+                                        unitPrice: item.unitPrice,
+                                        type: item.type || 'unit',
+                                        mfgDate: item.mfgDate || '',
+                                        expDate: item.expDate || '',
+                                        datesHidden: false,
+                                        quantityDisplay: item.quantityDisplay
+                                    };
+                                    nextId++;
+                                });
+                                console.log('Restored cart from session storage:', cartItems);
+                                renderCartItems();
+                                saveCartToPersistentStorage(); // Save back to localStorage
+                            } catch (sessionError) {
+                                console.error('Error loading session cart:', sessionError);
+                            }
                         }
                     }
                     
