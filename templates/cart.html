@@ -50,2625 +50,451 @@
         font-family: "Font Awesome 6 Free", "Font Awesome 6 Brands" !important;
       }
     </style>
-<style>
-  .highlighted-section {
-    outline: 2px solid #3F20FB;
-    background-color: rgba(63, 32, 251, 0.1);
-  }
-
-  .edit-button {
-    position: absolute;
-    z-index: 1000;
-  }
-
-  ::-webkit-scrollbar {
-    display: none;
-  }
-
-  html, body {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-  }
-
-  /* Modal specific styles */
-  #edit-item-modal {
-    backdrop-filter: blur(2px);
-    z-index: 9999 !important;
-  }
-
-  #edit-item-modal select {
-    z-index: 10000 !important;
-    position: relative;
-    max-width: 100%;
-  }
-
-  /* Ensure modal content is properly contained */
-  #edit-item-modal .bg-white {
-    position: relative;
-    z-index: 10001;
-    overflow: hidden;
-  }
-
-  /* Prevent dropdown overflow */
-  #edit-weight-based-input {
-    overflow: hidden;
-  }
-
-  #edit-unit-select {
-    text-overflow: ellipsis;
-  }
-</style>
 </head>
-<body class="font-poppins bg-gray-50">
-    <!-- Header Section -->
-    <header id="header" class="bg-white shadow-sm fixed top-0 left-0 right-0 z-20">
-        <div class="flex items-center justify-between p-4">
-            <button class="p-2 rounded-full hover:bg-gray-100" onclick="goBack()">
-                <i class="fa-solid fa-arrow-left text-dark text-lg"></i>
-            </button>
-            <h1 class="text-lg font-bold text-dark">Cart</h1>
-            <button class="p-2 hover:bg-gray-100 rounded-lg transition-colors" onclick="openSearch()">
-                <i class="fa-solid fa-search text-gray-600 text-lg"></i>
-            </button>
+<body class="bg-light font-sans">
+    <!-- Header -->
+    <div class="bg-primary text-white p-4 text-center relative">
+        <div class="absolute left-4 top-4">
+            <a href="/dashboard" class="text-white text-xl">
+                <i class="fa-solid fa-arrow-left"></i>
+            </a>
         </div>
-    </header>
-
-
-
-    <!-- Shop Info Section -->
-    <div id="shop-info" class="bg-white shadow-sm mt-16 p-3 border-b">
-        <div class="text-center">
-            <h2 class="text-base font-bold text-dark">Kirana Konnect</h2>
-            <h3 class="text-sm font-semibold text-dark mt-1">Sharma Kirana Store</h3>
-            <p class="text-xs text-gray-600 mt-1">GST: 24ABCDE1234F1Z5</p>
-            <p class="text-xs text-gray-600">UDYAM: UDYAM-UP-12-0012345</p>
-        </div>
+        <h1 class="text-xl font-bold">Cart</h1>
     </div>
 
-    <!-- Bill Type Selection -->
-    <div id="bill-type-section" class="px-4 py-3">
-        <div class="bg-white rounded-xl shadow-sm p-3">
-            <div class="flex justify-center">
-                <div class="flex bg-gray-100 rounded-full p-1 w-full max-w-md">
-                    <button id="billing-tab" class="flex-1 py-2 px-2 rounded-full bg-green-500 text-white font-medium text-xs text-center" onclick="showBillingTab()">
-                        Billing
-                    </button>
-                    <button id="customer-tab" class="flex-1 py-2 px-2 rounded-full text-gray-600 font-medium text-xs text-center" onclick="showCustomerTab()">
-                        Customer
-                    </button>
-                    <button id="new-customer-tab" class="flex-1 py-2 px-2 rounded-full text-gray-600 font-medium text-xs text-center" onclick="showNewCustomerTab()">
-                        New Customer
-                    </button>
+    <!-- Cart Items -->
+    <div class="p-4 space-y-3 max-h-96 overflow-y-auto" id="cart-items">
+        <!-- Items will be dynamically rendered here -->
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="px-4 pb-4">
+        <button class="w-full bg-secondary text-white py-3 rounded-lg font-medium mb-3 hover:bg-opacity-90 transition-colors" onclick="addMoreItems()">
+            Add More Items
+        </button>
+    </div>
+
+    <!-- Billing Summary -->
+    <div class="bg-white p-4 rounded-t-3xl shadow-lg">
+        <!-- Customer Selection -->
+        <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-700 mb-2">Customer</label>
+            <div class="relative">
+                <input type="text" id="customer-search" placeholder="Search customer by name or phone..." 
+                       class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
+                <div id="customer-suggestions" class="absolute top-full left-0 right-0 bg-white border border-gray-300 rounded-lg mt-1 hidden z-10 max-h-40 overflow-y-auto">
                 </div>
+            </div>
+            <div class="flex mt-2 space-x-2">
+                <button class="text-sm text-primary hover:underline" onclick="selectCashCustomer()">Cash Customer</button>
+                <button class="text-sm text-primary hover:underline" onclick="showNewCustomerModal()">New Customer</button>
+            </div>
+            <div id="selected-customer" class="mt-2 text-sm text-gray-600"></div>
+        </div>
+        
+        <!-- Billing Summary -->
+        <div class="space-y-2 border-t pt-4">
+            <div class="flex justify-between text-sm">
+                <span>Subtotal:</span>
+                <span id="subtotal">₹0.00</span>
+            </div>
+            <div class="flex justify-between text-sm">
+                <span>Tax (0%):</span>
+                <span id="tax">₹0.00</span>
+            </div>
+            <div class="flex justify-between text-sm">
+                <span>Discount:</span>
+                <span id="discount">₹0.00</span>
+            </div>
+            <div class="flex justify-between text-lg font-bold border-t pt-2">
+                <span>Total:</span>
+                <span id="total">₹0.00</span>
+            </div>
+        </div>
+
+        <!-- Payment Mode -->
+        <div class="mt-4">
+            <label class="block text-sm font-medium text-gray-700 mb-2">Payment Mode</label>
+            <div class="grid grid-cols-2 gap-2 mb-3">
+                <button class="payment-mode-btn bg-primary text-white py-2 px-4 rounded-lg text-sm font-medium" onclick="selectPaymentMode('cash')" data-mode="cash">Cash</button>
+                <button class="payment-mode-btn bg-gray-200 text-gray-700 py-2 px-4 rounded-lg text-sm font-medium" onclick="selectPaymentMode('online')" data-mode="online">Online</button>
+                <button class="payment-mode-btn bg-gray-200 text-gray-700 py-2 px-4 rounded-lg text-sm font-medium" onclick="selectPaymentMode('split')" data-mode="split">Split</button>
+                <button class="payment-mode-btn bg-gray-200 text-gray-700 py-2 px-4 rounded-lg text-sm font-medium" onclick="selectPaymentMode('credit')" data-mode="credit">Credit</button>
             </div>
             
-            <!-- Bill Number Section -->
-            <div id="bill-section" class="mt-3">
-                <div class="text-center mb-3">
-                    <p class="text-xs text-gray-600">Bill No:</p>
-                    <p class="text-lg font-bold text-primary" id="bill-number">#KK-2025-001</p>
-                </div>
-                <div class="border-t pt-3">
-                    <p id="customer-field-label" class="text-xs text-gray-600 mb-2">Add name to bill (optional):</p>
-                    <div class="relative">
-                        <input type="text" id="bill-customer-name" placeholder="Enter customer name for bill" class="w-full p-2 pr-8 border border-gray-200 rounded-lg text-sm">
-                        <button id="clear-customer" class="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-red-500 hidden" onclick="clearCustomer()">
-                            <i class="fa-solid fa-times text-sm"></i>
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Customer Search Section -->
-            <div id="customer-section" class="mt-3 hidden">
-                <div class="relative">
-                    <input type="text" id="customer-search-input" placeholder="Search customer..." class="w-full p-2 border border-gray-200 rounded-lg pr-10 text-sm" oninput="filterCustomers(this.value)">
-                    <i class="fa-solid fa-search absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
-                </div>
-                <div id="customer-results" class="mt-2 space-y-2 hidden">
-                    <!-- Customer results will appear here when searching -->
-                </div>
-                <div id="no-search-message" class="mt-4 text-center text-gray-500 text-sm">
-                    <i class="fa-solid fa-search text-gray-400 text-lg mb-2"></i>
-                    <p>Start typing to search customers</p>
-                </div>
-            </div>
-
-            <!-- New Customer Section -->
-            <div id="new-customer-section" class="mt-3 hidden">
-                <div class="space-y-2">
-                    <input type="text" id="new-customer-name" placeholder="Customer Name" class="w-full p-2 border border-gray-200 rounded-lg text-sm">
-                    <input type="tel" id="new-customer-phone" placeholder="Contact Number" class="w-full p-2 border border-gray-200 rounded-lg text-sm">
-                    <button class="w-full bg-primary text-white py-2 rounded-lg font-medium text-sm" onclick="saveNewCustomer()">Save Customer</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Cart Items List -->
-    <div id="cart-items" class="px-4 space-y-2 mb-4">
-        <!-- All cart items will be dynamically rendered here -->
-    </div>
-
-
-
-    <!-- Tax & Offer Section -->
-    <div id="tax-offer-section" class="px-4 mb-3">
-        <div class="bg-white rounded-xl shadow-sm p-3">
-            <div class="grid grid-cols-2 gap-3">
-                <button id="tax-btn" class="p-3 border-2 border-primary bg-primary/10 rounded-xl text-center" onclick="toggleTax()">
-                    <i class="fa-solid fa-percentage text-primary text-lg mb-1"></i>
-                    <p class="text-xs font-medium text-primary">Add Tax</p>
-                </button>
-                <button id="offer-btn" class="p-3 border-2 border-gray-200 rounded-xl text-center hover:border-accent hover:bg-accent/10" onclick="toggleOffer()">
-                    <i class="fa-solid fa-tag text-gray-600 text-lg mb-1"></i>
-                    <p class="text-xs font-medium text-gray-600">Add Offer</p>
-                </button>
-            </div>
-            
-            <!-- Tax Section -->
-            <div id="tax-section" class="mt-3">
-                <div class="space-y-1">
-                    <div class="flex justify-between">
-                        <span class="text-gray-600 text-sm">Subtotal</span>
-                        <span class="font-medium text-sm" id="subtotal">₹955</span>
-                    </div>
-                    <div class="flex justify-between">
-                        <span class="text-gray-600 text-sm">GST (18%)</span>
-                        <span class="font-medium text-sm" id="gst-amount">₹171.90</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Offer Section -->
-            <div id="offer-section" class="mt-3 hidden">
-                <div class="grid grid-cols-2 gap-2">
-                    <input type="number" placeholder="Discount ₹" class="p-2 border border-gray-200 rounded-lg text-sm" onchange="calculateDiscount()" id="discount-amount">
-                    <input type="number" placeholder="Discount %" class="p-2 border border-gray-200 rounded-lg text-sm" onchange="calculateDiscount()" id="discount-percent">
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Total Amount -->
-    <div id="total-section" class="px-4 mb-3">
-        <div class="bg-white rounded-xl shadow-sm p-3">
-            <div class="flex justify-between items-center">
-                <span class="text-lg font-bold text-dark">Total Amount</span>
-                <span class="text-xl font-bold text-primary" id="total-amount">₹1,126.90</span>
-            </div>
-        </div>
-    </div>
-
-    <!-- Bill Generated By -->
-    <div id="generated-by-section" class="px-4 mb-3">
-        <div class="bg-white rounded-xl shadow-sm p-3 space-y-3">
-            <div class="flex items-center justify-between">
-                <span class="text-gray-600 font-medium text-sm">Bill Generated By:</span>
-                <select id="bill-generator" class="p-2 border border-gray-200 rounded-lg bg-white text-sm min-w-0 flex-1 ml-2">
-                    <!-- Options populated by JavaScript based on present staff -->
-                </select>
-            </div>
-            
-
-        </div>
-    </div>
-
-
-
-    <!-- Payment Method -->
-    <div id="payment-section" class="px-4 mb-3">
-        <div class="bg-white rounded-xl shadow-sm p-3">
-            <div class="flex justify-center mb-3">
-                <div id="payment-buttons-container" class="flex bg-gray-100 rounded-full p-1 w-full max-w-xs">
-                    <button id="cash-payment" class="flex-1 py-2 px-2 rounded-full bg-primary text-white font-medium text-xs" onclick="selectPayment('cash')">
-                        Cash
-                    </button>
-                    <button id="online-payment" class="flex-1 py-2 px-2 rounded-full text-gray-600 font-medium text-xs" onclick="selectPayment('online')">
-                        Online
-                    </button>
-                    <button id="split-payment" class="flex-1 py-2 px-2 rounded-full text-gray-600 font-medium text-xs" onclick="selectPayment('split')">
-                        Split
-                    </button>
-                    <button id="credit-payment" class="flex-1 py-2 px-2 rounded-full text-gray-600 font-medium text-xs hidden" onclick="selectPayment('credit')">
-                        Credit
-                    </button>
-                </div>
-            </div>
-
-            <!-- Online Payment Section -->
-            <div id="online-payment-section" class="hidden">
-                <div class="space-y-2">
+            <!-- Payment Details (shown based on mode) -->
+            <div id="payment-details" class="space-y-3 hidden">
+                <div id="split-details" class="hidden">
                     <div class="grid grid-cols-2 gap-2">
-                        <button id="upi-button" class="p-2 border border-gray-200 rounded-lg text-sm bg-blue-50 text-blue-600" onclick="selectOnlineMethod('upi')">UPI</button>
-                        <button id="card-button" class="p-2 border border-gray-200 rounded-lg text-sm bg-green-50 text-green-600" onclick="selectOnlineMethod('card')">Card</button>
-                    </div>
-                    <input type="text" id="transaction-reference" placeholder="UPI ID or Transaction Reference" class="w-full p-2 border border-gray-200 rounded-lg text-sm">
-                </div>
-            </div>
-
-            <!-- Split Payment Section -->
-            <div id="split-payment-section" class="hidden">
-                <div class="space-y-2">
-                    <div class="flex items-center space-x-2">
-                        <input type="number" id="split-amount" placeholder="Enter amount" class="flex-1 p-2 border border-gray-200 rounded-lg text-sm">
-                        <button id="apply-split" class="bg-primary text-white px-3 py-2 rounded-lg text-xs font-medium" onclick="applySplit()">Apply</button>
-                    </div>
-                    <div id="remaining-amount" class="hidden">
-                        <p class="text-sm text-gray-600 mb-2">Remaining: <span id="remaining-value" class="font-bold">₹0</span></p>
-                        <div class="grid grid-cols-3 gap-2">
-                            <button id="remaining-cash" class="py-2 px-3 border border-gray-300 rounded-lg text-xs" onclick="selectRemaining('cash')">Cash</button>
-                            <button id="remaining-online" class="py-2 px-3 border border-gray-300 rounded-lg text-xs" onclick="selectRemaining('online')">Online</button>
-                            <button id="remaining-credit" class="py-2 px-3 border border-gray-300 rounded-lg text-xs" onclick="selectRemaining('credit')">Credit</button>
+                        <div>
+                            <label class="block text-xs text-gray-600 mb-1">Cash Amount</label>
+                            <input type="number" id="cash-amount" class="w-full px-2 py-1 border border-gray-300 rounded text-sm" placeholder="0.00">
                         </div>
-                        
-                        <!-- Remaining Online Payment Options -->
-                        <div id="remaining-online-section" class="hidden mt-2">
-                            <div class="grid grid-cols-2 gap-2 mb-2">
-                                <button id="remaining-upi-btn" class="p-2 border border-gray-200 rounded-lg text-sm bg-blue-50 text-blue-600" onclick="selectRemainingOnlineMethod('upi')">UPI</button>
-                                <button id="remaining-card-btn" class="p-2 border border-gray-200 rounded-lg text-sm bg-green-50 text-green-600" onclick="selectRemainingOnlineMethod('card')">Card</button>
-                            </div>
-                            <input type="text" id="remaining-transaction-reference" placeholder="UPI Transaction ID" class="w-full p-2 border border-gray-300 rounded-lg text-sm">
+                        <div>
+                            <label class="block text-xs text-gray-600 mb-1">Online Amount</label>
+                            <input type="number" id="online-amount" class="w-full px-2 py-1 border border-gray-300 rounded text-sm" placeholder="0.00">
                         </div>
                     </div>
                 </div>
-            </div>
-
-            <!-- Credit Payment Section -->
-            <div id="credit-payment-section" class="hidden">
-                <div class="space-y-2">
+                <div id="credit-details" class="hidden">
                     <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
-                        <div class="flex items-center space-x-2 mb-2">
-                            <i class="fa-solid fa-credit-card text-yellow-600"></i>
-                            <span class="text-sm font-medium text-yellow-800">Credit Purchase</span>
-                        </div>
-                        <p class="text-xs text-yellow-700">Amount will be added to customer's ledger for future payment</p>
-                    </div>
-                    <div class="bg-gray-50 rounded-lg p-3">
-                        <div class="flex justify-between items-center">
-                            <span class="text-sm text-gray-600">Credit Amount:</span>
-                            <span class="text-lg font-bold text-red-600" id="credit-amount">₹0</span>
-                        </div>
+                        <p class="text-sm text-yellow-800">
+                            <i class="fa-solid fa-exclamation-triangle mr-1"></i>
+                            Credit Amount: <span id="credit-amount" class="font-semibold">₹0.00</span>
+                        </p>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
 
-    <!-- Generate Bill Button -->
-    <div id="generate-bill-section" class="px-4 pb-24">
-        <button class="w-full bg-primary text-white py-3 rounded-xl font-bold text-base shadow-md" onclick="generateBill()">
+        <!-- Generate Bill Button -->
+        <button class="w-full bg-primary text-white py-3 rounded-lg font-medium mt-4 hover:bg-opacity-90 transition-colors" onclick="generateBill()">
             Generate Bill
         </button>
     </div>
 
     <script>
-        let currentTab = 'billing';
-        let taxEnabled = true;
-        let offerEnabled = false;
-        let subtotal = 955;
-        let gstRate = 0.18;
-        let discountAmount = 0;
-        let paymentMode = 'cash';
-
-        function goBack() {
-            window.history.back();
-        }
-
-        // Tab switching functions
-        function showBillingTab() {
-            switchTab('billing');
-        }
-
-        function showCustomerTab() {
-            switchTab('customer');
-        }
-
-        function showNewCustomerTab() {
-            switchTab('new-customer');
-        }
-
-        function switchTab(tab) {
-            currentTab = tab;
-            
-            // Reset all tabs
-            document.getElementById('billing-tab').className = 'flex-1 py-2 px-2 rounded-full text-gray-600 font-medium text-xs text-center';
-            document.getElementById('customer-tab').className = 'flex-1 py-2 px-2 rounded-full text-gray-600 font-medium text-xs text-center';
-            document.getElementById('new-customer-tab').className = 'flex-1 py-2 px-2 rounded-full text-gray-600 font-medium text-xs text-center';
-            
-            // Hide all sections
-            document.getElementById('bill-section').classList.add('hidden');
-            document.getElementById('customer-section').classList.add('hidden');
-            document.getElementById('new-customer-section').classList.add('hidden');
-            
-            // Update label and field behavior based on tab
-            const label = document.getElementById('customer-field-label');
-            const field = document.getElementById('bill-customer-name');
-            
-            // Show active tab with green color and update label
-            if (tab === 'billing') {
-                document.getElementById('billing-tab').className = 'flex-1 py-2 px-2 rounded-full bg-green-500 text-white font-medium text-xs text-center';
-                document.getElementById('bill-section').classList.remove('hidden');
-                label.textContent = 'Add name to bill (optional):';
-                field.placeholder = 'Enter customer name for bill';
-                field.readOnly = false;
-                field.classList.remove('bg-blue-50', 'text-blue-700', 'font-medium');
-                document.getElementById('clear-customer').classList.add('hidden');
-                // Hide credit payment button for billing customers
-                document.getElementById('credit-payment').classList.add('hidden');
-            } else if (tab === 'customer') {
-                document.getElementById('customer-tab').className = 'flex-1 py-2 px-2 rounded-full bg-green-500 text-white font-medium text-xs text-center';
-                document.getElementById('customer-section').classList.remove('hidden');
-                label.textContent = 'Customer Name:';
-                field.placeholder = 'Select a customer from search';
-                // Show credit payment button for registered customers
-                document.getElementById('credit-payment').classList.remove('hidden');
-            } else if (tab === 'new-customer') {
-                document.getElementById('new-customer-tab').className = 'flex-1 py-2 px-2 rounded-full bg-green-500 text-white font-medium text-xs text-center';
-                document.getElementById('new-customer-section').classList.remove('hidden');
-                label.textContent = 'Customer Name:';
-                field.placeholder = 'Add new customer details';
-                // Show credit payment button for new customers
-                document.getElementById('credit-payment').classList.remove('hidden');
+        // UNIFIED CART MANAGEMENT SYSTEM
+        class CartManager {
+            constructor() {
+                this.cartItems = {};
+                this.selectedCustomer = null;
+                this.selectedPaymentMode = 'cash';
+                this.isInitialized = false;
+                this.STORAGE_KEY = 'kiranakonnect_persistent_cart';
+                this.TEMP_KEY = 'kiranakonnect_cart';
             }
-        }
 
-        let selectedCustomerId = null;
-        let onlinePaymentMethod = 'upi'; // Default to UPI
-
-        function selectOnlineMethod(method) {
-            onlinePaymentMethod = method;
-            
-            // Reset button styles
-            document.getElementById('upi-button').className = 'p-2 border border-gray-200 rounded-lg text-sm bg-blue-50 text-blue-600';
-            document.getElementById('card-button').className = 'p-2 border border-gray-200 rounded-lg text-sm bg-green-50 text-green-600';
-            
-            // Update placeholder text and highlight selected button
-            const referenceInput = document.getElementById('transaction-reference');
-            if (method === 'upi') {
-                document.getElementById('upi-button').className = 'p-2 border-2 border-blue-500 rounded-lg text-sm bg-blue-100 text-blue-700 font-medium';
-                referenceInput.placeholder = 'Enter UPI Transaction ID';
-            } else if (method === 'card') {
-                document.getElementById('card-button').className = 'p-2 border-2 border-green-500 rounded-lg text-sm bg-green-100 text-green-700 font-medium';
-                referenceInput.placeholder = 'Enter Card Transaction Reference';
-            }
-        }
-
-        async function filterCustomers(searchTerm) {
-            const resultsContainer = document.getElementById('customer-results');
-            const noSearchMessage = document.getElementById('no-search-message');
-            
-            if (searchTerm.length < 2) {
-                resultsContainer.classList.add('hidden');
-                resultsContainer.innerHTML = '';
-                noSearchMessage.classList.remove('hidden');
-                return;
-            }
-            
-            try {
-                const response = await fetch(`/api/customers/search?q=${encodeURIComponent(searchTerm)}`);
-                const customers = await response.json();
+            // Initialize cart - load from storage
+            init() {
+                if (this.isInitialized) return;
                 
-                if (customers.length > 0) {
-                    noSearchMessage.classList.add('hidden');
-                    resultsContainer.classList.remove('hidden');
-                    
-                    resultsContainer.innerHTML = customers.map(customer => `
-                        <div class="p-2 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100" onclick="selectCustomer('${customer.name}', ${customer.id})">
-                            <div class="flex justify-between items-center">
-                                <div>
-                                    <p class="font-medium text-dark text-sm">${customer.name}</p>
-                                    <p class="text-xs text-gray-600">${customer.phone}</p>
-                                </div>
-                                <span class="text-xs ${customer.outstanding === 'No Outstanding' ? 'text-green-500' : 'text-red-500'} font-medium">${customer.outstanding}</span>
-                            </div>
-                        </div>
-                    `).join('');
-                } else {
-                    noSearchMessage.classList.add('hidden');
-                    resultsContainer.classList.remove('hidden');
-                    resultsContainer.innerHTML = '<div class="p-4 text-center text-gray-500 text-sm">No customers found</div>';
-                }
-            } catch (error) {
-                console.error('Error searching customers:', error);
-                resultsContainer.innerHTML = '<div class="p-4 text-center text-red-500 text-sm">Error searching customers</div>';
-            }
-        }
-
-        function selectCustomer(name, customerId = null) {
-            selectedCustomerId = customerId;
-            const billCustomerField = document.getElementById('bill-customer-name');
-            const clearButton = document.getElementById('clear-customer');
-            
-            billCustomerField.value = name;
-            billCustomerField.readOnly = true;
-            billCustomerField.classList.add('bg-blue-50', 'text-blue-700', 'font-medium');
-            clearButton.classList.remove('hidden');
-            
-            document.getElementById('customer-search-input').value = '';
-            document.getElementById('customer-results').classList.add('hidden');
-            document.getElementById('customer-results').innerHTML = '';
-            document.getElementById('no-search-message').classList.remove('hidden');
-            
-            // Keep Customer tab active instead of switching to Billing
-            switchTab('customer');
-            document.getElementById('bill-section').classList.remove('hidden');
-        }
-
-        function clearCustomer() {
-            selectedCustomerId = null;
-            const billCustomerField = document.getElementById('bill-customer-name');
-            const clearButton = document.getElementById('clear-customer');
-            
-            billCustomerField.value = '';
-            billCustomerField.readOnly = false;
-            billCustomerField.classList.remove('bg-blue-50', 'text-blue-700', 'font-medium');
-            clearButton.classList.add('hidden');
-        }
-
-        async function saveNewCustomer() {
-            const name = document.getElementById('new-customer-name').value;
-            const phone = document.getElementById('new-customer-phone').value;
-            
-            if (!name || !phone) {
-                showNotification('Please fill in both name and phone number.', 'error');
-                return;
-            }
-            
-            try {
-                const response = await fetch('/api/customers', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        name: name,
-                        phone: phone
-                    })
-                });
+                console.log('Initializing cart manager...');
                 
-                const result = await response.json();
+                // Load from persistent storage
+                this.loadFromStorage();
                 
-                if (response.ok) {
-                    // Automatically select the newly created customer
-                    selectedCustomerId = result.id;
-                    const billCustomerField = document.getElementById('bill-customer-name');
-                    const clearButton = document.getElementById('clear-customer');
-                    
-                    billCustomerField.value = name;
-                    billCustomerField.readOnly = true;
-                    billCustomerField.classList.add('bg-blue-50', 'text-blue-700', 'font-medium');
-                    clearButton.classList.remove('hidden');
-                    
-                    // Clear the form
-                    document.getElementById('new-customer-name').value = '';
-                    document.getElementById('new-customer-phone').value = '';
-                    showNotification(`Customer ${name} saved and selected!`, 'success');
-                    
-                    // Switch to customer tab and show the newly added customer
-                    switchTab('customer');
-                    
-                    // Add the new customer to the customer list if it exists
-                    const customerList = document.getElementById('customer-list');
-                    if (customerList) {
-                        const customerItem = document.createElement('div');
-                        customerItem.className = 'flex items-center justify-between p-3 border-b border-gray-100 bg-blue-50 border-l-4 border-l-blue-500';
-                        customerItem.onclick = () => selectCustomer(result.id, name, phone);
-                        customerItem.innerHTML = `
-                            <div class="flex-1">
-                                <p class="font-medium text-blue-700 text-sm">${name} ✓</p>
-                                <p class="text-blue-600 text-xs">${phone}</p>
-                            </div>
-                            <div class="text-right">
-                                <p class="text-green-600 font-bold text-sm">₹0.00</p>
-                                <p class="text-gray-500 text-xs">Balance</p>
-                            </div>
-                        `;
-                        
-                        // Insert at the top of the customer list
-                        if (customerList.firstChild) {
-                            customerList.insertBefore(customerItem, customerList.firstChild);
-                        } else {
-                            customerList.appendChild(customerItem);
-                        }
-                        
-                        // Hide the no search message if it's visible
-                        const noSearchMessage = document.getElementById('no-search-message');
-                        if (noSearchMessage) {
-                            noSearchMessage.classList.add('hidden');
-                        }
-                    }
-                    
-                    // Show the bill section since customer is selected
-                    document.getElementById('bill-section').classList.remove('hidden');
-                } else {
-                    showNotification('Error saving customer. Please try again.', 'error');
-                }
-            } catch (error) {
-                console.error('Error saving customer:', error);
-                console.log('Full error details:', error.message, error.stack);
-                showNotification('Error saving customer. Please try again.', 'error');
-            }
-        }
-
-        function showNotification(message, type = 'info') {
-            // Create notification element
-            const notification = document.createElement('div');
-            notification.className = `fixed top-4 right-4 z-50 p-3 rounded-lg shadow-lg ${
-                type === 'success' ? 'bg-green-500 text-white' : 
-                type === 'error' ? 'bg-red-500 text-white' : 
-                'bg-blue-500 text-white'
-            }`;
-            notification.textContent = message;
-            
-            document.body.appendChild(notification);
-            
-            // Remove after 3 seconds
-            setTimeout(() => {
-                notification.remove();
-            }, 3000);
-        }
-
-        function removeItem(itemId) {
-            const item = cartItems[itemId];
-            if (item && confirm(`Remove ${item.name} from cart?`)) {
-                // Remove from cart items
-                delete cartItems[itemId];
+                // Check for new items from inventory
+                this.processNewItems();
                 
-                // Save updated cart to persistent storage
-                saveCartToPersistentStorage();
+                // Render cart
+                this.render();
                 
-                // Remove from UI and recalculate
-                renderCartItems();
-                calculateTotals();
-                showNotification(`${item.name} removed from cart`, 'info');
-            }
-        }
-
-        function saveCartToPersistentStorage() {
-            const cartArray = Object.values(cartItems);
-            localStorage.setItem('kiranakonnect_persistent_cart', JSON.stringify(cartArray));
-            // Also save to session storage as backup
-            sessionStorage.setItem('kiranakonnect_cart_session', JSON.stringify(cartArray));
-            console.log('Cart saved to persistent storage:', cartArray);
-        }
-
-        function removeDates(itemId) {
-            const item = document.getElementById(`cart-item-${itemId}`);
-            const datesSection = item.querySelector('.mt-2.space-y-1');
-            if (datesSection) {
-                datesSection.remove();
-            }
-        }
-
-        function addMoreItems() {
-            alert('Add Items feature will redirect to inventory selection.');
-        }
-
-        function toggleTax() {
-            taxEnabled = !taxEnabled;
-            const btn = document.getElementById('tax-btn');
-            const section = document.getElementById('tax-section');
-            
-            if (taxEnabled) {
-                btn.className = 'p-3 border-2 border-primary bg-primary/10 rounded-xl text-center';
-                btn.innerHTML = '<i class="fa-solid fa-percentage text-primary text-lg mb-1"></i><p class="text-xs font-medium text-primary">Add Tax</p>';
-                section.classList.remove('hidden');
-            } else {
-                btn.className = 'p-3 border-2 border-gray-200 rounded-xl text-center hover:border-primary hover:bg-primary/10';
-                btn.innerHTML = '<i class="fa-solid fa-percentage text-gray-600 text-lg mb-1"></i><p class="text-xs font-medium text-gray-600">Add Tax</p>';
-                section.classList.add('hidden');
-            }
-            calculateTotals();
-        }
-
-        function toggleOffer() {
-            offerEnabled = !offerEnabled;
-            const btn = document.getElementById('offer-btn');
-            const section = document.getElementById('offer-section');
-            
-            if (offerEnabled) {
-                btn.className = 'p-3 border-2 border-accent bg-accent/10 rounded-xl text-center';
-                btn.innerHTML = '<i class="fa-solid fa-tag text-accent text-lg mb-1"></i><p class="text-xs font-medium text-accent">Add Offer</p>';
-                section.classList.remove('hidden');
-            } else {
-                btn.className = 'p-3 border-2 border-gray-200 rounded-xl text-center hover:border-accent hover:bg-accent/10';
-                btn.innerHTML = '<i class="fa-solid fa-tag text-gray-600 text-lg mb-1"></i><p class="text-xs font-medium text-gray-600">Add Offer</p>';
-                section.classList.add('hidden');
-                discountAmount = 0;
-            }
-            calculateTotals();
-        }
-
-        function calculateDiscount() {
-            const discountAmountInput = document.getElementById('discount-amount').value;
-            const discountPercentInput = document.getElementById('discount-percent').value;
-            
-            if (discountAmountInput) {
-                discountAmount = parseFloat(discountAmountInput);
-            } else if (discountPercentInput) {
-                discountAmount = subtotal * (parseFloat(discountPercentInput) / 100);
-            } else {
-                discountAmount = 0;
-            }
-            
-            calculateTotals();
-        }
-
-        function selectPayment(mode) {
-            paymentMode = mode;
-            
-            // Reset payment buttons
-            document.getElementById('cash-payment').className = 'flex-1 py-2 px-2 rounded-full text-gray-600 font-medium text-xs';
-            document.getElementById('online-payment').className = 'flex-1 py-2 px-2 rounded-full text-gray-600 font-medium text-xs';
-            document.getElementById('split-payment').className = 'flex-1 py-2 px-2 rounded-full text-gray-600 font-medium text-xs';
-            document.getElementById('credit-payment').className = 'flex-1 py-2 px-2 rounded-full text-gray-600 font-medium text-xs';
-            
-            // Hide payment sections
-            document.getElementById('online-payment-section').classList.add('hidden');
-            document.getElementById('split-payment-section').classList.add('hidden');
-            document.getElementById('credit-payment-section').classList.add('hidden');
-            
-            // Ensure credit button is hidden for billing customers
-            if (currentTab === 'billing') {
-                document.getElementById('credit-payment').classList.add('hidden');
-            }
-            
-            // Show active payment method
-            if (mode === 'cash') {
-                document.getElementById('cash-payment').className = 'flex-1 py-2 px-2 rounded-full bg-primary text-white font-medium text-xs';
-            } else if (mode === 'online') {
-                document.getElementById('online-payment').className = 'flex-1 py-2 px-2 rounded-full bg-primary text-white font-medium text-xs';
-                document.getElementById('online-payment-section').classList.remove('hidden');
-            } else if (mode === 'split') {
-                document.getElementById('split-payment').className = 'flex-1 py-2 px-2 rounded-full bg-primary text-white font-medium text-xs';
-                document.getElementById('split-payment-section').classList.remove('hidden');
-            } else if (mode === 'credit') {
-                document.getElementById('credit-payment').className = 'flex-1 py-2 px-2 rounded-full bg-primary text-white font-medium text-xs';
-                document.getElementById('credit-payment-section').classList.remove('hidden');
-                // Update credit amount display
-                const total = calculateFinalTotal();
-                document.getElementById('credit-amount').textContent = `₹${total.toFixed(2)}`;
-            }
-        }
-
-        function applySplit() {
-            const splitAmount = parseFloat(document.getElementById('split-amount').value);
-            const total = calculateFinalTotal();
-            
-            if (splitAmount && splitAmount < total) {
-                const remaining = total - splitAmount;
-                document.getElementById('remaining-value').textContent = `₹${remaining.toFixed(2)}`;
-                document.getElementById('remaining-amount').classList.remove('hidden');
+                // Calculate totals
+                this.calculateTotals();
                 
-                // Show/hide credit option based on current tab
-                const creditButton = document.getElementById('remaining-credit');
-                if (currentTab === 'billing') {
-                    creditButton.style.display = 'none';
-                    // Adjust grid to 2 columns for billing customers
-                    creditButton.parentElement.className = 'grid grid-cols-2 gap-2';
-                } else {
-                    creditButton.style.display = 'block';
-                    // Keep 3 columns for customer/new-customer tabs
-                    creditButton.parentElement.className = 'grid grid-cols-3 gap-2';
-                }
+                this.isInitialized = true;
+                console.log('Cart initialized with', Object.keys(this.cartItems).length, 'items');
             }
-        }
 
-        function selectRemaining(method) {
-            // Reset remaining buttons
-            document.getElementById('remaining-cash').className = 'py-2 px-3 border border-gray-300 rounded-lg text-xs';
-            document.getElementById('remaining-online').className = 'py-2 px-3 border border-gray-300 rounded-lg text-xs';
-            document.getElementById('remaining-credit').className = 'py-2 px-3 border border-gray-300 rounded-lg text-xs';
-            
-            // Hide online section
-            document.getElementById('remaining-online-section').classList.add('hidden');
-            
-            // Highlight selected method and show options if online
-            document.getElementById(`remaining-${method}`).className = 'py-2 px-3 border border-primary bg-primary/10 text-primary rounded-lg text-xs';
-            
-            if (method === 'online') {
-                document.getElementById('remaining-online-section').classList.remove('hidden');
-                selectRemainingOnlineMethod('upi'); // Default to UPI
-            }
-        }
-
-        function selectRemainingOnlineMethod(method) {
-            // Reset button styles
-            document.getElementById('remaining-upi-btn').className = 'p-2 border border-gray-200 rounded-lg text-sm bg-blue-50 text-blue-600';
-            document.getElementById('remaining-card-btn').className = 'p-2 border border-gray-200 rounded-lg text-sm bg-green-50 text-green-600';
-            
-            // Update placeholder text and highlight selected button
-            const referenceInput = document.getElementById('remaining-transaction-reference');
-            if (method === 'upi') {
-                document.getElementById('remaining-upi-btn').className = 'p-2 border-2 border-blue-500 rounded-lg text-sm bg-blue-100 text-blue-700 font-medium';
-                referenceInput.placeholder = 'Enter UPI Transaction ID';
-            } else if (method === 'card') {
-                document.getElementById('remaining-card-btn').className = 'p-2 border-2 border-green-500 rounded-lg text-sm bg-green-100 text-green-700 font-medium';
-                referenceInput.placeholder = 'Enter Card Transaction Reference';
-            }
-        }
-
-        function calculateTotals() {
-            const gstAmount = taxEnabled ? subtotal * gstRate : 0;
-            const finalTotal = subtotal + gstAmount - discountAmount;
-            
-            document.getElementById('subtotal').textContent = `₹${subtotal}`;
-            document.getElementById('gst-amount').textContent = `₹${gstAmount.toFixed(2)}`;
-            document.getElementById('total-amount').textContent = `₹${finalTotal.toFixed(2)}`;
-        }
-
-        function calculateFinalTotal() {
-            const gstAmount = taxEnabled ? subtotal * gstRate : 0;
-            return subtotal + gstAmount - discountAmount;
-        }
-
-        function generateBill() {
-            try {
-                // Get basic bill data
-                const customerName = document.getElementById('bill-customer-name')?.value || '';
-                const billGenerator = document.getElementById('bill-generator')?.value || 'Store Staff';
-                const finalTotal = calculateFinalTotal();
-                
-                // Use actual cart items with individual date settings
-                const items = cartItems.map(item => ({
-                    item_name: item.name,
-                    quantity: item.quantity,
-                    unit_price: item.price,
-                    total_price: item.quantity * item.price,
-                    weight: item.weight || null,
-                    price_per_kg: item.pricePerKg || null,
-                    include_dates: !item.datesHidden, // Individual product date setting
-                    mfg_date: item.mfgDate || null,
-                    exp_date: item.expDate || null
-                }));
-                
-                const billData = {
-                    customer_id: selectedCustomerId,
-                    customer_name: customerName || null,
-                    subtotal: subtotal,
-                    tax_amount: taxEnabled ? subtotal * gstRate : 0,
-                    discount_amount: discountAmount,
-                    total_amount: finalTotal,
-                    payment_mode: paymentMode,
-                    generated_by: billGenerator,
-                    items: items
-                };
-                
-                console.log('Generating bill with data:', billData);
-                
-                // Make API call
-                fetch('/api/bills', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(billData)
-                })
-                .then(response => response.json())
-                .then(result => {
-                    console.log('API Response:', result);
-                    if (result.bill_number) {
-                        // Clear persistent cart after successful bill generation
-                        localStorage.removeItem('kiranakonnect_persistent_cart');
-                        alert(`Bill ${result.bill_number} generated successfully!`);
-                        // Redirect to receipt page
-                        window.location.href = `/receipt?bill=${result.bill_number}`;
-                    } else {
-                        console.error('Server error:', result);
-                        alert('Error generating bill. Please try again.');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error generating bill:', error);
-                    alert('Error generating bill. Please try again.');
-                });
-                
-            } catch (error) {
-                console.error('Error in generateBill function:', error);
-                alert('Error generating bill. Please try again.');
-            }
-        }
-
-        // Global variables
-        let currentEditingItem = null;
-        let cartItems = {
-            1: {
-                id: 1,
-                name: 'Aashirvaad Atta',
-                quantity: 10,
-                unitPrice: 45,
-                price: 450,
-                unit: 'Kg',
-                type: 'unit',
-                mfgDate: '01/05/2025',
-                expDate: '01/09/2025',
-                datesHidden: false
-            },
-            2: {
-                id: 2,
-                name: 'Real Fruit Juice',
-                quantity: 2,
-                unitPrice: 60,
-                price: 120,
-                unit: 'Bottles',
-                type: 'unit',
-                mfgDate: '12/05/2025',
-                expDate: '25/07/2025',
-                datesHidden: false
-            },
-            3: {
-                id: 3,
-                name: 'Colgate Paste',
-                quantity: 3,
-                unitPrice: 30,
-                price: 90,
-                unit: 'Pieces',
-                type: 'unit'
-            },
-            4: {
-                id: 4,
-                name: 'Good Day Biscuits',
-                quantity: 5,
-                unitPrice: 12,
-                price: 60,
-                unit: 'Packets',
-                type: 'unit',
-                mfgDate: '05/03/2025',
-                expDate: '05/09/2025',
-                datesHidden: false
-            },
-            5: {
-                id: 5,
-                name: 'Surf Excel (500gm)',
-                quantity: 1,
-                unitPrice: 55,
-                price: 55,
-                unit: 'Packet',
-                type: 'unit'
-            },
-            6: {
-                id: 6,
-                name: 'Dabur Honey',
-                quantity: 1,
-                unitPrice: 180,
-                price: 180,
-                unit: 'Bottle',
-                type: 'unit',
-                mfgDate: '01/01/2025',
-                expDate: '01/01/2027',
-                datesHidden: false
-            }
-        };
-
-        // RECREATED: Simplified cart addition function with duplicate prevention
-        function addNewItemToCart(newItem) {
-            console.log('RECREATED: Adding item to cart:', newItem);
-            
-            // Check if this exact product already exists in cart
-            const existingItemId = Object.keys(cartItems).find(id => 
-                cartItems[id].name === newItem.name && 
-                cartItems[id].type === newItem.type
-            );
-            
-            if (existingItemId) {
-                // Update existing item instead of creating duplicate
-                const existingItem = cartItems[existingItemId];
-                existingItem.quantity += newItem.quantity;
-                existingItem.price = newItem.price; // Use new calculated price
-                existingItem.quantityDisplay = newItem.quantityDisplay;
-                
-                console.log('RECREATED: Updated existing cart item:', existingItem);
-                
-                // Update display
-                const quantityElement = document.getElementById(`quantity-${existingItemId}`);
-                const priceElement = document.getElementById(`price-${existingItemId}`);
-                if (quantityElement) quantityElement.textContent = existingItem.quantityDisplay;
-                if (priceElement) priceElement.textContent = `₹${existingItem.price.toFixed(2)}`;
-                
-                return existingItemId;
-            }
-            
-            const nextItemId = Math.max(...Object.keys(cartItems).map(k => parseInt(k)), 0) + 1;
-            
-            // Add new item to cart
-            cartItems[nextItemId] = {
-                id: nextItemId,
-                name: newItem.name,
-                price: newItem.price,
-                quantity: newItem.quantity,
-                unit: newItem.unit || 'kg',
-                unitPrice: newItem.unitPrice,
-                type: newItem.type || 'unit',
-                mfgDate: newItem.mfgDate || '',
-                expDate: newItem.expDate || '',
-                datesHidden: false,
-                quantityDisplay: newItem.quantityDisplay
-            };
-            
-            console.log('RECREATED: New cart item added:', cartItems[nextItemId]);
-            
-            // Save to persistent storage immediately
-            saveCartToPersistentStorage();
-            
-            // Create HTML exactly like existing cart items
-            const cartContainer = document.getElementById('cart-items');
-            const newCartItemHTML = createExactCartItemHTML(nextItemId, newItem);
-            
-            // Insert before the "Add More Items" section
-            const addMoreSection = document.getElementById('add-items-section');
-            addMoreSection.insertAdjacentHTML('beforebegin', newCartItemHTML);
-            
-            // Recalculate totals
-            calculateTotals();
-            
-            console.log(`Added ${newItem.name} to cart with ID ${nextItemId}`);
-            return nextItemId;
-        }
-        
-        // RECREATED: Create cart item HTML with exact values
-        function createExactCartItemHTML(itemId, item) {
-            const quantityDisplay = item.quantityDisplay || `${item.quantity} ${item.unit}`;
-            const displayPrice = item.price; // Use exact price without modification
-            
-            let dateSection = '';
-            if (item.mfgDate && item.expDate && item.mfgDate !== '' && item.expDate !== '') {
-                dateSection = `
-                        <div class="mt-2 space-y-1">
-                            <div class="flex items-center text-xs text-gray-500 date-info">
-                                <i class="fa-solid fa-calendar mr-1"></i>
-                                <span>MFG: ${item.mfgDate}</span>
-                            </div>
-                            <div class="flex items-center text-xs text-gray-500 date-info">
-                                <i class="fa-solid fa-clock mr-1"></i>
-                                <span>EXP: ${item.expDate}</span>
-                            </div>
-                            <div class="flex items-center space-x-2 mt-1">
-                                <button class="text-xs text-primary hover:underline flex items-center" onclick="editItem(${itemId})">
-                                    <i class="fa-solid fa-edit mr-1"></i>
-                                    Edit
-                                </button>
-                                <button id="date-toggle-${itemId}" class="text-xs text-danger hover:underline flex items-center" onclick="toggleProductDates(${itemId})">
-                                    <i class="fa-solid fa-times mr-1"></i>
-                                    Remove Dates
-                                </button>
-                            </div>
-                        </div>`;
-            } else {
-                dateSection = `
-                        <div class="mt-2">
-                            <button class="text-xs text-primary hover:underline flex items-center" onclick="editItem(${itemId})">
-                                <i class="fa-solid fa-edit mr-1"></i>
-                                Edit
-                            </button>
-                        </div>`;
-            }
-            
-            return `
-        <div class="bg-white rounded-xl shadow-sm p-3" id="cart-item-${itemId}">
-            <div class="flex items-start justify-between">
-                <div class="flex-1">
-                    <h3 class="font-semibold text-dark text-sm">${item.name}</h3>
-                    <div class="flex justify-between items-center mt-1">
-                        <span class="text-sm text-gray-700 font-medium" id="quantity-${itemId}">${quantityDisplay}</span>
-                        <span class="text-lg font-bold text-primary" id="price-${itemId}">₹${displayPrice.toFixed(2)}</span>
-                    </div>${dateSection}
-                </div>
-                <button class="text-danger text-sm ml-3 p-1" onclick="removeItem(${itemId})">
-                    <i class="fa-solid fa-trash"></i>
-                </button>
-            </div>
-        </div>`;
-        }
-        
-        // Create and insert cart item into DOM
-        function createAndInsertCartItem(itemId, item) {
-            const cartContainer = document.getElementById('cart-items');
-            const addMoreSection = document.getElementById('add-items-section');
-            
-            // Create new cart item div
-            const cartItemDiv = document.createElement('div');
-            cartItemDiv.className = 'bg-white rounded-xl shadow-sm p-3';
-            cartItemDiv.id = `cart-item-${itemId}`;
-            
-            // Build HTML structure exactly like existing items
-            let itemHTML = `
-                <div class="flex items-start justify-between">
-                    <div class="flex-1">
-                        <h3 class="font-semibold text-dark text-sm">${item.name}</h3>
-                        <div class="flex justify-between items-center mt-1">
-                            <span class="text-sm text-gray-700 font-medium" id="quantity-${itemId}">${item.quantityDisplay || item.quantity + ' ' + item.unit}</span>
-                            <span class="text-lg font-bold text-primary" id="price-${itemId}">₹${item.price}</span>
-                        </div>`;
-            
-            // Add date section if dates exist (check for both defined and non-empty values)
-            if (item.mfgDate && item.expDate && item.mfgDate !== '' && item.expDate !== '') {
-                itemHTML += `
-                        <div class="mt-2 space-y-1">
-                            <div class="flex items-center text-xs text-gray-500 date-info">
-                                <i class="fa-solid fa-calendar mr-1"></i>
-                                <span>MFG: ${item.mfgDate}</span>
-                            </div>
-                            <div class="flex items-center text-xs text-gray-500 date-info">
-                                <i class="fa-solid fa-clock mr-1"></i>
-                                <span>EXP: ${item.expDate}</span>
-                            </div>
-                            <div class="flex items-center space-x-2 mt-1">
-                                <button class="text-xs text-primary hover:underline flex items-center" onclick="editItem(${itemId})">
-                                    <i class="fa-solid fa-edit mr-1"></i>
-                                    Edit
-                                </button>
-                                <button id="date-toggle-${itemId}" class="text-xs text-danger hover:underline flex items-center" onclick="toggleProductDates(${itemId})">
-                                    <i class="fa-solid fa-times mr-1"></i>
-                                    Remove Dates
-                                </button>
-                            </div>
-                        </div>`;
-            } else {
-                itemHTML += `
-                        <div class="mt-2">
-                            <button class="text-xs text-primary hover:underline flex items-center" onclick="editItem(${itemId})">
-                                <i class="fa-solid fa-edit mr-1"></i>
-                                Edit
-                            </button>
-                        </div>`;
-            }
-            
-            itemHTML += `
-                    </div>
-                    <button class="text-danger text-sm ml-3 p-1" onclick="removeItem(${itemId})">
-                        <i class="fa-solid fa-trash"></i>
-                    </button>
-                </div>`;
-            
-            cartItemDiv.innerHTML = itemHTML;
-            
-            // Insert before "Add More Items" section
-            if (addMoreSection) {
-                addMoreSection.parentNode.insertBefore(cartItemDiv, addMoreSection);
-            } else {
-                cartContainer.appendChild(cartItemDiv);
-            }
-        }
-        
-        // Load previously added cart items that should persist across pages
-        function loadPersistentCartItems() {
-            const persistentData = localStorage.getItem('kiranakonnect_persistent_cart');
-            if (!persistentData) return;
-            
-            const persistentItems = JSON.parse(persistentData);
-            if (persistentItems.length === 0) return;
-            
-            // Add each persistent item to the cart
-            persistentItems.forEach(item => {
-                addNewItemToCart(item);
-            });
-            
-            console.log(`Loaded ${persistentItems.length} persistent cart items`);
-        }
-
-        // Simplified cart loading - only load new items from inventory
-        function loadCartItems() {
-            const cartData = localStorage.getItem('kiranakonnect_cart');
-            if (!cartData) return;
-            
-            const storedItems = JSON.parse(cartData);
-            if (storedItems.length === 0) return;
-            
-            // Add each item directly to the cart (duplicates prevented in addNewItemToCart)
-            storedItems.forEach(item => {
-                addNewItemToCart(item);
-            });
-            
-            // Clear the temporary cart after processing
-            localStorage.removeItem('kiranakonnect_cart');
-            console.log(`Processed ${storedItems.length} items from inventory`);
-        }
-
-        // Clear duplicate cart items based on product name and type
-        function clearCartDuplicates() {
-            const seen = new Set();
-            const uniqueItems = {};
-            
-            Object.keys(cartItems).forEach(itemId => {
-                const item = cartItems[itemId];
-                const itemKey = `${item.name}_${item.type || 'unit'}`;
-                
-                if (!seen.has(itemKey)) {
-                    seen.add(itemKey);
-                    uniqueItems[itemId] = item;
-                } else {
-                    console.log('Removing duplicate item:', item.name);
-                }
-            });
-            
-            cartItems = uniqueItems;
-            console.log('Cart after duplicate removal:', cartItems);
-        }
-
-        // Check for new items from inventory periodically
-        function checkForNewItems() {
-            const cartData = localStorage.getItem('kiranakonnect_cart');
-            if (cartData) {
+            // Load cart from persistent storage
+            loadFromStorage() {
                 try {
-                    const storedItems = JSON.parse(cartData);
-                    if (storedItems.length > 0) {
-                        console.log('Found new items from inventory:', storedItems);
+                    const savedData = localStorage.getItem(this.STORAGE_KEY);
+                    if (savedData) {
+                        const items = JSON.parse(savedData);
+                        this.cartItems = {};
                         
-                        // Check if cartItems is initialized, if not initialize it
-                        if (!cartItems || typeof cartItems !== 'object') {
-                            cartItems = {};
-                        }
-                        
-                        // Add each new item to existing cartItems without clearing
-                        storedItems.forEach(item => {
-                            const existingIds = Object.keys(cartItems).map(Number);
-                            const nextItemId = existingIds.length > 0 ? Math.max(...existingIds) + 1 : 1;
-                            
-                            const newItem = {
-                                id: nextItemId,
+                        items.forEach((item, index) => {
+                            const id = index + 1;
+                            this.cartItems[id] = {
+                                id: id,
                                 name: item.name,
-                                price: item.price || item.totalPrice,
-                                quantity: item.quantity,
-                                unit: item.unit,
-                                unitPrice: item.unitPrice,
-                                type: item.type || 'unit',
-                                mfgDate: item.mfgDate || '',
-                                expDate: item.expDate || '',
-                                datesHidden: false,
-                                quantityDisplay: item.quantityDisplay || `${item.quantity} ${item.unit}`
-                            };
-                            
-                            cartItems[nextItemId] = newItem;
-                            console.log('Added new item to cart:', newItem);
-                        });
-                        
-                        // Clear temporary cart storage
-                        localStorage.removeItem('kiranakonnect_cart');
-                        
-                        // Save updated cart to persistent storage
-                        saveCartToPersistentStorage();
-                        
-                        console.log('Cart now has', Object.keys(cartItems).length, 'total items');
-                        
-                        // Re-render cart if on cart page
-                        if (document.getElementById('cart-items')) {
-                            renderCartItems();
-                            calculateTotals();
-                        }
-                    }
-                } catch (error) {
-                    console.error('Error processing new cart items:', error);
-                    localStorage.removeItem('kiranakonnect_cart'); // Clear corrupted data
-                }
-            }
-        }
-
-        // Global function for real-time updates from inventory
-        window.updateCartFromInventory = function(newItem) {
-            addNewItemToCart(newItem);
-        };
-
-        // Navigate to inventory page
-        function navigateToInventory() {
-            console.log('Navigating to inventory...');
-            window.location.href = '/inventory';
-        }
-
-        // Alternative navigation function for direct onclick use
-        function goToInventory() {
-            console.log('Going to inventory page...');
-            try {
-                window.location.assign('/inventory');
-            } catch (error) {
-                console.error('Navigation error:', error);
-                window.location.href = '/inventory';
-            }
-        }
-
-        // Initialize cart with localStorage data
-        function initializeCart() {
-            // Only initialize if cartItems is not already loaded
-            if (!cartItems || Object.keys(cartItems).length === 0) {
-                // Load existing persistent cart first
-                const persistentData = localStorage.getItem('kiranakonnect_persistent_cart');
-                if (persistentData) {
-                    try {
-                        const savedItems = JSON.parse(persistentData);
-                        cartItems = {};
-                        let nextId = 1;
-                        
-                        savedItems.forEach(item => {
-                            cartItems[nextId] = {
-                                id: nextId,
-                                name: item.name,
-                                price: item.price,
-                                quantity: item.quantity,
+                                price: parseFloat(item.price || 0),
+                                quantity: parseFloat(item.quantity || 1),
                                 unit: item.unit || 'piece',
-                                unitPrice: item.unitPrice,
+                                unitPrice: parseFloat(item.unitPrice || 0),
                                 type: item.type || 'unit',
                                 mfgDate: item.mfgDate || '',
                                 expDate: item.expDate || '',
                                 datesHidden: item.datesHidden || false,
-                                quantityDisplay: item.quantityDisplay
+                                quantityDisplay: item.quantityDisplay || `${item.quantity} ${item.unit}`
                             };
-                            nextId++;
                         });
-                        console.log('Cart initialized with', Object.keys(cartItems).length, 'existing items');
-                    } catch (error) {
-                        console.error('Error loading cart:', error);
-                        cartItems = {};
-                    }
-                } else {
-                    cartItems = {};
-                    console.log('No existing cart data found - starting fresh');
-                }
-            } else {
-                console.log('Cart already initialized with', Object.keys(cartItems).length, 'items');
-            }
-            
-            // Always check for new items from inventory
-            checkForNewItems();
-            
-            // Calculate totals
-            calculateTotals();
-        }
-
-        // Render cart items in the UI
-        function renderCartItems() {
-            const cartContainer = document.getElementById('cart-items');
-            if (!cartContainer) {
-                console.error('Cart container not found, retrying in 500ms...');
-                setTimeout(renderCartItems, 500);
-                return;
-            }
-            
-            console.log('Rendering cart with items:', Object.keys(cartItems).length);
-            
-            // Completely clear container to prevent all duplicates
-            cartContainer.innerHTML = '';
-            
-            if (Object.keys(cartItems).length === 0) {
-                // Show empty cart message
-                cartContainer.innerHTML = `
-                    <div class="bg-white rounded-xl shadow-sm p-6 text-center">
-                        <i class="fa-solid fa-shopping-cart text-gray-400 text-3xl mb-3"></i>
-                        <h3 class="text-lg font-medium text-gray-600 mb-2">Your cart is empty</h3>
-                        <p class="text-sm text-gray-500 mb-4">Add items from inventory to get started</p>
-                        <button class="bg-primary text-white px-6 py-2 rounded-lg font-medium" onclick="navigateToInventory()">
-                            Browse Inventory
-                        </button>
-                    </div>
-                `;
-                return;
-            }
-            
-            // Render each unique cart item only once
-            Object.keys(cartItems).forEach(itemId => {
-                const item = cartItems[itemId];
-                try {
-                    const cartItemHTML = createCartItemHTML(itemId, item);
-                    cartContainer.insertAdjacentHTML('beforeend', cartItemHTML);
-                } catch (error) {
-                    console.error('Error rendering cart item:', error, item);
-                }
-            });
-            
-            // Add single "Add More Items" button at the end
-            try {
-                const buttonHTML = `
-                    <div class="bg-white rounded-xl shadow-sm p-3">
-                        <div class="flex justify-center">
-                            <button id="add-items-btn" class="flex items-center justify-center bg-secondary text-white rounded-full px-6 py-3 font-medium text-sm">
-                                <i class="fa-solid fa-plus mr-2"></i>
-                                Add More Items to Cart
-                            </button>
-                        </div>
-                    </div>
-                `;
-                cartContainer.insertAdjacentHTML('beforeend', buttonHTML);
-                
-                // Add event listener directly to the button
-                setTimeout(() => {
-                    const button = document.getElementById('add-items-btn');
-                    console.log('Looking for button with ID add-items-btn:', !!button);
-                    
-                    if (button) {
-                        button.addEventListener('click', function(e) {
-                            e.preventDefault();
-                            console.log('Button clicked - navigating to inventory');
-                            window.location.href = '/inventory';
-                        });
-                        console.log('Event listener added to Add Items button');
                         
-                        // Also try direct onclick as backup
-                        button.onclick = function(e) {
-                            e.preventDefault();
-                            console.log('Onclick fired - navigating to inventory');
-                            window.location.href = '/inventory';
-                            return false;
-                        };
+                        console.log('Loaded', items.length, 'items from storage');
                     } else {
-                        console.error('Could not find Add Items button to attach event listener');
-                        // Try to find any button in cart container
-                        const allButtons = cartContainer.querySelectorAll('button');
-                        console.log('All buttons found in cart:', allButtons.length);
-                        allButtons.forEach((btn, index) => {
-                            console.log(`Button ${index}:`, btn.id || 'no-id', btn.textContent.trim());
-                        });
+                        // Initialize with default items if no storage
+                        this.initializeDefaults();
                     }
-                }, 100);
-                
-            } catch (error) {
-                console.error('Error adding Add More Items button:', error);
-            }
-            
-            console.log('Cart rendering complete');
-            
-            // Debug: Check if button was actually added
-            setTimeout(() => {
-                const button = document.getElementById('add-items-btn');
-                console.log('Add Items button found:', !!button);
-                if (button) {
-                    console.log('Button onclick:', button.onclick);
-                    console.log('Button outerHTML:', button.outerHTML);
-                } else {
-                    console.error('Add Items button NOT found in DOM');
+                } catch (error) {
+                    console.error('Error loading cart from storage:', error);
+                    this.initializeDefaults();
                 }
-            }, 100);
-        }
-
-        // Legacy function for compatibility
-        function addNewItemsToDOM() {
-            // Now handled by addItemToCart function
-        }
-
-        // Legacy function for compatibility
-        function renderNewCartItems() {
-            // Now handled by addItemToCart function
-        }
-
-        // Create HTML for individual cart item matching existing structure exactly
-        function createCartItemHTML(itemId, item) {
-            const hasDate = item.mfgDate && item.expDate;
-            const quantityDisplay = item.quantityDisplay || `${item.quantity} ${item.unit}`;
-            
-            // Use the already calculated price for weight-based items
-            let displayPrice = item.price;
-
-            return `<div class="bg-white rounded-xl shadow-sm p-3" id="cart-item-${itemId}">
-            <div class="flex items-start justify-between">
-                <div class="flex-1">
-                    <h3 class="font-semibold text-dark text-sm">${item.name}</h3>
-                    <div class="flex justify-between items-center mt-1">
-                        <span class="text-sm text-gray-700 font-medium" id="quantity-${itemId}">${quantityDisplay}</span>
-                        <span class="text-lg font-bold text-primary" id="price-${itemId}">₹${displayPrice.toFixed(2)}</span>
-                    </div>
-                    ${hasDate ? `
-                    <div class="mt-2 space-y-1">
-                        <div class="flex items-center text-xs text-gray-500 date-info">
-                            <i class="fa-solid fa-calendar mr-1"></i>
-                            <span>MFG: ${item.mfgDate}</span>
-                        </div>
-                        <div class="flex items-center text-xs text-gray-500 date-info">
-                            <i class="fa-solid fa-clock mr-1"></i>
-                            <span>EXP: ${item.expDate}</span>
-                        </div>
-                        <div class="flex items-center space-x-2 mt-1">
-                            <button class="text-xs text-primary hover:underline flex items-center" onclick="editItem(${itemId})">
-                                <i class="fa-solid fa-edit mr-1"></i>
-                                Edit
-                            </button>
-                            <button id="date-toggle-${itemId}" class="text-xs text-danger hover:underline flex items-center" onclick="toggleProductDates(${itemId})">
-                                <i class="fa-solid fa-times mr-1"></i>
-                                Remove Dates
-                            </button>
-                        </div>
-                    </div>` : `
-                    <div class="mt-2">
-                        <button class="text-xs text-primary hover:underline flex items-center" onclick="editItem(${itemId})">
-                            <i class="fa-solid fa-edit mr-1"></i>
-                            Edit
-                        </button>
-                    </div>`}
-                </div>
-                <button class="text-danger text-sm ml-3 p-1" onclick="removeItem(${itemId})">
-                    <i class="fa-solid fa-trash"></i>
-                </button>
-            </div>
-        </div>`;
-        }
-
-        function decreaseQuantity(itemId) {
-            const item = cartItems[itemId];
-            if (item && item.quantity > item.minQty) {
-                const newQuantity = Math.max(item.minQty, item.quantity - item.step);
-                item.quantity = newQuantity;
-                item.price = newQuantity * item.unitPrice;
-                
-                // Update localStorage
-                updateCartItemInStorage(item);
-                updateCartDisplay(itemId);
-                calculateTotals();
-                showNotification(`${item.name} quantity decreased`, 'info');
             }
-        }
 
-        function increaseQuantity(itemId) {
-            const item = cartItems[itemId];
-            if (item) {
-                const newQuantity = item.quantity + item.step;
-                item.quantity = newQuantity;
-                item.price = newQuantity * item.unitPrice;
-                
-                // Update localStorage
-                updateCartItemInStorage(item);
-                updateCartDisplay(itemId);
-                calculateTotals();
-                showNotification(`${item.name} quantity increased`, 'info');
+            // Initialize with default sample items
+            initializeDefaults() {
+                this.cartItems = {
+                    1: { id: 1, name: 'Aashirvaad Atta', quantity: 10, unitPrice: 45, price: 450, unit: 'Kg', type: 'unit', mfgDate: '01/05/2025', expDate: '01/09/2025', datesHidden: false, quantityDisplay: '10 Kg' },
+                    2: { id: 2, name: 'Real Fruit Juice', quantity: 2, unitPrice: 60, price: 120, unit: 'Bottles', type: 'unit', mfgDate: '12/05/2025', expDate: '25/07/2025', datesHidden: false, quantityDisplay: '2 Bottles' },
+                    3: { id: 3, name: 'Colgate Paste', quantity: 3, unitPrice: 30, price: 90, unit: 'Pieces', type: 'unit', quantityDisplay: '3 Pieces' },
+                    4: { id: 4, name: 'Good Day Biscuits', quantity: 5, unitPrice: 12, price: 60, unit: 'Packets', type: 'unit', mfgDate: '05/03/2025', expDate: '05/09/2025', datesHidden: false, quantityDisplay: '5 Packets' },
+                    5: { id: 5, name: 'Surf Excel (500gm)', quantity: 1, unitPrice: 55, price: 55, unit: 'Packet', type: 'unit', quantityDisplay: '1 Packet' },
+                    6: { id: 6, name: 'Dabur Honey', quantity: 1, unitPrice: 180, price: 180, unit: 'Bottle', type: 'unit', mfgDate: '01/01/2025', expDate: '01/01/2027', datesHidden: false, quantityDisplay: '1 Bottle' }
+                };
+                this.saveToStorage();
+                console.log('Initialized with default items');
             }
-        }
 
-        function updateCartItemInStorage(item) {
-            const cartData = localStorage.getItem('kiranakonnect_cart');
-            let storedItems = cartData ? JSON.parse(cartData) : [];
-            
-            // Find and update the item in storage
-            const itemIndex = storedItems.findIndex(storedItem => storedItem.id === item.id);
-            if (itemIndex > -1) {
-                storedItems[itemIndex].quantity = item.quantity;
-                storedItems[itemIndex].totalPrice = item.price;
-                storedItems[itemIndex].quantityDisplay = item.quantityDisplay;
-                localStorage.setItem('kiranakonnect_cart', JSON.stringify(storedItems));
-            }
-        }
-
-        function updateCartDisplay(itemId) {
-            const item = cartItems[itemId];
-            if (item) {
-                const quantityElement = document.getElementById(`quantity-${itemId}`);
-                const priceElement = document.getElementById(`price-${itemId}`);
-                
-                if (quantityElement && priceElement) {
-                    let displayQuantity;
-                    if (item.type === 'weight-based') {
-                        // For weight-based items, show appropriate unit
-                        if (item.quantity < 1) {
-                            displayQuantity = `${(item.quantity * 1000).toFixed(0)} gm`;
-                        } else {
-                            displayQuantity = `${item.quantity.toFixed(1)} ${item.unit}`;
+            // Process new items from inventory
+            processNewItems() {
+                try {
+                    const tempData = localStorage.getItem(this.TEMP_KEY);
+                    if (tempData) {
+                        const newItems = JSON.parse(tempData);
+                        if (newItems.length > 0) {
+                            console.log('Processing', newItems.length, 'new items from inventory');
+                            
+                            newItems.forEach(item => {
+                                this.addItem(item);
+                            });
+                            
+                            // Clear temporary storage
+                            localStorage.removeItem(this.TEMP_KEY);
+                            
+                            // Save updated cart
+                            this.saveToStorage();
+                            
+                            console.log('Added new items. Cart now has', Object.keys(this.cartItems).length, 'items');
                         }
-                    } else {
-                        // For unit-based items, show whole numbers
-                        const unitText = item.quantity === 1 ? item.unit.slice(0, -1) : item.unit;
-                        displayQuantity = `${item.quantity} ${unitText}`;
                     }
-                    
-                    quantityElement.textContent = displayQuantity;
-                    priceElement.textContent = `₹${item.price.toFixed(2)}`;
+                } catch (error) {
+                    console.error('Error processing new items:', error);
+                    localStorage.removeItem(this.TEMP_KEY);
                 }
             }
-        }
 
-        function editItem(itemId) {
-            currentEditingItem = itemId;
-            const item = cartItems[itemId];
-            if (item) {
-                console.log('Editing item:', item.name, 'Type:', item.type);
+            // Add new item to cart
+            addItem(item) {
+                const existingIds = Object.keys(this.cartItems).map(Number);
+                const nextId = existingIds.length > 0 ? Math.max(...existingIds) + 1 : 1;
                 
-                // Populate edit modal with current item data
-                document.getElementById('edit-product-name').textContent = item.name;
-                document.getElementById('edit-product-price').textContent = `₹${item.unitPrice}/${item.unit.toLowerCase()}`;
+                this.cartItems[nextId] = {
+                    id: nextId,
+                    name: item.name,
+                    price: parseFloat(item.price || item.totalPrice || 0),
+                    quantity: parseFloat(item.quantity || 1),
+                    unit: item.unit || 'piece',
+                    unitPrice: parseFloat(item.unitPrice || 0),
+                    type: item.type || 'unit',
+                    mfgDate: item.mfgDate || '',
+                    expDate: item.expDate || '',
+                    datesHidden: false,
+                    quantityDisplay: item.quantityDisplay || `${item.quantity} ${item.unit}`
+                };
                 
-                // Configure modal based on item type
-                const inputMethodSection = document.getElementById('edit-input-method');
-                const priceSection = document.getElementById('edit-price-section');
-                const quantityLabel = document.getElementById('edit-quantity-label');
-                const unitBasedInput = document.getElementById('edit-unit-based-input');
-                const weightBasedInput = document.getElementById('edit-weight-based-input');
-                const unitSelect = document.getElementById('edit-unit-select');
-                
-                console.log('Unit-based input element:', unitBasedInput);
-                console.log('Weight-based input element:', weightBasedInput);
-                
-                if (item.type === 'weight-based') {
-                    // Weight-based item configuration
-                    inputMethodSection.classList.remove('hidden');
-                    quantityLabel.textContent = 'Weight';
-                    
-                    // Show weight-based input, hide unit-based input
-                    weightBasedInput.classList.remove('hidden');
-                    unitBasedInput.classList.add('hidden');
-                    
-                    // Set input method to quantity by default
-                    document.querySelector('input[name="editInputMethod"][value="quantity"]').checked = true;
-                    
-                    // Show quantity section, hide price section
-                    document.getElementById('edit-quantity-section').classList.remove('hidden');
-                    priceSection.classList.add('hidden');
-                    
-                    // Set appropriate unit and input value
-                    if (item.quantity >= 1) {
-                        unitSelect.value = 'kg';
-                        document.getElementById('edit-quantity-input-weight').value = item.quantity.toFixed(1);
-                    } else {
-                        unitSelect.value = 'gm';
-                        document.getElementById('edit-quantity-input-weight').value = (item.quantity * 1000).toFixed(0);
-                    }
-                } else {
-                    // Unit-based item configuration
-                    console.log('Configuring for unit-based item');
-                    inputMethodSection.classList.add('hidden');
-                    priceSection.classList.add('hidden');
-                    quantityLabel.textContent = item.unit;
-                    
-                    // Show unit-based input, hide weight-based input
-                    unitBasedInput.classList.remove('hidden');
-                    weightBasedInput.classList.add('hidden');
-                    
-                    console.log('Unit-based input visibility:', !unitBasedInput.classList.contains('hidden'));
-                    console.log('Weight-based input visibility:', !weightBasedInput.classList.contains('hidden'));
-                    
-                    document.getElementById('edit-quantity-input-unit').value = item.quantity;
-                }
-                
-                updateEditTotal();
-                document.getElementById('edit-item-modal').classList.remove('hidden');
-                document.body.style.overflow = 'hidden';
+                console.log('Added item:', this.cartItems[nextId]);
+                return nextId;
             }
-        }
 
-        function closeEditModal() {
-            document.getElementById('edit-item-modal').classList.add('hidden');
-            document.body.style.overflow = 'auto';
-            currentEditingItem = null;
-        }
-
-        function updateEditTotal() {
-            if (!currentEditingItem) return;
-            
-            const item = cartItems[currentEditingItem];
-            let quantity, price;
-            
-            if (item.type === 'weight-based') {
-                quantity = parseFloat(document.getElementById('edit-quantity-input-weight').value) || 1;
-                const unit = document.getElementById('edit-unit-select').value;
-                
-                // Convert to base unit
-                if (unit === 'gm') {
-                    quantity = quantity / 1000;
-                } else if (unit === 'ml') {
-                    quantity = quantity / 1000;
-                }
-                
-                price = quantity * item.unitPrice;
-                
-                // Display quantity
-                let displayQuantity = quantity;
-                let displayUnit = item.unit;
-                
-                if (unit === 'gm' || unit === 'ml') {
-                    displayQuantity = quantity * 1000;
-                    displayUnit = unit;
-                }
-                
-                document.getElementById('edit-calculated-quantity').textContent = `${displayQuantity.toFixed(displayUnit === 'kg' || displayUnit === 'l' ? 3 : 0)} ${displayUnit}`;
-            } else {
-                quantity = parseInt(document.getElementById('edit-quantity-input-unit').value) || 1;
-                price = quantity * item.unitPrice;
-                
-                const unitText = quantity === 1 ? item.unit.slice(0, -1) : item.unit;
-                document.getElementById('edit-calculated-quantity').textContent = `${quantity} ${unitText}`;
-            }
-            
-            document.getElementById('edit-calculated-price').textContent = `₹${price.toFixed(2)}`;
-        }
-
-        function onEditUnitChange() {
-            if (!currentEditingItem) return;
-            
-            const item = cartItems[currentEditingItem];
-            if (item.type === 'weight-based') {
-                const unit = document.getElementById('edit-unit-select').value;
-                const input = document.getElementById('edit-quantity-input-weight');
-                
-                if (unit === 'kg' || unit === 'l') {
-                    input.step = '0.1';
-                    input.min = '0.1';
-                    input.placeholder = '0.5';
-                } else {
-                    input.step = '100';
-                    input.min = '100';
-                    input.placeholder = '500';
-                }
-                
-                updateEditTotal();
-            }
-        }
-
-        function saveEditedItem() {
-            if (!currentEditingItem) return;
-            
-            const item = cartItems[currentEditingItem];
-            let newQuantity, newPrice;
-            
-            if (item.type === 'weight-based') {
-                const inputQuantity = parseFloat(document.getElementById('edit-quantity-input-weight').value) || 1;
-                const unit = document.getElementById('edit-unit-select').value;
-                
-                // Convert to base unit (only kg/gm for weight products)
-                if (unit === 'gm') {
-                    newQuantity = inputQuantity / 1000;
-                } else {
-                    newQuantity = inputQuantity;
-                }
-                
-                newPrice = newQuantity * item.unitPrice;
-                
-                // Update quantity display
-                if (newQuantity < 1) {
-                    item.quantityDisplay = `${(newQuantity * 1000).toFixed(0)} gm`;
-                } else {
-                    item.quantityDisplay = `${newQuantity.toFixed(3)} kg`;
-                }
-            } else {
-                newQuantity = parseInt(document.getElementById('edit-quantity-input-unit').value) || 1;
-                newPrice = newQuantity * item.unitPrice;
-                
-                const unitText = newQuantity === 1 ? item.unit.slice(0, -1) : item.unit;
-                item.quantityDisplay = `${newQuantity} ${unitText}`;
-            }
-            
-            // Update cart item
-            item.quantity = newQuantity;
-            item.price = newPrice;
-            
-            // Save updated cart to persistent storage
-            saveCartToPersistentStorage();
-            
-            // Update display
-            updateCartDisplay(currentEditingItem);
-            calculateTotals();
-            renderCartItems();
-            
-            closeEditModal();
-            showNotification(`${item.name} updated successfully`, 'success');
-        }
-
-        // Function name that matches the original button onclick
-        function saveItemChanges() {
-            saveEditedItem();
-        }
-
-        function renderCartItems() {
-            const cartContainer = document.getElementById('cart-items');
-            if (!cartContainer) return;
-            
-            // Clear existing content completely
-            cartContainer.innerHTML = '';
-            
-            // Render each cart item
-            Object.values(cartItems).forEach(item => {
-                const itemHTML = createExactCartItemHTML(item.id, item);
-                cartContainer.insertAdjacentHTML('beforeend', itemHTML);
-            });
-            
-            // Add single "Add More Items" button at the end
-            const addItemsHTML = `
-                <div id="add-items-section" class="py-4">
-                    <button id="working-add-items-btn" class="w-full bg-blue-500 text-white py-3 rounded-xl font-medium text-sm flex items-center justify-center space-x-2 hover:bg-blue-600 transition-colors" onclick="window.location.href='/inventory';">
-                        <i class="fa-solid fa-plus text-white"></i>
-                        <span>Add More Items to Cart</span>
-                    </button>
-                </div>
-            `;
-            cartContainer.insertAdjacentHTML('beforeend', addItemsHTML);
-            
-            // Initialize date toggles after rendering
-            setTimeout(() => {
-                initializeDateToggles();
-                calculateTotals();
-            }, 100);
-            
-            console.log('Cart rendered with', Object.keys(cartItems).length, 'items and single Add More button');
-        }
-
-
-
-        function editDecreaseQuantity() {
-            if (!currentEditingItem) return;
-            
-            const item = cartItems[currentEditingItem];
-            
-            // Only for unit-based items (weight-based items don't use +/- buttons)
-            if (item.type !== 'weight') {
-                const input = document.getElementById('edit-quantity-input-unit');
-                const current = parseInt(input.value) || 1;
-                
-                if (current > 1) {
-                    input.value = current - 1;
-                    updateEditTotal();
+            // Remove item from cart
+            removeItem(itemId) {
+                if (this.cartItems[itemId]) {
+                    delete this.cartItems[itemId];
+                    this.saveToStorage();
+                    this.render();
+                    this.calculateTotals();
+                    console.log('Removed item', itemId);
                 }
             }
-        }
 
-        function editIncreaseQuantity() {
-            if (!currentEditingItem) return;
-            
-            const item = cartItems[currentEditingItem];
-            
-            // Only for unit-based items (weight-based items don't use +/- buttons)
-            if (item.type !== 'weight') {
-                const input = document.getElementById('edit-quantity-input-unit');
-                const current = parseInt(input.value) || 1;
-                
-                input.value = current + 1;
-                updateEditTotal();
-            }
-        }
-
-        function switchEditInputMethod(method) {
-            const quantitySection = document.getElementById('edit-quantity-section');
-            const priceSection = document.getElementById('edit-price-section');
-            
-            if (method === 'quantity') {
-                quantitySection.classList.remove('hidden');
-                priceSection.classList.add('hidden');
-                updateEditTotal();
-            } else {
-                quantitySection.classList.add('hidden');
-                priceSection.classList.remove('hidden');
-                updateEditPriceTotal();
-            }
-        }
-
-        function editDecreaseQuantity() {
-            const input = document.getElementById('edit-quantity-input-unit');
-            if (input) {
-                const current = parseInt(input.value) || 1;
-                if (current > 1) {
-                    input.value = current - 1;
-                    updateEditTotal();
+            // Save cart to persistent storage
+            saveToStorage() {
+                try {
+                    const cartArray = Object.values(this.cartItems);
+                    localStorage.setItem(this.STORAGE_KEY, JSON.stringify(cartArray));
+                    console.log('Cart saved to storage');
+                } catch (error) {
+                    console.error('Error saving cart:', error);
                 }
             }
-        }
 
-        function editIncreaseQuantity() {
-            const input = document.getElementById('edit-quantity-input-unit');
-            if (input) {
-                const current = parseInt(input.value) || 1;
-                input.value = current + 1;
-                updateEditTotal();
-            }
-        }
+            // Render cart items in UI
+            render() {
+                const container = document.getElementById('cart-items');
+                if (!container) return;
 
-        function updateEditTotal() {
-            if (!currentEditingItem) return;
-            
-            const item = cartItems[currentEditingItem];
-            let quantity;
-            
-            if (item.type === 'weight-based') {
-                quantity = parseFloat(document.getElementById('edit-quantity-input-weight').value) || 1;
-                const unit = document.getElementById('edit-unit-select').value;
-                
-                if (unit === 'gm') {
-                    quantity = quantity / 1000; // Convert to kg for calculation
-                }
-                
-                // Update quantity display for weight-based items
-                const displayQuantity = unit === 'kg' ? `${quantity.toFixed(1)} Kg` : `${(quantity * 1000).toFixed(0)} gm`;
-                document.getElementById('edit-calculated-quantity').textContent = displayQuantity;
-            } else {
-                quantity = parseInt(document.getElementById('edit-quantity-input-unit').value) || 1;
-                
-                // Update quantity display for unit-based items
-                const unitText = quantity === 1 ? item.unit.slice(0, -1) : item.unit;
-                document.getElementById('edit-calculated-quantity').textContent = `${quantity} ${unitText}`;
-            }
-            
-            const total = quantity * item.unitPrice;
-            document.getElementById('edit-calculated-price').textContent = `₹${total.toFixed(2)}`;
-        }
+                container.innerHTML = '';
 
-        function updateEditPriceTotal() {
-            if (!currentEditingItem) return;
-            
-            const item = cartItems[currentEditingItem];
-            const price = parseFloat(document.getElementById('edit-price-input').value) || 0;
-            const quantity = price / item.unitPrice;
-            
-            // Update quantity display based on calculated weight
-            let displayQuantity = quantity;
-            let displayUnit = 'Kg';
-            
-            if (quantity < 1) {
-                displayQuantity = quantity * 1000;
-                displayUnit = 'gm';
-            }
-            
-            document.getElementById('edit-calculated-quantity').textContent = `${displayQuantity.toFixed(displayUnit === 'Kg' ? 1 : 0)} ${displayUnit}`;
-            document.getElementById('edit-calculated-price').textContent = `₹${price.toFixed(2)}`;
-        }
-
-        function onEditUnitChange() {
-            if (!currentEditingItem) return;
-            
-            const item = cartItems[currentEditingItem];
-            if (item.type === 'weight-based') {
-                const unit = document.getElementById('edit-unit-select').value;
-                const input = document.getElementById('edit-quantity-input-weight');
-                const currentValue = parseFloat(input.value) || 1;
-                
-                if (unit === 'kg') {
-                    input.step = '0.1';
-                    input.min = '0.1';
-                    input.placeholder = '0.5';
-                    // Convert from grams to kg if needed
-                    if (input.value && currentValue > 10) {
-                        input.value = (currentValue / 1000).toFixed(1);
-                    }
-                } else {
-                    input.step = '100';
-                    input.min = '100';
-                    input.placeholder = '500';
-                    // Convert from kg to grams if needed
-                    if (input.value && currentValue < 10) {
-                        input.value = (currentValue * 1000).toFixed(0);
-                    }
-                }
-                updateEditTotal();
-            }
-        }
-
-        function saveItemChanges() {
-            if (!currentEditingItem) return;
-            
-            const item = cartItems[currentEditingItem];
-            let newQuantity;
-            let newPrice;
-            
-            if (item.type === 'weight-based') {
-                const inputMethod = document.querySelector('input[name="editInputMethod"]:checked').value;
-                
-                if (inputMethod === 'quantity') {
-                    // Calculate quantity based on weight input
-                    let qty = parseFloat(document.getElementById('edit-quantity-input-weight').value) || 0.5;
-                    const unit = document.getElementById('edit-unit-select').value;
-                    
-                    if (unit === 'gm') {
-                        qty = qty / 1000; // Convert grams to kg
-                    }
-                    
-                    newQuantity = qty;
-                    newPrice = qty * item.unitPrice;
-                } else {
-                    // Calculate quantity based on price input
-                    const price = parseFloat(document.getElementById('edit-price-input').value) || 0;
-                    newQuantity = price / item.unitPrice;
-                    newPrice = price;
-                }
-            } else {
-                // Unit-based items
-                newQuantity = parseInt(document.getElementById('edit-quantity-input-unit').value) || 1;
-                newPrice = newQuantity * item.unitPrice;
-            }
-            
-            // Update item data
-            item.quantity = newQuantity;
-            item.price = newPrice;
-            
-            // Update display
-            updateCartDisplay(currentEditingItem);
-            calculateTotals();
-            
-            closeEditModal();
-            showNotification(`${item.name} updated successfully`, 'success');
-        }
-
-        function removeItem(itemId) {
-            const item = cartItems[itemId];
-            if (item) {
-                // Remove from persistent storage
-                const persistentData = localStorage.getItem('kiranakonnect_persistent_cart');
-                if (persistentData) {
-                    let persistentItems = JSON.parse(persistentData);
-                    persistentItems = persistentItems.filter(storedItem => 
-                        !(storedItem.name === item.name && storedItem.unitPrice === item.unitPrice)
-                    );
-                    localStorage.setItem('kiranakonnect_persistent_cart', JSON.stringify(persistentItems));
-                }
-                
-                // Remove from DOM with animation
-                const itemElement = document.getElementById(`cart-item-${itemId}`);
-                if (itemElement) {
-                    itemElement.style.transform = 'translateX(-100%)';
-                    itemElement.style.opacity = '0';
-                    setTimeout(() => {
-                        itemElement.remove();
-                        delete cartItems[itemId];
-                        calculateTotals();
-                        showNotification(`${item.name} removed from cart`, 'info');
-                    }, 300);
-                }
-            }
-        }
-
-        function toggleProductDates(itemId) {
-            console.log('Toggling dates for item:', itemId);
-            
-            // Wait for DOM to be ready
-            setTimeout(() => {
-                const item = cartItems[itemId];
-                const button = document.getElementById(`date-toggle-${itemId}`);
-                
-                if (!button) {
-                    console.error('Toggle button NOT found - debugging needed');
-                    return;
-                }
-                
-                if (!item) {
-                    console.error('Item not found in cartItems:', itemId);
-                    return;
-                }
-                
-                if (item.datesHidden) {
-                    // Show dates
-                    item.datesHidden = false;
-                    button.innerHTML = '<i class="fa-solid fa-times mr-1"></i>Remove Dates';
-                    button.classList.remove('text-success');
-                    button.classList.add('text-danger');
-                    
-                    // Show date elements
-                    const dateElements = document.querySelectorAll(`#cart-item-${itemId} .date-info`);
-                    dateElements.forEach(el => {
-                        el.classList.remove('hidden');
-                        el.style.display = '';
-                    });
-                    
-                    showNotification(`Dates shown for ${item.name}`, 'success');
-                } else {
-                    // Hide dates
-                    item.datesHidden = true;
-                    button.innerHTML = '<i class="fa-solid fa-plus mr-1"></i>Add Dates';
-                    button.classList.remove('text-danger');
-                    button.classList.add('text-success');
-                    
-                    // Hide date elements
-                    const dateElements = document.querySelectorAll(`#cart-item-${itemId} .date-info`);
-                    dateElements.forEach(el => {
-                        el.classList.add('hidden');
-                        el.style.display = 'none';
-                    });
-                    
-                    showNotification(`Dates hidden for ${item.name}`, 'info');
-                }
-            }, 100);
-        }
-
-        // Initialize date toggle functionality
-        function initializeDateToggles() {
-            console.log('Initializing date toggles...');
-            
-            // Check all toggle buttons exist and hide toggle for items without dates
-            for (let i = 1; i <= 6; i++) {
-                const button = document.getElementById(`date-toggle-${i}`);
-                const cartItem = document.getElementById(`cart-item-${i}`);
-                const dateElements = document.querySelectorAll(`#cart-item-${i} .date-info`);
-                const item = cartItems[i];
-                
-                console.log(`Item ${i}:`, {
-                    button: !!button,
-                    cartItem: !!cartItem,
-                    dateElements: dateElements.length,
-                    cartItemData: !!item,
-                    hasDates: !!(item && (item.mfgDate || item.expDate))
+                Object.values(this.cartItems).forEach(item => {
+                    const itemElement = this.createItemElement(item);
+                    container.appendChild(itemElement);
                 });
-                
-                if (button && item) {
-                    if (item.mfgDate || item.expDate) {
-                        // Show toggle button for items with dates
-                        button.style.display = '';
-                        if (item.datesHidden === undefined) {
-                            item.datesHidden = false;
-                        }
-                    } else {
-                        // Hide toggle button for items without dates
-                        button.style.display = 'none';
-                        console.log(`Hiding date toggle for ${item.name} - no dates available`);
-                    }
-                }
-            }
-        }
 
-        // Enhanced total calculation
-        function calculateTotals() {
-            let newSubtotal = 0;
-            Object.values(cartItems).forEach(item => {
-                newSubtotal += item.quantity * item.unitPrice;
-            });
-            
-            subtotal = newSubtotal;
-            const gstAmount = taxEnabled ? subtotal * gstRate : 0;
-            const finalTotal = subtotal + gstAmount - discountAmount;
-            
-            document.getElementById('subtotal').textContent = `₹${subtotal.toFixed(2)}`;
-            document.getElementById('gst-amount').textContent = `₹${gstAmount.toFixed(2)}`;
-            document.getElementById('total-amount').textContent = `₹${finalTotal.toFixed(2)}`;
-            
-            // Update credit amount if in credit mode
-            if (paymentMode === 'credit') {
-                document.getElementById('credit-amount').textContent = `₹${finalTotal.toFixed(2)}`;
+                console.log('Rendered', Object.keys(this.cartItems).length, 'cart items');
             }
-        }
 
-        // Never automatically clear cart storage - let user decide
-        console.log('Cart page loaded - preserving existing storage');
-        
-        // Initialize cart with localStorage data
-        initializeCart();
-        populatePresentStaff();
-        
-        // Check for new items from inventory every 5 seconds (reduced frequency)
-        setInterval(() => {
-            checkForNewItems();
-        }, 5000);
-        
-        // Debug: Check if toggle exists
-        setTimeout(() => {
-            const toggle = document.getElementById('include-dates-toggle');
-            if (toggle) {
-                console.log('Toggle button found and loaded successfully');
-            } else {
-                console.error('Toggle button NOT found - debugging needed');
-            }
-        }, 1000);
-        
-        // Hide credit button on page load since billing tab is default
-        document.getElementById('credit-payment').classList.add('hidden');
-        
-        // Initialize UPI as selected by default
-        selectOnlineMethod('upi');
+            // Create DOM element for cart item
+            createItemElement(item) {
+                const div = document.createElement('div');
+                div.className = 'bg-white rounded-xl shadow-sm p-3';
+                div.id = `cart-item-${item.id}`;
 
-        // Initialize quantity input listeners in edit modal
-        // Initialize when DOM is ready
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('DOM loaded, starting cart initialization...');
-            
-            // Set a timeout to ensure all elements are rendered
-            setTimeout(function() {
-                console.log('Delayed initialization starting...');
-                
-                // Check if elements exist
-                const cartItemsContainer = document.getElementById('cart-items');
-                const button1 = document.getElementById('date-toggle-1');
-                const cartItem1 = document.getElementById('cart-item-1');
-                
-                // Debug what elements actually exist
-                const allElements = document.querySelectorAll('[id^="cart-item-"], [id^="date-toggle-"]');
-                const allCartItems = document.querySelectorAll('#cart-items > div');
-                const allButtons = document.querySelectorAll('button[onclick*="toggleProductDates"]');
-                console.log('All cart-related elements found:', Array.from(allElements).map(el => el.id));
-                console.log('Cart items divs:', allCartItems.length);
-                console.log('Toggle buttons:', allButtons.length);
-                console.log('Cart HTML structure:', cartItemsContainer ? cartItemsContainer.innerHTML.length : 'Not found');
-                console.log('Cart items HTML:', cartItemsContainer ? cartItemsContainer.innerHTML : 'Container not found');
-                
-                console.log('Elements verification:', {
-                    container: !!cartItemsContainer,
-                    button1: !!button1,
-                    cartItem1: !!cartItem1,
-                    allCartElements: allElements.length
-                });
-                
-                if (cartItemsContainer) {
-                    // Use the unified cart initialization function
-                    initializeCart();
-                    
-                    // Render cart items
-                    renderCartItems();
-                    
-                    // Set up periodic check for new items from inventory
-                    setInterval(checkForNewItems, 1000);
-                    
-                    calculateTotals();
-                    initializeDateToggles();
-                    populatePresentStaff();
-                    console.log('Cart initialization completed successfully');
+                let html = `
+                    <div class="flex items-start justify-between">
+                        <div class="flex-1">
+                            <h3 class="font-semibold text-dark text-sm">${item.name}</h3>
+                            <div class="flex justify-between items-center mt-1">
+                                <span class="text-sm text-gray-700 font-medium">${item.quantityDisplay}</span>
+                                <span class="text-lg font-bold text-primary">₹${item.price.toFixed(2)}</span>
+                            </div>
+                `;
+
+                // Add dates if they exist
+                if (item.mfgDate && item.expDate && !item.datesHidden) {
+                    html += `
+                            <div class="mt-2 space-y-1">
+                                <div class="flex items-center text-xs text-gray-500">
+                                    <i class="fa-solid fa-calendar mr-1"></i>
+                                    <span>MFG: ${item.mfgDate}</span>
+                                </div>
+                                <div class="flex items-center text-xs text-gray-500">
+                                    <i class="fa-solid fa-clock mr-1"></i>
+                                    <span>EXP: ${item.expDate}</span>
+                                </div>
+                                <div class="flex items-center space-x-2 mt-1">
+                                    <button class="text-xs text-primary hover:underline flex items-center" onclick="cartManager.editItem(${item.id})">
+                                        <i class="fa-solid fa-edit mr-1"></i>
+                                        Edit
+                                    </button>
+                                    <button class="text-xs text-danger hover:underline flex items-center" onclick="cartManager.toggleDates(${item.id})">
+                                        <i class="fa-solid fa-times mr-1"></i>
+                                        Remove Dates
+                                    </button>
+                                </div>
+                            </div>
+                    `;
                 } else {
-                    console.error('Cart elements not found, retrying...');
-                    // Retry after more time
-                    setTimeout(function() {
-                        if (document.getElementById('cart-items') && document.getElementById('date-toggle-1')) {
-                            calculateTotals();
-                            initializeDateToggles();
-                            populatePresentStaff();
-                            console.log('Cart initialization completed on retry');
-                        }
-                    }, 1000);
-                }
-            }, 100);
-            
-            const editQuantityInputWeight = document.getElementById('edit-quantity-input-weight');
-            const editQuantityInputUnit = document.getElementById('edit-quantity-input-unit');
-            const editPriceInput = document.getElementById('edit-price-input');
-            const editUnitSelect = document.getElementById('edit-unit-select');
-            
-            if (editQuantityInputWeight) {
-                editQuantityInputWeight.addEventListener('input', updateEditTotal);
-            }
-            
-            if (editQuantityInputUnit) {
-                editQuantityInputUnit.addEventListener('input', updateEditTotal);
-            }
-            
-            if (editPriceInput) {
-                editPriceInput.addEventListener('input', updateEditPriceTotal);
-            }
-            
-            if (editUnitSelect) {
-                editUnitSelect.addEventListener('change', onEditUnitChange);
-            }
-            
-            // Add event listeners for input method radio buttons
-            const inputMethodRadios = document.querySelectorAll('input[name="editInputMethod"]');
-            inputMethodRadios.forEach(radio => {
-                radio.addEventListener('change', (e) => {
-                    switchEditInputMethod(e.target.value);
-                });
-            });
-            
-            // Initialize modals
-            document.querySelectorAll('.modal').forEach(modal => {
-                modal.addEventListener('click', function(e) {
-                    if (e.target === modal) {
-                        modal.classList.add('hidden');
-                    }
-                });
-            });
-        });
-
-        // Staff management with attendance tracking
-        function populatePresentStaff() {
-            const allStaff = [
-                { name: 'Rajesh Sharma', position: 'Owner', status: 'present' },
-                { name: 'Anil Kumar', position: 'Cashier', status: 'present' },
-                { name: 'Priya Singh', position: 'Manager', status: 'absent' },
-                { name: 'Suresh Yadav', position: 'Assistant Manager', status: 'present' },
-                { name: 'Meera Devi', position: 'Worker', status: 'absent' },
-                { name: 'Vikram Singh', position: 'Supervisor', status: 'present' }
-            ];
-
-            const presentStaff = allStaff.filter(staff => staff.status === 'present');
-            const billGeneratorSelect = document.getElementById('bill-generator');
-            
-            // Clear existing options
-            billGeneratorSelect.innerHTML = '';
-            
-            // Add present staff as options
-            presentStaff.forEach(staff => {
-                const option = document.createElement('option');
-                option.value = `${staff.name} (${staff.position})`;
-                option.textContent = `${staff.name} (${staff.position})`;
-                billGeneratorSelect.appendChild(option);
-            });
-        }
-    </script>
-
-    <!-- Bottom Navigation -->
-    <nav id="footer" class="fixed bottom-0 left-0 right-0 bg-white shadow-lg border-t">
-        <div class="flex justify-around items-end py-2">
-            <button class="flex flex-col items-center py-1 px-3" onclick="window.location.href='/dashboard'">
-                <i class="fa-solid fa-home text-gray-400 text-xl"></i>
-                <span class="text-xs mt-1 text-gray-400">Home</span>
-            </button>
-            <button class="flex flex-col items-center py-1 px-3" onclick="window.location.href='/inventory'">
-                <i class="fa-solid fa-box text-gray-400 text-xl"></i>
-                <span class="text-xs mt-1 text-gray-400">Inventory</span>
-            </button>
-            <button onclick="openScanner()" class="relative -top-4 bg-primary rounded-full p-4 shadow-lg">
-                <i class="fa-solid fa-barcode text-white text-xl"></i>
-            </button>
-            <button class="flex flex-col items-center py-1 px-3 relative">
-                <i class="fa-solid fa-shopping-cart text-primary text-xl"></i>
-                <span class="text-xs mt-1 text-primary font-semibold">Cart</span>
-                <span class="absolute -top-1 -right-1 bg-danger text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold">3</span>
-            </button>
-            <button class="flex flex-col items-center py-1 px-3" onclick="window.location.href='/profile'">
-                <i class="fa-solid fa-user text-gray-400 text-xl"></i>
-                <span class="text-xs mt-1 text-gray-400">Profile</span>
-            </button>
-        </div>
-    </nav>
-
-    <!-- Edit Item Modal -->
-    <div id="edit-item-modal" class="fixed inset-0 bg-black bg-opacity-50 z-[9999] hidden">
-        <div class="flex items-center justify-center min-h-screen p-4">
-            <div class="bg-white rounded-lg shadow-xl w-full max-w-md max-h-[85vh] overflow-y-auto m-4">
-                <!-- Modal Header -->
-                <div class="flex items-center justify-between p-3 border-b border-gray-200">
-                    <h3 class="text-base font-bold text-dark">Edit Item</h3>
-                    <button onclick="closeEditModal()" class="p-1 hover:bg-gray-100 rounded">
-                        <i class="fa-solid fa-times text-gray-600"></i>
-                    </button>
-                </div>
-
-                <!-- Modal Content -->
-                <div class="p-3">
-                
-                <!-- Product Info -->
-                <div class="flex items-center space-x-2 mb-3 p-2 bg-gray-50 rounded-lg">
-                    <div class="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
-                        <i class="fa-solid fa-box text-white text-sm"></i>
-                    </div>
-                    <div class="flex-1">
-                        <h4 id="edit-product-name" class="font-medium text-dark text-sm">Product Name</h4>
-                        <p id="edit-product-price" class="text-xs text-gray-600">₹0/unit</p>
-                    </div>
-                </div>
-
-                <!-- Input Method Selection (for weight-based products) -->
-                <div id="edit-input-method" class="mb-3 hidden">
-                    <label class="block text-xs font-medium text-dark mb-2">Select Input Method</label>
-                    <div class="grid grid-cols-2 gap-2">
-                        <label class="flex items-center space-x-2 cursor-pointer p-2 bg-gray-50 rounded-lg hover:bg-gray-100">
-                            <input type="radio" name="editInputMethod" value="quantity" class="text-orange-500 focus:ring-orange-500" checked onchange="switchEditInputMethod('quantity')">
-                            <span class="text-xs font-medium text-dark">By Quantity</span>
-                        </label>
-                        <label class="flex items-center space-x-2 cursor-pointer p-2 bg-gray-50 rounded-lg hover:bg-gray-100">
-                            <input type="radio" name="editInputMethod" value="price" class="text-orange-500 focus:ring-orange-500" onchange="switchEditInputMethod('price')">
-                            <span class="text-xs font-medium text-dark">By Price</span>
-                        </label>
-                    </div>
-                </div>
-
-                <!-- Quantity Input Section -->
-                <div id="edit-quantity-section" class="mb-3">
-                    <label id="edit-quantity-label" class="block text-xs font-medium text-dark mb-2">Quantity</label>
-                    
-                    <!-- Unit-based products (with +/- buttons) -->
-                    <div id="edit-unit-based-input" class="flex items-center gap-3 mb-3">
-                        <button type="button" class="w-12 h-12 bg-red-50 border-2 border-red-200 rounded-lg flex items-center justify-center hover:bg-red-100 hover:border-red-300 transition-colors flex-shrink-0" onclick="editDecreaseQuantity()">
-                            <span class="text-red-600 font-bold text-xl">−</span>
-                        </button>
-                        <input type="number" id="edit-quantity-input-unit" class="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-center font-medium min-w-0" value="1" min="1" step="1" oninput="updateEditTotal()">
-                        <button type="button" class="w-12 h-12 bg-green-50 border-2 border-green-200 rounded-lg flex items-center justify-center hover:bg-green-100 hover:border-green-300 transition-colors flex-shrink-0" onclick="editIncreaseQuantity()">
-                            <span class="text-green-600 font-bold text-xl">+</span>
-                        </button>
-                    </div>
-                    
-                    <!-- Weight-based products (input + unit dropdown, no +/- buttons) -->
-                    <div id="edit-weight-based-input" class="flex items-center gap-2 mb-3 hidden">
-                        <input type="number" id="edit-quantity-input-weight" class="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-center font-medium text-base min-w-0" value="1" min="0.1" step="0.1" oninput="updateEditTotal()">
-                        <select id="edit-unit-select" class="px-2 py-2 border border-gray-300 rounded-lg font-medium text-sm w-16 flex-shrink-0" onchange="onEditUnitChange()">
-                            <option value="kg">Kg</option>
-                            <option value="gm">Gm</option>
-                        </select>
-                    </div>
-                    
-                    <p id="edit-quantity-help" class="text-xs text-gray-500">Enter the required quantity</p>
-                </div>
-
-                <!-- Price Section (for weight-based items) -->
-                <div id="edit-price-section" class="mb-3 hidden">
-                    <label class="block text-xs font-medium text-dark mb-2">Enter Price Amount</label>
-                    <div class="relative">
-                        <span class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 font-medium">₹</span>
-                        <input type="number" id="edit-price-input" class="w-full pl-8 pr-4 py-2 border border-gray-200 rounded-lg text-base font-medium" placeholder="0.00" step="0.01" oninput="updateEditPriceTotal()">
-                    </div>
-                    <p class="text-xs text-gray-500 mt-1">System calculates quantity based on price per kg</p>
-                </div>
-
-                <!-- Summary -->
-                <div class="bg-gray-50 p-2 rounded-lg mb-3">
-                    <div class="flex justify-between items-center mb-1">
-                        <span class="text-xs text-gray-600">Quantity:</span>
-                        <span id="edit-calculated-quantity" class="text-xs font-medium text-dark">1 Unit</span>
-                    </div>
-                    <div class="flex justify-between items-center">
-                        <span class="text-xs text-gray-600">Total Price:</span>
-                        <span id="edit-calculated-price" class="text-sm font-bold text-green-600">₹0</span>
-                    </div>
-                </div>
-
-                <!-- Action Buttons -->
-                <div class="flex space-x-2">
-                    <button onclick="closeEditModal()" class="flex-1 py-2 px-3 bg-gray-200 text-gray-700 rounded-lg font-medium hover:bg-gray-300 transition-colors text-sm">
-                        Cancel
-                    </button>
-                    <button onclick="saveItemChanges()" class="flex-1 py-2 px-3 bg-orange-500 text-white rounded-lg font-medium hover:bg-orange-600 transition-colors text-sm">
-                        Save Changes
-                    </button>
-                </div>
-                
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Search Modal -->
-    <div id="search-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden">
-        <div class="fixed inset-0 flex flex-col">
-            <div class="bg-white p-4">
-                <div class="flex items-center space-x-3">
-                    <button onclick="closeSearch()" class="p-2 hover:bg-gray-100 rounded-lg">
-                        <i class="fa-solid fa-arrow-left text-gray-600"></i>
-                    </button>
-                    <div class="flex-1 relative">
-                        <input type="text" id="search-input" placeholder="Search products to add..." class="w-full px-4 py-3 border border-gray-300 rounded-lg text-sm">
-                        <button onclick="clearSearch()" class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600">
-                            <i class="fa-solid fa-times"></i>
-                        </button>
-                    </div>
-                    <button onclick="openScanner()" class="p-2 bg-primary text-white rounded-lg hover:bg-primary-dark">
-                        <i class="fa-solid fa-barcode"></i>
-                    </button>
-                </div>
-            </div>
-            <div class="flex-1 bg-white px-4 pb-4 overflow-y-auto">
-                <div id="search-results" class="space-y-3">
-                    <!-- Search results will appear here -->
-                </div>
-                <div id="search-empty" class="text-center py-12 hidden">
-                    <i class="fa-solid fa-search text-gray-300 text-4xl mb-4"></i>
-                    <p class="text-gray-500">No products found</p>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Scanner Modal -->
-    <div id="scanner-modal" class="fixed inset-0 bg-black bg-opacity-90 z-50 hidden">
-        <div class="fixed inset-0 flex flex-col">
-            <div class="bg-black text-white p-4">
-                <div class="flex items-center justify-between">
-                    <button onclick="closeScanner()" class="p-2 hover:bg-gray-800 rounded-lg">
-                        <i class="fa-solid fa-times text-white"></i>
-                    </button>
-                    <h2 class="text-lg font-semibold">Scan to Add Product</h2>
-                    <button onclick="toggleFlashlight()" class="p-2 hover:bg-gray-800 rounded-lg">
-                        <i class="fa-solid fa-flashlight text-white"></i>
-                    </button>
-                </div>
-            </div>
-            <div class="flex-1 relative bg-black">
-                <div class="absolute inset-0 flex items-center justify-center">
-                    <div class="relative">
-                        <div class="w-64 h-64 border-2 border-white border-dashed rounded-lg flex items-center justify-center">
-                            <div class="text-center text-white">
-                                <i class="fa-solid fa-barcode text-4xl mb-4"></i>
-                                <p>Point camera at barcode</p>
-                                <p class="text-sm text-gray-300 mt-2">Product will be added to cart</p>
-                                <button onclick="manualBarcodeEntry()" class="mt-2 px-4 py-2 bg-primary text-white rounded-lg text-sm">
-                                    Enter Manually
+                    html += `
+                            <div class="mt-2">
+                                <button class="text-xs text-primary hover:underline flex items-center" onclick="cartManager.editItem(${item.id})">
+                                    <i class="fa-solid fa-edit mr-1"></i>
+                                    Edit
                                 </button>
                             </div>
+                    `;
+                }
+
+                html += `
                         </div>
-                        <div class="absolute top-0 left-0 right-0 h-1 bg-red-500 opacity-75 animate-pulse"></div>
+                        <button class="text-danger text-sm ml-3 p-1" onclick="cartManager.removeItem(${item.id})">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
                     </div>
-                </div>
-            </div>
-        </div>
-    </div>
+                `;
 
-    <!-- Manual Barcode Entry Modal -->
-    <div id="manual-barcode-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden">
-        <div class="fixed inset-0 flex items-center justify-center p-4">
-            <div class="bg-white rounded-2xl max-w-sm w-full p-6">
-                <h2 class="text-lg font-bold text-dark mb-4">Enter Barcode</h2>
-                <input type="text" id="manual-barcode-input" placeholder="Enter barcode number" class="w-full px-4 py-3 border border-gray-300 rounded-lg mb-4">
-                <div class="flex space-x-3">
-                    <button onclick="closeManualBarcode()" class="flex-1 px-4 py-2 border border-gray-200 text-gray-700 rounded-lg">
-                        Cancel
-                    </button>
-                    <button onclick="searchByBarcode()" class="flex-1 px-4 py-2 bg-primary text-white rounded-lg">
-                        Add to Cart
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
+                div.innerHTML = html;
+                return div;
+            }
 
-    <script>
-        // Search and Scanner functionality for Cart
-        function openSearch() {
-            document.getElementById('search-modal').classList.remove('hidden');
-            document.getElementById('search-input').focus();
-            document.body.style.overflow = 'hidden';
-        }
+            // Calculate and display totals
+            calculateTotals() {
+                const subtotal = Object.values(this.cartItems).reduce((sum, item) => sum + item.price, 0);
+                const tax = 0; // No tax for now
+                const discount = 0; // No discount for now
+                const total = subtotal + tax - discount;
 
-        function closeSearch() {
-            document.getElementById('search-modal').classList.add('hidden');
-            document.body.style.overflow = 'auto';
-            clearSearch();
-        }
+                document.getElementById('subtotal').textContent = `₹${subtotal.toFixed(2)}`;
+                document.getElementById('tax').textContent = `₹${tax.toFixed(2)}`;
+                document.getElementById('discount').textContent = `₹${discount.toFixed(2)}`;
+                document.getElementById('total').textContent = `₹${total.toFixed(2)}`;
 
-        function clearSearch() {
-            document.getElementById('search-input').value = '';
-            document.getElementById('search-results').innerHTML = '';
-            document.getElementById('search-empty').classList.add('hidden');
-        }
+                // Update credit amount if needed
+                if (this.selectedPaymentMode === 'credit') {
+                    document.getElementById('credit-amount').textContent = `₹${total.toFixed(2)}`;
+                }
+            }
 
-        function openScanner() {
-            document.getElementById('scanner-modal').classList.remove('hidden');
-            simulateScanning();
-        }
+            // Edit item (placeholder)
+            editItem(itemId) {
+                console.log('Edit item', itemId);
+                // TODO: Implement edit functionality
+            }
 
-        function closeScanner() {
-            document.getElementById('scanner-modal').classList.add('hidden');
-        }
-
-        function manualBarcodeEntry() {
-            document.getElementById('manual-barcode-modal').classList.remove('hidden');
-            document.getElementById('manual-barcode-input').focus();
-        }
-
-        function closeManualBarcode() {
-            document.getElementById('manual-barcode-modal').classList.add('hidden');
-            document.getElementById('manual-barcode-input').value = '';
-        }
-
-        function searchByBarcode() {
-            const barcode = document.getElementById('manual-barcode-input').value.trim();
-            if (barcode) {
-                performBarcodeSearch(barcode);
-                closeManualBarcode();
-                closeScanner();
+            // Toggle dates visibility
+            toggleDates(itemId) {
+                if (this.cartItems[itemId]) {
+                    this.cartItems[itemId].datesHidden = !this.cartItems[itemId].datesHidden;
+                    this.saveToStorage();
+                    this.render();
+                }
             }
         }
 
-        function toggleFlashlight() {
-            const button = event.target.closest('button');
-            button.classList.toggle('text-yellow-400');
-        }
+        // Create global cart manager instance
+        const cartManager = new CartManager();
 
-        function performBarcodeSearch(barcode) {
-            const barcodeProducts = {
-                '8901030823456': { name: 'Coconut Oil', price: 180, unit: 'Bottle', id: 'coconut-oil' },
-                '8901030834567': { name: 'Aashirvaad Atta', price: 120, unit: 'Bag', id: 'aashirvaad-atta' },
-                '8901030845678': { name: 'Maggi Noodles', price: 15, unit: 'Pack', id: 'maggi-noodles' },
-                '8901030856789': { name: 'Dairy Milk', price: 25, unit: 'Bar', id: 'dairy-milk' },
-                '8901030867890': { name: 'Uncle Chips', price: 10, unit: 'Pack', id: 'uncle-chips' }
-            };
-
-            const product = barcodeProducts[barcode];
-            if (product) {
-                showNotification(`Found ${product.name}`, 'success');
-                // Redirect to product details page
-                setTimeout(() => {
-                    window.location.href = `/product-details?id=${product.id}&name=${encodeURIComponent(product.name)}&price=${product.price}&unit=${encodeURIComponent(product.unit)}`;
-                }, 1000);
-            } else {
-                showNotification('Product not found', 'error');
-            }
-        }
-
-        function simulateScanning() {
-            setTimeout(() => {
-                const randomBarcodes = ['8901030823456', '8901030834567', '8901030845678'];
-                const randomBarcode = randomBarcodes[Math.floor(Math.random() * randomBarcodes.length)];
-                performBarcodeSearch(randomBarcode);
-                closeScanner();
-            }, 3000);
-        }
-
-        // Real-time search functionality
+        // Initialize when DOM is ready
         document.addEventListener('DOMContentLoaded', function() {
-            const searchInput = document.getElementById('search-input');
-            if (searchInput) {
-                searchInput.addEventListener('input', function() {
-                    const query = this.value.toLowerCase().trim();
-                    performSearch(query);
-                });
-            }
+            cartManager.init();
+            
+            // Set up periodic check for new items
+            setInterval(() => {
+                cartManager.processNewItems();
+                cartManager.render();
+                cartManager.calculateTotals();
+            }, 2000);
         });
 
-        function performSearch(query) {
-            const resultsContainer = document.getElementById('search-results');
-            const emptyState = document.getElementById('search-empty');
+        // Global functions for UI interactions
+        function addMoreItems() {
+            window.location.href = '/inventory';
+        }
+
+        function selectPaymentMode(mode) {
+            cartManager.selectedPaymentMode = mode;
             
-            if (!query) {
-                resultsContainer.innerHTML = '';
-                emptyState.classList.add('hidden');
+            // Update button styles
+            document.querySelectorAll('.payment-mode-btn').forEach(btn => {
+                btn.classList.remove('bg-primary', 'text-white');
+                btn.classList.add('bg-gray-200', 'text-gray-700');
+            });
+            
+            document.querySelector(`[data-mode="${mode}"]`).classList.remove('bg-gray-200', 'text-gray-700');
+            document.querySelector(`[data-mode="${mode}"]`).classList.add('bg-primary', 'text-white');
+            
+            // Show/hide payment details
+            const detailsDiv = document.getElementById('payment-details');
+            const splitDiv = document.getElementById('split-details');
+            const creditDiv = document.getElementById('credit-details');
+            
+            if (mode === 'split') {
+                detailsDiv.classList.remove('hidden');
+                splitDiv.classList.remove('hidden');
+                creditDiv.classList.add('hidden');
+            } else if (mode === 'credit') {
+                detailsDiv.classList.remove('hidden');
+                splitDiv.classList.add('hidden');
+                creditDiv.classList.remove('hidden');
+                cartManager.calculateTotals();
+            } else {
+                detailsDiv.classList.add('hidden');
+                splitDiv.classList.add('hidden');
+                creditDiv.classList.add('hidden');
+            }
+        }
+
+        function selectCashCustomer() {
+            cartManager.selectedCustomer = { type: 'cash', name: 'Cash Customer' };
+            document.getElementById('selected-customer').textContent = 'Cash Customer Selected';
+        }
+
+        function showNewCustomerModal() {
+            // TODO: Implement new customer modal
+            console.log('Show new customer modal');
+        }
+
+        function generateBill() {
+            if (Object.keys(cartManager.cartItems).length === 0) {
+                alert('Cart is empty! Please add items before generating bill.');
                 return;
             }
-
-            const products = [
-                { name: 'Wheat Flour', price: 50, unit: 'Kg', image: 'https://storage.googleapis.com/uxpilot-auth.appspot.com/ad8aa6cee1-b621e3cd72c9ea714c53.png' },
-                { name: 'Coconut Oil', price: 180, unit: 'Bottle', image: 'https://storage.googleapis.com/uxpilot-auth.appspot.com/02cda64d32-ca63fc32eaab87b7db4c.png' },
-                { name: 'Aashirvaad Atta', price: 120, unit: 'Bag', image: 'https://storage.googleapis.com/uxpilot-auth.appspot.com/dd29a1f85f-469e6193e37489fc8c43.png' },
-                { name: 'Maggi Noodles', price: 15, unit: 'Pack', image: 'https://storage.googleapis.com/uxpilot-auth.appspot.com/46dc2aecf3-4ae1d7f8a3bc9c8b21d6.png' },
-                { name: 'Dairy Milk', price: 25, unit: 'Bar', image: 'https://storage.googleapis.com/uxpilot-auth.appspot.com/f12345-chocolate-bar.png' }
-            ];
-
-            const searchResults = products.filter(product => 
-                product.name.toLowerCase().includes(query)
-            );
-
-            if (searchResults.length === 0) {
-                resultsContainer.innerHTML = '';
-                emptyState.classList.remove('hidden');
-            } else {
-                emptyState.classList.add('hidden');
-                resultsContainer.innerHTML = searchResults.map(product => `
-                    <div class="flex items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer" onclick="openProductDetails('${product.name}', ${product.price}, '${product.unit}')">
-                        <img src="${product.image}" alt="${product.name}" class="w-12 h-12 rounded-lg object-cover mr-3">
-                        <div class="flex-1">
-                            <h3 class="font-semibold text-dark text-sm">${product.name}</h3>
-                            <p class="text-xs text-gray-600">${product.unit}</p>
-                        </div>
-                        <div class="text-right">
-                            <p class="font-bold text-primary">₹${product.price}</p>
-                        </div>
-                    </div>
-                `).join('');
-            }
-        }
-
-        function openProductDetails(name, price, unit) {
-            // Create product ID from name for URL
-            const productId = name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
             
-            // Determine if it's weight-based or unit-based product
-            const isWeightBased = unit.toLowerCase().includes('kg') || unit.toLowerCase().includes('gram');
-            const detailsPage = isWeightBased ? '/product-details-weight' : '/product-details';
-            
-            // Close search modal and navigate to product details
-            closeSearch();
-            
-            // Navigate to appropriate product details page
-            window.location.href = `${detailsPage}?id=${productId}&name=${encodeURIComponent(name)}&price=${price}&unit=${encodeURIComponent(unit)}`;
-        }
-
-        // Notification system
-        function showNotification(message, type = 'info') {
-            const existingNotifications = document.querySelectorAll('.kc-notification');
-            existingNotifications.forEach(notif => {
-                if (notif.parentNode) {
-                    notif.parentNode.removeChild(notif);
-                }
-            });
-
-            const notification = document.createElement('div');
-            const bgColor = type === 'success' ? 'bg-green-500' : 
-                           type === 'error' ? 'bg-red-500' : 
-                           type === 'warning' ? 'bg-orange-500' : 'bg-blue-500';
-            
-            const icon = type === 'success' ? 'fa-check-circle' : 
-                        type === 'error' ? 'fa-exclamation-circle' : 
-                        type === 'warning' ? 'fa-exclamation-triangle' : 'fa-info-circle';
-            
-            notification.className = `kc-notification fixed top-4 left-4 right-4 ${bgColor} text-white px-4 py-3 rounded-xl shadow-xl z-[9999] transform transition-all duration-300 ease-out opacity-0 translate-y-[-20px]`;
-            notification.style.maxWidth = 'calc(100vw - 2rem)';
-            notification.innerHTML = `
-                <div class="flex items-center space-x-3">
-                    <i class="fa-solid ${icon} text-lg flex-shrink-0"></i>
-                    <span class="text-sm font-medium flex-1">${message}</span>
-                    <button onclick="this.parentElement.parentElement.remove()" class="text-white hover:text-gray-200 ml-2 flex-shrink-0">
-                        <i class="fa-solid fa-times text-sm"></i>
-                    </button>
-                </div>
-            `;
-            
-            document.body.appendChild(notification);
-            
-            setTimeout(() => {
-                notification.classList.remove('opacity-0', 'translate-y-[-20px]');
-                notification.classList.add('opacity-100', 'translate-y-0');
-            }, 50);
-            
-            setTimeout(() => {
-                if (notification.parentNode) {
-                    notification.classList.add('opacity-0', 'translate-y-[-20px]');
-                    setTimeout(() => {
-                        if (notification.parentNode) {
-                            notification.parentNode.removeChild(notification);
-                        }
-                    }, 300);
-                }
-            }, 4000);
+            // TODO: Implement bill generation
+            console.log('Generate bill with items:', cartManager.cartItems);
+            alert('Bill generation functionality will be implemented soon.');
         }
     </script>
-
 </body>
 </html>
