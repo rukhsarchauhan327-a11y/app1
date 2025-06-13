@@ -5,48 +5,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Notifications - Kirana Konnect</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        primary: '#4CAF50',
-                        secondary: '#2196F3',
-                        accent: '#FF9800',
-                        danger: '#F44336',
-                        dark: '#333333',
-                        light: '#F5F5F5'
-                    },
-                    fontFamily: {
-                        inter: ['Inter', 'sans-serif'],
-                        sans: ['Inter', 'sans-serif']
-                    }
-                }
-            }
-        };
-    </script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body {
-            font-family: 'Inter', sans-serif !important;
+        .filter-btn {
+            transition: all 0.3s ease;
         }
-        .fa, .fas, .far, .fal, .fab {
-            font-family: "Font Awesome 6 Free", "Font Awesome 6 Brands" !important;
+        .notification-item {
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
-        ::-webkit-scrollbar {
-            display: none;
-        }
-        html, body {
-            -ms-overflow-style: none;
-            scrollbar-width: none;
+        .notification-item:hover {
+            transform: translateY(-1px);
         }
     </style>
 </head>
-<body class="font-inter bg-gray-50">
-    <!-- Header Section -->
+<body class="bg-gray-50">
+    <!-- Header -->
     <header class="bg-white border-b border-gray-200 fixed top-0 left-0 right-0 z-10">
         <div class="flex items-center justify-between px-4 py-3">
             <button onclick="goBack()" class="p-2 hover:bg-gray-100 rounded-lg">
@@ -119,147 +92,42 @@
                 </div>
             </div>
 
-            <!-- Payment Alert - Pending Credits -->
-            <div class="notification-item bg-white rounded-lg shadow-sm border-l-4 border-secondary cursor-pointer hover:shadow-md transition-shadow" data-type="payments" onclick="window.location.href='/pending-credits'">
+            <!-- Payment Alert -->
+            <div class="notification-item bg-white rounded-lg shadow-sm border-l-4 border-success cursor-pointer hover:shadow-md transition-shadow" data-type="payment" onclick="window.location.href='/pending-credits'">
                 <div class="p-4">
                     <div class="flex items-start space-x-3">
-                        <div class="bg-secondary/10 p-2 rounded-full">
-                            <i class="fa-solid fa-credit-card text-secondary text-sm"></i>
+                        <div class="bg-success/10 p-2 rounded-full">
+                            <i class="fa-solid fa-money-bill text-success text-sm"></i>
                         </div>
                         <div class="flex-1">
                             <div class="flex items-start justify-between">
                                 <div>
-                                    <h3 class="font-semibold text-secondary text-sm">₹1,500 Pending Credits</h3>
-                                    <p class="text-xs text-gray-600 mt-1">From 3 customers - follow up required</p>
-                                    <p class="text-xs text-gray-400 mt-2">6 hours ago</p>
-                                </div>
-                                <span class="bg-secondary text-white text-xs px-2 py-1 rounded-full">MEDIUM</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Inventory Alert - Items Expiring Soon -->
-            <div class="notification-item bg-white rounded-lg shadow-sm border-l-4 border-yellow-500 cursor-pointer hover:shadow-md transition-shadow" data-type="inventory" onclick="window.location.href='/expiry-alert'">
-                <div class="p-4">
-                    <div class="flex items-start space-x-3">
-                        <div class="bg-yellow-100 p-2 rounded-full">
-                            <i class="fa-solid fa-clock text-yellow-600 text-sm"></i>
-                        </div>
-                        <div class="flex-1">
-                            <div class="flex items-start justify-between">
-                                <div>
-                                    <h3 class="font-semibold text-yellow-600 text-sm">8 Items Expiring This Week</h3>
-                                    <p class="text-xs text-gray-600 mt-1">Plan promotions or mark down prices</p>
+                                    <h3 class="font-semibold text-success text-sm">₹5,000 Payment Received</h3>
+                                    <p class="text-xs text-gray-600 mt-1">Ramesh Kumar made a credit payment</p>
                                     <p class="text-xs text-gray-400 mt-2">1 day ago</p>
                                 </div>
-                                <span class="bg-yellow-500 text-white text-xs px-2 py-1 rounded-full">MEDIUM</span>
+                                <span class="bg-success text-white text-xs px-2 py-1 rounded-full">PAID</span>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Critical Alert - Data Backup Needed -->
-            <div id="backup-notification-full" class="notification-item bg-white rounded-lg shadow-sm border-l-4 border-orange-500 cursor-pointer hover:shadow-md transition-shadow" data-type="backup" onclick="window.location.href='/profile?highlight=backup'" style="display: none;">
-                <div class="p-4">
-                    <div class="flex items-start space-x-3">
-                        <div class="bg-orange-100 p-2 rounded-full">
-                            <i class="fa-solid fa-shield-halved text-orange-600 text-sm"></i>
-                        </div>
-                        <div class="flex-1">
-                            <div class="flex items-start justify-between">
-                                <div>
-                                    <h3 class="font-semibold text-orange-600 text-sm">Critical: Backup Your Data Now</h3>
-                                    <p class="text-xs text-gray-600 mt-1">Last backup was 7 days ago. Don't risk losing your business data - backup now!</p>
-                                    <p class="text-xs text-gray-400 mt-2">1 hour ago</p>
-                                </div>
-                                <span class="bg-orange-500 text-white text-xs px-2 py-1 rounded-full">CRITICAL</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Subscription Alert - Expiring Soon -->
-            <div class="notification-item bg-white rounded-lg shadow-sm border-l-4 border-purple-500 cursor-pointer hover:shadow-md transition-shadow" data-type="system" onclick="window.location.href='/profile'">
-                <div class="p-4">
-                    <div class="flex items-start space-x-3">
-                        <div class="bg-purple-100 p-2 rounded-full">
-                            <i class="fa-solid fa-crown text-purple-600 text-sm"></i>
-                        </div>
-                        <div class="flex-1">
-                            <div class="flex items-start justify-between">
-                                <div>
-                                    <h3 class="font-semibold text-purple-600 text-sm">Premium Subscription Expiring Soon</h3>
-                                    <p class="text-xs text-gray-600 mt-1">Your premium plan expires in 7 days. Renew to continue advanced features</p>
-                                    <p class="text-xs text-gray-400 mt-2">3 hours ago</p>
-                                </div>
-                                <span class="bg-purple-500 text-white text-xs px-2 py-1 rounded-full">URGENT</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- System Notification - Backup Complete -->
-            <div class="notification-item bg-white rounded-lg shadow-sm border-l-4 border-primary cursor-pointer hover:shadow-md transition-shadow" data-type="system" onclick="window.location.href='/settings'">
+            <!-- System Alert -->
+            <div class="notification-item bg-white rounded-lg shadow-sm border-l-4 border-primary cursor-pointer hover:shadow-md transition-shadow" data-type="system" onclick="window.location.href='/profile'">
                 <div class="p-4">
                     <div class="flex items-start space-x-3">
                         <div class="bg-primary/10 p-2 rounded-full">
-                            <i class="fa-solid fa-cloud-arrow-up text-primary text-sm"></i>
+                            <i class="fa-solid fa-shield-exclamation text-primary text-sm"></i>
                         </div>
                         <div class="flex-1">
                             <div class="flex items-start justify-between">
                                 <div>
-                                    <h3 class="font-semibold text-primary text-sm">Data Backup Completed</h3>
-                                    <p class="text-xs text-gray-600 mt-1">All business data safely backed up to cloud</p>
-                                    <p class="text-xs text-gray-400 mt-2">1 day ago</p>
-                                </div>
-                                <span class="bg-primary text-white text-xs px-2 py-1 rounded-full">INFO</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Payment Success -->
-            <div class="notification-item bg-white rounded-lg shadow-sm border-l-4 border-green-500 cursor-pointer hover:shadow-md transition-shadow" data-type="payments" onclick="window.location.href='/pending-credits'">
-                <div class="p-4">
-                    <div class="flex items-start space-x-3">
-                        <div class="bg-green-100 p-2 rounded-full">
-                            <i class="fa-solid fa-check-circle text-green-600 text-sm"></i>
-                        </div>
-                        <div class="flex-1">
-                            <div class="flex items-start justify-between">
-                                <div>
-                                    <h3 class="font-semibold text-green-600 text-sm">Payment Received - ₹500</h3>
-                                    <p class="text-xs text-gray-600 mt-1">From Rajesh Kumar via UPI</p>
+                                    <h3 class="font-semibold text-primary text-sm">Backup Disabled</h3>
+                                    <p class="text-xs text-gray-600 mt-1">Enable backup to protect your business data</p>
                                     <p class="text-xs text-gray-400 mt-2">2 days ago</p>
                                 </div>
-                                <span class="bg-green-500 text-white text-xs px-2 py-1 rounded-full">SUCCESS</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Inventory Restocked -->
-            <div class="notification-item bg-white rounded-lg shadow-sm border-l-4 border-blue-500 cursor-pointer hover:shadow-md transition-shadow" data-type="inventory" onclick="window.location.href='/inventory'">
-                <div class="p-4">
-                    <div class="flex items-start space-x-3">
-                        <div class="bg-blue-100 p-2 rounded-full">
-                            <i class="fa-solid fa-boxes-stacked text-blue-600 text-sm"></i>
-                        </div>
-                        <div class="flex-1">
-                            <div class="flex items-start justify-between">
-                                <div>
-                                    <h3 class="font-semibold text-blue-600 text-sm">15 Items Restocked</h3>
-                                    <p class="text-xs text-gray-600 mt-1">Inventory levels updated successfully</p>
-                                    <p class="text-xs text-gray-400 mt-2">3 days ago</p>
-                                </div>
-                                <span class="bg-blue-500 text-white text-xs px-2 py-1 rounded-full">INFO</span>
+                                <span class="bg-primary text-white text-xs px-2 py-1 rounded-full">WARNING</span>
                             </div>
                         </div>
                     </div>
@@ -269,8 +137,8 @@
     </main>
 
     <!-- Bottom Navigation -->
-    <nav id="footer" class="fixed bottom-0 left-0 right-0 bg-white shadow-lg border-t">
-        <div class="flex justify-around items-end py-2">
+    <nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200">
+        <div class="flex items-center justify-around py-2">
             <button class="flex flex-col items-center py-1 px-3" onclick="window.location.href='/dashboard'">
                 <i class="fa-solid fa-home text-gray-400 text-xl"></i>
                 <span class="text-xs mt-1 text-gray-400">Home</span>
@@ -287,7 +155,7 @@
                 <span class="text-xs mt-1 text-gray-400">Cart</span>
                 <span class="absolute -top-1 -right-1 bg-danger text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold">7</span>
             </button>
-            <button class="flex flex-col items-center py-1 px-3" onclick="window.location.href='/profile'">
+            <button class="flex flex-col items-center py-1 px-3">
                 <i class="fa-solid fa-user text-gray-400 text-xl"></i>
                 <span class="text-xs mt-1 text-gray-400">Profile</span>
             </button>
@@ -295,6 +163,28 @@
     </nav>
 
     <script>
+        // Basic configuration
+        var primaryColor = '#2563eb';
+        var dangerColor = '#dc2626';
+        var accentColor = '#f59e0b';
+        var successColor = '#16a34a';
+
+        // Configure Tailwind colors
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: primaryColor,
+                        danger: dangerColor,
+                        accent: accentColor,
+                        success: successColor,
+                        dark: '#1f2937'
+                    }
+                }
+            }
+        };
+
+        // Simple functions that work
         function goBack() {
             window.location.href = '/dashboard';
         }
@@ -304,11 +194,15 @@
         }
 
         function filterNotifications(filter) {
-            // Update button states
-            document.querySelectorAll('.filter-btn').forEach(function(btn) {
+            var filterBtns = document.querySelectorAll('.filter-btn');
+            var notifications = document.querySelectorAll('.notification-item');
+            
+            // Update button styles
+            for (var i = 0; i < filterBtns.length; i++) {
+                var btn = filterBtns[i];
                 btn.classList.remove('bg-primary', 'text-white');
                 btn.classList.add('bg-gray-100', 'text-gray-600');
-            });
+            }
             
             var activeBtn = document.querySelector('[data-filter="' + filter + '"]');
             if (activeBtn) {
@@ -317,243 +211,26 @@
             }
             
             // Filter notifications
-            var allNotifications = document.querySelectorAll('.notification-item');
-            allNotifications.forEach(function(notification) {
+            for (var j = 0; j < notifications.length; j++) {
+                var notification = notifications[j];
                 var type = notification.getAttribute('data-type');
                 var shouldShow = false;
                 
                 if (filter === 'all') {
                     shouldShow = true;
                 } else if (filter === 'critical') {
-                    shouldShow = (type === 'expiry' || type === 'backup');
+                    shouldShow = (type === 'critical');
                 } else if (filter === 'inventory') {
-                    shouldShow = (type === 'expiry' || type === 'inventory');
+                    shouldShow = (type === 'inventory');
                 } else if (filter === 'payments') {
                     shouldShow = (type === 'payment');
                 } else if (filter === 'system') {
-                    shouldShow = (type === 'subscription' || type === 'backup' || type === 'system');
-                } else {
-                    shouldShow = (type === filter);
+                    shouldShow = (type === 'system');
                 }
                 
                 notification.style.display = shouldShow ? 'block' : 'none';
-            });
-        }
-
-        function showStyledNotification(message, type) {
-            alert(message);
-        }
-
-        // Check backup status and show/hide notification
-        function checkBackupStatusFull() {
-            const backupEnabled = localStorage.getItem('emailBackupEnabled') === 'true';
-            const backupNotification = document.getElementById('backup-notification-full');
-            
-            if (backupEnabled) {
-                backupNotification.style.display = 'none';
-            } else {
-                backupNotification.style.display = 'block';
             }
         }
-
-        // Load real-time notifications from database
-        async function loadNotifications() {
-            try {
-                const response = await fetch('/api/notifications');
-                const data = await response.json();
-                
-                if (data.notifications) {
-                    displayNotifications(data.notifications);
-                    updateNotificationCount(data.count);
-                }
-            } catch (error) {
-                console.error('Error loading notifications:', error);
-            }
-        }
-
-        function displayNotifications(notifications) {
-            const container = document.getElementById('notifications-container');
-            if (!container) return;
-
-            if (notifications.length === 0) {
-                container.innerHTML = `
-                    <div class="text-center py-12">
-                        <i class="fa-solid fa-bell-slash text-gray-300 text-4xl mb-4"></i>
-                        <h3 class="text-lg font-semibold text-gray-600 mb-2">No New Notifications</h3>
-                        <p class="text-gray-500">All caught up! Check back later for updates.</p>
-                    </div>
-                `;
-                return;
-            }
-
-            container.innerHTML = notifications.map(notification => {
-                const priorityColors = {
-                    'urgent': 'border-red-500',
-                    'high': 'border-orange-500', 
-                    'medium': 'border-blue-500',
-                    'low': 'border-gray-500'
-                };
-
-                const typeColors = {
-                    'backup': 'bg-orange-100 text-orange-600',
-                    'subscription': 'bg-purple-100 text-purple-600',
-                    'expiry': 'bg-red-100 text-red-600',
-                    'inventory': 'bg-yellow-100 text-yellow-600',
-                    'payment': 'bg-green-100 text-green-600',
-                    'system': 'bg-blue-100 text-blue-600'
-                };
-
-                const typeIcons = {
-                    'subscription': 'fa-crown',
-                    'backup': 'fa-shield-exclamation',
-                    'inventory': 'fa-box',
-                    'expiry': 'fa-calendar-times',
-                    'payment': 'fa-money-bill',
-                    'system': 'fa-cog'
-                };
-
-                const priorityBadgeColors = {
-                    'urgent': 'bg-red-500',
-                    'high': 'bg-orange-500',
-                    'medium': 'bg-blue-500',
-                    'low': 'bg-gray-500'
-                };
-
-                const typeColor = typeColors[notification.type] || 'bg-gray-100 text-gray-600';
-                const badgeColor = priorityBadgeColors[notification.priority] || 'bg-gray-500';
-
-                return `
-                    <div class="notification-item bg-white rounded-lg shadow-sm border-l-4 ${priorityColors[notification.priority]} cursor-pointer hover:shadow-md transition-shadow" 
-                         data-type="${notification.type}" onclick="handleNotificationClick(${notification.id}, '${notification.type}', ${notification.customer_id || 'null'}, ${notification.bill_id || 'null'}, ${notification.product_id || 'null'})">`
-                        <div class="p-4">
-                            <div class="flex items-start space-x-3">
-                                <div class="${typeColor} p-2 rounded-full">
-                                    <i class="fa-solid ${typeIcons[notification.type]} text-sm"></i>
-                                </div>
-                                <div class="flex-1">
-                                    <div class="flex items-start justify-between">
-                                        <div>
-                                            <h3 class="font-semibold text-gray-800 text-sm">${notification.title}</h3>
-                                            <p class="text-xs text-gray-600 mt-1">${notification.message}</p>
-                                            <p class="text-xs text-gray-400 mt-2">${notification.time_ago}</p>
-                                        </div>
-                                        <span class="${badgeColor} text-white text-xs px-2 py-1 rounded-full">
-                                            ${notification.priority.toUpperCase()}
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            }).join('');
-        }
-
-        function updateNotificationCount(count) {
-            // Update notification badge on dashboard
-            const badge = document.querySelector('.notification-badge');
-            if (badge) {
-                badge.textContent = count;
-                badge.style.display = count > 0 ? 'flex' : 'none';
-            }
-        }
-
-        async function handleNotificationClick(notificationId, type, customerId, billId, productId) {
-            // Mark notification as read first
-            await markAsRead(notificationId);
-            
-            // Handle null string values
-            customerId = (customerId === 'null' || customerId === null) ? null : customerId;
-            billId = (billId === 'null' || billId === null) ? null : billId;
-            productId = (productId === 'null' || productId === null) ? null : productId;
-            
-            // Navigate to appropriate page based on notification type
-            switch(type) {
-                case 'inventory':
-                    if (productId) {
-                        // Go to specific product details
-                        window.location.href = `/product-details?id=${productId}`;
-                    } else {
-                        // Go to low stock page or inventory
-                        window.location.href = '/low-stock';
-                    }
-                    break;
-                    
-                case 'expiry':
-                    if (productId) {
-                        // Go to specific product details
-                        window.location.href = `/product-details?id=${productId}`;
-                    } else {
-                        // Go to expiry alert page
-                        window.location.href = '/expiry-alert';
-                    }
-                    break;
-                    
-                case 'payment':
-                    if (customerId) {
-                        // Go to customer ledger
-                        window.location.href = `/customer-ledger?customer_id=${customerId}`;
-                    } else if (billId) {
-                        // Go to bill details
-                        window.location.href = `/receipt?bill_number=${billId}`;
-                    } else {
-                        // Go to pending credits page
-                        window.location.href = '/pending-credits';
-                    }
-                    break;
-                    
-                case 'subscription':
-                    // Go to profile page
-                    window.location.href = '/profile';
-                    break;
-                    
-                case 'backup':
-                    // Go to profile page with backup highlight
-                    console.log('Navigating to backup profile page');
-                    window.location.href = '/profile?highlight=backup';
-                    break;
-                    
-                case 'system':
-                    // Go to settings page
-                    window.location.href = '/settings';
-                    break;
-                    
-                default:
-                    // Default to dashboard
-                    window.location.href = '/dashboard';
-            }
-        }
-
-        async function markAsRead(notificationId) {
-            try {
-                await fetch(`/api/notifications/${notificationId}/mark-read`, {
-                    method: 'POST'
-                });
-                // Reload notifications to update the display
-                loadNotifications();
-            } catch (error) {
-                console.error('Error marking notification as read:', error);
-            }
-        }
-
-        // Initialize page
-        document.addEventListener('DOMContentLoaded', function() {
-            // Load real notifications on page load
-            loadNotifications();
-
-            // Check backup status on page load
-            checkBackupStatusFull();
-
-            // Listen for storage changes
-            window.addEventListener('storage', function(e) {
-                if (e.key === 'emailBackupEnabled') {
-                    checkBackupStatusFull();
-                }
-            });
-
-            // Refresh notifications every 30 seconds
-            setInterval(loadNotifications, 30000);
-        });
     </script>
 </body>
 </html>
