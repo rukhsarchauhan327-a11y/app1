@@ -1004,7 +1004,6 @@
                 renderProducts();
             } catch (error) {
                 console.error('Error loading products:', error);
-                showNotification('Failed to load products', 'error');
             }
         }
 
@@ -1025,11 +1024,17 @@
         document.addEventListener('DOMContentLoaded', function() {
             loadProducts();
             
-            // Add search input event listener
-            document.getElementById('search-input').addEventListener('input', performSearch);
+            // Add search input event listener if element exists
+            const searchInput = document.getElementById('search-input');
+            if (searchInput) {
+                searchInput.addEventListener('input', performSearch);
+            }
             
-            // Add close search modal event listener
-            document.getElementById('close-search').addEventListener('click', closeSearch);
+            // Add close search modal event listener if element exists
+            const closeSearch = document.getElementById('close-search');
+            if (closeSearch) {
+                closeSearch.addEventListener('click', closeSearch);
+            }
         });
 
         function performBarcodeSearch(barcode) {
