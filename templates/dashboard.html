@@ -857,21 +857,33 @@
         }
 
         function performBarcodeSearch(barcode) {
+            // Ensure products are loaded before searching
+            if (products.length === 0) {
+                showStyledNotification('Loading products...', 'info');
+                loadProductsForSearch().then(() => {
+                    performBarcodeSearchInternal(barcode);
+                });
+                return;
+            }
+            performBarcodeSearchInternal(barcode);
+        }
+
+        function performBarcodeSearchInternal(barcode) {
             const product = products.find(p => p.barcode === barcode);
             if (product) {
-                showNotification(`Found: ${product.name}`, 'success');
+                showStyledNotification(`Found: ${product.name}`, 'success');
                 setTimeout(() => {
                     viewProductDetails(product.id);
                 }, 1000);
             } else {
-                showNotification('Product not found', 'error');
+                showStyledNotification('Product not found', 'error');
             }
         }
 
         function viewProductDetails(productId) {
             const product = products.find(p => p.id === productId);
             if (!product) {
-                showNotification('Product not found', 'error');
+                showStyledNotification('Product not found', 'error');
                 return;
             }
 
@@ -913,26 +925,19 @@
             }
         }
 
-        function showNotification(message, type = 'info') {
-            const notification = document.createElement('div');
-            notification.className = `fixed top-4 right-4 z-50 p-4 rounded-lg text-white font-medium ${
-                type === 'success' ? 'bg-green-500' : 
-                type === 'error' ? 'bg-red-500' : 'bg-blue-500'
-            }`;
-            notification.textContent = message;
-            
-            document.body.appendChild(notification);
-            
-            setTimeout(() => {
-                if (notification.parentNode) {
-                    notification.parentNode.removeChild(notification);
-                }
-            }, 3000);
-        }
+
 
         function showStyledNotification(message, type = 'info') {
+            // Remove any existing notifications to prevent stacking
+            const existingNotifications = document.querySelectorAll('.notification-toast');
+            existingNotifications.forEach(notif => {
+                if (notif.parentNode) {
+                    notif.parentNode.removeChild(notif);
+                }
+            });
+
             const notification = document.createElement('div');
-            notification.className = `fixed top-4 right-4 z-50 p-4 rounded-lg text-white font-medium shadow-lg transform transition-all duration-300 ${
+            notification.className = `notification-toast fixed top-4 right-4 z-50 p-4 rounded-lg text-white font-medium shadow-lg transform transition-all duration-300 ${
                 type === 'success' ? 'bg-green-500' : 
                 type === 'error' ? 'bg-red-500' : 
                 type === 'warning' ? 'bg-orange-500' : 'bg-blue-500'
