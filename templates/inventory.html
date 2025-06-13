@@ -598,6 +598,41 @@
             window.history.back();
         }
 
+        function viewProductDetails(itemId) {
+            const product = productData[itemId];
+            if (!product) {
+                showNotification('Product not found', 'error');
+                return;
+            }
+
+            // Navigate to appropriate product details page based on product type
+            if (product.type === 'weight' || product.type === 'weight-based') {
+                const params = new URLSearchParams({
+                    id: product.id,
+                    name: product.name,
+                    price: product.price,
+                    stock: product.stock,
+                    image: product.image,
+                    mfgDate: product.mfgDate || '',
+                    expDate: product.expDate || ''
+                });
+                window.location.href = `/product-details-weight?${params.toString()}`;
+            } else {
+                const params = new URLSearchParams({
+                    id: product.id,
+                    name: product.name,
+                    price: product.price,
+                    unit: product.unit,
+                    stock: product.stock,
+                    image: product.image,
+                    type: product.type,
+                    mfgDate: product.mfgDate || '',
+                    expDate: product.expDate || ''
+                });
+                window.location.href = `/product-details?${params.toString()}`;
+            }
+        }
+
         // Search and Scanner functionality
         function openSearch() {
             document.getElementById('search-modal').classList.remove('hidden');
