@@ -1360,7 +1360,7 @@
             
             Object.keys(cartItems).forEach(itemId => {
                 const item = cartItems[itemId];
-                const itemKey = `${item.name}_${item.type}`;
+                const itemKey = `${item.name}_${item.type || 'unit'}`;
                 
                 if (!seen.has(itemKey)) {
                     seen.add(itemKey);
@@ -1371,7 +1371,7 @@
             });
             
             cartItems = uniqueItems;
-            renderCartItems();
+            console.log('Cart after duplicate removal:', cartItems);
         }
 
         // Check for new items from inventory periodically
@@ -1402,8 +1402,7 @@
             const cartContainer = document.getElementById('cart-items');
             if (!cartContainer) return;
             
-            // Clear existing items except the "Add More Items" button
-            const addMoreBtn = cartContainer.querySelector('#add-items-btn')?.parentElement;
+            // Completely clear container to prevent all duplicates
             cartContainer.innerHTML = '';
             
             if (Object.keys(cartItems).length === 0) {
@@ -1421,28 +1420,24 @@
                 return;
             }
             
-            // Render each cart item
+            // Render each unique cart item only once
             Object.keys(cartItems).forEach(itemId => {
                 const item = cartItems[itemId];
                 const cartItemHTML = createCartItemHTML(itemId, item);
                 cartContainer.insertAdjacentHTML('beforeend', cartItemHTML);
             });
             
-            // Re-add the "Add More Items" button if it existed
-            if (addMoreBtn) {
-                cartContainer.appendChild(addMoreBtn);
-            } else {
-                cartContainer.insertAdjacentHTML('beforeend', `
-                    <div class="bg-white rounded-xl shadow-sm p-3">
-                        <div class="flex justify-center">
-                            <button id="add-items-btn" class="flex items-center justify-center bg-secondary text-white rounded-full px-6 py-3 font-medium text-sm" onclick="window.location.href='/inventory'">
-                                <i class="fa-solid fa-plus mr-2"></i>
-                                Add More Items to Cart
-                            </button>
-                        </div>
+            // Add single "Add More Items" button at the end
+            cartContainer.insertAdjacentHTML('beforeend', `
+                <div class="bg-white rounded-xl shadow-sm p-3">
+                    <div class="flex justify-center">
+                        <button id="add-items-btn" class="flex items-center justify-center bg-secondary text-white rounded-full px-6 py-3 font-medium text-sm" onclick="window.location.href='/inventory'">
+                            <i class="fa-solid fa-plus mr-2"></i>
+                            Add More Items to Cart
+                        </button>
                     </div>
-                `);
-            }
+                </div>
+            `);
         }
 
         // Legacy function for compatibility
@@ -2046,8 +2041,10 @@
                         };
                     }
                     
-                    // Clear any existing duplicates first
-                    clearCartDuplicates();
+                    // EMERGENCY FIX: Clear all cart data and start fresh
+                    cartItems = {};
+                    localStorage.removeItem('kiranakonnect_cart');
+                    localStorage.removeItem('kiranakonnect_persistent_cart');
                     
                     // Only load new items from inventory (disable duplicate loading)
                     loadCartItems();
