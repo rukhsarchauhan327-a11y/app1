@@ -107,55 +107,249 @@
         </div>
 
         <!-- Stock Items List -->
-        <div class="px-4 space-y-3">
-            <!-- Critical Stock Items -->
-            <div class="stock-item bg-white rounded-lg p-4 shadow-sm border-l-4 border-red-500" data-level="critical">
+        <div id="stock-items-container" class="px-4 space-y-3">
+            <!-- Loading state -->
+            <div id="loading-state" class="text-center py-8">
+                <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+                <p class="text-gray-600">Loading stock data...</p>
+            </div>
+            
+            <!-- Empty state -->
+            <div id="empty-state" class="text-center py-8 hidden">
+                <div class="bg-green-100 p-4 rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center">
+                    <i class="fa-solid fa-check text-green-600 text-2xl"></i>
+                </div>
+                <h3 class="font-bold text-dark mb-2">All Stock Levels Good!</h3>
+                <p class="text-gray-600">No products are running low on stock right now.</p>
+            </div>
+            
+            <!-- Dynamic stock items will be inserted here -->
+        </div>
+
+    <!-- Bottom Navigation -->
+    <div class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-4 py-2">
+        <div class="flex justify-around items-center">
+            <a href="/dashboard" class="flex flex-col items-center space-y-1 text-gray-600">
+                <i class="fa-solid fa-house text-xl"></i>
+                <span class="text-xs">Home</span>
+            </a>
+            <a href="/inventory" class="flex flex-col items-center space-y-1 text-gray-600">
+                <i class="fa-solid fa-boxes-stacked text-xl"></i>
+                <span class="text-xs">Inventory</span>
+            </a>
+            <a href="/cart" class="flex flex-col items-center space-y-1 text-gray-600">
+                <i class="fa-solid fa-shopping-cart text-xl"></i>
+                <span class="text-xs">Cart</span>
+            </a>
+            <a href="/profile" class="flex flex-col items-center space-y-1 text-gray-600">
+                <i class="fa-solid fa-user text-xl"></i>
+                <span class="text-xs">Profile</span>
+            </a>
+        </div>
+    </div>
+
+    <script>
+        let allProducts = [];
+        let filteredProducts = [];
+        let currentFilter = 'all';
+
+        // Load products on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            loadLowStockProducts();
+        });
+
+        function loadLowStockProducts() {
+            fetch('/api/low-stock-products')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        allProducts = data.products;
+                        updateFilterCounts();
+                        filterProducts(currentFilter);
+                    } else {
+                        showError('Failed to load stock data');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading products:', error);
+                    showError('Failed to load stock data');
+                });
+        }
+
+        function updateFilterCounts() {
+            const criticalCount = allProducts.filter(p => p.level === 'critical').length;
+            const lowCount = allProducts.filter(p => p.level === 'low').length;
+            const mediumCount = allProducts.filter(p => p.level === 'medium').length;
+            const totalCount = allProducts.length;
+
+            // Update filter button text
+            document.querySelector('[data-filter="critical"]').textContent = `Critical (${criticalCount})`;
+            document.querySelector('[data-filter="low"]').textContent = `Low (${lowCount})`;
+            document.querySelector('[data-filter="medium"]').textContent = `Medium (${mediumCount})`;
+            document.querySelector('[data-filter="all"]').textContent = `All Items (${totalCount})`;
+        }
+
+        function filterProducts(filter) {
+            currentFilter = filter;
+            
+            if (filter === 'all') {
+                filteredProducts = allProducts;
+            } else {
+                filteredProducts = allProducts.filter(product => product.level === filter);
+            }
+            
+            displayProducts();
+        }
+
+        function displayProducts() {
+            const container = document.getElementById('stock-items-container');
+            const loadingState = document.getElementById('loading-state');
+            const emptyState = document.getElementById('empty-state');
+            
+            // Hide loading state
+            loadingState.style.display = 'none';
+            
+            // Clear existing items (keep loading and empty states)
+            const existingItems = container.querySelectorAll('.stock-item');
+            existingItems.forEach(item => item.remove());
+            
+            if (filteredProducts.length === 0) {
+                emptyState.classList.remove('hidden');
+                return;
+            } else {
+                emptyState.classList.add('hidden');
+            }
+            
+            filteredProducts.forEach(product => {
+                const productElement = createProductElement(product);
+                container.appendChild(productElement);
+            });
+        }
+
+        function createProductElement(product) {
+            const div = document.createElement('div');
+            div.className = `stock-item bg-white rounded-lg p-4 shadow-sm border-l-4 border-${product.level_color}-500`;
+            div.setAttribute('data-level', product.level);
+            
+            const levelClass = getLevelClass(product.level_color);
+            const progressColor = product.level_color === 'red' ? 'bg-red-500' : 
+                                 product.level_color === 'orange' ? 'bg-orange-500' : 'bg-yellow-500';
+            
+            div.innerHTML = `
                 <div class="flex items-center space-x-3">
-                    <div class="w-12 h-12 rounded-lg overflow-hidden bg-gray-100">
-                        <img src="https://storage.googleapis.com/uxpilot-auth.appspot.com/ad8aa6cee1-b621e3cd72c9ea714c53.png" alt="Wheat Flour" class="w-full h-full object-cover">
+                    <div class="w-12 h-12 rounded-lg overflow-hidden bg-gray-100 flex items-center justify-center">
+                        <i class="fa-solid fa-box text-gray-400 text-xl"></i>
                     </div>
                     <div class="flex-1">
                         <div class="flex items-start justify-between">
                             <div class="flex-1">
-                                <h3 class="font-bold text-dark">Wheat Flour</h3>
-                                <p class="text-sm text-gray-600">₹50/Kg</p>
+                                <h3 class="font-bold text-dark">${product.name}</h3>
+                                <p class="text-sm text-gray-600">${product.price_display}</p>
                                 <div class="flex items-center space-x-2 mt-1">
-                                    <span class="bg-red-100 text-red-700 px-2 py-1 rounded-full text-xs font-medium">Critical</span>
-                                    <span class="text-xs text-gray-500">Last restocked: 5 days ago</span>
+                                    <span class="${levelClass} px-2 py-1 rounded-full text-xs font-medium">${product.level_text}</span>
+                                    <span class="text-xs text-gray-500">Category: ${product.category}</span>
                                 </div>
                             </div>
                             <div class="text-right">
-                                <p class="text-lg font-bold text-red-600">0.5 Kg</p>
-                                <p class="text-xs text-gray-500">Min: 5 Kg</p>
+                                <p class="text-lg font-bold text-${product.level_color}-600">${product.stock_quantity} ${product.unit}</p>
+                                <p class="text-xs text-gray-500">Min: ${product.reorder_level} ${product.unit}</p>
                                 <div class="w-16 bg-gray-200 rounded-full h-2 mt-1">
-                                    <div class="bg-red-500 h-2 rounded-full" style="width: 10%"></div>
+                                    <div class="${progressColor} h-2 rounded-full" style="width: ${product.progress}%"></div>
                                 </div>
                             </div>
                         </div>
                         <div class="flex items-center justify-between mt-3">
-                            <span class="text-xs text-gray-500">Suggested reorder: 50 Kg</span>
+                            <span class="text-xs text-gray-500">Suggested reorder: ${product.suggested_reorder} ${product.unit}</span>
                             <div class="flex space-x-2">
-                                <button onclick="refillStock('wheat-flour')" class="bg-blue-500 text-white px-3 py-1 rounded text-xs font-medium">
+                                <button onclick="refillStock(${product.id})" class="bg-blue-500 text-white px-3 py-1 rounded text-xs font-medium">
                                     <i class="fa-solid fa-plus mr-1"></i>Refill
                                 </button>
-                                <button onclick="viewDetails('wheat-flour')" class="bg-gray-200 text-gray-700 px-3 py-1 rounded text-xs font-medium">
+                                <button onclick="viewDetails(${product.id})" class="bg-gray-200 text-gray-700 px-3 py-1 rounded text-xs font-medium">
                                     Details
                                 </button>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
+            `;
+            
+            return div;
+        }
 
-            <div class="stock-item bg-white rounded-lg p-4 shadow-sm border-l-4 border-red-500" data-level="critical">
-                <div class="flex items-center space-x-3">
-                    <div class="w-12 h-12 rounded-lg overflow-hidden bg-gray-100">
-                        <img src="https://storage.googleapis.com/uxpilot-auth.appspot.com/e8f1a9b234-salt-package-1kg-white.png" alt="Tata Salt" class="w-full h-full object-cover">
-                    </div>
-                    <div class="flex-1">
-                        <div class="flex items-start justify-between">
-                            <div class="flex-1">
-                                <h3 class="font-bold text-dark">Tata Salt</h3>
+        function getLevelClass(color) {
+            switch(color) {
+                case 'red': return 'bg-red-100 text-red-700';
+                case 'orange': return 'bg-orange-100 text-orange-700';
+                case 'yellow': return 'bg-yellow-100 text-yellow-700';
+                default: return 'bg-gray-100 text-gray-700';
+            }
+        }
+
+        function showError(message) {
+            const container = document.getElementById('stock-items-container');
+            const loadingState = document.getElementById('loading-state');
+            
+            loadingState.style.display = 'none';
+            
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'text-center py-8';
+            errorDiv.innerHTML = `
+                <div class="bg-red-100 p-4 rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center">
+                    <i class="fa-solid fa-exclamation-triangle text-red-600 text-2xl"></i>
+                </div>
+                <h3 class="font-bold text-dark mb-2">Error Loading Data</h3>
+                <p class="text-gray-600">${message}</p>
+                <button onclick="loadLowStockProducts()" class="mt-4 bg-blue-500 text-white px-4 py-2 rounded">
+                    Try Again
+                </button>
+            `;
+            container.appendChild(errorDiv);
+        }
+
+        function refillStock(productId) {
+            // Navigate to refill stock page
+            window.location.href = `/refill-stock?id=${productId}`;
+        }
+
+        function viewDetails(productId) {
+            // Navigate to product details page
+            window.location.href = `/product-details?id=${productId}`;
+        }
+
+        // Filter button functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const filterButtons = document.querySelectorAll('.filter-btn');
+            
+            filterButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const filter = this.getAttribute('data-filter');
+                    
+                    // Update active button
+                    filterButtons.forEach(btn => {
+                        btn.classList.remove('active', 'bg-red-500', 'bg-orange-500', 'bg-yellow-500', 'bg-blue-500', 'text-white');
+                        btn.classList.add('bg-gray-200', 'text-gray-600');
+                    });
+                    
+                    this.classList.add('active');
+                    this.classList.remove('bg-gray-200', 'text-gray-600');
+                    if (filter === 'critical') {
+                        this.classList.add('bg-red-500', 'text-white');
+                    } else if (filter === 'low') {
+                        this.classList.add('bg-orange-500', 'text-white');
+                    } else if (filter === 'medium') {
+                        this.classList.add('bg-yellow-500', 'text-white');
+                    } else {
+                        this.classList.add('bg-blue-500', 'text-white');
+                    }
+
+                    // Filter products
+                    filterProducts(filter);
+                });
+            });
+        });
+    </script>
+</body>
+</html>
                                 <p class="text-sm text-gray-600">₹25/Bag</p>
                                 <div class="flex items-center space-x-2 mt-1">
                                     <span class="bg-red-100 text-red-700 px-2 py-1 rounded-full text-xs font-medium">Critical</span>

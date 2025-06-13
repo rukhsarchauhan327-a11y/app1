@@ -1541,5 +1541,128 @@ def export_business_data():
         logging.error(f"Error generating business data export: {str(e)}")
         return jsonify({'success': False, 'error': 'Failed to generate export'}), 500
 
+@app.route('/api/low-stock-products')
+def api_low_stock_products():
+    """Get products that are running low on stock"""
+    try:
+        # Get products where stock is at or below reorder level
+        low_stock_products = Product.query.filter(
+            Product.stock_quantity <= Product.reorder_level
+        ).all()
+        
+        products_data = []
+        for product in low_stock_products:
+            # Calculate stock level
+            if product.stock_quantity <= 0:
+                level = 'critical'
+                level_text = 'Out of Stock'
+                level_color = 'red'
+            elif product.stock_quantity <= (product.reorder_level * 0.3):
+                level = 'critical'
+                level_text = 'Critical'
+                level_color = 'red'
+            elif product.stock_quantity <= (product.reorder_level * 0.6):
+                level = 'low'
+                level_text = 'Low Stock'
+                level_color = 'orange'
+            else:
+                level = 'medium'
+                level_text = 'Medium Stock'
+                level_color = 'yellow'
+            
+            # Calculate progress percentage
+            progress = (product.stock_quantity / product.reorder_level * 100) if product.reorder_level > 0 else 0
+            progress = min(progress, 100)
+            
+            products_data.append({
+                'id': product.id,
+                'name': product.name,
+                'price': product.price,
+                'stock_quantity': product.stock_quantity,
+                'reorder_level': product.reorder_level,
+                'level': level,
+                'level_text': level_text,
+                'level_color': level_color,
+                'progress': progress,
+                'unit': 'Kg' if product.is_weight_based else 'Pcs',
+                'price_display': f"₹{product.price_per_kg}/Kg" if product.is_weight_based else f"₹{product.price}/Pc",
+                'suggested_reorder': product.reorder_level * 3,
+                'category': product.category or 'General'
+            })
+        
+        return jsonify({
+            'success': True,
+            'products': products_data,
+            'total_count': len(products_data)
+        })
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+@app.route('/api/expired-products')
+def api_expired_products():
+    """Get products that are expired or expiring soon"""
+    try:
+        from datetime import date, timedelta
+        
+        today = date.today()
+        next_week = today + timedelta(days=7)
+        
+        # Get expired products
+        expired_products = Product.query.filter(
+            Product.expiry_date < today
+        ).all()
+        
+        # Get expiring soon products
+        expiring_products = Product.query.filter(
+            Product.expiry_date.between(today, next_week)
+        ).all()
+        
+        products_data = []
+        
+        # Add expired products
+        for product in expired_products:
+            days_expired = (today - product.expiry_date).days
+            products_data.append({
+                'id': product.id,
+                'name': product.name,
+                'price': product.price,
+                'expiry_date': product.expiry_date.strftime('%d-%m-%Y'),
+                'status': 'expired',
+                'days_info': f"Expired {days_expired} days ago",
+                'level': 'critical',
+                'level_color': 'red',
+                'stock_quantity': product.stock_quantity
+            })
+        
+        # Add expiring soon products
+        for product in expiring_products:
+            days_to_expire = (product.expiry_date - today).days
+            products_data.append({
+                'id': product.id,
+                'name': product.name,
+                'price': product.price,
+                'expiry_date': product.expiry_date.strftime('%d-%m-%Y'),
+                'status': 'expiring',
+                'days_info': f"Expires in {days_to_expire} days",
+                'level': 'low',
+                'level_color': 'orange',
+                'stock_quantity': product.stock_quantity
+            })
+        
+        return jsonify({
+            'success': True,
+            'products': products_data,
+            'expired_count': len(expired_products),
+            'expiring_count': len(expiring_products)
+        })
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
