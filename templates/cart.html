@@ -1130,8 +1130,106 @@
             }
         };
 
-        // Track processed items to prevent duplicates
-        let processedItems = new Set();
+        // Real-time cart addition function
+        function addItemToCart(newItem) {
+            const nextItemId = Math.max(...Object.keys(cartItems).map(k => parseInt(k)), 0) + 1;
+            
+            // Add to cart data
+            cartItems[nextItemId] = {
+                id: nextItemId,
+                name: newItem.name,
+                price: newItem.totalPrice || (newItem.quantity * newItem.unitPrice),
+                quantity: newItem.quantity,
+                unit: newItem.unit,
+                unitPrice: newItem.unitPrice,
+                type: newItem.type || 'unit',
+                minQty: newItem.type === 'weight-based' ? 0.1 : 1,
+                step: newItem.type === 'weight-based' ? 0.1 : 1,
+                mfgDate: newItem.mfgDate,
+                expDate: newItem.expDate,
+                datesHidden: false,
+                quantityDisplay: newItem.quantityDisplay
+            };
+            
+            // Create cart item HTML exactly matching existing structure
+            createAndInsertCartItem(nextItemId, cartItems[nextItemId]);
+            
+            // Recalculate totals
+            calculateTotals();
+            
+            console.log(`Added ${newItem.name} to cart with ID ${nextItemId}`);
+            return nextItemId;
+        }
+        
+        // Create and insert cart item into DOM
+        function createAndInsertCartItem(itemId, item) {
+            const cartContainer = document.getElementById('cart-items');
+            const addMoreSection = document.getElementById('add-items-section');
+            
+            // Create new cart item div
+            const cartItemDiv = document.createElement('div');
+            cartItemDiv.className = 'bg-white rounded-xl shadow-sm p-3';
+            cartItemDiv.id = `cart-item-${itemId}`;
+            
+            // Build HTML structure exactly like existing items
+            let itemHTML = `
+                <div class="flex items-start justify-between">
+                    <div class="flex-1">
+                        <h3 class="font-semibold text-dark text-sm">${item.name}</h3>
+                        <div class="flex justify-between items-center mt-1">
+                            <span class="text-sm text-gray-700 font-medium" id="quantity-${itemId}">${item.quantityDisplay || item.quantity + ' ' + item.unit}</span>
+                            <span class="text-lg font-bold text-primary" id="price-${itemId}">₹${item.price}</span>
+                        </div>`;
+            
+            // Add date section if dates exist
+            if (item.mfgDate && item.expDate) {
+                itemHTML += `
+                        <div class="mt-2 space-y-1">
+                            <div class="flex items-center text-xs text-gray-500 date-info">
+                                <i class="fa-solid fa-calendar mr-1"></i>
+                                <span>MFG: ${item.mfgDate}</span>
+                            </div>
+                            <div class="flex items-center text-xs text-gray-500 date-info">
+                                <i class="fa-solid fa-clock mr-1"></i>
+                                <span>EXP: ${item.expDate}</span>
+                            </div>
+                            <div class="flex items-center space-x-2 mt-1">
+                                <button class="text-xs text-primary hover:underline flex items-center" onclick="editItem(${itemId})">
+                                    <i class="fa-solid fa-edit mr-1"></i>
+                                    Edit
+                                </button>
+                                <button id="date-toggle-${itemId}" class="text-xs text-danger hover:underline flex items-center" onclick="toggleProductDates(${itemId})">
+                                    <i class="fa-solid fa-times mr-1"></i>
+                                    Remove Dates
+                                </button>
+                            </div>
+                        </div>`;
+            } else {
+                itemHTML += `
+                        <div class="mt-2">
+                            <button class="text-xs text-primary hover:underline flex items-center" onclick="editItem(${itemId})">
+                                <i class="fa-solid fa-edit mr-1"></i>
+                                Edit
+                            </button>
+                        </div>`;
+            }
+            
+            itemHTML += `
+                    </div>
+                    <button class="text-danger text-sm ml-3 p-1" onclick="removeItem(${itemId})">
+                        <i class="fa-solid fa-trash"></i>
+                    </button>
+                </div>`;
+            
+            cartItemDiv.innerHTML = itemHTML;
+            
+            // Insert before "Add More Items" section
+            if (addMoreSection) {
+                addMoreSection.parentNode.insertBefore(cartItemDiv, addMoreSection);
+            } else {
+                cartContainer.appendChild(cartItemDiv);
+            }
+        }
         
         // Load cart items from localStorage and merge with existing cart
         function loadCartItems() {
@@ -1142,46 +1240,14 @@
                 return cartItems;
             }
             
-            let nextItemId = Math.max(...Object.keys(cartItems).map(k => parseInt(k)), 0) + 1;
-            let itemsAdded = 0;
-            
+            // Process each stored item
             storedItems.forEach((item) => {
-                const itemSignature = `${item.name}-${item.unitPrice}-${item.addedAt}`;
-                
-                // Skip if already processed
-                if (processedItems.has(itemSignature)) {
-                    return;
-                }
-                
-                // Add new item to cart
-                cartItems[nextItemId] = {
-                    id: item.id || nextItemId,
-                    name: item.name,
-                    price: item.totalPrice || (item.quantity * item.unitPrice),
-                    quantity: item.quantity,
-                    unit: item.unit,
-                    unitPrice: item.unitPrice,
-                    type: item.type === 'weight-based' ? 'weight' : 'unit',
-                    minQty: item.type === 'weight-based' ? 0.1 : 1,
-                    step: item.type === 'weight-based' ? 0.1 : 1,
-                    mfgDate: item.mfgDate,
-                    expDate: item.expDate,
-                    datesHidden: false,
-                    quantityDisplay: item.quantityDisplay,
-                    pricePerKg: item.pricePerKg,
-                    image: item.image
-                };
-                
-                processedItems.add(itemSignature);
-                nextItemId++;
-                itemsAdded++;
+                addItemToCart(item);
             });
             
-            // Clear localStorage only after successful processing
-            if (itemsAdded > 0) {
-                localStorage.removeItem('kiranakonnect_cart');
-                console.log(`Added ${itemsAdded} new items from inventory to cart`);
-            }
+            // Clear localStorage after processing
+            localStorage.removeItem('kiranakonnect_cart');
+            console.log(`Loaded ${storedItems.length} items from localStorage`);
             
             return cartItems;
         }
@@ -1241,72 +1307,14 @@
             }
         }
 
-        // Add new items directly to DOM
+        // Legacy function for compatibility
         function addNewItemsToDOM() {
-            const existingItemIds = Array.from(document.querySelectorAll('#cart-items > div[id^="cart-item-"]'))
-                .map(div => parseInt(div.id.replace('cart-item-', '')));
-            
-            console.log('Existing cart item IDs:', existingItemIds);
-            console.log('All cart items in memory:', Object.keys(cartItems));
-            
-            let itemsAdded = 0;
-            Object.keys(cartItems).forEach(itemId => {
-                const numericId = parseInt(itemId);
-                if (!existingItemIds.includes(numericId)) {
-                    const item = cartItems[itemId];
-                    console.log(`Need to add item ${itemId}: ${item.name}`);
-                    
-                    const addMoreSection = document.getElementById('add-items-section');
-                    
-                    // Create the cart item element
-                    const cartItemDiv = document.createElement('div');
-                    cartItemDiv.className = 'bg-white rounded-xl shadow-sm p-3';
-                    cartItemDiv.id = `cart-item-${itemId}`;
-                    cartItemDiv.innerHTML = `
-                        <div class="flex items-start justify-between">
-                            <div class="flex-1">
-                                <h3 class="font-semibold text-dark text-sm">${item.name}</h3>
-                                <div class="flex justify-between items-center mt-1">
-                                    <span class="text-sm text-gray-700 font-medium" id="quantity-${itemId}">${item.quantityDisplay || item.quantity + ' ' + item.unit}</span>
-                                    <span class="text-lg font-bold text-primary" id="price-${itemId}">₹${item.price}</span>
-                                </div>
-                                <div class="mt-2">
-                                    <button class="text-xs text-primary hover:underline flex items-center" onclick="editItem(${itemId})">
-                                        <i class="fa-solid fa-edit mr-1"></i>
-                                        Edit
-                                    </button>
-                                </div>
-                            </div>
-                            <button class="text-danger text-sm ml-3 p-1" onclick="removeItem(${itemId})">
-                                <i class="fa-solid fa-trash"></i>
-                            </button>
-                        </div>
-                    `;
-                    
-                    // Insert before "Add More Items" section
-                    if (addMoreSection) {
-                        addMoreSection.parentNode.insertBefore(cartItemDiv, addMoreSection);
-                        console.log(`Successfully inserted ${item.name} before add-more section`);
-                    } else {
-                        document.getElementById('cart-items').appendChild(cartItemDiv);
-                        console.log(`Successfully appended ${item.name} to cart`);
-                    }
-                    
-                    itemsAdded++;
-                }
-            });
-            
-            if (itemsAdded > 0) {
-                console.log(`Added ${itemsAdded} items to DOM, recalculating totals`);
-                calculateTotals();
-            } else {
-                console.log('No new items to add to DOM');
-            }
+            // Now handled by addItemToCart function
         }
 
-        // Render only new cart items that aren't in the HTML yet
+        // Legacy function for compatibility
         function renderNewCartItems() {
-            addNewItemsToDOM();
+            // Now handled by addItemToCart function
         }
 
         // Create HTML for individual cart item matching existing structure exactly
@@ -1888,9 +1896,6 @@
                     
                     // Load and merge any new items from inventory
                     loadCartItems();
-                    
-                    // Always check for new items and render them
-                    addNewItemsToDOM();
                     
                     calculateTotals();
                     initializeDateToggles();
