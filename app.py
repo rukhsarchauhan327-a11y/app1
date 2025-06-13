@@ -1,6 +1,6 @@
 import os
 import logging
-from flask import Flask, render_template, request, jsonify, send_file
+from flask import Flask, render_template, request, jsonify, send_file, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import DeclarativeBase
 from datetime import datetime
@@ -177,8 +177,8 @@ def dashboard():
 
 @app.route('/cart')
 def cart():
-    """Serve the cart/billing page"""
-    return render_template('cart.html')
+    """Redirect cart requests to dashboard"""
+    return redirect(url_for('dashboard'))
 
 @app.route('/inventory')
 def inventory():
