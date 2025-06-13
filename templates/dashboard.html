@@ -141,7 +141,7 @@
                 </div>
             </div>
             
-            <div class="p-4 border-b hover:bg-gray-50 cursor-pointer" onclick="window.location.href='/profile'">
+            <div id="backup-notification" class="p-4 border-b hover:bg-gray-50 cursor-pointer" onclick="window.location.href='/profile'" style="display: none;">
                 <div class="flex items-start space-x-3">
                     <div class="bg-orange-100 p-2 rounded-full">
                         <i class="fa-solid fa-shield-halved text-orange-600 text-sm"></i>
@@ -946,13 +946,42 @@
             window.location.href = '/inventory';
         }
 
+        // Check backup status and show/hide notification accordingly
+        function checkBackupStatus() {
+            const backupEnabled = localStorage.getItem('emailBackupEnabled') === 'true';
+            const backupNotification = document.getElementById('backup-notification');
+            const notificationBadge = document.querySelector('#notification-bell .absolute');
+            
+            if (backupEnabled) {
+                // Hide backup notification when backup is enabled
+                backupNotification.style.display = 'none';
+                // Update notification count
+                let currentCount = parseInt(notificationBadge.textContent);
+                notificationBadge.textContent = Math.max(0, currentCount - 1);
+            } else {
+                // Show backup notification when backup is disabled
+                backupNotification.style.display = 'block';
+                // Update notification count
+                let currentCount = parseInt(notificationBadge.textContent);
+                notificationBadge.textContent = currentCount + 1;
+            }
+        }
+
         // Initialize dashboard
         document.addEventListener('DOMContentLoaded', function() {
             loadDashboardStats();
             updateDateTime();
+            checkBackupStatus();
             
             // Refresh stats every 30 seconds
             setInterval(loadDashboardStats, 30000);
+            
+            // Check backup status on page load and when storage changes
+            window.addEventListener('storage', function(e) {
+                if (e.key === 'emailBackupEnabled') {
+                    checkBackupStatus();
+                }
+            });
         });
     </script>
 

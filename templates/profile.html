@@ -86,6 +86,45 @@
       .notification-toggle:hover .toggle-track {
         opacity: 0.8;
       }
+
+      /* Backup Toggle Button Styles */
+      .backup-toggle-btn {
+        width: 100px;
+        background-color: #e5e7eb;
+      }
+
+      .backup-toggle-btn .toggle-option {
+        transition: all 0.3s ease;
+        z-index: 1;
+      }
+
+      .backup-toggle-btn .toggle-option.off {
+        background-color: white;
+        color: #6b7280;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+
+      .backup-toggle-btn .toggle-option.on {
+        background-color: transparent;
+        color: #6b7280;
+      }
+
+      /* When backup is enabled (checked) */
+      #emailBackup:checked + .backup-toggle-btn {
+        background-color: #10b981;
+      }
+
+      #emailBackup:checked + .backup-toggle-btn .toggle-option.off {
+        background-color: transparent;
+        color: white;
+        box-shadow: none;
+      }
+
+      #emailBackup:checked + .backup-toggle-btn .toggle-option.on {
+        background-color: white;
+        color: #10b981;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
     </style>
 <style>
   .highlighted-section {
@@ -269,8 +308,9 @@
                     <div class="flex items-center">
                         <label class="relative inline-flex items-center cursor-pointer">
                             <input type="checkbox" id="emailBackup" class="sr-only" checked onchange="toggleEmailBackup()">
-                            <div class="w-6 h-6 bg-white border-2 border-gray-300 rounded-full flex items-center justify-center transition-all duration-200 checkbox-custom">
-                                <i class="fa-solid fa-check text-white text-xs opacity-0 transition-opacity duration-200"></i>
+                            <div class="backup-toggle-btn flex items-center bg-gray-200 rounded-full p-1 transition-all duration-300">
+                                <span class="toggle-option off bg-white text-gray-600 px-3 py-1 rounded-full text-xs font-medium transition-all duration-300">OFF</span>
+                                <span class="toggle-option on text-white px-3 py-1 rounded-full text-xs font-medium transition-all duration-300">ON</span>
                             </div>
                         </label>
                     </div>
@@ -1463,20 +1503,28 @@
 
         function toggleEmailBackup() {
             const checkbox = document.getElementById('emailBackup');
-            const checkboxVisual = document.querySelector('.checkbox-custom');
             const isEnabled = checkbox.checked;
             
             if (isEnabled) {
                 console.log('Email backup enabled');
-                checkboxVisual.classList.add('checked');
+                localStorage.setItem('emailBackupEnabled', 'true');
+                // Dispatch storage event to notify dashboard
+                window.dispatchEvent(new StorageEvent('storage', {
+                    key: 'emailBackupEnabled',
+                    newValue: 'true'
+                }));
             } else {
                 console.log('Email backup disabled');
                 if (confirm('Are you sure you want to disable email backup? Your data will not be automatically backed up.')) {
-                    checkboxVisual.classList.remove('checked');
+                    localStorage.setItem('emailBackupEnabled', 'false');
+                    // Dispatch storage event to notify dashboard
+                    window.dispatchEvent(new StorageEvent('storage', {
+                        key: 'emailBackupEnabled',
+                        newValue: 'false'
+                    }));
                 } else {
                     // Re-enable if user cancels
                     checkbox.checked = true;
-                    checkboxVisual.classList.add('checked');
                 }
             }
         }
