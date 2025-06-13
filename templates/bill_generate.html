@@ -1169,30 +1169,36 @@
         }
 
         function performBarcodeSearch(barcode) {
-            const barcodeProducts = {
-                '8901030823456': { name: 'Coconut Oil', price: 180, unit: 'Bottle', id: 'coconut-oil' },
-                '8901030834567': { name: 'Aashirvaad Atta', price: 120, unit: 'Bag', id: 'aashirvaad-atta' },
-                '8901030845678': { name: 'Maggi Noodles', price: 15, unit: 'Pack', id: 'maggi-noodles' },
-                '8901030856789': { name: 'Dairy Milk', price: 25, unit: 'Bar', id: 'dairy-milk' },
-                '8901030867890': { name: 'Uncle Chips', price: 10, unit: 'Pack', id: 'uncle-chips' }
-            };
-
-            const product = barcodeProducts[barcode];
-            if (product) {
-                alert(`Found ${product.name} - ₹${product.price}`);
-                // Redirect to product details page
-                setTimeout(() => {
-                    window.location.href = `/product-details?id=${product.id}&name=${encodeURIComponent(product.name)}&price=${product.price}&unit=${encodeURIComponent(product.unit)}`;
-                }, 1000);
-            } else {
-                alert('Product not found');
-            }
+            // Search for product using actual database API
+            fetch(`/api/products`)
+                .then(response => response.json())
+                .then(data => {
+                    const product = data.products.find(p => p.barcode === barcode);
+                    if (product) {
+                        showStyledNotification(`Found ${product.name} - ₹${product.price}`, 'success');
+                        // Redirect to appropriate product details page
+                        setTimeout(() => {
+                            if (product.is_weight_based) {
+                                window.location.href = `/product-details-weight?id=${product.id}`;
+                            } else {
+                                window.location.href = `/product-details?id=${product.id}`;
+                            }
+                        }, 1000);
+                    } else {
+                        showStyledNotification('Product not found in inventory', 'error');
+                    }
+                })
+                .catch(error => {
+                    console.error('Barcode search error:', error);
+                    showStyledNotification('Search failed. Please try again.', 'error');
+                });
         }
 
         function simulateScanning() {
             setTimeout(() => {
-                const randomBarcodes = ['8901030823456', '8901030834567', '8901030845678'];
-                const randomBarcode = randomBarcodes[Math.floor(Math.random() * randomBarcodes.length)];
+                // Use actual barcodes from database
+                const realBarcodes = ['8901030789012', '8901030567890', '8901030345678', '8901030234567', '8901030456789', '8901030845371', '8901786101234', '8901030825456', '8901030123456', '8901030678901'];
+                const randomBarcode = realBarcodes[Math.floor(Math.random() * realBarcodes.length)];
                 performBarcodeSearch(randomBarcode);
                 closeScanner();
             }, 3000);
@@ -1256,6 +1262,41 @@
             // Redirect to product details page
             const productId = name.toLowerCase().replace(/\s+/g, '-');
             window.location.href = `/product-details?id=${productId}&name=${encodeURIComponent(name)}&price=${price}&unit=${encodeURIComponent(unit)}`;
+        }
+
+        // Styled notification system
+        function showStyledNotification(message, type = 'info') {
+            // Remove any existing notifications
+            const existingNotifications = document.querySelectorAll('.styled-notification');
+            existingNotifications.forEach(notification => notification.remove());
+            
+            const notification = document.createElement('div');
+            notification.classList.add('styled-notification', 'fixed', 'top-4', 'left-1/2', 'transform', '-translate-x-1/2', 'px-6', 'py-3', 'rounded-lg', 'shadow-lg', 'z-50', 'max-w-sm', 'text-center');
+            
+            // Set colors based on type
+            switch (type) {
+                case 'success':
+                    notification.classList.add('bg-green-500', 'text-white');
+                    break;
+                case 'error':
+                    notification.classList.add('bg-red-500', 'text-white');
+                    break;
+                case 'warning':
+                    notification.classList.add('bg-yellow-500', 'text-white');
+                    break;
+                default:
+                    notification.classList.add('bg-blue-500', 'text-white');
+            }
+            
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            
+            // Auto remove after 3 seconds
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.remove();
+                }
+            }, 3000);
         }
     </script>
 
