@@ -1146,10 +1146,20 @@
                 existingItem.quantity += newItem.quantity;
                 existingItem.price = existingItem.quantity * existingItem.unitPrice;
                 
-                // Update the display
+                // Update the display with proper formatting for weight-based items
                 const quantityElement = document.getElementById(`quantity-${existingItemId}`);
                 const priceElement = document.getElementById(`price-${existingItemId}`);
-                if (quantityElement) quantityElement.textContent = `${existingItem.quantity} ${existingItem.unit}`;
+                if (quantityElement) {
+                    let displayText;
+                    if (existingItem.type === 'weight-based') {
+                        displayText = existingItem.quantity < 1 ? 
+                            `${(existingItem.quantity * 1000).toFixed(0)} gm` : 
+                            `${existingItem.quantity.toFixed(3)} kg`;
+                    } else {
+                        displayText = `${existingItem.quantity} ${existingItem.unit}`;
+                    }
+                    quantityElement.textContent = displayText;
+                }
                 if (priceElement) priceElement.textContent = `₹${existingItem.price}`;
                 
                 calculateTotals();
@@ -1190,7 +1200,15 @@
         
         // Create exact HTML structure matching existing cart items
         function createExactCartItemHTML(itemId, item) {
-            const quantityDisplay = item.quantityDisplay || `${item.quantity} ${item.unit}`;
+            // Handle quantity display for weight-based vs unit-based items
+            let quantityDisplay;
+            if (item.type === 'weight-based') {
+                quantityDisplay = item.quantityDisplay || (item.quantity < 1 ? 
+                    `${(item.quantity * 1000).toFixed(0)} gm` : 
+                    `${item.quantity.toFixed(3)} kg`);
+            } else {
+                quantityDisplay = item.quantityDisplay || `${item.quantity} ${item.unit}`;
+            }
             const totalPrice = item.totalPrice || item.price;
             
             let dateSection = '';

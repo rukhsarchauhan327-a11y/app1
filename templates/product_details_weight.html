@@ -342,18 +342,18 @@
                 cartItem.pricePerKg = productData.sellingPrice;
             }
 
-            // Add to cart storage
-            addItemToCart(cartItem);
+            // Add manufacturing and expiry dates if available
+            cartItem.mfgDate = productData.mfgDate || '';
+            cartItem.expDate = productData.expDate || '';
+            cartItem.price = cartItem.totalPrice;
             
-            showNotification(`Added ${cartItem.name} to cart. Total: ₹${cartItem.totalPrice.toFixed(2)}`, 'success');
+            // Save to localStorage using the same system as inventory
+            const existingCart = JSON.parse(localStorage.getItem('kiranakonnect_cart') || '[]');
+            existingCart.push(cartItem);
+            localStorage.setItem('kiranakonnect_cart', JSON.stringify(existingCart));
+            
+            showNotification(`Added ${cartItem.quantityDisplay} of ${cartItem.name} to cart!`, 'success');
             cartModal.classList.add('hidden');
-            
-            // Navigate to cart page after adding
-            setTimeout(() => {
-                if (confirm('Item added to cart! Would you like to view your cart?')) {
-                    window.location.href = '/cart';
-                }
-            }, 1500);
         });
 
         // Cart management functions
