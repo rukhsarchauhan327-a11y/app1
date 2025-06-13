@@ -1065,10 +1065,10 @@
         }
 
         function simulateScanning() {
-            // Simulate successful scan after 3 seconds
+            // Simulate successful scan after 3 seconds using real database barcodes
             setTimeout(() => {
-                const randomBarcodes = ['8901030823456', '8901030834567', '8901030845678'];
-                const randomBarcode = randomBarcodes[Math.floor(Math.random() * randomBarcodes.length)];
+                const realBarcodes = ['8901030789012', '8901030567890', '8901030345678', '8901030234567', '8901030456789', '8901030845371', '8901786101234', '8901030825456', '8901030123456', '8901030678901'];
+                const randomBarcode = realBarcodes[Math.floor(Math.random() * realBarcodes.length)];
                 performBarcodeSearch(randomBarcode);
                 closeScanner();
             }, 3000);

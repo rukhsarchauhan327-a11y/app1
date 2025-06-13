@@ -799,8 +799,9 @@
                     scanArea.classList.remove('animate-pulse');
                 }
                 
-                const sampleBarcodes = ['8901030870391', '8901030827604', '8901030870384'];
-                const randomBarcode = sampleBarcodes[Math.floor(Math.random() * sampleBarcodes.length)];
+                // Use actual barcodes from database
+                const realBarcodes = ['8901030789012', '8901030567890', '8901030345678', '8901030234567', '8901030456789', '8901030845371', '8901786101234', '8901030825456', '8901030123456', '8901030678901'];
+                const randomBarcode = realBarcodes[Math.floor(Math.random() * realBarcodes.length)];
                 
                 showStyledNotification('Barcode detected!', 'success');
                 performBarcodeSearch(randomBarcode);
