@@ -1726,10 +1726,8 @@
                 const inputQuantity = parseFloat(document.getElementById('edit-quantity-input-weight').value) || 1;
                 const unit = document.getElementById('edit-unit-select').value;
                 
-                // Convert to base unit
+                // Convert to base unit (only kg/gm for weight products)
                 if (unit === 'gm') {
-                    newQuantity = inputQuantity / 1000;
-                } else if (unit === 'ml') {
                     newQuantity = inputQuantity / 1000;
                 } else {
                     newQuantity = inputQuantity;
@@ -1739,9 +1737,9 @@
                 
                 // Update quantity display
                 if (newQuantity < 1) {
-                    item.quantityDisplay = `${(newQuantity * 1000).toFixed(0)} ${unit === 'gm' ? 'gm' : 'ml'}`;
+                    item.quantityDisplay = `${(newQuantity * 1000).toFixed(0)} gm`;
                 } else {
-                    item.quantityDisplay = `${newQuantity.toFixed(3)} ${unit === 'kg' ? 'kg' : 'L'}`;
+                    item.quantityDisplay = `${newQuantity.toFixed(3)} kg`;
                 }
             } else {
                 newQuantity = parseInt(document.getElementById('edit-quantity-input-unit').value) || 1;
@@ -1765,6 +1763,11 @@
             
             closeEditModal();
             showNotification(`${item.name} updated successfully`, 'success');
+        }
+
+        // Function name that matches the original button onclick
+        function saveItemChanges() {
+            saveEditedItem();
         }
 
 
@@ -2322,89 +2325,92 @@
 
                 <!-- Modal Content -->
                 <div class="p-3">
-                    <!-- Product Info -->
-                    <div class="flex items-center space-x-2 mb-3 p-2 bg-gray-50 rounded-lg">
-                        <div class="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
-                            <i class="fa-solid fa-box text-white text-sm"></i>
-                        </div>
-                        <div class="flex-1">
-                            <h4 id="edit-product-name" class="font-medium text-dark text-sm">Product Name</h4>
-                            <p id="edit-product-price" class="text-xs text-gray-600">₹0/unit</p>
-                        </div>
+                
+                <!-- Product Info -->
+                <div class="flex items-center space-x-2 mb-3 p-2 bg-gray-50 rounded-lg">
+                    <div class="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
+                        <i class="fa-solid fa-box text-white text-sm"></i>
                     </div>
-
-                    <!-- Input Method Selection -->
-                    <div id="edit-input-method" class="mb-3 hidden">
-                        <label class="block text-xs font-medium text-dark mb-2">Select Input Method</label>
-                        <div class="grid grid-cols-2 gap-2">
-                            <label class="flex items-center space-x-2 cursor-pointer p-2 bg-gray-50 rounded-lg hover:bg-gray-100">
-                                <input type="radio" name="editInputMethod" value="quantity" class="text-orange-500 focus:ring-orange-500" checked>
-                                <span class="text-xs font-medium text-dark">By Quantity</span>
-                            </label>
-                            <label class="flex items-center space-x-2 cursor-pointer p-2 bg-gray-50 rounded-lg hover:bg-gray-100">
-                                <input type="radio" name="editInputMethod" value="price" class="text-orange-500 focus:ring-orange-500">
-                                <span class="text-xs font-medium text-dark">By Price</span>
-                            </label>
-                        </div>
-                    </div>
-
-                    <!-- Quantity Section -->
-                    <div id="edit-quantity-section" class="mb-3">
-                        <label id="edit-quantity-label" class="block text-xs font-medium text-dark mb-2">Quantity</label>
-                        
-                        <!-- Unit-based products -->
-                        <div id="edit-unit-based-input" class="flex items-center gap-3 mb-3">
-                            <button type="button" class="w-12 h-12 bg-red-50 border-2 border-red-200 rounded-lg flex items-center justify-center hover:bg-red-100 hover:border-red-300 transition-colors flex-shrink-0" onclick="editDecreaseQuantity()">
-                                <span class="text-red-600 font-bold text-xl">−</span>
-                            </button>
-                            <input type="number" id="edit-quantity-input-unit" class="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-center font-medium min-w-0" value="1" min="1" step="1" oninput="updateEditTotal()">
-                            <button type="button" class="w-12 h-12 bg-green-50 border-2 border-green-200 rounded-lg flex items-center justify-center hover:bg-green-100 hover:border-green-300 transition-colors flex-shrink-0" onclick="editIncreaseQuantity()">
-                                <span class="text-green-600 font-bold text-xl">+</span>
-                            </button>
-                        </div>
-                        
-                        <!-- Weight-based products -->
-                        <div id="edit-weight-based-input" class="hidden">
-                            <div class="flex gap-2 mb-2">
-                                <input type="number" id="edit-quantity-input-weight" class="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-center font-medium" value="1" min="0.1" step="0.1" placeholder="0.5" oninput="updateEditTotal()">
-                                <select id="edit-unit-select" class="px-3 py-2 border border-gray-300 rounded-lg bg-white min-w-0" onchange="onEditUnitChange()">
-                                    <option value="kg">Kg</option>
-                                    <option value="gm">gm</option>
-                                    <option value="l">L</option>
-                                    <option value="ml">ml</option>
-                                </select>
-                            </div>
-                        </div>
-                        
-                        <!-- Preview -->
-                        <div class="bg-gray-50 rounded-lg p-2 text-center">
-                            <div class="text-xs text-gray-600 mb-1">You're getting</div>
-                            <div class="font-medium text-sm" id="edit-calculated-quantity">1 piece</div>
-                            <div class="text-lg font-bold text-primary" id="edit-calculated-price">₹50.00</div>
-                        </div>
-                    </div>
-
-                    <!-- Price Section -->
-                    <div id="edit-price-section" class="mb-3 hidden">
-                        <label class="block text-xs font-medium text-dark mb-2">Enter Amount</label>
-                        <input type="number" id="edit-price-input" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-center font-medium" placeholder="Enter amount you want to pay" oninput="updateEditPriceTotal()">
-                        
-                        <div class="bg-gray-50 rounded-lg p-2 text-center mt-2">
-                            <div class="text-xs text-gray-600 mb-1">You're getting</div>
-                            <div class="font-medium text-sm" id="edit-price-calculated-quantity">1 kg</div>
-                            <div class="text-lg font-bold text-primary" id="edit-price-calculated-price">₹50.00</div>
-                        </div>
+                    <div class="flex-1">
+                        <h4 id="edit-product-name" class="font-medium text-dark text-sm">Product Name</h4>
+                        <p id="edit-product-price" class="text-xs text-gray-600">₹0/unit</p>
                     </div>
                 </div>
 
-                <!-- Modal Footer -->
-                <div class="flex space-x-2 p-3 border-t border-gray-200">
-                    <button onclick="closeEditModal()" class="flex-1 py-2 px-4 bg-gray-200 text-gray-700 rounded-lg font-medium text-sm hover:bg-gray-300 transition-colors">
+                <!-- Input Method Selection (for weight-based products) -->
+                <div id="edit-input-method" class="mb-3 hidden">
+                    <label class="block text-xs font-medium text-dark mb-2">Select Input Method</label>
+                    <div class="grid grid-cols-2 gap-2">
+                        <label class="flex items-center space-x-2 cursor-pointer p-2 bg-gray-50 rounded-lg hover:bg-gray-100">
+                            <input type="radio" name="editInputMethod" value="quantity" class="text-orange-500 focus:ring-orange-500" checked onchange="switchEditInputMethod('quantity')">
+                            <span class="text-xs font-medium text-dark">By Quantity</span>
+                        </label>
+                        <label class="flex items-center space-x-2 cursor-pointer p-2 bg-gray-50 rounded-lg hover:bg-gray-100">
+                            <input type="radio" name="editInputMethod" value="price" class="text-orange-500 focus:ring-orange-500" onchange="switchEditInputMethod('price')">
+                            <span class="text-xs font-medium text-dark">By Price</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Quantity Input Section -->
+                <div id="edit-quantity-section" class="mb-3">
+                    <label id="edit-quantity-label" class="block text-xs font-medium text-dark mb-2">Quantity</label>
+                    
+                    <!-- Unit-based products (with +/- buttons) -->
+                    <div id="edit-unit-based-input" class="flex items-center gap-3 mb-3">
+                        <button type="button" class="w-12 h-12 bg-red-50 border-2 border-red-200 rounded-lg flex items-center justify-center hover:bg-red-100 hover:border-red-300 transition-colors flex-shrink-0" onclick="editDecreaseQuantity()">
+                            <span class="text-red-600 font-bold text-xl">−</span>
+                        </button>
+                        <input type="number" id="edit-quantity-input-unit" class="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-center font-medium min-w-0" value="1" min="1" step="1" oninput="updateEditTotal()">
+                        <button type="button" class="w-12 h-12 bg-green-50 border-2 border-green-200 rounded-lg flex items-center justify-center hover:bg-green-100 hover:border-green-300 transition-colors flex-shrink-0" onclick="editIncreaseQuantity()">
+                            <span class="text-green-600 font-bold text-xl">+</span>
+                        </button>
+                    </div>
+                    
+                    <!-- Weight-based products (input + unit dropdown, no +/- buttons) -->
+                    <div id="edit-weight-based-input" class="flex items-center gap-2 mb-3 hidden">
+                        <input type="number" id="edit-quantity-input-weight" class="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-center font-medium text-base min-w-0" value="1" min="0.1" step="0.1" oninput="updateEditTotal()">
+                        <select id="edit-unit-select" class="px-2 py-2 border border-gray-300 rounded-lg font-medium text-sm w-16 flex-shrink-0" onchange="onEditUnitChange()">
+                            <option value="kg">Kg</option>
+                            <option value="gm">Gm</option>
+                        </select>
+                    </div>
+                    
+                    <p id="edit-quantity-help" class="text-xs text-gray-500">Enter the required quantity</p>
+                </div>
+
+                <!-- Price Section (for weight-based items) -->
+                <div id="edit-price-section" class="mb-3 hidden">
+                    <label class="block text-xs font-medium text-dark mb-2">Enter Price Amount</label>
+                    <div class="relative">
+                        <span class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 font-medium">₹</span>
+                        <input type="number" id="edit-price-input" class="w-full pl-8 pr-4 py-2 border border-gray-200 rounded-lg text-base font-medium" placeholder="0.00" step="0.01" oninput="updateEditPriceTotal()">
+                    </div>
+                    <p class="text-xs text-gray-500 mt-1">System calculates quantity based on price per kg</p>
+                </div>
+
+                <!-- Summary -->
+                <div class="bg-gray-50 p-2 rounded-lg mb-3">
+                    <div class="flex justify-between items-center mb-1">
+                        <span class="text-xs text-gray-600">Quantity:</span>
+                        <span id="edit-calculated-quantity" class="text-xs font-medium text-dark">1 Unit</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-xs text-gray-600">Total Price:</span>
+                        <span id="edit-calculated-price" class="text-sm font-bold text-green-600">₹0</span>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="flex space-x-2">
+                    <button onclick="closeEditModal()" class="flex-1 py-2 px-3 bg-gray-200 text-gray-700 rounded-lg font-medium hover:bg-gray-300 transition-colors text-sm">
                         Cancel
                     </button>
-                    <button onclick="saveEditedItem()" class="flex-1 py-2 px-4 bg-primary text-white rounded-lg font-medium text-sm hover:bg-primary/90 transition-colors">
-                        Update Item
+                    <button onclick="saveItemChanges()" class="flex-1 py-2 px-3 bg-orange-500 text-white rounded-lg font-medium hover:bg-orange-600 transition-colors text-sm">
+                        Save Changes
                     </button>
+                </div>
+                
                 </div>
             </div>
         </div>
