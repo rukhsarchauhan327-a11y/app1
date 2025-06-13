@@ -1674,7 +1674,87 @@
                     localStorage.setItem('emailBackupEnabled', 'true');
                 }
             }
+            
+            // Check if we need to highlight backup section
+            checkForBackupHighlight();
         });
+
+        function checkForBackupHighlight() {
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('highlight') === 'backup') {
+                highlightBackupSection();
+            }
+        }
+
+        function highlightBackupSection() {
+            // Find the backup section in quick actions - target the Email Backup div specifically
+            const backupSections = document.querySelectorAll('#quick-actions .w-full.flex.items-center.justify-between');
+            let backupSection = null;
+            
+            // Find the section containing Email Backup
+            backupSections.forEach(section => {
+                const textContent = section.textContent;
+                if (textContent.includes('Email Backup')) {
+                    backupSection = section;
+                }
+            });
+            
+            if (backupSection) {
+                // Scroll to the backup section
+                backupSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                
+                // Add highlight effect
+                backupSection.style.transition = 'all 0.5s ease';
+                backupSection.style.backgroundColor = '#fef3c7'; // Yellow highlight
+                backupSection.style.border = '2px solid #f59e0b';
+                backupSection.style.boxShadow = '0 0 20px rgba(245, 158, 11, 0.3)';
+                backupSection.style.borderRadius = '8px';
+                
+                // Remove highlight after 4 seconds
+                setTimeout(() => {
+                    backupSection.style.backgroundColor = '';
+                    backupSection.style.border = '';
+                    backupSection.style.boxShadow = '';
+                }, 4000);
+                
+                // Show a notification
+                showStyledNotification('Backup settings highlighted. Enable backup to protect your data.', 'warning');
+            }
+        }
+
+        function showStyledNotification(message, type = 'info') {
+            // Remove any existing notifications
+            const existingNotifications = document.querySelectorAll('.styled-notification');
+            existingNotifications.forEach(notification => notification.remove());
+            
+            const notification = document.createElement('div');
+            notification.classList.add('styled-notification', 'fixed', 'top-4', 'left-1/2', 'transform', '-translate-x-1/2', 'px-6', 'py-3', 'rounded-lg', 'shadow-lg', 'z-50', 'max-w-sm', 'text-center');
+            
+            // Set colors based on type
+            switch (type) {
+                case 'success':
+                    notification.classList.add('bg-green-500', 'text-white');
+                    break;
+                case 'error':
+                    notification.classList.add('bg-red-500', 'text-white');
+                    break;
+                case 'warning':
+                    notification.classList.add('bg-yellow-500', 'text-white');
+                    break;
+                default:
+                    notification.classList.add('bg-blue-500', 'text-white');
+            }
+            
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            
+            // Auto remove after 4 seconds
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.remove();
+                }
+            }, 4000);
+        }
 
         function managePlan() {
             // Open plan management modal

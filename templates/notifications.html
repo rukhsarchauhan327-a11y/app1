@@ -162,7 +162,7 @@
             </div>
 
             <!-- Critical Alert - Data Backup Needed -->
-            <div id="backup-notification-full" class="notification-item bg-white rounded-lg shadow-sm border-l-4 border-orange-500 cursor-pointer hover:shadow-md transition-shadow" data-type="critical" onclick="window.location.href='/profile'" style="display: none;">
+            <div id="backup-notification-full" class="notification-item bg-white rounded-lg shadow-sm border-l-4 border-orange-500 cursor-pointer hover:shadow-md transition-shadow" data-type="critical" onclick="window.location.href='/profile?highlight=backup'" style="display: none;">
                 <div class="p-4">
                     <div class="flex items-start space-x-3">
                         <div class="bg-orange-100 p-2 rounded-full">
@@ -506,8 +506,8 @@
                     break;
                     
                 case 'backup':
-                    // Go to settings page
-                    window.location.href = '/settings';
+                    // Go to profile page with backup highlight
+                    window.location.href = '/profile?highlight=backup';
                     break;
                     
                 case 'system':
