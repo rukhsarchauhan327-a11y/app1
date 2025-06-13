@@ -1130,9 +1130,9 @@
             }
         };
 
-        // Global cart state to track added items
-        let addedFromInventory = JSON.parse(localStorage.getItem('addedFromInventory') || '{}');
-
+        // Track processed items to prevent duplicates
+        let processedItems = new Set();
+        
         // Load cart items from localStorage and merge with existing cart
         function loadCartItems() {
             const cartData = localStorage.getItem('kiranakonnect_cart');
@@ -1142,66 +1142,45 @@
                 return cartItems;
             }
             
-            // Don't clear existing cart items - merge instead
             let nextItemId = Math.max(...Object.keys(cartItems).map(k => parseInt(k)), 0) + 1;
             let itemsAdded = 0;
             
-            // Convert stored items to cart format and add to existing cart
             storedItems.forEach((item) => {
-                const itemKey = `${item.name}_${item.unitPrice}`;
+                const itemSignature = `${item.name}-${item.unitPrice}-${item.addedAt}`;
                 
-                // Check if this item was already added before
-                if (addedFromInventory[itemKey]) {
-                    console.log(`Item ${item.name} already exists in cart, skipping duplicate`);
+                // Skip if already processed
+                if (processedItems.has(itemSignature)) {
                     return;
                 }
                 
-                // Check if item already exists in existing cart
-                const existingItemKey = Object.keys(cartItems).find(key => {
-                    const cartItem = cartItems[key];
-                    return cartItem.name === item.name && cartItem.unitPrice === item.unitPrice;
-                });
+                // Add new item to cart
+                cartItems[nextItemId] = {
+                    id: item.id || nextItemId,
+                    name: item.name,
+                    price: item.totalPrice || (item.quantity * item.unitPrice),
+                    quantity: item.quantity,
+                    unit: item.unit,
+                    unitPrice: item.unitPrice,
+                    type: item.type === 'weight-based' ? 'weight' : 'unit',
+                    minQty: item.type === 'weight-based' ? 0.1 : 1,
+                    step: item.type === 'weight-based' ? 0.1 : 1,
+                    mfgDate: item.mfgDate,
+                    expDate: item.expDate,
+                    datesHidden: false,
+                    quantityDisplay: item.quantityDisplay,
+                    pricePerKg: item.pricePerKg,
+                    image: item.image
+                };
                 
-                if (existingItemKey) {
-                    // Update quantity of existing item
-                    const existingItem = cartItems[existingItemKey];
-                    existingItem.quantity += item.quantity;
-                    existingItem.price = existingItem.quantity * existingItem.unitPrice;
-                    existingItem.quantityDisplay = item.quantityDisplay || `${existingItem.quantity} ${existingItem.unit}`;
-                } else {
-                    // Add new item to cart
-                    cartItems[nextItemId] = {
-                        id: item.id || nextItemId,
-                        name: item.name,
-                        price: item.totalPrice || (item.quantity * item.unitPrice),
-                        quantity: item.quantity,
-                        unit: item.unit,
-                        unitPrice: item.unitPrice,
-                        type: item.type === 'weight-based' ? 'weight' : 'unit',
-                        minQty: item.type === 'weight-based' ? 0.1 : 1,
-                        step: item.type === 'weight-based' ? 0.1 : 1,
-                        mfgDate: item.mfgDate,
-                        expDate: item.expDate,
-                        datesHidden: false,
-                        quantityDisplay: item.quantityDisplay,
-                        pricePerKg: item.pricePerKg,
-                        image: item.image
-                    };
-                    nextItemId++;
-                    itemsAdded++;
-                }
-                
-                // Mark this item as added
-                addedFromInventory[itemKey] = true;
+                processedItems.add(itemSignature);
+                nextItemId++;
+                itemsAdded++;
             });
             
-            // Save the tracking state
-            localStorage.setItem('addedFromInventory', JSON.stringify(addedFromInventory));
-            
-            // Clear the cart items after processing
-            if (storedItems.length > 0) {
+            // Clear localStorage only after successful processing
+            if (itemsAdded > 0) {
                 localStorage.removeItem('kiranakonnect_cart');
-                console.log(`Merged ${storedItems.length} items from localStorage into cart (${itemsAdded} new items added)`);
+                console.log(`Added ${itemsAdded} new items from inventory to cart`);
             }
             
             return cartItems;
@@ -1262,38 +1241,59 @@
             }
         }
 
-        // Render only new cart items that aren't in the HTML yet
-        function renderNewCartItems() {
-            const cartContainer = document.getElementById('cart-items');
+        // Add new items directly to DOM
+        function addNewItemsToDOM() {
             const existingItemIds = Array.from(document.querySelectorAll('#cart-items > div[id^="cart-item-"]'))
                 .map(div => parseInt(div.id.replace('cart-item-', '')));
-            
-            let itemsRendered = 0;
             
             Object.keys(cartItems).forEach(itemId => {
                 const numericId = parseInt(itemId);
                 if (!existingItemIds.includes(numericId)) {
                     const item = cartItems[itemId];
-                    const cartItemHTML = createCartItemHTML(itemId, item);
-                    
-                    // Insert before the "Add More Items" section
                     const addMoreSection = document.getElementById('add-items-section');
+                    
+                    // Create the cart item element
+                    const cartItemDiv = document.createElement('div');
+                    cartItemDiv.className = 'bg-white rounded-xl shadow-sm p-3';
+                    cartItemDiv.id = `cart-item-${itemId}`;
+                    cartItemDiv.innerHTML = `
+                        <div class="flex items-start justify-between">
+                            <div class="flex-1">
+                                <h3 class="font-semibold text-dark text-sm">${item.name}</h3>
+                                <div class="flex justify-between items-center mt-1">
+                                    <span class="text-sm text-gray-700 font-medium" id="quantity-${itemId}">${item.quantityDisplay || item.quantity + ' ' + item.unit}</span>
+                                    <span class="text-lg font-bold text-primary" id="price-${itemId}">₹${item.price}</span>
+                                </div>
+                                <div class="mt-2">
+                                    <button class="text-xs text-primary hover:underline flex items-center" onclick="editItem(${itemId})">
+                                        <i class="fa-solid fa-edit mr-1"></i>
+                                        Edit
+                                    </button>
+                                </div>
+                            </div>
+                            <button class="text-danger text-sm ml-3 p-1" onclick="removeItem(${itemId})">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                        </div>
+                    `;
+                    
+                    // Insert before "Add More Items" section
                     if (addMoreSection) {
-                        addMoreSection.insertAdjacentHTML('beforebegin', cartItemHTML);
+                        addMoreSection.parentNode.insertBefore(cartItemDiv, addMoreSection);
                     } else {
-                        cartContainer.insertAdjacentHTML('beforeend', cartItemHTML);
+                        document.getElementById('cart-items').appendChild(cartItemDiv);
                     }
                     
-                    itemsRendered++;
-                    console.log(`Added new cart item: ${item.name}`);
+                    console.log(`Added ${item.name} to cart display`);
                 }
             });
             
-            if (itemsRendered > 0) {
-                console.log(`Rendered ${itemsRendered} new cart items`);
-                calculateTotals();
-                initializeDateToggles(); // Re-initialize toggles for new items
-            }
+            calculateTotals();
+        }
+
+        // Render only new cart items that aren't in the HTML yet
+        function renderNewCartItems() {
+            addNewItemsToDOM();
         }
 
         // Create HTML for individual cart item matching existing structure exactly
@@ -1301,8 +1301,7 @@
             const hasDate = item.mfgDate && item.expDate;
             const quantityDisplay = item.quantityDisplay || `${item.quantity} ${item.unit}`;
 
-            return `
-        <div class="bg-white rounded-xl shadow-sm p-3" id="cart-item-${itemId}">
+            return `<div class="bg-white rounded-xl shadow-sm p-3" id="cart-item-${itemId}">
             <div class="flex items-start justify-between">
                 <div class="flex-1">
                     <h3 class="font-semibold text-dark text-sm">${item.name}</h3>
@@ -1875,15 +1874,14 @@
                     }
                     
                     // Load and merge any new items from inventory
+                    const itemsBeforeLoad = Object.keys(cartItems).length;
                     loadCartItems();
+                    const itemsAfterLoad = Object.keys(cartItems).length;
                     
-                    // Check if new items were added and need to be rendered
-                    const currentCartItemCount = document.querySelectorAll('#cart-items > div[id^="cart-item-"]').length;
-                    const cartDataCount = Object.keys(cartItems).length;
-                    
-                    if (cartDataCount > currentCartItemCount) {
-                        console.log(`New items detected: ${cartDataCount - currentCartItemCount} items need to be rendered`);
-                        renderNewCartItems();
+                    // If new items were loaded, render them immediately
+                    if (itemsAfterLoad > itemsBeforeLoad) {
+                        console.log(`${itemsAfterLoad - itemsBeforeLoad} new items loaded, rendering now`);
+                        addNewItemsToDOM();
                     }
                     
                     calculateTotals();
