@@ -1008,11 +1008,32 @@ def mark_notification_read(notification_id):
         notification.is_read = True
         db.session.commit()
         
-        return jsonify({'message': 'Notification marked as read'})
+        return jsonify({'success': True, 'message': 'Notification marked as read'})
         
     except Exception as e:
         app.logger.error(f"Error marking notification as read: {e}")
         return jsonify({'error': 'Failed to update notification'}), 500
+
+@app.route('/api/notifications/mark-all-read', methods=['POST'])
+def mark_all_notifications_read():
+    """Mark all notifications as read"""
+    try:
+        # Mark all unread notifications as read
+        unread_notifications = Notification.query.filter_by(is_read=False).all()
+        
+        for notification in unread_notifications:
+            notification.is_read = True
+        
+        db.session.commit()
+        
+        return jsonify({
+            'success': True, 
+            'message': f'Marked {len(unread_notifications)} notifications as read',
+            'count': len(unread_notifications)
+        })
+    except Exception as e:
+        app.logger.error(f"Error marking all notifications as read: {e}")
+        return jsonify({'error': str(e)}), 500
 
 @app.route('/api/notification-settings', methods=['GET'])
 def get_notification_settings_api():

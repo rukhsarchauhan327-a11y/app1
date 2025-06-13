@@ -3,7 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Notifications - Kirana Konnect</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         window.FontAwesomeConfig = { autoReplaceSvg: 'nest' };
@@ -13,28 +12,23 @@
         ::-webkit-scrollbar { 
             display: none;
         }
-        body {
-            font-family: 'Inter', sans-serif !important;
-        }
-        .fa, .fas, .far, .fal, .fab {
-            font-family: "Font Awesome 6 Free", "Font Awesome 6 Brands" !important;
-        }
     </style>
+    
     <script>
         tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        primary: "#4CAF50",
-                        secondary: "#2196F3",
-                        accent: "#FF9800",
-                        danger: "#F44336",
-                        dark: "#333333",
-                        light: "#F5F5F5"
+            "theme": {
+                "extend": {
+                    "colors": {
+                        "primary": "#4CAF50",
+                        "secondary": "#2196F3",
+                        "accent": "#FF9800",
+                        "danger": "#F44336",
+                        "dark": "#333333",
+                        "light": "#F5F5F5"
                     },
-                    fontFamily: {
-                        poppins: ["Poppins", "sans-serif"],
-                        sans: ["Inter", "sans-serif"]
+                    "fontFamily": {
+                        "poppins": ["Poppins", "sans-serif"],
+                        "sans": ["Inter", "sans-serif"]
                     }
                 }
             }
@@ -43,9 +37,46 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;500;600;700;800;900&display=swap">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif !important;
+        }
+        
+        .fa, .fas, .far, .fal, .fab {
+            font-family: "Font Awesome 6 Free", "Font Awesome 6 Brands" !important;
+        }
+
+        .notification-item {
+            transition: all 0.3s ease;
+        }
+
+        .notification-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .filter-btn {
+            transition: all 0.2s ease;
+        }
+
+        .filter-btn.active {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        .filter-btn:not(.active) {
+            background-color: #f3f4f6;
+            color: #6b7280;
+        }
+
+        .filter-btn:not(.active):hover {
+            background-color: #e5e7eb;
+            color: #374151;
+        }
+    </style>
 </head>
 <body class="font-poppins bg-gray-50">
-    <!-- Header -->
+    <!-- Header Section -->
     <header class="bg-white shadow-sm fixed top-0 left-0 right-0 z-20">
         <div class="flex items-center justify-between p-4">
             <button class="p-2 rounded-full hover:bg-gray-100" onclick="goBack()">
@@ -61,142 +92,37 @@
         </div>
     </header>
 
-    <!-- Filter Tabs -->
-    <div class="bg-white shadow-sm mt-16 px-4 py-3 border-b">
+    <!-- Filter Navigation -->
+    <div class="bg-white mt-16 px-4 py-3 border-b">
         <div class="flex space-x-2 overflow-x-auto">
-            <button class="filter-btn px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap bg-primary text-white" data-filter="all" onclick="filterNotifications('all')">
+            <button class="filter-btn px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap active" data-filter="all" onclick="filterNotifications('all')">
                 All
             </button>
-            <button class="filter-btn px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap bg-gray-100 text-gray-600" data-filter="critical" onclick="filterNotifications('critical')">
+            <button class="filter-btn px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap" data-filter="critical" onclick="filterNotifications('critical')">
                 Critical
             </button>
-            <button class="filter-btn px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap bg-gray-100 text-gray-600" data-filter="inventory" onclick="filterNotifications('inventory')">
+            <button class="filter-btn px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap" data-filter="inventory" onclick="filterNotifications('inventory')">
                 Inventory
             </button>
-            <button class="filter-btn px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap bg-gray-100 text-gray-600" data-filter="payment" onclick="filterNotifications('payment')">
+            <button class="filter-btn px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap" data-filter="payment" onclick="filterNotifications('payment')">
                 Payment
             </button>
         </div>
     </div>
 
-    <!-- Notifications List -->
-    <div class="px-4 py-4 space-y-3 pb-20" id="notifications-container">
-        <!-- Backup Notification -->
-        <div id="backup-notification-full" class="notification-item bg-white rounded-xl shadow-sm border-l-4 border-accent p-4" data-type="system">
-            <div class="flex items-start space-x-3">
-                <div class="bg-accent/10 p-2 rounded-full">
-                    <i class="fa-solid fa-shield-exclamation text-accent text-lg"></i>
-                </div>
-                <div class="flex-1">
-                    <div class="flex items-start justify-between">
-                        <div>
-                            <h3 class="font-semibold text-dark text-sm">Backup Disabled</h3>
-                            <p class="text-xs text-gray-600 mt-1">Enable backup to protect your business data from loss</p>
-                            <p class="text-xs text-gray-400 mt-2">2 days ago</p>
-                        </div>
-                        <span class="bg-accent text-white text-xs px-2 py-1 rounded-full">ACTION</span>
-                    </div>
-                    <div class="mt-3 flex space-x-2">
-                        <button class="bg-accent text-white px-3 py-1 rounded-lg text-xs font-medium" onclick="enableBackup()">
-                            Enable Backup
-                        </button>
-                        <button class="bg-gray-200 text-gray-700 px-3 py-1 rounded-lg text-xs font-medium" onclick="dismissNotification('backup')">
-                            Dismiss
-                        </button>
-                    </div>
-                </div>
-            </div>
+    <!-- Notifications Container -->
+    <div id="notifications-container" class="px-4 py-4 space-y-3 pb-20">
+        <!-- Loading state -->
+        <div id="loading-state" class="text-center py-12">
+            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+            <p class="text-gray-500">Loading notifications...</p>
         </div>
 
-        <!-- Critical Alert - Expired Items -->
-        <div class="notification-item bg-white rounded-xl shadow-sm border-l-4 border-danger p-4" data-type="critical">
-            <div class="flex items-start space-x-3">
-                <div class="bg-danger/10 p-2 rounded-full">
-                    <i class="fa-solid fa-triangle-exclamation text-danger text-lg"></i>
-                </div>
-                <div class="flex-1">
-                    <div class="flex items-start justify-between">
-                        <div>
-                            <h3 class="font-semibold text-danger text-sm">5 Items Expired</h3>
-                            <p class="text-xs text-gray-600 mt-1">Remove from inventory immediately to avoid health risks</p>
-                            <p class="text-xs text-gray-400 mt-2">2 hours ago</p>
-                        </div>
-                        <span class="bg-danger text-white text-xs px-2 py-1 rounded-full">URGENT</span>
-                    </div>
-                    <div class="mt-3">
-                        <button class="bg-danger text-white px-3 py-1 rounded-lg text-xs font-medium" onclick="window.location.href='/expiry-alert'">
-                            Remove Items
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Inventory Alert - Low Stock -->
-        <div class="notification-item bg-white rounded-xl shadow-sm border-l-4 border-secondary p-4" data-type="inventory">
-            <div class="flex items-start space-x-3">
-                <div class="bg-secondary/10 p-2 rounded-full">
-                    <i class="fa-solid fa-box text-secondary text-lg"></i>
-                </div>
-                <div class="flex-1">
-                    <div class="flex items-start justify-between">
-                        <div>
-                            <h3 class="font-semibold text-secondary text-sm">12 Items Low Stock</h3>
-                            <p class="text-xs text-gray-600 mt-1">Reorder soon to avoid stockouts</p>
-                            <p class="text-xs text-gray-400 mt-2">4 hours ago</p>
-                        </div>
-                        <span class="bg-secondary text-white text-xs px-2 py-1 rounded-full">STOCK</span>
-                    </div>
-                    <div class="mt-3">
-                        <button class="bg-secondary text-white px-3 py-1 rounded-lg text-xs font-medium" onclick="window.location.href='/low-stock'">
-                            View Items
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Payment Alert -->
-        <div class="notification-item bg-white rounded-xl shadow-sm border-l-4 border-primary p-4" data-type="payment">
-            <div class="flex items-start space-x-3">
-                <div class="bg-primary/10 p-2 rounded-full">
-                    <i class="fa-solid fa-money-bill text-primary text-lg"></i>
-                </div>
-                <div class="flex-1">
-                    <div class="flex items-start justify-between">
-                        <div>
-                            <h3 class="font-semibold text-primary text-sm">₹5,000 Payment Received</h3>
-                            <p class="text-xs text-gray-600 mt-1">Ramesh Kumar made a credit payment</p>
-                            <p class="text-xs text-gray-400 mt-2">1 day ago</p>
-                        </div>
-                        <span class="bg-primary text-white text-xs px-2 py-1 rounded-full">PAID</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Pending Credits Alert -->
-        <div class="notification-item bg-white rounded-xl shadow-sm border-l-4 border-accent p-4" data-type="payment">
-            <div class="flex items-start space-x-3">
-                <div class="bg-accent/10 p-2 rounded-full">
-                    <i class="fa-solid fa-clock text-accent text-lg"></i>
-                </div>
-                <div class="flex-1">
-                    <div class="flex items-start justify-between">
-                        <div>
-                            <h3 class="font-semibold text-accent text-sm">₹12,500 Pending Credits</h3>
-                            <p class="text-xs text-gray-600 mt-1">Outstanding amount from 8 customers</p>
-                            <p class="text-xs text-gray-400 mt-2">Today</p>
-                        </div>
-                        <span class="bg-accent text-white text-xs px-2 py-1 rounded-full">PENDING</span>
-                    </div>
-                    <div class="mt-3">
-                        <button class="bg-accent text-white px-3 py-1 rounded-lg text-xs font-medium" onclick="window.location.href='/pending-credits'">
-                            View Details
-                        </button>
-                    </div>
-                </div>
-            </div>
+        <!-- Empty state -->
+        <div id="empty-state" class="text-center py-12 hidden">
+            <i class="fa-solid fa-bell-slash text-gray-300 text-4xl mb-4"></i>
+            <h3 class="text-lg font-semibold text-gray-600 mb-2">No New Notifications</h3>
+            <p class="text-gray-500">All caught up! Check back later for updates.</p>
         </div>
     </div>
 
@@ -222,104 +148,287 @@
             <button class="flex flex-col items-center py-1 px-3 relative" onclick="window.location.href='/notifications'">
                 <i class="fa-solid fa-bell text-primary text-xl"></i>
                 <span class="text-xs mt-1 text-primary">Notifications</span>
-                <span class="absolute -top-1 -right-1 bg-danger text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold">5</span>
+                <span id="notification-badge" class="absolute -top-1 -right-1 bg-danger text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold">0</span>
             </button>
         </div>
     </nav>
 
     <script>
+        var currentFilter = 'all';
+        var allNotifications = [];
+
         function goBack() {
             window.location.href = '/dashboard';
         }
 
         function markAllAsRead() {
             if (confirm('Mark all notifications as read?')) {
-                // Hide all notifications or mark them as read
-                var notifications = document.querySelectorAll('.notification-item');
-                for (var i = 0; i < notifications.length; i++) {
-                    notifications[i].style.opacity = '0.5';
-                }
-                showStyledNotification('All notifications marked as read!', 'success');
+                fetch('/api/notifications/mark-all-read', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                })
+                .then(function(response) {
+                    return response.json();
+                })
+                .then(function(data) {
+                    if (data.success) {
+                        loadNotifications();
+                        showNotification('All notifications marked as read', 'success');
+                    }
+                })
+                .catch(function(error) {
+                    console.error('Error marking notifications as read:', error);
+                    showNotification('Error marking notifications as read', 'error');
+                });
             }
         }
 
         function filterNotifications(filter) {
-            var filterBtns = document.querySelectorAll('.filter-btn');
-            var notifications = document.querySelectorAll('.notification-item');
+            currentFilter = filter;
             
-            // Update button styles
-            for (var i = 0; i < filterBtns.length; i++) {
-                var btn = filterBtns[i];
-                btn.classList.remove('bg-primary', 'text-white');
-                btn.classList.add('bg-gray-100', 'text-gray-600');
+            // Update filter buttons
+            var filterButtons = document.querySelectorAll('.filter-btn');
+            for (var i = 0; i < filterButtons.length; i++) {
+                filterButtons[i].classList.remove('active');
             }
             
-            var activeBtn = document.querySelector('[data-filter="' + filter + '"]');
-            if (activeBtn) {
-                activeBtn.classList.remove('bg-gray-100', 'text-gray-600');
-                activeBtn.classList.add('bg-primary', 'text-white');
+            var activeButton = document.querySelector('[data-filter="' + filter + '"]');
+            if (activeButton) {
+                activeButton.classList.add('active');
             }
             
             // Filter notifications
-            for (var j = 0; j < notifications.length; j++) {
-                var notification = notifications[j];
-                var type = notification.getAttribute('data-type');
-                var shouldShow = false;
-                
-                if (filter === 'all') {
-                    shouldShow = true;
-                } else if (filter === 'critical') {
-                    shouldShow = (type === 'critical');
-                } else if (filter === 'inventory') {
-                    shouldShow = (type === 'inventory');
-                } else if (filter === 'payment') {
-                    shouldShow = (type === 'payment');
+            displayNotifications(allNotifications, filter);
+        }
+
+        function loadNotifications() {
+            fetch('/api/notifications')
+                .then(function(response) {
+                    return response.json();
+                })
+                .then(function(data) {
+                    if (data.notifications) {
+                        allNotifications = data.notifications;
+                        displayNotifications(data.notifications, currentFilter);
+                        updateNotificationBadge(data.count || 0);
+                        document.getElementById('loading-state').style.display = 'none';
+                    }
+                })
+                .catch(function(error) {
+                    console.error('Error loading notifications:', error);
+                    document.getElementById('loading-state').style.display = 'none';
+                    showNotification('Error loading notifications', 'error');
+                });
+        }
+
+        function displayNotifications(notifications, filter) {
+            var container = document.getElementById('notifications-container');
+            var loadingState = document.getElementById('loading-state');
+            var emptyState = document.getElementById('empty-state');
+            
+            // Filter notifications
+            var filteredNotifications = notifications;
+            if (filter !== 'all') {
+                filteredNotifications = notifications.filter(function(notification) {
+                    return notification.type === filter;
+                });
+            }
+            
+            // Clear container except loading/empty states
+            var elementsToKeep = [loadingState, emptyState];
+            var children = Array.from(container.children);
+            for (var i = 0; i < children.length; i++) {
+                if (elementsToKeep.indexOf(children[i]) === -1) {
+                    container.removeChild(children[i]);
                 }
-                
-                notification.style.display = shouldShow ? 'block' : 'none';
+            }
+            
+            if (filteredNotifications.length === 0) {
+                emptyState.style.display = 'block';
+                return;
+            } else {
+                emptyState.style.display = 'none';
+            }
+            
+            // Create notification elements
+            for (var j = 0; j < filteredNotifications.length; j++) {
+                var notification = filteredNotifications[j];
+                var notificationElement = createNotificationElement(notification);
+                container.appendChild(notificationElement);
             }
         }
 
-        function enableBackup() {
-            if (confirm('Enable email backup to protect your business data?')) {
-                localStorage.setItem('emailBackupEnabled', 'true');
-                var backupNotification = document.getElementById('backup-notification-full');
-                if (backupNotification) {
-                    backupNotification.style.display = 'none';
+        function createNotificationElement(notification) {
+            var div = document.createElement('div');
+            div.className = 'notification-item bg-white rounded-xl shadow-sm border-l-4 p-4 cursor-pointer';
+            div.setAttribute('data-type', notification.type);
+            div.setAttribute('data-id', notification.id);
+            
+            var borderColor = 'border-gray-300';
+            var iconBg = 'bg-gray-100';
+            var iconColor = 'text-gray-600';
+            var icon = 'fa-bell';
+            var badgeColor = 'bg-gray-500';
+            
+            // Set colors and icons based on type and priority
+            if (notification.type === 'critical' || notification.priority === 'urgent') {
+                borderColor = 'border-danger';
+                iconBg = 'bg-danger/10';
+                iconColor = 'text-danger';
+                icon = 'fa-triangle-exclamation';
+                badgeColor = 'bg-danger';
+            } else if (notification.type === 'inventory') {
+                borderColor = 'border-secondary';
+                iconBg = 'bg-secondary/10';
+                iconColor = 'text-secondary';
+                icon = 'fa-box';
+                badgeColor = 'bg-secondary';
+            } else if (notification.type === 'payment') {
+                borderColor = 'border-primary';
+                iconBg = 'bg-primary/10';
+                iconColor = 'text-primary';
+                icon = 'fa-money-bill';
+                badgeColor = 'bg-primary';
+            } else if (notification.type === 'expiry') {
+                borderColor = 'border-danger';
+                iconBg = 'bg-danger/10';
+                iconColor = 'text-danger';
+                icon = 'fa-calendar-times';
+                badgeColor = 'bg-danger';
+            } else if (notification.type === 'backup' || notification.type === 'system') {
+                borderColor = 'border-accent';
+                iconBg = 'bg-accent/10';
+                iconColor = 'text-accent';
+                icon = 'fa-shield-exclamation';
+                badgeColor = 'bg-accent';
+            }
+            
+            div.classList.add(borderColor);
+            
+            div.innerHTML = 
+                '<div class="flex items-start space-x-3">' +
+                    '<div class="' + iconBg + ' p-2 rounded-full">' +
+                        '<i class="fa-solid ' + icon + ' ' + iconColor + ' text-lg"></i>' +
+                    '</div>' +
+                    '<div class="flex-1">' +
+                        '<div class="flex items-start justify-between">' +
+                            '<div>' +
+                                '<h3 class="font-semibold text-dark text-sm">' + notification.title + '</h3>' +
+                                '<p class="text-xs text-gray-600 mt-1">' + notification.message + '</p>' +
+                                '<p class="text-xs text-gray-400 mt-2">' + (notification.time_ago || 'Just now') + '</p>' +
+                            '</div>' +
+                            '<span class="' + badgeColor + ' text-white text-xs px-2 py-1 rounded-full">' + 
+                                notification.priority.toUpperCase() + 
+                            '</span>' +
+                        '</div>' +
+                    '</div>' +
+                '</div>';
+            
+            // Add click handler
+            div.onclick = function() {
+                handleNotificationClick(notification);
+            };
+            
+            return div;
+        }
+
+        function handleNotificationClick(notification) {
+            // Mark as read first
+            markNotificationAsRead(notification.id);
+            
+            // Navigate based on type
+            if (notification.type === 'inventory' || notification.type === 'expiry') {
+                if (notification.type === 'expiry') {
+                    window.location.href = '/expiry-alert';
+                } else {
+                    window.location.href = '/low-stock';
                 }
-                showStyledNotification('Email backup enabled successfully!', 'success');
+            } else if (notification.type === 'payment') {
+                if (notification.customer_id) {
+                    window.location.href = '/customer-ledger?customer_id=' + notification.customer_id;
+                } else {
+                    window.location.href = '/pending-credits';
+                }
+            } else if (notification.type === 'backup' || notification.type === 'system') {
+                window.location.href = '/profile';
+            } else {
+                window.location.href = '/dashboard';
             }
         }
 
-        function dismissNotification(type) {
-            if (confirm('Dismiss this notification?')) {
-                if (type === 'backup') {
-                    var backupNotification = document.getElementById('backup-notification-full');
-                    if (backupNotification) {
-                        backupNotification.style.display = 'none';
+        function markNotificationAsRead(notificationId) {
+            fetch('/api/notifications/' + notificationId + '/mark-read', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(function(response) {
+                return response.json();
+            })
+            .then(function(data) {
+                if (data.success) {
+                    // Update badge count
+                    var badge = document.getElementById('notification-badge');
+                    var currentCount = parseInt(badge.textContent) || 0;
+                    if (currentCount > 0) {
+                        badge.textContent = currentCount - 1;
                     }
                 }
-                showStyledNotification('Notification dismissed', 'info');
+            })
+            .catch(function(error) {
+                console.error('Error marking notification as read:', error);
+            });
+        }
+
+        function updateNotificationBadge(count) {
+            var badge = document.getElementById('notification-badge');
+            if (badge) {
+                badge.textContent = count;
+                badge.style.display = count > 0 ? 'flex' : 'none';
             }
         }
 
-        function showStyledNotification(message, type) {
+        function showNotification(message, type) {
+            // Simple alert for now - can be enhanced with custom toast
             alert(message);
         }
 
-        // Check backup status on page load
+        // Check backup status and create notification if needed
         function checkBackupStatus() {
             var backupEnabled = localStorage.getItem('emailBackupEnabled') === 'true';
-            var backupNotification = document.getElementById('backup-notification-full');
-            
-            if (backupEnabled && backupNotification) {
-                backupNotification.style.display = 'none';
+            if (!backupEnabled) {
+                // This would normally come from the backend
+                var backupNotification = {
+                    id: 'backup-local',
+                    type: 'backup',
+                    priority: 'medium',
+                    title: 'Backup Disabled',
+                    message: 'Enable backup to protect your business data from loss',
+                    time_ago: '2 days ago'
+                };
+                
+                // Add to notifications if not already present
+                var hasBackupNotification = allNotifications.some(function(n) {
+                    return n.type === 'backup';
+                });
+                
+                if (!hasBackupNotification) {
+                    allNotifications.unshift(backupNotification);
+                    displayNotifications(allNotifications, currentFilter);
+                }
             }
         }
 
         // Initialize page
         document.addEventListener('DOMContentLoaded', function() {
+            loadNotifications();
             checkBackupStatus();
+            
+            // Auto-refresh notifications every 30 seconds
+            setInterval(loadNotifications, 30000);
         });
     </script>
 </body>
