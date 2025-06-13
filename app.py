@@ -378,6 +378,8 @@ def get_dashboard_stats():
         'today_profit': round(today_profit, 2),
         'profit_growth': round(profit_growth, 1),
         'total_sales': round(total_sales, 2),
+        'actual_cost': round(actual_cost, 2),
+        'total_revenue': round(total_revenue, 2),
         'transaction_count': transaction_count,
         'outstanding_amount': round(total_outstanding, 2),
         'customers_with_credit': customers_with_credit,

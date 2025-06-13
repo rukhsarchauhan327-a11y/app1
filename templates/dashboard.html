@@ -852,15 +852,19 @@
                             <h4 class="font-semibold text-dark mb-3">Profit Summary</h4>
                             <div class="space-y-2">
                                 <div class="flex justify-between">
-                                    <span class="text-gray-600">Total Sales:</span>
+                                    <span class="text-gray-600">Total Revenue:</span>
                                     <span class="font-medium" id="modal-sales">₹0</span>
                                 </div>
                                 <div class="flex justify-between">
-                                    <span class="text-gray-600">Estimated Cost (65%):</span>
+                                    <span class="text-gray-600">Cost of Goods Sold:</span>
                                     <span class="font-medium" id="modal-cost">₹0</span>
                                 </div>
+                                <div class="flex justify-between text-sm">
+                                    <span class="text-gray-500">Profit Margin:</span>
+                                    <span class="text-gray-500" id="modal-margin">0%</span>
+                                </div>
                                 <div class="border-t pt-2 flex justify-between">
-                                    <span class="font-semibold text-dark">Net Profit (35%):</span>
+                                    <span class="font-semibold text-dark">Net Profit:</span>
                                     <span class="font-bold text-primary" id="modal-profit">₹0</span>
                                 </div>
                             </div>
@@ -887,10 +891,16 @@
                 const response = await fetch('/api/dashboard/stats');
                 const stats = await response.json();
                 
-                const cost = stats.total_sales * 0.65;
-                document.getElementById('modal-sales').textContent = `₹${stats.total_sales}`;
-                document.getElementById('modal-cost').textContent = `₹${cost.toFixed(2)}`;
-                document.getElementById('modal-profit').textContent = `₹${stats.today_profit}`;
+                // Use actual cost and revenue data from the backend
+                const revenue = stats.total_revenue || stats.total_sales;
+                const actualCost = stats.actual_cost || 0;
+                const profit = stats.today_profit || 0;
+                const profitMargin = revenue > 0 ? ((profit / revenue) * 100) : 0;
+                
+                document.getElementById('modal-sales').textContent = `₹${revenue.toFixed(2)}`;
+                document.getElementById('modal-cost').textContent = `₹${actualCost.toFixed(2)}`;
+                document.getElementById('modal-profit').textContent = `₹${profit.toFixed(2)}`;
+                document.getElementById('modal-margin').textContent = `${profitMargin.toFixed(1)}%`;
                 
             } catch (error) {
                 console.error('Error loading profit modal data:', error);
