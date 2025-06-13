@@ -162,7 +162,7 @@
             </div>
 
             <!-- Critical Alert - Data Backup Needed -->
-            <div class="notification-item bg-white rounded-lg shadow-sm border-l-4 border-orange-500 cursor-pointer hover:shadow-md transition-shadow" data-type="critical" onclick="window.location.href='/profile'">
+            <div id="backup-notification-full" class="notification-item bg-white rounded-lg shadow-sm border-l-4 border-orange-500 cursor-pointer hover:shadow-md transition-shadow" data-type="critical" onclick="window.location.href='/profile'" style="display: none;">
                 <div class="p-4">
                     <div class="flex items-start space-x-3">
                         <div class="bg-orange-100 p-2 rounded-full">
@@ -309,10 +309,32 @@
             }, 500);
         }
 
+        // Check backup status and show/hide notification
+        function checkBackupStatusFull() {
+            const backupEnabled = localStorage.getItem('emailBackupEnabled') === 'true';
+            const backupNotification = document.getElementById('backup-notification-full');
+            
+            if (backupEnabled) {
+                backupNotification.style.display = 'none';
+            } else {
+                backupNotification.style.display = 'block';
+            }
+        }
+
         // Filter functionality
         document.addEventListener('DOMContentLoaded', function() {
             const filterBtns = document.querySelectorAll('.filter-btn');
             const notifications = document.querySelectorAll('.notification-item');
+
+            // Check backup status on page load
+            checkBackupStatusFull();
+
+            // Listen for storage changes
+            window.addEventListener('storage', function(e) {
+                if (e.key === 'emailBackupEnabled') {
+                    checkBackupStatusFull();
+                }
+            });
 
             filterBtns.forEach(btn => {
                 btn.addEventListener('click', function() {

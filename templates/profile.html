@@ -1529,13 +1529,21 @@
             }
         }
 
-        // Initialize checkbox visual state on page load
+        // Initialize backup state on page load
         document.addEventListener('DOMContentLoaded', function() {
             const checkbox = document.getElementById('emailBackup');
-            const checkboxVisual = document.querySelector('.checkbox-custom');
             
-            if (checkbox && checkbox.checked) {
-                checkboxVisual.classList.add('checked');
+            if (checkbox) {
+                // Get saved backup status from localStorage (default to enabled)
+                const backupEnabled = localStorage.getItem('emailBackupEnabled') !== 'false';
+                
+                // Set checkbox state
+                checkbox.checked = backupEnabled;
+                
+                // Save initial state if not set
+                if (localStorage.getItem('emailBackupEnabled') === null) {
+                    localStorage.setItem('emailBackupEnabled', 'true');
+                }
             }
         });
 
