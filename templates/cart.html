@@ -1130,6 +1130,9 @@
             }
         };
 
+        // Global cart state to track added items
+        let addedFromInventory = JSON.parse(localStorage.getItem('addedFromInventory') || '{}');
+
         // Load cart items from localStorage and merge with existing cart
         function loadCartItems() {
             const cartData = localStorage.getItem('kiranakonnect_cart');
@@ -1145,7 +1148,15 @@
             
             // Convert stored items to cart format and add to existing cart
             storedItems.forEach((item) => {
-                // Check if item already exists in cart (by name and price)
+                const itemKey = `${item.name}_${item.unitPrice}`;
+                
+                // Check if this item was already added before
+                if (addedFromInventory[itemKey]) {
+                    console.log(`Item ${item.name} already exists in cart, skipping duplicate`);
+                    return;
+                }
+                
+                // Check if item already exists in existing cart
                 const existingItemKey = Object.keys(cartItems).find(key => {
                     const cartItem = cartItems[key];
                     return cartItem.name === item.name && cartItem.unitPrice === item.unitPrice;
@@ -1179,10 +1190,16 @@
                     nextItemId++;
                     itemsAdded++;
                 }
+                
+                // Mark this item as added
+                addedFromInventory[itemKey] = true;
             });
             
-            // Only clear localStorage after successful merge
-            if (itemsAdded > 0 || storedItems.length > 0) {
+            // Save the tracking state
+            localStorage.setItem('addedFromInventory', JSON.stringify(addedFromInventory));
+            
+            // Clear the cart items after processing
+            if (storedItems.length > 0) {
                 localStorage.removeItem('kiranakonnect_cart');
                 console.log(`Merged ${storedItems.length} items from localStorage into cart (${itemsAdded} new items added)`);
             }
@@ -1259,18 +1276,12 @@
                     const item = cartItems[itemId];
                     const cartItemHTML = createCartItemHTML(itemId, item);
                     
-                    // Insert before the "Add More Items" section if it exists
+                    // Insert before the "Add More Items" section
                     const addMoreSection = document.getElementById('add-items-section');
                     if (addMoreSection) {
-                        // Create a wrapper div with proper spacing
-                        const wrapperDiv = document.createElement('div');
-                        wrapperDiv.innerHTML = cartItemHTML;
-                        addMoreSection.parentNode.insertBefore(wrapperDiv.firstElementChild, addMoreSection);
+                        addMoreSection.insertAdjacentHTML('beforebegin', cartItemHTML);
                     } else {
-                        // Add to end of cart container with proper spacing
-                        const wrapperDiv = document.createElement('div');
-                        wrapperDiv.innerHTML = cartItemHTML;
-                        cartContainer.appendChild(wrapperDiv.firstElementChild);
+                        cartContainer.insertAdjacentHTML('beforeend', cartItemHTML);
                     }
                     
                     itemsRendered++;
@@ -1280,8 +1291,8 @@
             
             if (itemsRendered > 0) {
                 console.log(`Rendered ${itemsRendered} new cart items`);
-                // Recalculate totals after adding new items
                 calculateTotals();
+                initializeDateToggles(); // Re-initialize toggles for new items
             }
         }
 
