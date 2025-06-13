@@ -16,16 +16,17 @@
   "theme": {
     "extend": {
       "colors": {
-        "primary": "#4CAF50",
-        "secondary": "#2196F3",
-        "accent": "#FF9800",
-        "danger": "#F44336",
-        "dark": "#333333",
-        "light": "#F5F5F5"
+        "primary": "#2563eb",
+        "secondary": "#64748b",
+        "accent": "#f59e0b",
+        "success": "#10b981",
+        "danger": "#ef4444",
+        "dark": "#1e293b",
+        "light": "#f8fafc"
       },
       "fontFamily": {
-        "poppins": [
-          "Poppins",
+        "inter": [
+          "Inter",
           "sans-serif"
         ],
         "sans": [
@@ -39,7 +40,6 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;500;600;700;800;900&display=swap">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap">
 <style>
       body {
         font-family: 'Inter', sans-serif !important;
@@ -51,301 +51,120 @@
       }
     </style>
 </head>
-<body class="bg-light font-sans">
-    <!-- Header -->
-    <div class="bg-primary text-white p-4 text-center relative">
-        <div class="absolute left-4 top-4">
-            <a href="/dashboard" class="text-white text-xl">
-                <i class="fa-solid fa-arrow-left"></i>
-            </a>
+<body class="font-inter bg-gray-100">
+    <!-- Header Section -->
+    <header class="bg-white border-b border-gray-200 fixed top-0 left-0 right-0 z-10">
+        <div class="flex items-center justify-between px-4 py-3">
+            <button class="p-2 hover:bg-gray-100 rounded-lg" onclick="window.location.href='/dashboard'">
+                <i class="fa-solid fa-arrow-left text-gray-600 text-lg"></i>
+            </button>
+            <div class="text-center">
+                <h1 class="text-lg font-semibold text-dark">Cart</h1>
+            </div>
+            <button class="p-2 hover:bg-gray-100 rounded-lg">
+                <i class="fa-solid fa-search text-gray-600 text-lg"></i>
+            </button>
         </div>
-        <h1 class="text-xl font-bold">Cart</h1>
-    </div>
+    </header>
 
-    <!-- Cart Items -->
-    <div class="p-4 space-y-3 max-h-96 overflow-y-auto" id="cart-items">
-        <!-- Default items -->
-        <div class="bg-white rounded-xl shadow-sm p-3" id="cart-item-1">
-            <div class="flex items-start justify-between">
-                <div class="flex-1">
-                    <h3 class="font-semibold text-dark text-sm">Aashirvaad Atta</h3>
-                    <div class="flex justify-between items-center mt-1">
-                        <span class="text-sm text-gray-700 font-medium" id="quantity-1">10 Kg</span>
-                        <span class="text-lg font-bold text-primary" id="price-1">₹450</span>
-                    </div>
-                    <div class="mt-2 space-y-1" id="dates-1">
-                        <div class="flex items-center text-xs text-gray-500 date-info">
-                            <i class="fa-solid fa-calendar mr-1"></i>
-                            <span>MFG: 01/05/2025</span>
-                        </div>
-                        <div class="flex items-center text-xs text-gray-500 date-info">
-                            <i class="fa-solid fa-clock mr-1"></i>
-                            <span>EXP: 01/09/2025</span>
-                        </div>
-                        <div class="flex items-center space-x-2 mt-1">
-                            <button class="text-xs text-primary hover:underline flex items-center" onclick="editItem(1)">
-                                <i class="fa-solid fa-edit mr-1"></i>
-                                Edit
-                            </button>
-                            <button id="date-toggle-1" class="text-xs text-danger hover:underline flex items-center" onclick="toggleProductDates(1)">
-                                <i class="fa-solid fa-times mr-1"></i>
-                                Remove Dates
-                            </button>
-                        </div>
-                    </div>
-                </div>
-                <button class="text-danger text-sm ml-3 p-1" onclick="removeItem(1)">
-                    <i class="fa-solid fa-trash"></i>
+    <!-- Main Content -->
+    <main class="pt-16 pb-32 bg-gray-100">
+        <!-- Cart Items Container -->
+        <div id="cart-items" class="px-4 pt-4 space-y-4">
+            <!-- Items will be dynamically rendered here -->
+        </div>
+
+        <!-- Add More Items Button -->
+        <div class="px-4 mt-6">
+            <button onclick="addMoreItems()" class="w-full bg-primary text-white py-3 rounded-lg font-medium flex items-center justify-center space-x-2">
+                <i class="fa-solid fa-plus"></i>
+                <span>Add More Items to Cart</span>
+            </button>
+        </div>
+
+        <!-- Tax and Offer Section -->
+        <div class="px-4 mt-6">
+            <div class="grid grid-cols-2 gap-4">
+                <button class="flex flex-col items-center justify-center py-4 bg-green-50 border border-green-200 rounded-lg">
+                    <i class="fa-solid fa-percent text-green-600 text-xl mb-2"></i>
+                    <span class="text-sm font-medium text-green-700">Add Tax</span>
+                </button>
+                <button class="flex flex-col items-center justify-center py-4 bg-gray-50 border border-gray-200 rounded-lg">
+                    <i class="fa-solid fa-tag text-gray-600 text-xl mb-2"></i>
+                    <span class="text-sm font-medium text-gray-700">Add Offer</span>
                 </button>
             </div>
         </div>
 
-        <div class="bg-white rounded-xl shadow-sm p-3" id="cart-item-2">
-            <div class="flex items-start justify-between">
-                <div class="flex-1">
-                    <h3 class="font-semibold text-dark text-sm">Real Fruit Juice</h3>
-                    <div class="flex justify-between items-center mt-1">
-                        <span class="text-sm text-gray-700 font-medium" id="quantity-2">2 Bottles</span>
-                        <span class="text-lg font-bold text-primary" id="price-2">₹120</span>
-                    </div>
-                    <div class="mt-2 space-y-1" id="dates-2">
-                        <div class="flex items-center text-xs text-gray-500 date-info">
-                            <i class="fa-solid fa-calendar mr-1"></i>
-                            <span>MFG: 12/05/2025</span>
-                        </div>
-                        <div class="flex items-center text-xs text-gray-500 date-info">
-                            <i class="fa-solid fa-clock mr-1"></i>
-                            <span>EXP: 25/07/2025</span>
-                        </div>
-                        <div class="flex items-center space-x-2 mt-1">
-                            <button class="text-xs text-primary hover:underline flex items-center" onclick="editItem(2)">
-                                <i class="fa-solid fa-edit mr-1"></i>
-                                Edit
-                            </button>
-                            <button id="date-toggle-2" class="text-xs text-danger hover:underline flex items-center" onclick="toggleProductDates(2)">
-                                <i class="fa-solid fa-times mr-1"></i>
-                                Remove Dates
-                            </button>
-                        </div>
+        <!-- Billing Summary -->
+        <div class="px-4 mt-6">
+            <div class="bg-white rounded-lg p-4 shadow-sm">
+                <div class="flex justify-between items-center mb-2">
+                    <span class="text-gray-600">Subtotal</span>
+                    <span id="subtotal" class="font-semibold">₹1135.00</span>
+                </div>
+                <div class="flex justify-between items-center mb-4">
+                    <span class="text-gray-600">GST (18%)</span>
+                    <span id="gst" class="font-semibold">₹204.30</span>
+                </div>
+                <div class="border-t pt-4">
+                    <div class="flex justify-between items-center">
+                        <span class="text-lg font-bold">Total Amount</span>
+                        <span id="total" class="text-lg font-bold text-green-600">₹1339.30</span>
                     </div>
                 </div>
-                <button class="text-danger text-sm ml-3 p-1" onclick="removeItem(2)">
-                    <i class="fa-solid fa-trash"></i>
-                </button>
             </div>
         </div>
 
-        <div class="bg-white rounded-xl shadow-sm p-3" id="cart-item-3">
-            <div class="flex items-start justify-between">
-                <div class="flex-1">
-                    <h3 class="font-semibold text-dark text-sm">Colgate Paste</h3>
-                    <div class="flex justify-between items-center mt-1">
-                        <span class="text-sm text-gray-700 font-medium" id="quantity-3">3 Pieces</span>
-                        <span class="text-lg font-bold text-primary" id="price-3">₹90</span>
-                    </div>
-                    <div class="mt-2">
-                        <button class="text-xs text-primary hover:underline flex items-center" onclick="editItem(3)">
-                            <i class="fa-solid fa-edit mr-1"></i>
-                            Edit
-                        </button>
+        <!-- Bill Generated By -->
+        <div class="px-4 mt-4">
+            <div class="bg-white rounded-lg p-4 shadow-sm">
+                <div class="flex items-center justify-between">
+                    <span class="text-gray-600">Bill Generated By:</span>
+                    <div class="flex items-center space-x-2">
+                        <span class="font-medium">Rajesh Sharma (Owner)</span>
+                        <i class="fa-solid fa-chevron-down text-gray-400"></i>
                     </div>
                 </div>
-                <button class="text-danger text-sm ml-3 p-1" onclick="removeItem(3)">
-                    <i class="fa-solid fa-trash"></i>
-                </button>
             </div>
         </div>
-
-        <div class="bg-white rounded-xl shadow-sm p-3" id="cart-item-4">
-            <div class="flex items-start justify-between">
-                <div class="flex-1">
-                    <h3 class="font-semibold text-dark text-sm">Good Day Biscuits</h3>
-                    <div class="flex justify-between items-center mt-1">
-                        <span class="text-sm text-gray-700 font-medium" id="quantity-4">5 Packets</span>
-                        <span class="text-lg font-bold text-primary" id="price-4">₹60</span>
-                    </div>
-                    <div class="mt-2 space-y-1" id="dates-4">
-                        <div class="flex items-center text-xs text-gray-500 date-info">
-                            <i class="fa-solid fa-calendar mr-1"></i>
-                            <span>MFG: 05/03/2025</span>
-                        </div>
-                        <div class="flex items-center text-xs text-gray-500 date-info">
-                            <i class="fa-solid fa-clock mr-1"></i>
-                            <span>EXP: 05/09/2025</span>
-                        </div>
-                        <div class="flex items-center space-x-2 mt-1">
-                            <button class="text-xs text-primary hover:underline flex items-center" onclick="editItem(4)">
-                                <i class="fa-solid fa-edit mr-1"></i>
-                                Edit
-                            </button>
-                            <button id="date-toggle-4" class="text-xs text-danger hover:underline flex items-center" onclick="toggleProductDates(4)">
-                                <i class="fa-solid fa-times mr-1"></i>
-                                Remove Dates
-                            </button>
-                        </div>
-                    </div>
-                </div>
-                <button class="text-danger text-sm ml-3 p-1" onclick="removeItem(4)">
-                    <i class="fa-solid fa-trash"></i>
-                </button>
-            </div>
-        </div>
-
-        <div class="bg-white rounded-xl shadow-sm p-3" id="cart-item-5">
-            <div class="flex items-start justify-between">
-                <div class="flex-1">
-                    <h3 class="font-semibold text-dark text-sm">Surf Excel (500gm)</h3>
-                    <div class="flex justify-between items-center mt-1">
-                        <span class="text-sm text-gray-700 font-medium" id="quantity-5">1 Packet</span>
-                        <span class="text-lg font-bold text-primary" id="price-5">₹55</span>
-                    </div>
-                    <div class="mt-2">
-                        <button class="text-xs text-primary hover:underline flex items-center" onclick="editItem(5)">
-                            <i class="fa-solid fa-edit mr-1"></i>
-                            Edit
-                        </button>
-                    </div>
-                </div>
-                <button class="text-danger text-sm ml-3 p-1" onclick="removeItem(5)">
-                    <i class="fa-solid fa-trash"></i>
-                </button>
-            </div>
-        </div>
-
-        <div class="bg-white rounded-xl shadow-sm p-3" id="cart-item-6">
-            <div class="flex items-start justify-between">
-                <div class="flex-1">
-                    <h3 class="font-semibold text-dark text-sm">Dabur Honey</h3>
-                    <div class="flex justify-between items-center mt-1">
-                        <span class="text-sm text-gray-700 font-medium" id="quantity-6">1 Bottle</span>
-                        <span class="text-lg font-bold text-primary" id="price-6">₹180</span>
-                    </div>
-                    <div class="mt-2 space-y-1" id="dates-6">
-                        <div class="flex items-center text-xs text-gray-500 date-info">
-                            <i class="fa-solid fa-calendar mr-1"></i>
-                            <span>MFG: 01/01/2025</span>
-                        </div>
-                        <div class="flex items-center text-xs text-gray-500 date-info">
-                            <i class="fa-solid fa-clock mr-1"></i>
-                            <span>EXP: 01/01/2027</span>
-                        </div>
-                        <div class="flex items-center space-x-2 mt-1">
-                            <button class="text-xs text-primary hover:underline flex items-center" onclick="editItem(6)">
-                                <i class="fa-solid fa-edit mr-1"></i>
-                                Edit
-                            </button>
-                            <button id="date-toggle-6" class="text-xs text-danger hover:underline flex items-center" onclick="toggleProductDates(6)">
-                                <i class="fa-solid fa-times mr-1"></i>
-                                Remove Dates
-                            </button>
-                        </div>
-                    </div>
-                </div>
-                <button class="text-danger text-sm ml-3 p-1" onclick="removeItem(6)">
-                    <i class="fa-solid fa-trash"></i>
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Action Buttons -->
-    <div class="px-4 pb-4">
-        <button class="w-full bg-secondary text-white py-3 rounded-lg font-medium mb-3 hover:bg-opacity-90 transition-colors" onclick="addMoreItems()">
-            Add More Items
-        </button>
-    </div>
+    </main>
 
     <!-- Bottom Navigation -->
-    <div class="fixed bottom-0 left-0 right-0 bg-white shadow-lg rounded-t-3xl p-4">
-        <!-- Customer Selection -->
-        <div class="mb-4">
-            <label class="block text-sm font-medium text-gray-700 mb-2">Customer</label>
-            <div class="relative">
-                <input type="text" id="customer-search" placeholder="Search customer by name or phone..." 
-                       class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
-                <div id="customer-suggestions" class="absolute top-full left-0 right-0 bg-white border border-gray-300 rounded-lg mt-1 hidden z-10 max-h-40 overflow-y-auto">
-                </div>
-            </div>
-            <div class="flex mt-2 space-x-2">
-                <button class="text-sm text-primary hover:underline" onclick="selectCashCustomer()">Cash Customer</button>
-                <button class="text-sm text-primary hover:underline" onclick="showNewCustomerModal()">New Customer</button>
-            </div>
-            <div id="selected-customer" class="mt-2 text-sm text-gray-600"></div>
+    <nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200">
+        <div class="flex justify-around items-end py-2">
+            <button class="flex flex-col items-center py-1 px-3" onclick="window.location.href='/dashboard'">
+                <i class="fa-solid fa-home text-gray-400 text-lg"></i>
+                <span class="text-xs mt-1 text-gray-400">Home</span>
+            </button>
+            <button class="flex flex-col items-center py-1 px-3" onclick="window.location.href='/inventory'">
+                <i class="fa-solid fa-box text-gray-400 text-lg"></i>
+                <span class="text-xs mt-1 text-gray-400">Inventory</span>
+            </button>
+            <button class="relative -top-3 bg-primary rounded-full p-3 shadow-lg" onclick="window.location.href='/add-item'">
+                <i class="fa-solid fa-barcode text-white text-lg"></i>
+            </button>
+            <button class="flex flex-col items-center py-1 px-3 relative">
+                <i class="fa-solid fa-shopping-cart text-primary text-lg"></i>
+                <span class="text-xs mt-1 text-primary font-semibold">Cart</span>
+                <span class="absolute -top-1 -right-1 bg-danger text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold">3</span>
+            </button>
+            <button class="flex flex-col items-center py-1 px-3" onclick="window.location.href='/profile'">
+                <i class="fa-solid fa-user text-gray-400 text-lg"></i>
+                <span class="text-xs mt-1 text-gray-400">Profile</span>
+            </button>
         </div>
-        
-        <!-- Billing Summary -->
-        <div class="space-y-2 border-t pt-4">
-            <div class="flex justify-between text-sm">
-                <span>Subtotal:</span>
-                <span id="subtotal">₹955.00</span>
-            </div>
-            <div class="flex justify-between text-sm">
-                <span>Tax (0%):</span>
-                <span id="tax">₹0.00</span>
-            </div>
-            <div class="flex justify-between text-sm">
-                <span>Discount:</span>
-                <span id="discount">₹0.00</span>
-            </div>
-            <div class="flex justify-between text-lg font-bold border-t pt-2">
-                <span>Total:</span>
-                <span id="total">₹955.00</span>
-            </div>
-        </div>
-
-        <!-- Payment Mode -->
-        <div class="mt-4">
-            <label class="block text-sm font-medium text-gray-700 mb-2">Payment Mode</label>
-            <div class="grid grid-cols-2 gap-2 mb-3">
-                <button class="payment-mode-btn bg-primary text-white py-2 px-4 rounded-lg text-sm font-medium" onclick="selectPaymentMode('cash')" data-mode="cash">Cash</button>
-                <button class="payment-mode-btn bg-gray-200 text-gray-700 py-2 px-4 rounded-lg text-sm font-medium" onclick="selectPaymentMode('online')" data-mode="online">Online</button>
-                <button class="payment-mode-btn bg-gray-200 text-gray-700 py-2 px-4 rounded-lg text-sm font-medium" onclick="selectPaymentMode('split')" data-mode="split">Split</button>
-                <button class="payment-mode-btn bg-gray-200 text-gray-700 py-2 px-4 rounded-lg text-sm font-medium" onclick="selectPaymentMode('credit')" data-mode="credit">Credit</button>
-            </div>
-            
-            <!-- Payment Details (shown based on mode) -->
-            <div id="payment-details" class="space-y-3 hidden">
-                <div id="split-details" class="hidden">
-                    <div class="grid grid-cols-2 gap-2">
-                        <div>
-                            <label class="block text-xs text-gray-600 mb-1">Cash Amount</label>
-                            <input type="number" id="cash-amount" class="w-full px-2 py-1 border border-gray-300 rounded text-sm" placeholder="0.00">
-                        </div>
-                        <div>
-                            <label class="block text-xs text-gray-600 mb-1">Online Amount</label>
-                            <input type="number" id="online-amount" class="w-full px-2 py-1 border border-gray-300 rounded text-sm" placeholder="0.00">
-                        </div>
-                    </div>
-                </div>
-                <div id="credit-details" class="hidden">
-                    <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
-                        <p class="text-sm text-yellow-800">
-                            <i class="fa-solid fa-exclamation-triangle mr-1"></i>
-                            Credit Amount: <span id="credit-amount" class="font-semibold">₹955.00</span>
-                        </p>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Generate Bill Button -->
-        <button class="w-full bg-primary text-white py-3 rounded-lg font-medium mt-4 hover:bg-opacity-90 transition-colors" onclick="generateBill()">
-            Generate Bill
-        </button>
-    </div>
+    </nav>
 
     <script>
-        // Global cart items object - FIXED PERSISTENCE SYSTEM
+        // Global cart items with persistence
         let cartItems = {
-            1: { id: 1, name: 'Aashirvaad Atta', quantity: 10, unitPrice: 45, price: 450, unit: 'Kg', type: 'unit', mfgDate: '01/05/2025', expDate: '01/09/2025', datesHidden: false },
+            1: { id: 1, name: 'Coconut Oil', quantity: 1, unitPrice: 180, price: 180, unit: 'Bottle', type: 'unit', mfgDate: '01/01/2025', expDate: '01/01/2027', datesHidden: false },
             2: { id: 2, name: 'Real Fruit Juice', quantity: 2, unitPrice: 60, price: 120, unit: 'Bottles', type: 'unit', mfgDate: '12/05/2025', expDate: '25/07/2025', datesHidden: false },
-            3: { id: 3, name: 'Colgate Paste', quantity: 3, unitPrice: 30, price: 90, unit: 'Pieces', type: 'unit' },
-            4: { id: 4, name: 'Good Day Biscuits', quantity: 5, unitPrice: 12, price: 60, unit: 'Packets', type: 'unit', mfgDate: '05/03/2025', expDate: '05/09/2025', datesHidden: false },
-            5: { id: 5, name: 'Surf Excel (500gm)', quantity: 1, unitPrice: 55, price: 55, unit: 'Packet', type: 'unit' },
-            6: { id: 6, name: 'Dabur Honey', quantity: 1, unitPrice: 180, price: 180, unit: 'Bottle', type: 'unit', mfgDate: '01/01/2025', expDate: '01/01/2027', datesHidden: false }
+            3: { id: 3, name: 'Aashirvaad Atta', quantity: 10, unitPrice: 45, price: 450, unit: 'Kg', type: 'unit', mfgDate: '01/05/2025', expDate: '01/09/2025', datesHidden: false }
         };
-        
-        // FIXED: Simple persistence save function
+
+        // Save cart to localStorage
         function saveCart() {
             try {
                 const cartArray = Object.values(cartItems);
@@ -356,7 +175,7 @@
             }
         }
 
-        // FIXED: Simple persistence load function  
+        // Load cart from localStorage
         function loadCart() {
             try {
                 const saved = localStorage.getItem('kiranakonnect_persistent_cart');
@@ -373,7 +192,7 @@
             }
         }
 
-        // FIXED: Check for new items from inventory
+        // Check for new items from inventory
         function checkNewItems() {
             try {
                 const newItems = localStorage.getItem('kiranakonnect_cart');
@@ -410,7 +229,7 @@
             }
         }
 
-        // FIXED: Render cart items
+        // Render cart items
         function renderCart() {
             const container = document.getElementById('cart-items');
             container.innerHTML = '';
@@ -426,60 +245,55 @@
         // Create cart item element
         function createCartItem(item) {
             const div = document.createElement('div');
-            div.className = 'bg-white rounded-xl shadow-sm p-3';
+            div.className = 'bg-white rounded-lg p-4 shadow-sm';
             div.id = `cart-item-${item.id}`;
             
-            const quantityDisplay = item.quantityDisplay || `${item.quantity} ${item.unit}`;
+            let html = '';
             
-            let html = `
-                <div class="flex items-start justify-between">
-                    <div class="flex-1">
-                        <h3 class="font-semibold text-dark text-sm">${item.name}</h3>
-                        <div class="flex justify-between items-center mt-1">
-                            <span class="text-sm text-gray-700 font-medium">${quantityDisplay}</span>
-                            <span class="text-lg font-bold text-primary">₹${item.price.toFixed(2)}</span>
-                        </div>
-            `;
-            
+            // Add dates if they exist and not hidden
             if (item.mfgDate && item.expDate && !item.datesHidden) {
                 html += `
-                        <div class="mt-2 space-y-1">
-                            <div class="flex items-center text-xs text-gray-500 date-info">
-                                <i class="fa-solid fa-calendar mr-1"></i>
-                                <span>MFG: ${item.mfgDate}</span>
-                            </div>
-                            <div class="flex items-center text-xs text-gray-500 date-info">
-                                <i class="fa-solid fa-clock mr-1"></i>
-                                <span>EXP: ${item.expDate}</span>
-                            </div>
-                            <div class="flex items-center space-x-2 mt-1">
-                                <button class="text-xs text-primary hover:underline flex items-center" onclick="editItem(${item.id})">
-                                    <i class="fa-solid fa-edit mr-1"></i>
-                                    Edit
-                                </button>
-                                <button class="text-xs text-danger hover:underline flex items-center" onclick="toggleProductDates(${item.id})">
-                                    <i class="fa-solid fa-times mr-1"></i>
-                                    Remove Dates
-                                </button>
-                            </div>
+                    <div class="mb-3">
+                        <div class="flex items-center text-xs text-gray-500 mb-1">
+                            <i class="fa-solid fa-calendar mr-2"></i>
+                            <span>MFG: ${item.mfgDate}</span>
                         </div>
-                `;
-            } else {
-                html += `
-                        <div class="mt-2">
-                            <button class="text-xs text-primary hover:underline flex items-center" onclick="editItem(${item.id})">
+                        <div class="flex items-center text-xs text-gray-500 mb-2">
+                            <i class="fa-solid fa-clock mr-2"></i>
+                            <span>EXP: ${item.expDate}</span>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <button onclick="editItem(${item.id})" class="text-xs text-green-600 hover:underline flex items-center">
                                 <i class="fa-solid fa-edit mr-1"></i>
                                 Edit
                             </button>
+                            <button onclick="toggleDates(${item.id})" class="text-xs text-red-600 hover:underline flex items-center">
+                                <i class="fa-solid fa-times mr-1"></i>
+                                Remove Dates
+                            </button>
                         </div>
+                    </div>
                 `;
             }
-            
+
             html += `
+                <div class="flex items-center justify-between">
+                    <div class="flex-1">
+                        <h3 class="font-semibold text-dark">${item.name}</h3>
+                        <p class="text-sm text-gray-600">${item.quantity} ${item.unit}</p>
+                        ${!item.mfgDate || !item.expDate || item.datesHidden ? `
+                        <button onclick="editItem(${item.id})" class="text-xs text-green-600 hover:underline flex items-center mt-1">
+                            <i class="fa-solid fa-edit mr-1"></i>
+                            Edit
+                        </button>
+                        ` : ''}
                     </div>
-                    <button class="text-danger text-sm ml-3 p-1" onclick="removeItem(${item.id})">
-                        <i class="fa-solid fa-trash"></i>
-                    </button>
+                    <div class="flex items-center space-x-3">
+                        <span class="text-lg font-bold text-green-600">₹${item.price.toFixed(2)}</span>
+                        <button onclick="removeItem(${item.id})" class="text-red-500 hover:text-red-700">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    </div>
                 </div>
             `;
             
@@ -490,13 +304,11 @@
         // Calculate totals
         function calculateTotals() {
             const subtotal = Object.values(cartItems).reduce((sum, item) => sum + item.price, 0);
-            const tax = 0;
-            const discount = 0;
-            const total = subtotal + tax - discount;
+            const gst = subtotal * 0.18;
+            const total = subtotal + gst;
 
             document.getElementById('subtotal').textContent = `₹${subtotal.toFixed(2)}`;
-            document.getElementById('tax').textContent = `₹${tax.toFixed(2)}`;
-            document.getElementById('discount').textContent = `₹${discount.toFixed(2)}`;
+            document.getElementById('gst').textContent = `₹${gst.toFixed(2)}`;
             document.getElementById('total').textContent = `₹${total.toFixed(2)}`;
         }
 
@@ -510,7 +322,7 @@
         }
 
         // Toggle dates
-        function toggleProductDates(itemId) {
+        function toggleDates(itemId) {
             if (cartItems[itemId]) {
                 cartItems[itemId].datesHidden = !cartItems[itemId].datesHidden;
                 saveCart();
@@ -523,67 +335,18 @@
             console.log('Edit item', itemId);
         }
 
-        // Add more items - navigate to inventory
+        // Add more items
         function addMoreItems() {
             window.location.href = '/inventory';
         }
 
-        // Payment mode selection
-        function selectPaymentMode(mode) {
-            const buttons = document.querySelectorAll('.payment-mode-btn');
-            buttons.forEach(btn => {
-                btn.classList.remove('bg-primary', 'text-white');
-                btn.classList.add('bg-gray-200', 'text-gray-700');
-            });
-            
-            document.querySelector(`[data-mode="${mode}"]`).classList.remove('bg-gray-200', 'text-gray-700');
-            document.querySelector(`[data-mode="${mode}"]`).classList.add('bg-primary', 'text-white');
-            
-            const detailsDiv = document.getElementById('payment-details');
-            const splitDiv = document.getElementById('split-details');
-            const creditDiv = document.getElementById('credit-details');
-            
-            if (mode === 'split') {
-                detailsDiv.classList.remove('hidden');
-                splitDiv.classList.remove('hidden');
-                creditDiv.classList.add('hidden');
-            } else if (mode === 'credit') {
-                detailsDiv.classList.remove('hidden');
-                splitDiv.classList.add('hidden');
-                creditDiv.classList.remove('hidden');
-                calculateTotals();
-            } else {
-                detailsDiv.classList.add('hidden');
-                splitDiv.classList.add('hidden');
-                creditDiv.classList.add('hidden');
-            }
-        }
-
-        // Customer functions
-        function selectCashCustomer() {
-            document.getElementById('selected-customer').textContent = 'Cash Customer Selected';
-        }
-
-        function showNewCustomerModal() {
-            console.log('Show new customer modal');
-        }
-
-        function generateBill() {
-            if (Object.keys(cartItems).length === 0) {
-                alert('Cart is empty! Please add items before generating bill.');
-                return;
-            }
-            console.log('Generate bill with items:', cartItems);
-            alert('Bill generation functionality will be implemented soon.');
-        }
-
-        // Update cart count across all pages
+        // Update cart count
         function updateCartCount() {
             const count = Object.keys(cartItems).length;
             localStorage.setItem('cart_count', count.toString());
         }
 
-        // FIXED: Initialize on page load
+        // Initialize
         document.addEventListener('DOMContentLoaded', function() {
             loadCart();
             checkNewItems();
