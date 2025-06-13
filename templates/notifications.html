@@ -206,52 +206,29 @@
         }
 
         function loadNotifications() {
-            // Load notifications
             fetch('/api/notifications')
                 .then(function(response) {
                     return response.json();
                 })
-                .then(function(notificationData) {
-                    if (notificationData.notifications) {
-                        allNotifications = notificationData.notifications;
-                        
-                        // Load settings separately 
-                        loadNotificationSettings();
-                        
-                        displayNotifications(allNotifications, currentFilter);
-                        updateNotificationBadge(getUnreadCount());
-                        document.getElementById('loading-state').style.display = 'none';
-                    }
+                .then(function(data) {
+                    allNotifications = data.notifications || [];
+                    addSystemNotifications();
+                    displayNotifications(allNotifications, currentFilter);
+                    updateNotificationBadge(data.count || 0);
+                    document.getElementById('loading-state').style.display = 'none';
                 })
                 .catch(function(error) {
                     console.error('Error loading notifications:', error);
                     document.getElementById('loading-state').style.display = 'none';
-                    alert('Error loading notifications');
-                });
-        }
-
-        function loadNotificationSettings() {
-            fetch('/api/notification-settings')
-                .then(function(response) {
-                    return response.json();
-                })
-                .then(function(settings) {
-                    notificationSettings = settings;
-                    addSystemNotifications();
-                    displayNotifications(allNotifications, currentFilter);
-                })
-                .catch(function(error) {
-                    console.error('Error loading notification settings:', error);
-                    // Continue without settings
-                    notificationSettings = {};
+                    document.getElementById('empty-state').style.display = 'block';
                 });
         }
 
         function addSystemNotifications() {
             var backupEnabled = localStorage.getItem('emailBackupEnabled') === 'true';
             
-            // Add backup notification if backup is disabled and backup alerts are enabled
-            if (!backupEnabled && notificationSettings.backup_alerts) {
+            // Add backup notification if backup is disabled
+            if (!backupEnabled) {
                 var hasBackupNotification = false;
                 for (var i = 0; i < allNotifications.length; i++) {
                     if (allNotifications[i].type === 'backup') {
@@ -267,7 +244,8 @@
                         priority: 'medium',
                         title: 'Backup Disabled',
                         message: 'Enable backup to protect your business data from loss',
-                        time_ago: '2 days ago'
+                        time_ago: '2 days ago',
+                        is_read: false
                     });
                 }
             }
