@@ -268,24 +268,28 @@
         </div>
     </main>
 
-    <!-- Navigation -->
-    <nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-4 py-2 z-10">
-        <div class="flex justify-around">
-            <button class="flex flex-col items-center p-2 text-gray-400" onclick="window.location.href='/dashboard'">
-                <i class="fa-solid fa-house text-xl mb-1"></i>
-                <span class="text-xs mt-1">Home</span>
+    <!-- Bottom Navigation -->
+    <nav id="footer" class="fixed bottom-0 left-0 right-0 bg-white shadow-lg border-t">
+        <div class="flex justify-around items-end py-2">
+            <button class="flex flex-col items-center py-1 px-3" onclick="window.location.href='/dashboard'">
+                <i class="fa-solid fa-home text-gray-400 text-xl"></i>
+                <span class="text-xs mt-1 text-gray-400">Home</span>
             </button>
-            <button class="flex flex-col items-center p-2 text-gray-400" onclick="window.location.href='/inventory'">
-                <i class="fa-solid fa-boxes-stacked text-xl mb-1"></i>
-                <span class="text-xs mt-1">Inventory</span>
+            <button class="flex flex-col items-center py-1 px-3" onclick="window.location.href='/inventory'">
+                <i class="fa-solid fa-box text-gray-400 text-xl"></i>
+                <span class="text-xs mt-1 text-gray-400">Inventory</span>
             </button>
-            <button class="flex flex-col items-center p-2 text-gray-400 relative" onclick="window.location.href='/cart'">
-                <i class="fa-solid fa-shopping-cart text-xl mb-1"></i>
-                <span class="text-xs mt-1">Cart</span>
+            <button onclick="window.location.href='/add-item'" class="relative -top-4 bg-primary rounded-full p-4 shadow-lg">
+                <i class="fa-solid fa-barcode text-white text-xl"></i>
             </button>
-            <button class="flex flex-col items-center p-2 text-gray-400" onclick="window.location.href='/profile'">
-                <i class="fa-solid fa-user text-xl mb-1"></i>
-                <span class="text-xs mt-1">Profile</span>
+            <button class="flex flex-col items-center py-1 px-3 relative" onclick="window.location.href='/cart'">
+                <i class="fa-solid fa-shopping-cart text-gray-400 text-xl"></i>
+                <span class="text-xs mt-1 text-gray-400">Cart</span>
+                <span class="absolute -top-1 -right-1 bg-danger text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold">7</span>
+            </button>
+            <button class="flex flex-col items-center py-1 px-3" onclick="window.location.href='/profile'">
+                <i class="fa-solid fa-user text-gray-400 text-xl"></i>
+                <span class="text-xs mt-1 text-gray-400">Profile</span>
             </button>
         </div>
     </nav>
@@ -359,31 +363,50 @@
                     'low': 'border-gray-500'
                 };
 
+                const typeColors = {
+                    'backup': 'bg-orange-100 text-orange-600',
+                    'subscription': 'bg-purple-100 text-purple-600',
+                    'expiry': 'bg-red-100 text-red-600',
+                    'inventory': 'bg-yellow-100 text-yellow-600',
+                    'payment': 'bg-green-100 text-green-600',
+                    'system': 'bg-blue-100 text-blue-600'
+                };
+
                 const typeIcons = {
                     'subscription': 'fa-crown',
-                    'backup': 'fa-cloud-arrow-up',
+                    'backup': 'fa-shield-exclamation',
                     'inventory': 'fa-box',
                     'expiry': 'fa-calendar-times',
                     'payment': 'fa-money-bill',
                     'system': 'fa-cog'
                 };
 
+                const priorityBadgeColors = {
+                    'urgent': 'bg-red-500',
+                    'high': 'bg-orange-500',
+                    'medium': 'bg-blue-500',
+                    'low': 'bg-gray-500'
+                };
+
+                const typeColor = typeColors[notification.type] || 'bg-gray-100 text-gray-600';
+                const badgeColor = priorityBadgeColors[notification.priority] || 'bg-gray-500';
+
                 return `
                     <div class="notification-item bg-white rounded-lg shadow-sm border-l-4 ${priorityColors[notification.priority]} cursor-pointer hover:shadow-md transition-shadow" 
                          data-type="${notification.type}" onclick="markAsRead(${notification.id})">
                         <div class="p-4">
                             <div class="flex items-start space-x-3">
-                                <div class="bg-primary/10 p-2 rounded-full">
-                                    <i class="fa-solid ${typeIcons[notification.type]} text-primary text-sm"></i>
+                                <div class="${typeColor} p-2 rounded-full">
+                                    <i class="fa-solid ${typeIcons[notification.type]} text-sm"></i>
                                 </div>
                                 <div class="flex-1">
                                     <div class="flex items-start justify-between">
                                         <div>
-                                            <h3 class="font-semibold text-primary text-sm">${notification.title}</h3>
+                                            <h3 class="font-semibold text-gray-800 text-sm">${notification.title}</h3>
                                             <p class="text-xs text-gray-600 mt-1">${notification.message}</p>
                                             <p class="text-xs text-gray-400 mt-2">${notification.time_ago}</p>
                                         </div>
-                                        <span class="bg-${notification.priority === 'urgent' ? 'red' : notification.priority === 'high' ? 'orange' : 'primary'}-500 text-white text-xs px-2 py-1 rounded-full">
+                                        <span class="${badgeColor} text-white text-xs px-2 py-1 rounded-full">
                                             ${notification.priority.toUpperCase()}
                                         </span>
                                     </div>
@@ -449,9 +472,14 @@
                     this.classList.add('bg-primary', 'text-white');
 
                     // Filter notifications
-                    notifications.forEach(notification => {
+                    const allNotifications = document.querySelectorAll('.notification-item');
+                    allNotifications.forEach(notification => {
                         const type = notification.getAttribute('data-type');
-                        if (filter === 'all' || type === filter) {
+                        if (filter === 'all' || type === filter || 
+                            (filter === 'critical' && (type === 'expiry' || type === 'backup')) ||
+                            (filter === 'inventory' && (type === 'expiry' || type === 'inventory')) ||
+                            (filter === 'payments' && type === 'payment') ||
+                            (filter === 'system' && (type === 'subscription' || type === 'backup'))) {
                             notification.style.display = 'block';
                         } else {
                             notification.style.display = 'none';
