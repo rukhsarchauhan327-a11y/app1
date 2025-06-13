@@ -1132,17 +1132,41 @@
             }
         };
 
-        // RECREATED: Simplified cart addition function
+        // RECREATED: Simplified cart addition function with duplicate prevention
         function addNewItemToCart(newItem) {
             console.log('RECREATED: Adding item to cart:', newItem);
             
+            // Check if this exact product already exists in cart
+            const existingItemId = Object.keys(cartItems).find(id => 
+                cartItems[id].name === newItem.name && 
+                cartItems[id].type === newItem.type
+            );
+            
+            if (existingItemId) {
+                // Update existing item instead of creating duplicate
+                const existingItem = cartItems[existingItemId];
+                existingItem.quantity += newItem.quantity;
+                existingItem.price = newItem.price; // Use new calculated price
+                existingItem.quantityDisplay = newItem.quantityDisplay;
+                
+                console.log('RECREATED: Updated existing cart item:', existingItem);
+                
+                // Update display
+                const quantityElement = document.getElementById(`quantity-${existingItemId}`);
+                const priceElement = document.getElementById(`price-${existingItemId}`);
+                if (quantityElement) quantityElement.textContent = existingItem.quantityDisplay;
+                if (priceElement) priceElement.textContent = `₹${existingItem.price.toFixed(2)}`;
+                
+                return existingItemId;
+            }
+            
             const nextItemId = Math.max(...Object.keys(cartItems).map(k => parseInt(k)), 0) + 1;
             
-            // Use the exact values from the weight-based product without any modification
+            // Add new item to cart
             cartItems[nextItemId] = {
                 id: nextItemId,
                 name: newItem.name,
-                price: newItem.price, // Use exact price from product page
+                price: newItem.price,
                 quantity: newItem.quantity,
                 unit: newItem.unit || 'kg',
                 unitPrice: newItem.unitPrice,
@@ -1153,7 +1177,7 @@
                 quantityDisplay: newItem.quantityDisplay
             };
             
-            console.log('RECREATED: Cart item added:', cartItems[nextItemId]);
+            console.log('RECREATED: New cart item added:', cartItems[nextItemId]);
             
             // Create HTML exactly like existing cart items
             const cartContainer = document.getElementById('cart-items');
@@ -1311,7 +1335,7 @@
             console.log(`Loaded ${persistentItems.length} persistent cart items`);
         }
 
-        // Persistent cart loading - maintain items across page navigation
+        // Simplified cart loading - only load new items from inventory
         function loadCartItems() {
             const cartData = localStorage.getItem('kiranakonnect_cart');
             if (!cartData) return;
@@ -1319,19 +1343,35 @@
             const storedItems = JSON.parse(cartData);
             if (storedItems.length === 0) return;
             
-            // Add each item directly to the cart
+            // Add each item directly to the cart (duplicates prevented in addNewItemToCart)
             storedItems.forEach(item => {
                 addNewItemToCart(item);
             });
             
-            // Move processed items to persistent storage instead of clearing
-            const persistentCart = JSON.parse(localStorage.getItem('kiranakonnect_persistent_cart') || '[]');
-            persistentCart.push(...storedItems);
-            localStorage.setItem('kiranakonnect_persistent_cart', JSON.stringify(persistentCart));
-            
-            // Clear only the temporary cart
+            // Clear the temporary cart after processing
             localStorage.removeItem('kiranakonnect_cart');
-            console.log(`Added ${storedItems.length} items from inventory to cart`);
+            console.log(`Processed ${storedItems.length} items from inventory`);
+        }
+
+        // Clear duplicate cart items based on product name and type
+        function clearCartDuplicates() {
+            const seen = new Set();
+            const uniqueItems = {};
+            
+            Object.keys(cartItems).forEach(itemId => {
+                const item = cartItems[itemId];
+                const itemKey = `${item.name}_${item.type}`;
+                
+                if (!seen.has(itemKey)) {
+                    seen.add(itemKey);
+                    uniqueItems[itemId] = item;
+                } else {
+                    console.log('Removing duplicate item:', item.name);
+                }
+            });
+            
+            cartItems = uniqueItems;
+            renderCartItems();
         }
 
         // Check for new items from inventory periodically
@@ -2006,10 +2046,10 @@
                         };
                     }
                     
-                    // Load persistent cart items first
-                    loadPersistentCartItems();
+                    // Clear any existing duplicates first
+                    clearCartDuplicates();
                     
-                    // Load and merge any new items from inventory
+                    // Only load new items from inventory (disable duplicate loading)
                     loadCartItems();
                     
                     // Set up periodic check for new items from inventory
