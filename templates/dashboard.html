@@ -571,6 +571,34 @@
             document.getElementById('current-time').textContent = now.toLocaleTimeString('en-US', timeOptions);
         }
 
+        // Load real notification count from API
+        async function updateNotificationCount() {
+            try {
+                const response = await fetch('/api/notifications');
+                const data = await response.json();
+                
+                const notificationBadge = document.getElementById('notification-count');
+                const count = data.count || 0;
+                
+                notificationBadge.textContent = count;
+                notificationBadge.style.display = count > 0 ? 'flex' : 'none';
+                
+                // Update backup-specific logic for UI consistency
+                const backupEnabled = localStorage.getItem('emailBackupEnabled') === 'true';
+                if (!backupEnabled && count === 0) {
+                    // If no other notifications and backup is disabled, show backup notification
+                    notificationBadge.textContent = '1';
+                    notificationBadge.style.display = 'flex';
+                }
+            } catch (error) {
+                console.error('Error fetching notification count:', error);
+                // Fallback to backup-only logic
+                const backupEnabled = localStorage.getItem('emailBackupEnabled') === 'true';
+                const notificationBadge = document.getElementById('notification-count');
+                notificationBadge.textContent = backupEnabled ? '1' : '2';
+            }
+        }
+
         // Notification dropdown toggle
         document.getElementById('notification-bell').addEventListener('click', function() {
             const dropdown = document.getElementById('notification-dropdown');
@@ -988,7 +1016,10 @@
         document.addEventListener('DOMContentLoaded', function() {
             loadDashboardStats();
             updateDateTime();
-            checkBackupStatus();
+            updateNotificationCount();
+            
+            // Update notification count every 2 minutes for real-time updates
+            setInterval(updateNotificationCount, 120000);
             
             // Refresh stats every 30 seconds
             setInterval(loadDashboardStats, 30000);
