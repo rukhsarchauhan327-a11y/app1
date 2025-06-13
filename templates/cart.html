@@ -1235,6 +1235,11 @@
             addNewItemToCart(newItem);
         };
 
+        // Navigate to inventory page
+        function navigateToInventory() {
+            window.location.href = '/inventory';
+        }
+
         // Initialize cart with localStorage data
         function initializeCart() {
             // First check for new items from inventory
@@ -1262,7 +1267,7 @@
                         <i class="fa-solid fa-shopping-cart text-gray-400 text-3xl mb-3"></i>
                         <h3 class="text-lg font-medium text-gray-600 mb-2">Your cart is empty</h3>
                         <p class="text-sm text-gray-500 mb-4">Add items from inventory to get started</p>
-                        <button class="bg-primary text-white px-6 py-2 rounded-lg font-medium" onclick="window.location.href='/inventory'">
+                        <button class="bg-primary text-white px-6 py-2 rounded-lg font-medium" onclick="navigateToInventory()">
                             Browse Inventory
                         </button>
                     </div>
@@ -1281,7 +1286,7 @@
             cartContainer.insertAdjacentHTML('beforeend', `
                 <div class="bg-white rounded-xl shadow-sm p-3">
                     <div class="flex justify-center">
-                        <button id="add-items-btn" class="flex items-center justify-center bg-secondary text-white rounded-full px-6 py-3 font-medium text-sm" onclick="window.location.href='/inventory'">
+                        <button id="add-items-btn" class="flex items-center justify-center bg-secondary text-white rounded-full px-6 py-3 font-medium text-sm" onclick="navigateToInventory()">
                             <i class="fa-solid fa-plus mr-2"></i>
                             Add More Items to Cart
                         </button>
@@ -2044,6 +2049,10 @@
                             5: { id: 5, name: 'Surf Excel (500gm)', quantity: 1, unitPrice: 55, price: 55, unit: 'Packet', type: 'unit', quantityDisplay: '1 Packet' },
                             6: { id: 6, name: 'Dabur Honey', quantity: 1, unitPrice: 180, price: 180, unit: 'Bottle', type: 'unit', mfgDate: '01/01/2025', expDate: '01/01/2027', datesHidden: false, quantityDisplay: '1 Bottle' }
                         };
+                        
+                        // Render the cart items immediately
+                        renderCartItems();
+                        calculateTotals();
                     }
                     
                     // Load existing cart data from persistent storage if available
