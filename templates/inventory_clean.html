@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inventory - Kirana Konnect</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .font-poppins { font-family: 'Poppins', sans-serif; }
+        .text-primary { color: #10B981; }
+        .bg-primary { background-color: #10B981; }
+        .text-accent { color: #F59E0B; }
+        .bg-accent { background-color: #F59E0B; }
+        .text-danger { color: #EF4444; }
+        .bg-danger { background-color: #EF4444; }
+        .text-dark { color: #1F2937; }
+        .bg-primary-dark { background-color: #059669; }
+    </style>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#10B981',
+                        accent: '#F59E0B',
+                        danger: '#EF4444',
+                        dark: '#1F2937'
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+
+<body class="font-poppins bg-gray-50">
+    <!-- Header Section -->
+    <header id="header" class="bg-white shadow-sm fixed top-0 left-0 right-0 z-10">
+        <div class="flex items-center justify-between p-4">
+            <button class="p-2 hover:bg-gray-100 rounded-lg transition-colors" onclick="goBack()">
+                <i class="fa-solid fa-arrow-left text-gray-600 text-lg"></i>
+            </button>
+            <h1 class="text-xl font-bold text-dark">Inventory</h1>
+            <button class="p-2 hover:bg-gray-100 rounded-lg transition-colors" onclick="openSearch()">
+                <i class="fa-solid fa-search text-gray-600 text-lg"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- Inventory Stats Header -->
+    <div id="inventory-stats" class="bg-white px-4 py-3 mt-16 shadow-sm border-b">
+        <div class="grid grid-cols-4 gap-2">
+            <div class="text-center cursor-pointer hover:bg-gray-50 p-2 rounded-lg transition-colors" onclick="filterBy('all')">
+                <p class="text-2xl font-bold text-dark" id="total-products">0</p>
+                <p class="text-xs text-gray-500">Total Products</p>
+            </div>
+            <div class="text-center cursor-pointer hover:bg-gray-50 p-2 rounded-lg transition-colors" onclick="filterBy('available')">
+                <p class="text-2xl font-bold text-primary" id="available-products">0</p>
+                <p class="text-xs text-gray-500">Available</p>
+            </div>
+            <div class="text-center cursor-pointer hover:bg-gray-50 p-2 rounded-lg transition-colors" onclick="filterBy('low-stock')">
+                <p class="text-2xl font-bold text-accent" id="low-stock-products">0</p>
+                <p class="text-xs text-gray-500">Low Stock</p>
+            </div>
+            <div class="text-center cursor-pointer hover:bg-gray-50 p-2 rounded-lg transition-colors" onclick="filterBy('expired')">
+                <p class="text-2xl font-bold text-danger" id="expired-products">0</p>
+                <p class="text-xs text-gray-500">Expired</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filter Tabs -->
+    <div class="bg-white px-4 py-3 border-b">
+        <div class="flex space-x-2 overflow-x-auto">
+            <button class="category-btn bg-primary text-white px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap" onclick="filterByCategory('all')" data-category="all">All</button>
+            <button class="category-btn bg-gray-100 text-gray-600 px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap" onclick="filterByCategory('staples')" data-category="staples">Staples</button>
+            <button class="category-btn bg-gray-100 text-gray-600 px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap" onclick="filterByCategory('beverages')" data-category="beverages">Beverages</button>
+            <button class="category-btn bg-gray-100 text-gray-600 px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap" onclick="filterByCategory('snacks')" data-category="snacks">Snacks</button>
+            <button class="category-btn bg-gray-100 text-gray-600 px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap" onclick="filterByCategory('dairy')" data-category="dairy">Dairy</button>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="px-4 pt-4 pb-20">
+        <div id="inventory-items" class="space-y-3">
+            <!-- Products will be loaded here -->
+        </div>
+    </main>
+
+    <!-- Floating Action Button -->
+    <div class="fixed bottom-20 right-4 z-20">
+        <button class="bg-primary text-white w-14 h-14 rounded-full shadow-lg hover:bg-primary-dark transition-colors flex items-center justify-center" onclick="window.location.href='/add-item'">
+            <i class="fa-solid fa-plus text-xl"></i>
+        </button>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-4 py-2 z-10">
+        <div class="flex justify-around">
+            <button class="flex flex-col items-center p-2 text-gray-400" onclick="window.location.href='/dashboard'">
+                <i class="fa-solid fa-house text-xl mb-1"></i>
+                <span class="text-xs mt-1">Home</span>
+            </button>
+            <button class="flex flex-col items-center p-2 text-primary" onclick="window.location.href='/inventory'">
+                <i class="fa-solid fa-boxes-stacked text-xl mb-1"></i>
+                <span class="text-xs mt-1">Inventory</span>
+            </button>
+            <button class="flex flex-col items-center p-2 text-gray-400 relative" onclick="window.location.href='/cart'">
+                <i class="fa-solid fa-shopping-cart text-xl mb-1"></i>
+                <span class="text-xs mt-1">Cart</span>
+                <div id="cart-badge" class="absolute -top-1 -right-1 bg-danger text-white text-xs rounded-full h-5 w-5 flex items-center justify-center" style="display: none;">0</div>
+            </button>
+            <button class="flex flex-col items-center p-2 text-gray-400" onclick="window.location.href='/profile'">
+                <i class="fa-solid fa-user text-xl mb-1"></i>
+                <span class="text-xs mt-1">Profile</span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Search Modal -->
+    <div id="search-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden">
+        <div class="absolute inset-0 flex items-start justify-center pt-16">
+            <div class="bg-white w-full max-w-md mx-4 rounded-lg shadow-lg">
+                <div class="p-4 border-b">
+                    <div class="flex items-center space-x-3">
+                        <i class="fa-solid fa-search text-gray-400"></i>
+                        <input type="text" id="search-input" placeholder="Search products..." class="flex-1 outline-none text-lg">
+                        <button onclick="closeSearch()" class="text-gray-400 hover:text-gray-600">
+                            <i class="fa-solid fa-times"></i>
+                        </button>
+                    </div>
+                </div>
+                <div id="search-results" class="max-h-64 overflow-y-auto p-4">
+                    <!-- Search results will appear here -->
+                </div>
+                <div id="search-empty" class="text-center py-8 text-gray-500 hidden">
+                    <i class="fa-solid fa-search text-4xl mb-2"></i>
+                    <p>No products found</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification -->
+    <div id="notification" class="fixed top-20 left-4 right-4 bg-green-500 text-white px-4 py-3 rounded-lg shadow-lg transform -translate-y-full transition-transform duration-300 z-50">
+        <div class="flex items-center justify-between">
+            <span id="notification-text">Notification message</span>
+            <button onclick="hideNotification()" class="text-white">
+                <i class="fa-solid fa-times"></i>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        let currentFilter = 'all';
+        let currentCategory = 'all';
+        let products = [];
+        let filteredProducts = [];
+
+        // Load products from database
+        async function loadProducts() {
+            try {
+                const response = await fetch('/api/products');
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                products = await response.json();
+                filteredProducts = products;
+                renderProducts();
+                updateStats();
+                updateCartCount();
+            } catch (error) {
+                console.error('Error loading products:', error);
+                const container = document.getElementById('inventory-items');
+                if (container) {
+                    container.innerHTML = `
+                        <div class="text-center py-8">
+                            <i class="fa-solid fa-exclamation-triangle text-orange-500 text-4xl mb-4"></i>
+                            <h3 class="text-lg font-semibold text-gray-700 mb-2">Unable to Load Products</h3>
+                            <p class="text-gray-500 mb-4">Please check your connection and try again</p>
+                            <button onclick="loadProducts()" class="bg-primary text-white px-4 py-2 rounded-lg hover:bg-primary-dark">
+                                Retry
+                            </button>
+                        </div>
+                    `;
+                }
+            }
+        }
+
+        // Render products in the inventory grid
+        function renderProducts() {
+            const container = document.getElementById('inventory-items');
+            if (!container) return;
+
+            if (filteredProducts.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-8">
+                        <i class="fa-solid fa-box-open text-gray-400 text-4xl mb-4"></i>
+                        <h3 class="text-lg font-semibold text-gray-700 mb-2">No Products Found</h3>
+                        <p class="text-gray-500">Try adjusting your filters or search terms.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = filteredProducts.map(product => {
+                const statusClass = product.is_expired ? 'bg-red-500' : 
+                                  product.is_low_stock ? 'bg-accent' : 'bg-primary';
+                const statusText = product.is_expired ? 'Expired' :
+                                 product.is_low_stock ? 'Low Stock' : 'In Stock';
+
+                const priceDisplay = product.is_weight_based ? 
+                    `₹${product.price_per_kg}/kg` : 
+                    `₹${product.price}/Piece`;
+
+                const stockDisplay = product.is_weight_based ? 
+                    `${product.stock_quantity} kg Available` :
+                    `${product.stock_quantity} Pieces Available`;
+
+                return `
+                    <div id="product-${product.id}" class="bg-white rounded-xl p-4 shadow-sm border hover:shadow-md transition-shadow cursor-pointer" 
+                         data-category="${product.category.toLowerCase()}" 
+                         data-status="${product.is_expired ? 'expired' : 'available'}" 
+                         onclick="viewProductDetails(${product.id})">
+                        <div class="flex items-center space-x-4">
+                            <div class="w-16 h-16 rounded-xl overflow-hidden bg-gray-100 flex items-center justify-center">
+                                <i class="fa-solid fa-box text-gray-400 text-2xl"></i>
+                            </div>
+                            <div class="flex-1">
+                                <div class="flex items-start justify-between">
+                                    <div class="flex-1">
+                                        <h3 class="font-bold text-dark text-lg">${product.name}</h3>
+                                        ${product.expiry_date ? `
+                                            <div class="text-xs text-gray-500 mt-1">
+                                                <p>EXP: ${product.expiry_date}</p>
+                                            </div>
+                                        ` : ''}
+                                    </div>
+                                    <div class="text-right">
+                                        <span class="${statusClass} text-white text-xs px-2 py-1 rounded-full font-semibold">${statusText}</span>
+                                        <p class="text-lg font-bold text-primary mt-2">${priceDisplay}</p>
+                                        <p class="text-sm text-gray-600">${stockDisplay}</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-center justify-end space-x-2 mt-3">
+                                    <button class="p-2 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors" 
+                                            onclick="event.stopPropagation(); refillItem(${product.id})" title="Refill Stock">
+                                        <i class="fa-solid fa-plus text-blue-600 text-sm"></i>
+                                    </button>
+                                    <button class="p-2 bg-green-50 hover:bg-green-100 rounded-lg transition-colors" 
+                                            onclick="event.stopPropagation(); addToCart(${product.id})" title="Add to Cart">
+                                        <i class="fa-solid fa-shopping-cart text-green-600 text-sm"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Update inventory statistics
+        function updateStats() {
+            const total = products.length;
+            const available = products.filter(p => !p.is_expired && !p.is_low_stock).length;
+            const lowStock = products.filter(p => p.is_low_stock).length;
+            const expired = products.filter(p => p.is_expired).length;
+
+            document.getElementById('total-products').textContent = total;
+            document.getElementById('available-products').textContent = available;
+            document.getElementById('low-stock-products').textContent = lowStock;
+            document.getElementById('expired-products').textContent = expired;
+        }
+
+        // Filter functions
+        function filterBy(status) {
+            currentFilter = status;
+            applyFilters();
+        }
+
+        function filterByCategory(category) {
+            currentCategory = category;
+            
+            // Update button states
+            document.querySelectorAll('.category-btn').forEach(btn => {
+                btn.classList.remove('bg-primary', 'text-white');
+                btn.classList.add('bg-gray-100', 'text-gray-600');
+            });
+            
+            const activeBtn = document.querySelector(`[data-category="${category}"]`);
+            if (activeBtn) {
+                activeBtn.classList.remove('bg-gray-100', 'text-gray-600');
+                activeBtn.classList.add('bg-primary', 'text-white');
+            }
+            
+            applyFilters();
+        }
+
+        function applyFilters() {
+            filteredProducts = products.filter(product => {
+                let matchesStatus = true;
+                let matchesCategory = true;
+
+                // Filter by status
+                if (currentFilter === 'available') {
+                    matchesStatus = !product.is_expired && !product.is_low_stock;
+                } else if (currentFilter === 'low-stock') {
+                    matchesStatus = product.is_low_stock;
+                } else if (currentFilter === 'expired') {
+                    matchesStatus = product.is_expired;
+                }
+
+                // Filter by category
+                if (currentCategory !== 'all') {
+                    matchesCategory = product.category.toLowerCase() === currentCategory;
+                }
+
+                return matchesStatus && matchesCategory;
+            });
+
+            renderProducts();
+        }
+
+        // Product interaction functions
+        function addToCart(productId) {
+            const product = products.find(p => p.id === productId);
+            if (!product) {
+                showNotification('Product not found', 'error');
+                return;
+            }
+
+            let cart = [];
+            try {
+                const existingCart = localStorage.getItem('kiranakonnect_cart');
+                if (existingCart) {
+                    cart = JSON.parse(existingCart);
+                }
+            } catch (error) {
+                console.error('Error loading cart:', error);
+            }
+
+            const cartItem = {
+                id: product.id,
+                name: product.name,
+                price: product.is_weight_based ? product.price_per_kg : product.price,
+                unit: product.is_weight_based ? product.unit : 'Piece',
+                quantity: 1,
+                mfgDate: '',
+                expDate: product.expiry_date || '',
+                showDates: false,
+                isWeightBased: product.is_weight_based
+            };
+
+            cart.push(cartItem);
+            localStorage.setItem('kiranakonnect_cart', JSON.stringify(cart));
+            
+            updateCartCount();
+            showNotification(`${product.name} added to cart`, 'success');
+        }
+
+        function viewProductDetails(productId) {
+            const product = products.find(p => p.id === productId);
+            if (!product) {
+                showNotification('Product not found', 'error');
+                return;
+            }
+
+            if (product.is_weight_based) {
+                const params = new URLSearchParams({
+                    id: product.id,
+                    name: product.name,
+                    price: product.price_per_kg,
+                    stock: product.stock_quantity,
+                    unit: product.unit,
+                    expDate: product.expiry_date || ''
+                });
+                window.location.href = `/product-details-weight?${params.toString()}`;
+            } else {
+                const params = new URLSearchParams({
+                    id: product.id,
+                    name: product.name,
+                    price: product.price,
+                    unit: 'Piece',
+                    stock: product.stock_quantity,
+                    expDate: product.expiry_date || ''
+                });
+                window.location.href = `/product-details?${params.toString()}`;
+            }
+        }
+
+        function refillItem(productId) {
+            const product = products.find(p => p.id === productId);
+            if (!product) {
+                showNotification('Product not found', 'error');
+                return;
+            }
+
+            const refillData = {
+                id: product.id,
+                name: product.name,
+                category: product.category,
+                type: product.is_weight_based ? 'weight-based' : 'unit',
+                unit: product.unit,
+                stock: product.stock_quantity,
+                threshold: product.reorder_level,
+                price: product.is_weight_based ? product.price_per_kg : product.price,
+                barcode: product.barcode
+            };
+            
+            localStorage.setItem('refillProductData', JSON.stringify(refillData));
+            
+            if (product.is_weight_based) {
+                window.location.href = '/refill-stock-weight';
+            } else {
+                window.location.href = '/refill-stock';
+            }
+        }
+
+        // Cart functions
+        function updateCartCount() {
+            try {
+                const cart = JSON.parse(localStorage.getItem('kiranakonnect_cart') || '[]');
+                const cartCount = cart.length;
+                const cartBadge = document.getElementById('cart-badge');
+                if (cartBadge) {
+                    cartBadge.textContent = cartCount;
+                    cartBadge.style.display = cartCount > 0 ? 'flex' : 'none';
+                }
+            } catch (error) {
+                console.error('Error updating cart count:', error);
+            }
+        }
+
+        // Search functions
+        function openSearch() {
+            document.getElementById('search-modal').classList.remove('hidden');
+            document.getElementById('search-input').focus();
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeSearch() {
+            document.getElementById('search-modal').classList.add('hidden');
+            document.body.style.overflow = 'auto';
+            clearSearch();
+        }
+
+        function clearSearch() {
+            document.getElementById('search-input').value = '';
+            document.getElementById('search-results').innerHTML = '';
+            document.getElementById('search-empty').classList.add('hidden');
+        }
+
+        function performSearch(query) {
+            const resultsContainer = document.getElementById('search-results');
+            const emptyState = document.getElementById('search-empty');
+            
+            if (!query) {
+                resultsContainer.innerHTML = '';
+                emptyState.classList.add('hidden');
+                return;
+            }
+
+            const searchResults = products.filter(product => 
+                product.name.toLowerCase().includes(query.toLowerCase())
+            );
+
+            if (searchResults.length === 0) {
+                resultsContainer.innerHTML = '';
+                emptyState.classList.remove('hidden');
+            } else {
+                emptyState.classList.add('hidden');
+                resultsContainer.innerHTML = searchResults.map(product => `
+                    <div class="bg-gray-50 rounded-lg p-3 cursor-pointer hover:bg-gray-100" onclick="viewProductDetails(${product.id})">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-12 h-12 bg-gray-200 rounded-lg flex items-center justify-center">
+                                <i class="fa-solid fa-box text-gray-400"></i>
+                            </div>
+                            <div class="flex-1">
+                                <h4 class="font-semibold text-gray-800">${product.name}</h4>
+                                <p class="text-sm text-gray-600">₹${product.is_weight_based ? product.price_per_kg : product.price}/${product.is_weight_based ? 'kg' : 'piece'}</p>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+            }
+        }
+
+        // Utility functions
+        function goBack() {
+            window.history.back();
+        }
+
+        function showNotification(message, type = 'success') {
+            const notification = document.getElementById('notification');
+            const notificationText = document.getElementById('notification-text');
+            
+            notificationText.textContent = message;
+            
+            // Set colors based on type
+            if (type === 'error') {
+                notification.className = notification.className.replace('bg-green-500', 'bg-red-500');
+            } else {
+                notification.className = notification.className.replace('bg-red-500', 'bg-green-500');
+            }
+            
+            notification.classList.remove('-translate-y-full');
+            
+            setTimeout(() => {
+                notification.classList.add('-translate-y-full');
+            }, 3000);
+        }
+
+        function hideNotification() {
+            document.getElementById('notification').classList.add('-translate-y-full');
+        }
+
+        // Initialize page when DOM is loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            loadProducts();
+            
+            // Set up search functionality
+            const searchInput = document.getElementById('search-input');
+            if (searchInput) {
+                searchInput.addEventListener('input', function() {
+                    const query = this.value.toLowerCase().trim();
+                    performSearch(query);
+                });
+            }
+        });
+    </script>
+</body>
+</html>
