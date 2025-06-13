@@ -592,63 +592,63 @@
     </nav>
 
     <script>
-        // Global functions
-        window.goBack = function() {
+        function goBack() {
             window.history.back();
-        };
+        }
 
-        window.refreshCustomers = function() {
+        function refreshCustomers() {
             window.location.reload();
-        };
+        }
 
-        window.showAddPaymentModal = function() {
+        function showAddPaymentModal() {
             alert('Add Payment Modal - Feature coming soon');
-        };
+        }
 
-        // Initialize page
         document.addEventListener('DOMContentLoaded', function() {
             const filterBtns = document.querySelectorAll('.filter-btn');
             const transactions = document.querySelectorAll('.transaction-entry');
             const clearFiltersBtn = document.getElementById('clear-filters');
 
-            filterBtns.forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const filter = this.getAttribute('data-filter');
-                    
-                    // Update active button
-                    filterBtns.forEach(b => {
-                        b.classList.remove('active', 'bg-primary', 'text-white');
-                        b.classList.add('bg-gray-200', 'text-gray-600');
-                    });
-                    this.classList.add('active', 'bg-primary', 'text-white');
-                    this.classList.remove('bg-gray-200', 'text-gray-600');
+            if (filterBtns && filterBtns.length > 0) {
+                filterBtns.forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const filter = this.getAttribute('data-filter');
+                        
+                        filterBtns.forEach(b => {
+                            b.classList.remove('active', 'bg-primary', 'text-white');
+                            b.classList.add('bg-gray-200', 'text-gray-600');
+                        });
+                        this.classList.add('active', 'bg-primary', 'text-white');
+                        this.classList.remove('bg-gray-200', 'text-gray-600');
 
-                    // Filter transactions
+                        transactions.forEach(transaction => {
+                            const type = transaction.getAttribute('data-type');
+                            if (filter === 'all' || type === filter) {
+                                transaction.style.display = 'block';
+                            } else {
+                                transaction.style.display = 'none';
+                            }
+                        });
+                    });
+                });
+            }
+
+            if (clearFiltersBtn) {
+                clearFiltersBtn.addEventListener('click', function() {
+                    if (filterBtns && filterBtns.length > 0) {
+                        filterBtns.forEach(b => {
+                            b.classList.remove('active', 'bg-primary', 'text-white');
+                            b.classList.add('bg-gray-200', 'text-gray-600');
+                        });
+                        filterBtns[0].classList.add('active', 'bg-primary', 'text-white');
+                        filterBtns[0].classList.remove('bg-gray-200', 'text-gray-600');
+                    }
+
                     transactions.forEach(transaction => {
-                        const type = transaction.getAttribute('data-type');
-                        if (filter === 'all' || type === filter) {
-                            transaction.style.display = 'block';
-                        } else {
-                            transaction.style.display = 'none';
-                        }
+                        transaction.style.display = 'block';
                     });
                 });
-            });
-
-            clearFiltersBtn.addEventListener('click', function() {
-                // Reset to "All" filter
-                filterBtns.forEach(b => {
-                    b.classList.remove('active', 'bg-primary', 'text-white');
-                    b.classList.add('bg-gray-200', 'text-gray-600');
-                });
-                filterBtns[0].classList.add('active', 'bg-primary', 'text-white');
-                filterBtns[0].classList.remove('bg-gray-200', 'text-gray-600');
-
-                // Show all transactions
-                transactions.forEach(transaction => {
-                    transaction.style.display = 'block';
-                });
-            });
+            }
         });
     </script>
 </body>
