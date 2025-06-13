@@ -1551,7 +1551,7 @@
                 
                 if (quantityElement && priceElement) {
                     let displayQuantity;
-                    if (item.type === 'weight') {
+                    if (item.type === 'weight-based') {
                         // For weight-based items, show appropriate unit
                         if (item.quantity < 1) {
                             displayQuantity = `${(item.quantity * 1000).toFixed(0)} gm`;
@@ -1591,7 +1591,7 @@
                 console.log('Unit-based input element:', unitBasedInput);
                 console.log('Weight-based input element:', weightBasedInput);
                 
-                if (item.type === 'weight') {
+                if (item.type === 'weight-based') {
                     // Weight-based item configuration
                     inputMethodSection.classList.remove('hidden');
                     quantityLabel.textContent = 'Weight';
@@ -1719,7 +1719,7 @@
             const item = cartItems[currentEditingItem];
             let quantity;
             
-            if (item.type === 'weight') {
+            if (item.type === 'weight-based') {
                 quantity = parseFloat(document.getElementById('edit-quantity-input-weight').value) || 1;
                 const unit = document.getElementById('edit-unit-select').value;
                 
@@ -1766,7 +1766,7 @@
             if (!currentEditingItem) return;
             
             const item = cartItems[currentEditingItem];
-            if (item.type === 'weight') {
+            if (item.type === 'weight-based') {
                 const unit = document.getElementById('edit-unit-select').value;
                 const input = document.getElementById('edit-quantity-input-weight');
                 const currentValue = parseFloat(input.value) || 1;
@@ -1799,7 +1799,7 @@
             let newQuantity;
             let newPrice;
             
-            if (item.type === 'weight') {
+            if (item.type === 'weight-based') {
                 const inputMethod = document.querySelector('input[name="editInputMethod"]:checked').value;
                 
                 if (inputMethod === 'quantity') {
