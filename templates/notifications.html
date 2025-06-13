@@ -321,10 +321,107 @@
             }
         }
 
+        // Load real-time notifications from database
+        async function loadNotifications() {
+            try {
+                const response = await fetch('/api/notifications');
+                const data = await response.json();
+                
+                if (data.notifications) {
+                    displayNotifications(data.notifications);
+                    updateNotificationCount(data.count);
+                }
+            } catch (error) {
+                console.error('Error loading notifications:', error);
+            }
+        }
+
+        function displayNotifications(notifications) {
+            const container = document.getElementById('notifications-container');
+            if (!container) return;
+
+            if (notifications.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-12">
+                        <i class="fa-solid fa-bell-slash text-gray-300 text-4xl mb-4"></i>
+                        <h3 class="text-lg font-semibold text-gray-600 mb-2">No New Notifications</h3>
+                        <p class="text-gray-500">All caught up! Check back later for updates.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = notifications.map(notification => {
+                const priorityColors = {
+                    'urgent': 'border-red-500',
+                    'high': 'border-orange-500', 
+                    'medium': 'border-blue-500',
+                    'low': 'border-gray-500'
+                };
+
+                const typeIcons = {
+                    'subscription': 'fa-crown',
+                    'backup': 'fa-cloud-arrow-up',
+                    'inventory': 'fa-box',
+                    'expiry': 'fa-calendar-times',
+                    'payment': 'fa-money-bill',
+                    'system': 'fa-cog'
+                };
+
+                return `
+                    <div class="notification-item bg-white rounded-lg shadow-sm border-l-4 ${priorityColors[notification.priority]} cursor-pointer hover:shadow-md transition-shadow" 
+                         data-type="${notification.type}" onclick="markAsRead(${notification.id})">
+                        <div class="p-4">
+                            <div class="flex items-start space-x-3">
+                                <div class="bg-primary/10 p-2 rounded-full">
+                                    <i class="fa-solid ${typeIcons[notification.type]} text-primary text-sm"></i>
+                                </div>
+                                <div class="flex-1">
+                                    <div class="flex items-start justify-between">
+                                        <div>
+                                            <h3 class="font-semibold text-primary text-sm">${notification.title}</h3>
+                                            <p class="text-xs text-gray-600 mt-1">${notification.message}</p>
+                                            <p class="text-xs text-gray-400 mt-2">${notification.time_ago}</p>
+                                        </div>
+                                        <span class="bg-${notification.priority === 'urgent' ? 'red' : notification.priority === 'high' ? 'orange' : 'primary'}-500 text-white text-xs px-2 py-1 rounded-full">
+                                            ${notification.priority.toUpperCase()}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function updateNotificationCount(count) {
+            // Update notification badge on dashboard
+            const badge = document.querySelector('.notification-badge');
+            if (badge) {
+                badge.textContent = count;
+                badge.style.display = count > 0 ? 'flex' : 'none';
+            }
+        }
+
+        async function markAsRead(notificationId) {
+            try {
+                await fetch(`/api/notifications/${notificationId}/mark-read`, {
+                    method: 'POST'
+                });
+                // Reload notifications to update the display
+                loadNotifications();
+            } catch (error) {
+                console.error('Error marking notification as read:', error);
+            }
+        }
+
         // Filter functionality
         document.addEventListener('DOMContentLoaded', function() {
             const filterBtns = document.querySelectorAll('.filter-btn');
-            const notifications = document.querySelectorAll('.notification-item');
+            
+            // Load real notifications on page load
+            loadNotifications();
 
             // Check backup status on page load
             checkBackupStatusFull();
@@ -335,6 +432,9 @@
                     checkBackupStatusFull();
                 }
             });
+
+            // Refresh notifications every 30 seconds
+            setInterval(loadNotifications, 30000);
 
             filterBtns.forEach(btn => {
                 btn.addEventListener('click', function() {

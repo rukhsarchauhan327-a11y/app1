@@ -127,6 +127,126 @@ class Product(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow)
 
+class Notification(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(200), nullable=False)
+    message = db.Column(db.Text, nullable=False)
+    type = db.Column(db.String(50), nullable=False)  # subscription, backup, inventory, payment, system
+    priority = db.Column(db.String(20), default='medium')  # low, medium, high, urgent
+    is_read = db.Column(db.Boolean, default=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    # Optional references
+    customer_id = db.Column(db.Integer, db.ForeignKey('customer.id'), nullable=True)
+    bill_id = db.Column(db.Integer, db.ForeignKey('bill.id'), nullable=True)
+    product_id = db.Column(db.Integer, db.ForeignKey('product.id'), nullable=True)
+
+# Notification helper functions
+def create_notification(title, message, notification_type, priority='medium', customer_id=None, bill_id=None, product_id=None):
+    """Create a new notification in the database"""
+    try:
+        notification = Notification(
+            title=title,
+            message=message,
+            type=notification_type,
+            priority=priority,
+            customer_id=customer_id,
+            bill_id=bill_id,
+            product_id=product_id
+        )
+        db.session.add(notification)
+        db.session.commit()
+        return notification
+    except Exception as e:
+        app.logger.error(f"Failed to create notification: {e}")
+        db.session.rollback()
+        return None
+
+def check_subscription_expiry():
+    """Check if subscription is expiring and create notification"""
+    # For production, this would check actual subscription status
+    # Currently creating demo notification for UI
+    try:
+        existing = Notification.query.filter_by(type='subscription', is_read=False).first()
+        if not existing:
+            create_notification(
+                "Subscription Expiring Soon",
+                "Your Kirana Konnect subscription expires in 3 days. Renew now to continue using all features.",
+                "subscription",
+                "high"
+            )
+    except Exception as e:
+        app.logger.error(f"Error checking subscription: {e}")
+
+def check_backup_status():
+    """Check backup status and create notification if needed"""
+    try:
+        # Check if backup notification already exists
+        existing = Notification.query.filter_by(type='backup', is_read=False).first()
+        if not existing:
+            create_notification(
+                "Enable Data Backup",
+                "Protect your business data by enabling automatic cloud backup in settings.",
+                "backup",
+                "medium"
+            )
+    except Exception as e:
+        app.logger.error(f"Error checking backup status: {e}")
+
+def check_low_stock():
+    """Check for low stock items and create notifications"""
+    try:
+        low_stock_products = Product.query.filter(Product.stock_quantity <= Product.reorder_level).all()
+        for product in low_stock_products:
+            # Check if notification already exists for this product
+            existing = Notification.query.filter_by(
+                type='inventory', 
+                product_id=product.id, 
+                is_read=False
+            ).first()
+            
+            if not existing:
+                create_notification(
+                    f"Low Stock Alert: {product.name}",
+                    f"Only {product.stock_quantity} units left. Reorder level: {product.reorder_level}",
+                    "inventory",
+                    "high",
+                    product_id=product.id
+                )
+    except Exception as e:
+        app.logger.error(f"Error checking low stock: {e}")
+
+def check_expiring_products():
+    """Check for products expiring soon and create notifications"""
+    try:
+        from datetime import date, timedelta
+        expiry_threshold = date.today() + timedelta(days=7)
+        
+        expiring_products = Product.query.filter(
+            Product.expiry_date.isnot(None),
+            Product.expiry_date <= expiry_threshold
+        ).all()
+        
+        for product in expiring_products:
+            # Check if notification already exists for this product
+            existing = Notification.query.filter_by(
+                type='expiry', 
+                product_id=product.id, 
+                is_read=False
+            ).first()
+            
+            if not existing:
+                days_to_expiry = (product.expiry_date - date.today()).days
+                create_notification(
+                    f"Product Expiring: {product.name}",
+                    f"Expires in {days_to_expiry} days on {product.expiry_date.strftime('%d/%m/%Y')}",
+                    "expiry",
+                    "urgent" if days_to_expiry <= 3 else "high",
+                    product_id=product.id
+                )
+    except Exception as e:
+        app.logger.error(f"Error checking expiring products: {e}")
+
 # Simplified database initialization - only create tables
 def init_db():
     """Initialize database tables without heavy seeding"""
@@ -625,6 +745,73 @@ def create_payment():
     except Exception as e:
         logging.error(f"Error creating payment: {str(e)}")
         return jsonify({'error': 'Failed to record payment'}), 500
+
+@app.route('/api/notifications')
+def get_notifications():
+    """Get all notifications from database"""
+    try:
+        # Run notification checks to ensure latest data
+        check_subscription_expiry()
+        check_backup_status()
+        check_low_stock()
+        check_expiring_products()
+        
+        # Fetch all unread notifications, ordered by priority and creation time
+        notifications = Notification.query.filter_by(is_read=False).order_by(
+            Notification.priority.desc(),
+            Notification.created_at.desc()
+        ).all()
+        
+        notification_data = []
+        for notif in notifications:
+            notification_data.append({
+                'id': notif.id,
+                'title': notif.title,
+                'message': notif.message,
+                'type': notif.type,
+                'priority': notif.priority,
+                'created_at': notif.created_at.isoformat(),
+                'time_ago': get_time_ago(notif.created_at)
+            })
+        
+        return jsonify({
+            'notifications': notification_data,
+            'count': len(notification_data)
+        })
+        
+    except Exception as e:
+        app.logger.error(f"Error fetching notifications: {e}")
+        return jsonify({'error': 'Failed to fetch notifications'}), 500
+
+@app.route('/api/notifications/<int:notification_id>/mark-read', methods=['POST'])
+def mark_notification_read(notification_id):
+    """Mark a notification as read"""
+    try:
+        notification = Notification.query.get_or_404(notification_id)
+        notification.is_read = True
+        db.session.commit()
+        
+        return jsonify({'message': 'Notification marked as read'})
+        
+    except Exception as e:
+        app.logger.error(f"Error marking notification as read: {e}")
+        return jsonify({'error': 'Failed to update notification'}), 500
+
+def get_time_ago(datetime_obj):
+    """Calculate human-readable time difference"""
+    now = datetime.utcnow()
+    diff = now - datetime_obj
+    
+    if diff.days > 0:
+        return f"{diff.days} day{'s' if diff.days != 1 else ''} ago"
+    elif diff.seconds > 3600:
+        hours = diff.seconds // 3600
+        return f"{hours} hour{'s' if hours != 1 else ''} ago"
+    elif diff.seconds > 60:
+        minutes = diff.seconds // 60
+        return f"{minutes} minute{'s' if minutes != 1 else ''} ago"
+    else:
+        return "Just now"
 
 @app.route('/export-business-data')
 def export_business_data():
