@@ -377,10 +377,24 @@
             cartItem.mfgDate = productData.mfgDate || '';
             cartItem.expDate = productData.expDate || '';
             cartItem.price = cartItem.totalPrice;
+            cartItem.unitPrice = productData.sellingPrice;
             
             // Save to localStorage using the same system as inventory
-            const existingCart = JSON.parse(localStorage.getItem('kiranakonnect_cart') || '[]');
-            existingCart.push(cartItem);
+            let existingCart = JSON.parse(localStorage.getItem('kiranakonnect_cart') || '[]');
+            
+            // Check if same product already exists
+            const existingIndex = existingCart.findIndex(item => item.id === cartItem.id);
+            if (existingIndex > -1) {
+                // Update existing item
+                existingCart[existingIndex].quantity += cartItem.quantity;
+                existingCart[existingIndex].totalPrice = existingCart[existingIndex].quantity * existingCart[existingIndex].unitPrice;
+                existingCart[existingIndex].price = existingCart[existingIndex].totalPrice;
+                existingCart[existingIndex].quantityDisplay = updateQuantityDisplay(existingCart[existingIndex]);
+            } else {
+                // Add new item
+                existingCart.push(cartItem);
+            }
+            
             localStorage.setItem('kiranakonnect_cart', JSON.stringify(existingCart));
             
             showNotification(`Added ${cartItem.quantityDisplay} of ${cartItem.name} to cart!`, 'success');
