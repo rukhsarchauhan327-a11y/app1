@@ -257,6 +257,35 @@ def staff():
 
 # API Endpoints for Customer Management and Billing
 
+@app.route('/api/products')
+def get_products():
+    """Get all products for inventory display"""
+    products = Product.query.all()
+    
+    results = []
+    for product in products:
+        # Check if product is low stock or expired
+        is_low_stock = product.stock_quantity <= product.reorder_level
+        is_expired = product.expiry_date and product.expiry_date < datetime.utcnow().date()
+        
+        results.append({
+            'id': product.id,
+            'name': product.name,
+            'barcode': product.barcode,
+            'category': product.category,
+            'price': product.price,
+            'price_per_kg': product.price_per_kg,
+            'is_weight_based': product.is_weight_based,
+            'stock_quantity': product.stock_quantity,
+            'reorder_level': product.reorder_level,
+            'expiry_date': product.expiry_date.strftime('%d/%m/%Y') if product.expiry_date else None,
+            'is_low_stock': is_low_stock,
+            'is_expired': is_expired,
+            'unit': 'kg' if product.is_weight_based else 'Piece'
+        })
+    
+    return jsonify(results)
+
 @app.route('/api/customers/search')
 def search_customers():
     """Search customers by name or phone number"""

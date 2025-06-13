@@ -593,50 +593,172 @@
     <script>
         let currentFilter = 'all';
         let currentCategory = 'all';
+        let products = [];
+        let filteredProducts = [];
+
+        // Load products from database on page load
+        async function loadProducts() {
+            try {
+                const response = await fetch('/api/products');
+                products = await response.json();
+                filteredProducts = products;
+                renderProducts();
+                updateCartCount();
+            } catch (error) {
+                console.error('Error loading products:', error);
+                showNotification('Failed to load products', 'error');
+            }
+        }
+
+        // Render products in the inventory grid
+        function renderProducts() {
+            const container = document.getElementById('inventory-items');
+            container.innerHTML = '';
+
+            filteredProducts.forEach((product, index) => {
+                const statusClass = product.is_expired ? 'bg-red-500' : 
+                                  product.is_low_stock ? 'bg-accent' : 'bg-primary';
+                const statusText = product.is_expired ? 'Expired' :
+                                 product.is_low_stock ? 'Low Stock' : 'In Stock';
+
+                const priceDisplay = product.is_weight_based ? 
+                    `₹${product.price_per_kg}/${product.unit}` : 
+                    `₹${product.price}/Piece`;
+
+                const stockDisplay = product.is_weight_based ? 
+                    `${product.stock_quantity} ${product.unit} Available` :
+                    `${product.stock_quantity} Pieces Available`;
+
+                const productCard = `
+                    <div id="product-${product.id}" class="bg-white rounded-xl p-4 shadow-sm border hover:shadow-md transition-shadow cursor-pointer" 
+                         data-category="${product.category.toLowerCase()}" 
+                         data-status="${product.is_expired ? 'expired' : 'available'}" 
+                         onclick="viewProductDetails(${product.id})">
+                        <div class="flex items-center space-x-4">
+                            <div class="w-16 h-16 rounded-xl overflow-hidden bg-gray-100 flex items-center justify-center">
+                                <i class="fa-solid fa-box text-gray-400 text-2xl"></i>
+                            </div>
+                            <div class="flex-1">
+                                <div class="flex items-start justify-between">
+                                    <div class="flex-1">
+                                        <h3 class="font-bold text-dark text-lg">${product.name}</h3>
+                                        ${product.expiry_date ? `
+                                            <div class="text-xs text-gray-500 mt-1">
+                                                <p>EXP: ${product.expiry_date}</p>
+                                            </div>
+                                        ` : ''}
+                                    </div>
+                                    <div class="text-right">
+                                        <span class="${statusClass} text-white text-xs px-2 py-1 rounded-full font-semibold">${statusText}</span>
+                                        <p class="text-lg font-bold text-primary mt-2">${priceDisplay}</p>
+                                        <p class="text-sm text-gray-600">${stockDisplay}</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-center justify-end space-x-2 mt-3">
+                                    <button class="p-2 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors" 
+                                            onclick="event.stopPropagation(); refillItem(${product.id})" title="Refill Stock">
+                                        <i class="fa-solid fa-plus text-blue-600 text-sm"></i>
+                                    </button>
+                                    <button class="p-2 bg-green-50 hover:bg-green-100 rounded-lg transition-colors" 
+                                            onclick="event.stopPropagation(); addToCart(${product.id})" title="Add to Cart">
+                                        <i class="fa-solid fa-shopping-cart text-green-600 text-sm"></i>
+                                    </button>
+                                    <button class="p-2 bg-red-50 hover:bg-red-100 rounded-lg transition-colors" 
+                                            onclick="event.stopPropagation(); deleteItem(${product.id})" title="Delete Item">
+                                        <i class="fa-solid fa-trash text-red-600 text-sm"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                container.innerHTML += productCard;
+            });
+        }
 
         function goBack() {
             window.history.back();
         }
 
-        function viewProductDetails(itemId) {
-            const product = productData[itemId];
+        // Cart functionality
+        function addToCart(productId) {
+            const product = products.find(p => p.id === productId);
             if (!product) {
                 showNotification('Product not found', 'error');
                 return;
             }
 
-            // Debug logging for inventory navigation
-            console.log('Navigating from inventory with product data:', {
-                itemId: itemId,
-                product: product,
-                price: product.price,
-                type: product.type
-            });
+            // Get existing cart from localStorage
+            let cart = [];
+            try {
+                const existingCart = localStorage.getItem('kiranakonnect_cart');
+                if (existingCart) {
+                    cart = JSON.parse(existingCart);
+                }
+            } catch (error) {
+                console.error('Error loading cart:', error);
+            }
+
+            // Add product to cart
+            const cartItem = {
+                id: product.id,
+                name: product.name,
+                price: product.is_weight_based ? product.price_per_kg : product.price,
+                unit: product.is_weight_based ? product.unit : 'Piece',
+                quantity: product.is_weight_based ? 1 : 1,
+                mfgDate: '',
+                expDate: product.expiry_date || '',
+                showDates: false,
+                isWeightBased: product.is_weight_based
+            };
+
+            cart.push(cartItem);
+            localStorage.setItem('kiranakonnect_cart', JSON.stringify(cart));
+            
+            updateCartCount();
+            showNotification(`${product.name} added to cart`, 'success');
+        }
+
+        function updateCartCount() {
+            try {
+                const cart = JSON.parse(localStorage.getItem('kiranakonnect_cart') || '[]');
+                const cartCount = cart.length;
+                const cartBadge = document.querySelector('.fa-shopping-cart').parentElement.querySelector('.bg-danger');
+                if (cartBadge) {
+                    cartBadge.textContent = cartCount;
+                    cartBadge.style.display = cartCount > 0 ? 'flex' : 'none';
+                }
+            } catch (error) {
+                console.error('Error updating cart count:', error);
+            }
+        }
+
+        function viewProductDetails(productId) {
+            const product = products.find(p => p.id === productId);
+            if (!product) {
+                showNotification('Product not found', 'error');
+                return;
+            }
 
             // Navigate to appropriate product details page based on product type
-            if (product.type === 'weight' || product.type === 'weight-based') {
+            if (product.is_weight_based) {
                 const params = new URLSearchParams({
                     id: product.id,
                     name: product.name,
-                    price: product.price,
-                    stock: product.stock,
-                    image: product.image,
-                    mfgDate: product.mfgDate || '',
-                    expDate: product.expDate || ''
+                    price: product.price_per_kg,
+                    stock: product.stock_quantity,
+                    unit: product.unit,
+                    expDate: product.expiry_date || ''
                 });
-                console.log('Weight-based navigation params:', params.toString());
                 window.location.href = `/product-details-weight?${params.toString()}`;
             } else {
                 const params = new URLSearchParams({
                     id: product.id,
                     name: product.name,
                     price: product.price,
-                    unit: product.unit,
-                    stock: product.stock,
-                    image: product.image,
-                    type: product.type,
-                    mfgDate: product.mfgDate || '',
-                    expDate: product.expDate || ''
+                    unit: 'Piece',
+                    stock: product.stock_quantity,
+                    expDate: product.expiry_date || ''
                 });
                 window.location.href = `/product-details?${params.toString()}`;
             }
@@ -695,8 +817,188 @@
             button.classList.toggle('text-yellow-400');
         }
 
+        // Add remaining utility functions
+        function refillItem(productId) {
+            const product = products.find(p => p.id === productId);
+            if (product && product.is_weight_based) {
+                window.location.href = `/refill-stock-weight?id=${productId}`;
+            } else {
+                window.location.href = `/refill-stock?id=${productId}`;
+            }
+        }
+
+        function deleteItem(productId) {
+            if (confirm('Are you sure you want to delete this item?')) {
+                showNotification('Item deleted successfully', 'success');
+                // In a real app, this would call an API to delete the product
+            }
+        }
+
+        function showNotification(message, type = 'info') {
+            // Create notification element
+            const notification = document.createElement('div');
+            notification.className = `fixed top-4 right-4 z-50 p-4 rounded-lg text-white font-medium ${
+                type === 'success' ? 'bg-green-500' : 
+                type === 'error' ? 'bg-red-500' : 'bg-blue-500'
+            }`;
+            notification.textContent = message;
+            
+            document.body.appendChild(notification);
+            
+            // Remove after 3 seconds
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.parentNode.removeChild(notification);
+                }
+            }, 3000);
+        }
+
+        // Navigation functions
+        function goToDashboard() {
+            window.location.href = '/dashboard';
+        }
+
+        function goToCart() {
+            window.location.href = '/cart';
+        }
+
+        function goToProfile() {
+            window.location.href = '/profile';
+        }
+
+        function addNewItem() {
+            window.location.href = '/add-item';
+        }
+
+        // Search functionality
+        function performSearch() {
+            const query = document.getElementById('search-input').value.toLowerCase().trim();
+            const resultsContainer = document.getElementById('search-results');
+            const emptyState = document.getElementById('search-empty');
+            
+            if (query.length < 2) {
+                resultsContainer.innerHTML = '';
+                emptyState.classList.add('hidden');
+                return;
+            }
+
+            const results = products.filter(product => 
+                product.name.toLowerCase().includes(query) ||
+                product.category.toLowerCase().includes(query)
+            );
+
+            if (results.length === 0) {
+                resultsContainer.innerHTML = '';
+                emptyState.classList.remove('hidden');
+                return;
+            }
+
+            emptyState.classList.add('hidden');
+            resultsContainer.innerHTML = results.map(product => `
+                <div class="p-3 hover:bg-gray-50 cursor-pointer border-b border-gray-100 last:border-b-0"
+                     onclick="selectSearchResult(${product.id})">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-8 h-8 bg-gray-100 rounded flex items-center justify-center">
+                            <i class="fa-solid fa-box text-gray-400 text-xs"></i>
+                        </div>
+                        <div class="flex-1">
+                            <h4 class="font-medium text-dark text-sm">${product.name}</h4>
+                            <p class="text-xs text-gray-500">${product.category}</p>
+                        </div>
+                        <p class="text-sm font-medium text-primary">
+                            ${product.is_weight_based ? `₹${product.price_per_kg}/${product.unit}` : `₹${product.price}/Piece`}
+                        </p>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function selectSearchResult(productId) {
+            closeSearch();
+            viewProductDetails(productId);
+        }
+
         function performBarcodeSearch(barcode) {
-            // Simulate barcode lookup
+            // Search for product by barcode in database
+            const product = products.find(p => p.barcode === barcode);
+            if (product) {
+                showNotification(`Found: ${product.name}`, 'success');
+                setTimeout(() => {
+                    viewProductDetails(product.id);
+                }, 1000);
+            } else {
+                showNotification('Product not found', 'error');
+            }
+        }
+
+        // Filter and category functions
+        function filterItems(status) {
+            currentFilter = status;
+            applyFilters();
+            updateFilterButtons();
+        }
+
+        function filterByCategory(category) {
+            currentCategory = category;
+            applyFilters();
+            updateCategoryButtons();
+        }
+
+        function applyFilters() {
+            filteredProducts = products.filter(product => {
+                const statusMatch = currentFilter === 'all' || 
+                    (currentFilter === 'available' && !product.is_expired && !product.is_low_stock) ||
+                    (currentFilter === 'low' && product.is_low_stock) ||
+                    (currentFilter === 'expired' && product.is_expired);
+                
+                const categoryMatch = currentCategory === 'all' || 
+                    product.category.toLowerCase() === currentCategory.toLowerCase();
+                
+                return statusMatch && categoryMatch;
+            });
+            
+            renderProducts();
+        }
+
+        function updateFilterButtons() {
+            document.querySelectorAll('[onclick^="filterItems"]').forEach(btn => {
+                btn.classList.remove('bg-primary', 'text-white');
+                btn.classList.add('bg-gray-100', 'text-gray-600');
+            });
+            
+            const activeBtn = document.querySelector(`[onclick="filterItems('${currentFilter}')"]`);
+            if (activeBtn) {
+                activeBtn.classList.remove('bg-gray-100', 'text-gray-600');
+                activeBtn.classList.add('bg-primary', 'text-white');
+            }
+        }
+
+        function updateCategoryButtons() {
+            document.querySelectorAll('[onclick^="filterByCategory"]').forEach(btn => {
+                btn.classList.remove('bg-primary', 'text-white');
+                btn.classList.add('bg-gray-100', 'text-gray-600');
+            });
+            
+            const activeBtn = document.querySelector(`[onclick="filterByCategory('${currentCategory}')"]`);
+            if (activeBtn) {
+                activeBtn.classList.remove('bg-gray-100', 'text-gray-600');
+                activeBtn.classList.add('bg-primary', 'text-white');
+            }
+        }
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            loadProducts();
+            
+            // Add search input event listener
+            document.getElementById('search-input').addEventListener('input', performSearch);
+            
+            // Add close search modal event listener
+            document.getElementById('close-search').addEventListener('click', closeSearch);
+        });
+
+        function performBarcodeSearch(barcode) {
+            // Search for product by barcode in database
             const barcodeProducts = {
                 '8901030823456': 'item-2', // Coconut Oil
                 '8901030834567': 'item-3', // Aashirvaad Atta
