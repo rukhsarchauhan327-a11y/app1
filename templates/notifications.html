@@ -427,7 +427,7 @@
 
                 return `
                     <div class="notification-item bg-white rounded-lg shadow-sm border-l-4 ${priorityColors[notification.priority]} cursor-pointer hover:shadow-md transition-shadow" 
-                         data-type="${notification.type}" onclick="handleNotificationClick(${notification.id}, '${notification.type}', ${notification.customer_id}, ${notification.bill_id}, ${notification.product_id})">
+                         data-type="${notification.type}" onclick="handleNotificationClick(${notification.id}, '${notification.type}', ${notification.customer_id || 'null'}, ${notification.bill_id || 'null'}, ${notification.product_id || 'null'})">`
                         <div class="p-4">
                             <div class="flex items-start space-x-3">
                                 <div class="${typeColor} p-2 rounded-full">
@@ -465,6 +465,11 @@
             // Mark notification as read first
             await markAsRead(notificationId);
             
+            // Handle null string values
+            customerId = (customerId === 'null' || customerId === null) ? null : customerId;
+            billId = (billId === 'null' || billId === null) ? null : billId;
+            productId = (productId === 'null' || productId === null) ? null : productId;
+            
             // Navigate to appropriate page based on notification type
             switch(type) {
                 case 'inventory':
@@ -501,7 +506,7 @@
                     break;
                     
                 case 'subscription':
-                    // Go to profile/settings page
+                    // Go to profile page
                     window.location.href = '/profile';
                     break;
                     
