@@ -170,12 +170,12 @@
         <div id="stats-section" class="px-4 mb-6">
             <div class="grid grid-cols-2 gap-4">
                 <!-- Today's Profit -->
-                <div class="bg-white p-4 rounded-xl shadow-sm border-l-4 border-primary">
+                <div class="bg-white p-4 rounded-xl shadow-sm border-l-4 border-primary cursor-pointer hover:shadow-md transition-shadow" onclick="showTodaysProfit()">
                     <div class="flex items-center justify-between">
                         <div class="flex-1">
                             <p class="text-xs text-gray-500 uppercase tracking-wide font-medium">Today's Profit</p>
-                            <p class="text-2xl font-bold text-primary mt-1">₹5,200</p>
-                            <p class="text-xs text-green-600 mt-1">+12% from yesterday</p>
+                            <p class="text-2xl font-bold text-primary mt-1" id="today-profit">₹0</p>
+                            <p class="text-xs mt-1" id="profit-growth">Loading...</p>
                         </div>
                         <div class="bg-primary/10 p-3 rounded-full">
                             <i class="fa-solid fa-chart-line text-primary text-lg"></i>
@@ -188,8 +188,8 @@
                     <div class="flex items-center justify-between">
                         <div class="flex-1">
                             <p class="text-xs text-gray-500 uppercase tracking-wide font-medium">Total Sales</p>
-                            <p class="text-2xl font-bold text-secondary mt-1">₹8,000</p>
-                            <p class="text-xs text-gray-500 mt-1">25 transactions</p>
+                            <p class="text-2xl font-bold text-secondary mt-1" id="total-sales">₹0</p>
+                            <p class="text-xs text-gray-500 mt-1" id="transaction-count">0 transactions</p>
                         </div>
                         <div class="bg-secondary/10 p-3 rounded-full">
                             <i class="fa-solid fa-rupee-sign text-secondary text-lg"></i>
@@ -202,8 +202,8 @@
                     <div class="flex items-center justify-between">
                         <div class="flex-1">
                             <p class="text-xs text-gray-500 uppercase tracking-wide font-medium">Udhar Ledger</p>
-                            <p class="text-sm font-semibold text-accent mt-1">3 Customers</p>
-                            <p class="text-xl font-bold text-accent">₹1,500</p>
+                            <p class="text-sm font-semibold text-accent mt-1" id="customers-with-credit">0 Customers</p>
+                            <p class="text-xl font-bold text-accent" id="outstanding-amount">₹0</p>
                         </div>
                         <div class="bg-accent/10 p-3 rounded-full">
                             <i class="fa-solid fa-credit-card text-accent text-lg"></i>
@@ -216,8 +216,8 @@
                     <div class="flex items-center justify-between">
                         <div class="flex-1">
                             <p class="text-xs text-gray-500 uppercase tracking-wide font-medium">Inventory</p>
-                            <p class="text-sm text-gray-600 mt-1">120 Items</p>
-                            <p class="text-xs text-danger font-medium">5 Expired • 10 Low</p>
+                            <p class="text-sm text-gray-600 mt-1" id="total-products">0 Items</p>
+                            <p class="text-xs text-danger font-medium" id="inventory-alerts">Loading...</p>
                         </div>
                         <div class="bg-danger/10 p-3 rounded-full">
                             <i class="fa-solid fa-boxes-stacked text-danger text-lg"></i>
@@ -793,6 +793,124 @@
             if (isRadialMenuOpen && !radialMenu.contains(e.target)) {
                 toggleRadialMenu();
             }
+        });
+
+        // Load dashboard statistics from database
+        async function loadDashboardStats() {
+            try {
+                const response = await fetch('/api/dashboard/stats');
+                const stats = await response.json();
+                
+                // Update Today's Profit
+                document.getElementById('today-profit').textContent = `₹${stats.today_profit}`;
+                const profitGrowthElement = document.getElementById('profit-growth');
+                if (stats.profit_growth > 0) {
+                    profitGrowthElement.textContent = `+${stats.profit_growth}% from yesterday`;
+                    profitGrowthElement.className = 'text-xs text-green-600 mt-1';
+                } else if (stats.profit_growth < 0) {
+                    profitGrowthElement.textContent = `${stats.profit_growth}% from yesterday`;
+                    profitGrowthElement.className = 'text-xs text-red-600 mt-1';
+                } else {
+                    profitGrowthElement.textContent = 'Same as yesterday';
+                    profitGrowthElement.className = 'text-xs text-gray-600 mt-1';
+                }
+                
+                // Update Total Sales
+                document.getElementById('total-sales').textContent = `₹${stats.total_sales}`;
+                document.getElementById('transaction-count').textContent = `${stats.transaction_count} transactions`;
+                
+                // Update Udhar Ledger
+                document.getElementById('customers-with-credit').textContent = `${stats.customers_with_credit} Customers`;
+                document.getElementById('outstanding-amount').textContent = `₹${stats.outstanding_amount}`;
+                
+                // Update Inventory
+                document.getElementById('total-products').textContent = `${stats.total_products} Items`;
+                document.getElementById('inventory-alerts').textContent = `${stats.expired_products} Expired • ${stats.low_stock_products} Low`;
+                
+            } catch (error) {
+                console.error('Error loading dashboard stats:', error);
+            }
+        }
+
+        // Today's Profit click handler
+        function showTodaysProfit() {
+            const modal = document.createElement('div');
+            modal.id = 'profit-modal';
+            modal.className = 'fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4';
+            
+            modal.innerHTML = `
+                <div class="bg-white rounded-xl p-6 w-full max-w-md">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-lg font-bold text-dark">Today's Profit Breakdown</h3>
+                        <button onclick="closeProfitModal()" class="text-gray-500 hover:text-gray-700">
+                            <i class="fa-solid fa-times text-xl"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="space-y-4">
+                        <div class="bg-gray-50 rounded-lg p-4">
+                            <h4 class="font-semibold text-dark mb-3">Profit Summary</h4>
+                            <div class="space-y-2">
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600">Total Sales:</span>
+                                    <span class="font-medium" id="modal-sales">₹0</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600">Estimated Cost (65%):</span>
+                                    <span class="font-medium" id="modal-cost">₹0</span>
+                                </div>
+                                <div class="border-t pt-2 flex justify-between">
+                                    <span class="font-semibold text-dark">Net Profit (35%):</span>
+                                    <span class="font-bold text-primary" id="modal-profit">₹0</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="grid grid-cols-2 gap-3">
+                            <button onclick="window.location.href='/bill-generate'" class="bg-primary text-white py-2 rounded-lg text-sm font-medium">
+                                View Bills
+                            </button>
+                            <button onclick="window.location.href='/customer-ledger'" class="bg-secondary text-white py-2 rounded-lg text-sm font-medium">
+                                Customer Ledger
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+            loadProfitModalData();
+        }
+
+        async function loadProfitModalData() {
+            try {
+                const response = await fetch('/api/dashboard/stats');
+                const stats = await response.json();
+                
+                const cost = stats.total_sales * 0.65;
+                document.getElementById('modal-sales').textContent = `₹${stats.total_sales}`;
+                document.getElementById('modal-cost').textContent = `₹${cost.toFixed(2)}`;
+                document.getElementById('modal-profit').textContent = `₹${stats.today_profit}`;
+                
+            } catch (error) {
+                console.error('Error loading profit modal data:', error);
+            }
+        }
+
+        function closeProfitModal() {
+            const modal = document.getElementById('profit-modal');
+            if (modal) {
+                modal.remove();
+            }
+        }
+
+        // Initialize dashboard
+        document.addEventListener('DOMContentLoaded', function() {
+            loadDashboardStats();
+            updateDateTime();
+            
+            // Refresh stats every 30 seconds
+            setInterval(loadDashboardStats, 30000);
         });
     </script>
 

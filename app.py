@@ -3,7 +3,7 @@ import logging
 from flask import Flask, render_template, request, jsonify, send_file, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import DeclarativeBase
-from datetime import datetime
+from datetime import datetime, timedelta
 from reportlab.lib.pagesizes import letter, A4
 from reportlab.lib import colors
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
@@ -285,6 +285,63 @@ def get_products():
         })
     
     return jsonify(results)
+
+@app.route('/api/dashboard/stats')
+def get_dashboard_stats():
+    """Get dashboard statistics including today's profit"""
+    today = datetime.utcnow().date()
+    
+    # Calculate today's sales
+    today_bills = Bill.query.filter(
+        db.func.date(Bill.created_at) == today,
+        Bill.payment_status == 'paid'
+    ).all()
+    
+    total_sales = sum(bill.total_amount for bill in today_bills)
+    transaction_count = len(today_bills)
+    
+    # Calculate cost of goods sold (assuming 65% margin for profit calculation)
+    cost_ratio = 0.65  # 65% cost, 35% profit margin
+    estimated_cost = total_sales * cost_ratio
+    today_profit = total_sales - estimated_cost
+    
+    # Get yesterday's sales for comparison
+    yesterday = today - timedelta(days=1)
+    yesterday_bills = Bill.query.filter(
+        db.func.date(Bill.created_at) == yesterday,
+        Bill.payment_status == 'paid'
+    ).all()
+    
+    yesterday_sales = sum(bill.total_amount for bill in yesterday_bills)
+    yesterday_profit = yesterday_sales * (1 - cost_ratio)
+    
+    # Calculate profit growth
+    profit_growth = 0
+    if yesterday_profit > 0:
+        profit_growth = ((today_profit - yesterday_profit) / yesterday_profit) * 100
+    
+    # Get outstanding credit amounts
+    outstanding_customers = Customer.query.all()
+    total_outstanding = sum(customer.outstanding_balance for customer in outstanding_customers)
+    customers_with_credit = len([c for c in outstanding_customers if c.outstanding_balance > 0])
+    
+    # Get inventory stats
+    all_products = Product.query.all()
+    total_products = len(all_products)
+    expired_products = len([p for p in all_products if p.expiry_date and p.expiry_date < today])
+    low_stock_products = len([p for p in all_products if p.stock_quantity <= p.reorder_level])
+    
+    return jsonify({
+        'today_profit': round(today_profit, 2),
+        'profit_growth': round(profit_growth, 1),
+        'total_sales': round(total_sales, 2),
+        'transaction_count': transaction_count,
+        'outstanding_amount': round(total_outstanding, 2),
+        'customers_with_credit': customers_with_credit,
+        'total_products': total_products,
+        'expired_products': expired_products,
+        'low_stock_products': low_stock_products
+    })
 
 @app.route('/api/customers/search')
 def search_customers():
