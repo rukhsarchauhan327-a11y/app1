@@ -1329,16 +1329,33 @@
                 // Add event listener directly to the button
                 setTimeout(() => {
                     const button = document.getElementById('add-items-btn');
+                    console.log('Looking for button with ID add-items-btn:', !!button);
+                    
                     if (button) {
-                        button.addEventListener('click', function() {
+                        button.addEventListener('click', function(e) {
+                            e.preventDefault();
                             console.log('Button clicked - navigating to inventory');
                             window.location.href = '/inventory';
                         });
                         console.log('Event listener added to Add Items button');
+                        
+                        // Also try direct onclick as backup
+                        button.onclick = function(e) {
+                            e.preventDefault();
+                            console.log('Onclick fired - navigating to inventory');
+                            window.location.href = '/inventory';
+                            return false;
+                        };
                     } else {
                         console.error('Could not find Add Items button to attach event listener');
+                        // Try to find any button in cart container
+                        const allButtons = cartContainer.querySelectorAll('button');
+                        console.log('All buttons found in cart:', allButtons.length);
+                        allButtons.forEach((btn, index) => {
+                            console.log(`Button ${index}:`, btn.id || 'no-id', btn.textContent.trim());
+                        });
                     }
-                }, 50);
+                }, 100);
                 
             } catch (error) {
                 console.error('Error adding Add More Items button:', error);
