@@ -1190,52 +1190,56 @@
         function checkForNewItems() {
             const cartData = localStorage.getItem('kiranakonnect_cart');
             if (cartData) {
-                const storedItems = JSON.parse(cartData);
-                if (storedItems.length > 0) {
-                    console.log('Found new items from inventory:', storedItems);
-                    
-                    // Add each new item to cartItems
-                    storedItems.forEach(item => {
-                        const nextItemId = Object.keys(cartItems).length > 0 ? Math.max(...Object.keys(cartItems).map(Number)) + 1 : 1;
+                try {
+                    const storedItems = JSON.parse(cartData);
+                    if (storedItems.length > 0) {
+                        console.log('Found new items from inventory:', storedItems);
                         
-                        const newItem = {
-                            id: nextItemId,
-                            name: item.name,
-                            price: item.price || item.totalPrice,
-                            quantity: item.quantity,
-                            unit: item.unit,
-                            unitPrice: item.unitPrice,
-                            type: item.type || 'unit',
-                            mfgDate: item.mfgDate || '',
-                            expDate: item.expDate || '',
-                            datesHidden: false,
-                            quantityDisplay: item.quantityDisplay
-                        };
+                        // Check if cartItems is initialized, if not initialize it
+                        if (!cartItems || typeof cartItems !== 'object') {
+                            cartItems = {};
+                        }
                         
-                        cartItems[nextItemId] = newItem;
-                        console.log('New item added from inventory:', newItem);
-                    });
-                    
-                    // Clear temporary cart storage
-                    localStorage.removeItem('kiranakonnect_cart');
-                    
-                    // Save to persistent storage
-                    saveCartToPersistentStorage();
-                    
-                    // Only re-render if DOM is ready
-                    if (document.readyState === 'complete' && document.getElementById('cart-items')) {
-                        console.log('Re-rendering cart with items:', Object.keys(cartItems).length);
-                        renderCartItems();
-                        calculateTotals();
-                    } else {
-                        console.log('DOM not ready, scheduling render...');
-                        setTimeout(() => {
+                        // Add each new item to existing cartItems without clearing
+                        storedItems.forEach(item => {
+                            const existingIds = Object.keys(cartItems).map(Number);
+                            const nextItemId = existingIds.length > 0 ? Math.max(...existingIds) + 1 : 1;
+                            
+                            const newItem = {
+                                id: nextItemId,
+                                name: item.name,
+                                price: item.price || item.totalPrice,
+                                quantity: item.quantity,
+                                unit: item.unit,
+                                unitPrice: item.unitPrice,
+                                type: item.type || 'unit',
+                                mfgDate: item.mfgDate || '',
+                                expDate: item.expDate || '',
+                                datesHidden: false,
+                                quantityDisplay: item.quantityDisplay || `${item.quantity} ${item.unit}`
+                            };
+                            
+                            cartItems[nextItemId] = newItem;
+                            console.log('Added new item to cart:', newItem);
+                        });
+                        
+                        // Clear temporary cart storage
+                        localStorage.removeItem('kiranakonnect_cart');
+                        
+                        // Save updated cart to persistent storage
+                        saveCartToPersistentStorage();
+                        
+                        console.log('Cart now has', Object.keys(cartItems).length, 'total items');
+                        
+                        // Re-render cart if on cart page
+                        if (document.getElementById('cart-items')) {
                             renderCartItems();
                             calculateTotals();
-                        }, 1000);
+                        }
                     }
-                    
-                    console.log('Cart update complete');
+                } catch (error) {
+                    console.error('Error processing new cart items:', error);
+                    localStorage.removeItem('kiranakonnect_cart'); // Clear corrupted data
                 }
             }
         }
@@ -1264,11 +1268,47 @@
 
         // Initialize cart with localStorage data
         function initializeCart() {
-            // First check for new items from inventory
-            checkForNewItems();
+            // Only initialize if cartItems is not already loaded
+            if (!cartItems || Object.keys(cartItems).length === 0) {
+                // Load existing persistent cart first
+                const persistentData = localStorage.getItem('kiranakonnect_persistent_cart');
+                if (persistentData) {
+                    try {
+                        const savedItems = JSON.parse(persistentData);
+                        cartItems = {};
+                        let nextId = 1;
+                        
+                        savedItems.forEach(item => {
+                            cartItems[nextId] = {
+                                id: nextId,
+                                name: item.name,
+                                price: item.price,
+                                quantity: item.quantity,
+                                unit: item.unit || 'piece',
+                                unitPrice: item.unitPrice,
+                                type: item.type || 'unit',
+                                mfgDate: item.mfgDate || '',
+                                expDate: item.expDate || '',
+                                datesHidden: item.datesHidden || false,
+                                quantityDisplay: item.quantityDisplay
+                            };
+                            nextId++;
+                        });
+                        console.log('Cart initialized with', Object.keys(cartItems).length, 'existing items');
+                    } catch (error) {
+                        console.error('Error loading cart:', error);
+                        cartItems = {};
+                    }
+                } else {
+                    cartItems = {};
+                    console.log('No existing cart data found - starting fresh');
+                }
+            } else {
+                console.log('Cart already initialized with', Object.keys(cartItems).length, 'items');
+            }
             
-            // Then load any persistent cart items
-            loadPersistentCartItems();
+            // Always check for new items from inventory
+            checkForNewItems();
             
             // Calculate totals
             calculateTotals();
@@ -2122,84 +2162,10 @@
                 });
                 
                 if (cartItemsContainer) {
-                    // Load cart data in priority order: persistent -> session -> defaults
-                    const persistentData = localStorage.getItem('kiranakonnect_persistent_cart');
-                    const sessionData = sessionStorage.getItem('kiranakonnect_cart_session');
+                    // Use the unified cart initialization function
+                    initializeCart();
                     
-                    if (persistentData) {
-                        // Load from persistent storage first
-                        try {
-                            const savedItems = JSON.parse(persistentData);
-                            cartItems = {};
-                            let nextId = 1;
-                            
-                            savedItems.forEach(item => {
-                                cartItems[nextId] = {
-                                    id: nextId,
-                                    name: item.name,
-                                    price: item.price,
-                                    quantity: item.quantity,
-                                    unit: item.unit || 'piece',
-                                    unitPrice: item.unitPrice,
-                                    type: item.type || 'unit',
-                                    mfgDate: item.mfgDate || '',
-                                    expDate: item.expDate || '',
-                                    datesHidden: false,
-                                    quantityDisplay: item.quantityDisplay
-                                };
-                                nextId++;
-                            });
-                            console.log('Loaded cart from persistent storage:', Object.keys(cartItems).length, 'items');
-                        } catch (error) {
-                            console.error('Error loading persistent cart:', error);
-                        }
-                    } else if (sessionData) {
-                        // Fallback to session storage
-                        try {
-                            const savedItems = JSON.parse(sessionData);
-                            cartItems = {};
-                            let nextId = 1;
-                            
-                            savedItems.forEach(item => {
-                                cartItems[nextId] = {
-                                    id: nextId,
-                                    name: item.name,
-                                    price: item.price,
-                                    quantity: item.quantity,
-                                    unit: item.unit || 'piece',
-                                    unitPrice: item.unitPrice,
-                                    type: item.type || 'unit',
-                                    mfgDate: item.mfgDate || '',
-                                    expDate: item.expDate || '',
-                                    datesHidden: false,
-                                    quantityDisplay: item.quantityDisplay
-                                };
-                                nextId++;
-                            });
-                            console.log('Loaded cart from session storage:', Object.keys(cartItems).length, 'items');
-                            saveCartToPersistentStorage(); // Save to persistent storage
-                        } catch (error) {
-                            console.error('Error loading session cart:', error);
-                        }
-                    }
-                    
-                    // Only use defaults if no storage data exists
-                    if (Object.keys(cartItems).length === 0) {
-                        console.log('No saved cart data - initializing with sample items');
-                        cartItems = {
-                            1: { id: 1, name: 'Aashirvaad Atta', quantity: 10, unitPrice: 45, price: 450, unit: 'Kg', type: 'unit', mfgDate: '01/05/2025', expDate: '01/09/2025', datesHidden: false },
-                            2: { id: 2, name: 'Real Fruit Juice', quantity: 2, unitPrice: 60, price: 120, unit: 'Bottles', type: 'unit', mfgDate: '12/05/2025', expDate: '25/07/2025', datesHidden: false },
-                            3: { id: 3, name: 'Colgate Paste', quantity: 3, unitPrice: 30, price: 90, unit: 'Pieces', type: 'unit' },
-                            4: { id: 4, name: 'Good Day Biscuits', quantity: 5, unitPrice: 12, price: 60, unit: 'Packets', type: 'unit', mfgDate: '05/03/2025', expDate: '05/09/2025', datesHidden: false },
-                            5: { id: 5, name: 'Surf Excel (500gm)', quantity: 1, unitPrice: 55, price: 55, unit: 'Packet', type: 'unit' },
-                            6: { id: 6, name: 'Dabur Honey', quantity: 1, unitPrice: 180, price: 180, unit: 'Bottle', type: 'unit', mfgDate: '01/01/2025', expDate: '01/01/2027', datesHidden: false }
-                        };
-                        saveCartToPersistentStorage(); // Save initial cart
-                    }
-
-                    
-                    // Render cart items dynamically to prevent duplicates
-                    console.log('About to render cart items:', cartItems);
+                    // Render cart items
                     renderCartItems();
                     
                     // Set up periodic check for new items from inventory
