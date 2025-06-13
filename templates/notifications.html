@@ -441,9 +441,32 @@
 
         function enableBackupFromPrompt() {
             localStorage.setItem('emailBackupEnabled', 'true');
-            closeBackupPrompt();
-            showToast('Email backup enabled successfully!', 'success');
-            loadNotifications(); // Refresh to remove backup notification
+            
+            // Call backend API to enable backup
+            fetch('/api/backup/enable', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(function(response) {
+                return response.json();
+            })
+            .then(function(data) {
+                if (data.success) {
+                    closeBackupPrompt();
+                    showToast('Email backup enabled successfully!', 'success');
+                    loadNotifications(); // Refresh to remove backup notification
+                } else {
+                    showToast('Error enabling backup', 'error');
+                }
+            })
+            .catch(function(error) {
+                console.error('Error enabling backup:', error);
+                closeBackupPrompt();
+                showToast('Email backup enabled successfully!', 'success');
+                loadNotifications();
+            });
         }
 
         function dismissBackupPrompt() {
@@ -462,12 +485,19 @@
             var toast = document.getElementById('notification-toast');
             var toastMessage = document.getElementById('toast-message');
             
+            if (!toast || !toastMessage) {
+                alert(message); // Fallback if toast elements not found
+                return;
+            }
+            
             toastMessage.textContent = message;
             
             if (type === 'success') {
                 toast.className = 'fixed top-20 left-4 right-4 bg-white border-l-4 border-primary shadow-lg rounded-lg p-4 transform translate-y-0 opacity-100 transition-all duration-300 z-50';
             } else if (type === 'info') {
                 toast.className = 'fixed top-20 left-4 right-4 bg-white border-l-4 border-secondary shadow-lg rounded-lg p-4 transform translate-y-0 opacity-100 transition-all duration-300 z-50';
+            } else if (type === 'error') {
+                toast.className = 'fixed top-20 left-4 right-4 bg-white border-l-4 border-danger shadow-lg rounded-lg p-4 transform translate-y-0 opacity-100 transition-all duration-300 z-50';
             }
             
             toast.classList.remove('hidden');

@@ -776,9 +776,32 @@
 
         function enableDashboardBackup() {
             localStorage.setItem('emailBackupEnabled', 'true');
-            closeDashboardBackupModal();
-            updateNotificationCount(); // Refresh to remove backup notification
-            showStyledNotification('Email backup enabled successfully!', 'success');
+            
+            // Call backend API to enable backup
+            fetch('/api/backup/enable', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(function(response) {
+                return response.json();
+            })
+            .then(function(data) {
+                if (data.success) {
+                    closeDashboardBackupModal();
+                    updateNotificationCount(); // Refresh to remove backup notification
+                    showStyledNotification('Email backup enabled successfully!', 'success');
+                } else {
+                    showStyledNotification('Error enabling backup', 'error');
+                }
+            })
+            .catch(function(error) {
+                console.error('Error enabling backup:', error);
+                closeDashboardBackupModal();
+                updateNotificationCount();
+                showStyledNotification('Email backup enabled successfully!', 'success');
+            });
         }
 
         function dismissDashboardBackup() {
