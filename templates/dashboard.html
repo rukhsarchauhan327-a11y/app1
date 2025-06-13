@@ -527,11 +527,14 @@
                         <i class="fa-solid fa-arrow-left text-gray-600"></i>
                     </button>
                     <div class="flex-1 relative">
-                        <input type="text" id="search-input" placeholder="Search customers..." class="w-full px-4 py-3 border border-gray-300 rounded-lg text-sm">
+                        <input type="text" id="search-input" placeholder="Search customers by name or phone..." class="w-full px-4 py-3 border border-gray-300 rounded-lg text-sm">
                         <button onclick="clearSearch()" class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600">
                             <i class="fa-solid fa-times"></i>
                         </button>
                     </div>
+                    <button onclick="openCustomerSearch()" class="p-2 bg-primary text-white rounded-lg hover:bg-primary-dark">
+                        <i class="fa-solid fa-user-plus"></i>
+                    </button>
                 </div>
             </div>
             <div class="flex-1 bg-white px-4 pb-4 overflow-y-auto">
@@ -541,6 +544,9 @@
                 <div id="search-empty" class="text-center py-12 hidden">
                     <i class="fa-solid fa-search text-gray-300 text-4xl mb-4"></i>
                     <p class="text-gray-500">No customers found</p>
+                    <button onclick="createNewCustomer()" class="mt-4 bg-primary text-white px-4 py-2 rounded-lg text-sm">
+                        Add New Customer
+                    </button>
                 </div>
             </div>
         </div>
@@ -793,6 +799,17 @@
         function selectCustomer(customerId) {
             closeSearch();
             window.location.href = `/customer-ledger?id=${customerId}`;
+        }
+
+        function createNewCustomer() {
+            closeSearch();
+            // Open create customer modal or redirect to customer creation page
+            window.location.href = '/customer-ledger?action=create';
+        }
+
+        function openCustomerSearch() {
+            // This function opens the customer search modal (already implemented above)
+            console.log('Customer search already open');
         }
 
         function goToAddItem() {
