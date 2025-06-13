@@ -991,6 +991,36 @@
             }
         }
 
+        // Load products from database API
+        async function loadProducts() {
+            try {
+                const response = await fetch('/api/products');
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                products = await response.json();
+                filteredProducts = products;
+                updateStats();
+                renderProducts();
+            } catch (error) {
+                console.error('Error loading products:', error);
+                showNotification('Failed to load products', 'error');
+            }
+        }
+
+        // Update inventory statistics
+        function updateStats() {
+            const total = products.length;
+            const available = products.filter(p => !p.is_expired && !p.is_low_stock).length;
+            const expiring = products.filter(p => p.is_expired).length;
+            const lowStock = products.filter(p => p.is_low_stock).length;
+
+            document.querySelector('[onclick="filterBy(\'all\')"] p').textContent = total;
+            document.querySelector('[onclick="filterBy(\'available\')"] p').textContent = available;
+            document.querySelector('[onclick="filterBy(\'expiring\')"] p').textContent = expiring;
+            document.querySelector('[onclick="filterBy(\'lowstock\')"] p').textContent = lowStock;
+        }
+
         // Initialize page
         document.addEventListener('DOMContentLoaded', function() {
             loadProducts();
