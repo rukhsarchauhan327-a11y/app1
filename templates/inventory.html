@@ -1208,22 +1208,14 @@
                 addedAt: new Date().toISOString()
             };
             
-            console.log('Product data:', currentProduct);
-            console.log('Cart item being created:', cartItem);
-            
             // Get existing cart from localStorage
             const existingCart = JSON.parse(localStorage.getItem('kiranakonnect_cart') || '[]');
             
-            // Always add as new item to prevent overwrites
+            // Add item to cart
             existingCart.push(cartItem);
             
-            // Save updated cart to localStorage
-            localStorage.setItem('kiranakonnect_cart', JSON.stringify(existingCart));
-            
-            // Send real-time update to cart if page is open
-            if (typeof window.parent !== 'undefined' && window.parent.updateCartFromInventory) {
-                window.parent.updateCartFromInventory(cartItem);
-            }
+            // Save to localStorage
+            localStorage.setItem('kiranakonnect_cart', JSON.stringify(existingCart))
             
             console.log(`Added ${displayQty} of ${currentProduct.name} to cart. Total: ₹${total.toFixed(2)}`);
             showNotification(`${displayQty} of ${currentProduct.name} added to cart!`, 'success');
