@@ -1782,6 +1782,31 @@
             };
         }
 
+        // Notification tabs functionality
+        function switchNotificationTab(tabName) {
+            // Remove active class from all tabs
+            document.querySelectorAll('.notification-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Hide all tab contents
+            document.querySelectorAll('.notification-tab-content').forEach(content => {
+                content.classList.add('hidden');
+            });
+            
+            // Activate clicked tab
+            const clickedTab = document.querySelector(`[onclick="switchNotificationTab('${tabName}')"]`);
+            if (clickedTab) {
+                clickedTab.classList.add('active');
+            }
+            
+            // Show corresponding content
+            const content = document.getElementById(`${tabName}-content`);
+            if (content) {
+                content.classList.remove('hidden');
+            }
+        }
+
         // Initialize backup state on page load
         document.addEventListener('DOMContentLoaded', function() {
             const checkbox = document.getElementById('emailBackup');
@@ -1798,6 +1823,9 @@
                     localStorage.setItem('emailBackupEnabled', 'true');
                 }
             }
+            
+            // Initialize first notification tab as active
+            switchNotificationTab('business');
             
             // Check if we need to highlight backup section
             checkForBackupHighlight();
