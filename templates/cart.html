@@ -1132,6 +1132,9 @@
 
         // Real-time cart addition function
         function addItemToCart(newItem) {
+            console.log('Adding item to cart:', newItem);
+            console.log('Item dates:', { mfgDate: newItem.mfgDate, expDate: newItem.expDate });
+            
             const nextItemId = Math.max(...Object.keys(cartItems).map(k => parseInt(k)), 0) + 1;
             
             // Add to cart data
@@ -1150,6 +1153,8 @@
                 datesHidden: false,
                 quantityDisplay: newItem.quantityDisplay
             };
+            
+            console.log('Cart item created:', cartItems[nextItemId]);
             
             // Create cart item HTML exactly matching existing structure
             createAndInsertCartItem(nextItemId, cartItems[nextItemId]);
@@ -1181,8 +1186,8 @@
                             <span class="text-lg font-bold text-primary" id="price-${itemId}">₹${item.price}</span>
                         </div>`;
             
-            // Add date section if dates exist
-            if (item.mfgDate && item.expDate) {
+            // Add date section if dates exist (check for both defined and non-empty values)
+            if (item.mfgDate && item.expDate && item.mfgDate !== '' && item.expDate !== '') {
                 itemHTML += `
                         <div class="mt-2 space-y-1">
                             <div class="flex items-center text-xs text-gray-500 date-info">

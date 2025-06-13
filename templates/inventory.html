@@ -1202,8 +1202,14 @@
                 unit: currentProduct.unit,
                 type: currentProduct.type || 'unit',
                 quantityDisplay: displayQty,
+                mfgDate: currentProduct.mfgDate,
+                expDate: currentProduct.expDate,
+                price: total,
                 addedAt: new Date().toISOString()
             };
+            
+            console.log('Product data:', currentProduct);
+            console.log('Cart item being created:', cartItem);
             
             // Get existing cart from localStorage
             const existingCart = JSON.parse(localStorage.getItem('kiranakonnect_cart') || '[]');
