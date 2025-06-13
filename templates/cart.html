@@ -1220,10 +1220,18 @@
                     // Save to persistent storage
                     saveCartToPersistentStorage();
                     
-                    // Force re-render entire cart
-                    console.log('Re-rendering cart with items:', Object.keys(cartItems).length);
-                    renderCartItems();
-                    calculateTotals();
+                    // Only re-render if DOM is ready
+                    if (document.readyState === 'complete' && document.getElementById('cart-items')) {
+                        console.log('Re-rendering cart with items:', Object.keys(cartItems).length);
+                        renderCartItems();
+                        calculateTotals();
+                    } else {
+                        console.log('DOM not ready, scheduling render...');
+                        setTimeout(() => {
+                            renderCartItems();
+                            calculateTotals();
+                        }, 1000);
+                    }
                     
                     console.log('Cart update complete');
                 }
@@ -1255,7 +1263,13 @@
         // Render cart items in the UI
         function renderCartItems() {
             const cartContainer = document.getElementById('cart-items');
-            if (!cartContainer) return;
+            if (!cartContainer) {
+                console.error('Cart container not found, retrying in 500ms...');
+                setTimeout(renderCartItems, 500);
+                return;
+            }
+            
+            console.log('Rendering cart with items:', Object.keys(cartItems).length);
             
             // Completely clear container to prevent all duplicates
             cartContainer.innerHTML = '';
@@ -1278,21 +1292,31 @@
             // Render each unique cart item only once
             Object.keys(cartItems).forEach(itemId => {
                 const item = cartItems[itemId];
-                const cartItemHTML = createCartItemHTML(itemId, item);
-                cartContainer.insertAdjacentHTML('beforeend', cartItemHTML);
+                try {
+                    const cartItemHTML = createCartItemHTML(itemId, item);
+                    cartContainer.insertAdjacentHTML('beforeend', cartItemHTML);
+                } catch (error) {
+                    console.error('Error rendering cart item:', error, item);
+                }
             });
             
             // Add single "Add More Items" button at the end
-            cartContainer.insertAdjacentHTML('beforeend', `
-                <div class="bg-white rounded-xl shadow-sm p-3">
-                    <div class="flex justify-center">
-                        <button id="add-items-btn" class="flex items-center justify-center bg-secondary text-white rounded-full px-6 py-3 font-medium text-sm" onclick="navigateToInventory()">
-                            <i class="fa-solid fa-plus mr-2"></i>
-                            Add More Items to Cart
-                        </button>
+            try {
+                cartContainer.insertAdjacentHTML('beforeend', `
+                    <div class="bg-white rounded-xl shadow-sm p-3">
+                        <div class="flex justify-center">
+                            <button id="add-items-btn" class="flex items-center justify-center bg-secondary text-white rounded-full px-6 py-3 font-medium text-sm" onclick="navigateToInventory()">
+                                <i class="fa-solid fa-plus mr-2"></i>
+                                Add More Items to Cart
+                            </button>
+                        </div>
                     </div>
-                </div>
-            `);
+                `);
+            } catch (error) {
+                console.error('Error adding Add More Items button:', error);
+            }
+            
+            console.log('Cart rendering complete');
         }
 
         // Legacy function for compatibility
@@ -1979,14 +2003,18 @@
             }
         }
 
+        // Clear any corrupted persistent storage first
+        localStorage.removeItem('kiranakonnect_persistent_cart');
+        console.log('Cleared corrupted cart storage');
+        
         // Initialize cart with localStorage data
         initializeCart();
         populatePresentStaff();
         
-        // Check for new items from inventory every 2 seconds
+        // Check for new items from inventory every 5 seconds (reduced frequency)
         setInterval(() => {
             checkForNewItems();
-        }, 2000);
+        }, 5000);
         
         // Debug: Check if toggle exists
         setTimeout(() => {
