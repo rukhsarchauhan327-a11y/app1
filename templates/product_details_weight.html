@@ -329,7 +329,8 @@
                 const weightInKg = unit === 'gm' ? weight / 1000 : weight;
                 
                 cartItem.quantity = weightInKg;
-                cartItem.quantityDisplay = `${weight} ${unit}`;
+                // Preserve the exact input format for display
+                cartItem.quantityDisplay = `${weight.toFixed(unit === 'kg' ? 3 : 0)} ${unit}`;
                 cartItem.totalPrice = weightInKg * productData.sellingPrice;
                 cartItem.pricePerKg = productData.sellingPrice;
             } else {
@@ -337,7 +338,12 @@
                 const weightInKg = price / productData.sellingPrice;
                 
                 cartItem.quantity = weightInKg;
-                cartItem.quantityDisplay = `${weightInKg.toFixed(3)} kg`;
+                // Show weight calculated from price with proper formatting
+                if (weightInKg >= 1) {
+                    cartItem.quantityDisplay = `${weightInKg.toFixed(3)} kg`;
+                } else {
+                    cartItem.quantityDisplay = `${(weightInKg * 1000).toFixed(0)} gm`;
+                }
                 cartItem.totalPrice = price;
                 cartItem.pricePerKg = productData.sellingPrice;
             }
