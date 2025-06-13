@@ -48,83 +48,60 @@
 </head>
 <body class="font-inter bg-gray-50">
     <!-- Header Section -->
-    <header class="bg-white border-b border-gray-200 fixed top-0 left-0 right-0 z-10">
-        <div class="flex items-center justify-between px-4 py-3">
-            <button onclick="goBack()" class="p-2 hover:bg-gray-100 rounded-lg">
-                <i class="fa-solid fa-arrow-left text-gray-600 text-lg"></i>
+    <div class="bg-white shadow-sm border-b border-gray-200 px-4 py-4">
+        <div class="flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <button onclick="window.history.back()" class="text-gray-600 hover:text-gray-800">
+                    <i class="fa-solid fa-arrow-left text-xl"></i>
+                </button>
+                <div>
+                    <h1 class="text-xl font-bold text-dark">Low Stock Alert</h1>
+                    <p class="text-sm text-gray-600">Items running low on inventory</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filter Section -->
+    <div class="bg-white mx-4 mt-4 rounded-lg shadow-sm border border-gray-200 p-4">
+        <div class="flex items-center justify-between mb-3">
+            <h3 class="font-semibold text-dark">Filter by Stock Level</h3>
+        </div>
+        <div class="flex space-x-2 overflow-x-auto">
+            <button class="filter-btn px-3 py-2 bg-red-500 text-white text-sm rounded-lg whitespace-nowrap active" data-filter="critical">
+                Critical (0)
             </button>
-            <div class="text-center">
-                <h1 class="text-lg font-semibold text-dark">Low Stock Alert</h1>
-                <p class="text-xs text-gray-500">Inventory Management</p>
-            </div>
-            <button onclick="refreshStock()" class="p-2 hover:bg-gray-100 rounded-lg">
-                <i class="fa-solid fa-refresh text-gray-600 text-lg"></i>
+            <button class="filter-btn px-3 py-2 bg-gray-200 text-gray-600 text-sm rounded-lg whitespace-nowrap" data-filter="low">
+                Low (0)
+            </button>
+            <button class="filter-btn px-3 py-2 bg-gray-200 text-gray-600 text-sm rounded-lg whitespace-nowrap" data-filter="medium">
+                Medium (0)
+            </button>
+            <button class="filter-btn px-3 py-2 bg-gray-200 text-gray-600 text-sm rounded-lg whitespace-nowrap" data-filter="all">
+                All Items (0)
             </button>
         </div>
-    </header>
+    </div>
 
-    <!-- Main Content -->
-    <main class="pt-16 pb-20 bg-gray-50">
-        <!-- Summary Cards -->
-        <div class="px-4 py-4">
-            <div class="grid grid-cols-3 gap-3 mb-4">
-                <div class="bg-red-50 p-3 rounded-lg text-center border border-red-200">
-                    <p class="text-xl font-bold text-red-600">5</p>
-                    <p class="text-xs text-red-500">Critical</p>
-                </div>
-                <div class="bg-orange-50 p-3 rounded-lg text-center border border-orange-200">
-                    <p class="text-xl font-bold text-orange-600">8</p>
-                    <p class="text-xs text-orange-500">Low Stock</p>
-                </div>
-                <div class="bg-yellow-50 p-3 rounded-lg text-center border border-yellow-200">
-                    <p class="text-xl font-bold text-yellow-600">12</p>
-                    <p class="text-xs text-yellow-500">Medium</p>
-                </div>
-            </div>
+    <!-- Stock Items List -->
+    <div id="stock-items-container" class="px-4 space-y-3 mt-4">
+        <!-- Loading state -->
+        <div id="loading-state" class="text-center py-8">
+            <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+            <p class="text-gray-600">Loading stock data...</p>
         </div>
-
-        <!-- Filter Tabs -->
-        <div class="px-4 mb-4">
-            <div class="bg-white rounded-lg p-3 shadow-sm border border-gray-100">
-                <div class="flex space-x-2 overflow-x-auto">
-                    <button class="filter-btn active px-3 py-2 bg-red-500 text-white text-sm rounded-lg whitespace-nowrap" data-filter="critical">
-                        <i class="fa-solid fa-triangle-exclamation mr-1"></i>
-                        Critical (5)
-                    </button>
-                    <button class="filter-btn px-3 py-2 bg-gray-200 text-gray-600 text-sm rounded-lg whitespace-nowrap" data-filter="low">
-                        <i class="fa-solid fa-exclamation mr-1"></i>
-                        Low Stock (8)
-                    </button>
-                    <button class="filter-btn px-3 py-2 bg-gray-200 text-gray-600 text-sm rounded-lg whitespace-nowrap" data-filter="medium">
-                        <i class="fa-solid fa-clock mr-1"></i>
-                        Medium (12)
-                    </button>
-                    <button class="filter-btn px-3 py-2 bg-gray-200 text-gray-600 text-sm rounded-lg whitespace-nowrap" data-filter="all">
-                        All Items
-                    </button>
-                </div>
+        
+        <!-- Empty state -->
+        <div id="empty-state" class="text-center py-8 hidden">
+            <div class="bg-green-100 p-4 rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center">
+                <i class="fa-solid fa-check text-green-600 text-2xl"></i>
             </div>
+            <h3 class="font-bold text-dark mb-2">All Stock Levels Good!</h3>
+            <p class="text-gray-600">No products are running low on stock right now.</p>
         </div>
-
-        <!-- Stock Items List -->
-        <div id="stock-items-container" class="px-4 space-y-3">
-            <!-- Loading state -->
-            <div id="loading-state" class="text-center py-8">
-                <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
-                <p class="text-gray-600">Loading stock data...</p>
-            </div>
-            
-            <!-- Empty state -->
-            <div id="empty-state" class="text-center py-8 hidden">
-                <div class="bg-green-100 p-4 rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center">
-                    <i class="fa-solid fa-check text-green-600 text-2xl"></i>
-                </div>
-                <h3 class="font-bold text-dark mb-2">All Stock Levels Good!</h3>
-                <p class="text-gray-600">No products are running low on stock right now.</p>
-            </div>
-            
-            <!-- Dynamic stock items will be inserted here -->
-        </div>
+        
+        <!-- Dynamic stock items will be inserted here -->
+    </div>
 
     <!-- Bottom Navigation -->
     <div class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-4 py-2">
@@ -344,277 +321,6 @@
 
                     // Filter products
                     filterProducts(filter);
-                });
-            });
-        });
-    </script>
-</body>
-</html>
-                                <p class="text-sm text-gray-600">₹25/Bag</p>
-                                <div class="flex items-center space-x-2 mt-1">
-                                    <span class="bg-red-100 text-red-700 px-2 py-1 rounded-full text-xs font-medium">Critical</span>
-                                    <span class="text-xs text-gray-500">Last restocked: 3 days ago</span>
-                                </div>
-                            </div>
-                            <div class="text-right">
-                                <p class="text-lg font-bold text-red-600">1 Bag</p>
-                                <p class="text-xs text-gray-500">Min: 10 Bags</p>
-                                <div class="w-16 bg-gray-200 rounded-full h-2 mt-1">
-                                    <div class="bg-red-500 h-2 rounded-full" style="width: 10%"></div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="flex items-center justify-between mt-3">
-                            <span class="text-xs text-gray-500">Suggested reorder: 50 Bags</span>
-                            <div class="flex space-x-2">
-                                <button onclick="refillStock('tata-salt')" class="bg-blue-500 text-white px-3 py-1 rounded text-xs font-medium">
-                                    <i class="fa-solid fa-plus mr-1"></i>Refill
-                                </button>
-                                <button onclick="viewDetails('tata-salt')" class="bg-gray-200 text-gray-700 px-3 py-1 rounded text-xs font-medium">
-                                    Details
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Low Stock Items -->
-            <div class="stock-item bg-white rounded-lg p-4 shadow-sm border-l-4 border-orange-500" data-level="low">
-                <div class="flex items-center space-x-3">
-                    <div class="w-12 h-12 rounded-lg overflow-hidden bg-gray-100">
-                        <img src="https://storage.googleapis.com/uxpilot-auth.appspot.com/dd29a1f85f-469e6193e37489fc8c43.png" alt="Aashirvaad Atta" class="w-full h-full object-cover">
-                    </div>
-                    <div class="flex-1">
-                        <div class="flex items-start justify-between">
-                            <div class="flex-1">
-                                <h3 class="font-bold text-dark">Aashirvaad Atta</h3>
-                                <p class="text-sm text-gray-600">₹120/Bag</p>
-                                <div class="flex items-center space-x-2 mt-1">
-                                    <span class="bg-orange-100 text-orange-700 px-2 py-1 rounded-full text-xs font-medium">Low Stock</span>
-                                    <span class="text-xs text-gray-500">Last restocked: 2 days ago</span>
-                                </div>
-                            </div>
-                            <div class="text-right">
-                                <p class="text-lg font-bold text-orange-600">3 Bags</p>
-                                <p class="text-xs text-gray-500">Min: 10 Bags</p>
-                                <div class="w-16 bg-gray-200 rounded-full h-2 mt-1">
-                                    <div class="bg-orange-500 h-2 rounded-full" style="width: 30%"></div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="flex items-center justify-between mt-3">
-                            <span class="text-xs text-gray-500">Suggested reorder: 25 Bags</span>
-                            <div class="flex space-x-2">
-                                <button onclick="refillStock('aashirvaad-atta')" class="bg-blue-500 text-white px-3 py-1 rounded text-xs font-medium">
-                                    <i class="fa-solid fa-plus mr-1"></i>Refill
-                                </button>
-                                <button onclick="viewDetails('aashirvaad-atta')" class="bg-gray-200 text-gray-700 px-3 py-1 rounded text-xs font-medium">
-                                    Details
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="stock-item bg-white rounded-lg p-4 shadow-sm border-l-4 border-orange-500" data-level="low">
-                <div class="flex items-center space-x-3">
-                    <div class="w-12 h-12 rounded-lg overflow-hidden bg-gray-100">
-                        <img src="https://storage.googleapis.com/uxpilot-auth.appspot.com/02cda64d32-ca63fc32eaab87b7db4c.png" alt="Coconut Oil" class="w-full h-full object-cover">
-                    </div>
-                    <div class="flex-1">
-                        <div class="flex items-start justify-between">
-                            <div class="flex-1">
-                                <h3 class="font-bold text-dark">Coconut Oil</h3>
-                                <p class="text-sm text-gray-600">₹180/Bottle</p>
-                                <div class="flex items-center space-x-2 mt-1">
-                                    <span class="bg-orange-100 text-orange-700 px-2 py-1 rounded-full text-xs font-medium">Low Stock</span>
-                                    <span class="text-xs text-gray-500">Last restocked: 1 week ago</span>
-                                </div>
-                            </div>
-                            <div class="text-right">
-                                <p class="text-lg font-bold text-orange-600">8 Bottles</p>
-                                <p class="text-xs text-gray-500">Min: 15 Bottles</p>
-                                <div class="w-16 bg-gray-200 rounded-full h-2 mt-1">
-                                    <div class="bg-orange-500 h-2 rounded-full" style="width: 50%"></div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="flex items-center justify-between mt-3">
-                            <span class="text-xs text-gray-500">Suggested reorder: 30 Bottles</span>
-                            <div class="flex space-x-2">
-                                <button onclick="refillStock('coconut-oil')" class="bg-blue-500 text-white px-3 py-1 rounded text-xs font-medium">
-                                    <i class="fa-solid fa-plus mr-1"></i>Refill
-                                </button>
-                                <button onclick="viewDetails('coconut-oil')" class="bg-gray-200 text-gray-700 px-3 py-1 rounded text-xs font-medium">
-                                    Details
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Medium Stock Items -->
-            <div class="stock-item bg-white rounded-lg p-4 shadow-sm border-l-4 border-yellow-500" data-level="medium">
-                <div class="flex items-center space-x-3">
-                    <div class="w-12 h-12 rounded-lg overflow-hidden bg-gray-100">
-                        <img src="https://storage.googleapis.com/uxpilot-auth.appspot.com/5fc8cd7bc4-09ff84e61b7234ca57e8.png" alt="Basmati Rice" class="w-full h-full object-cover">
-                    </div>
-                    <div class="flex-1">
-                        <div class="flex items-start justify-between">
-                            <div class="flex-1">
-                                <h3 class="font-bold text-dark">Basmati Rice</h3>
-                                <p class="text-sm text-gray-600">₹80/Bag</p>
-                                <div class="flex items-center space-x-2 mt-1">
-                                    <span class="bg-yellow-100 text-yellow-700 px-2 py-1 rounded-full text-xs font-medium">Medium Stock</span>
-                                    <span class="text-xs text-gray-500">Last restocked: 3 days ago</span>
-                                </div>
-                            </div>
-                            <div class="text-right">
-                                <p class="text-lg font-bold text-yellow-600">15 Bags</p>
-                                <p class="text-xs text-gray-500">Min: 10 Bags</p>
-                                <div class="w-16 bg-gray-200 rounded-full h-2 mt-1">
-                                    <div class="bg-yellow-500 h-2 rounded-full" style="width: 60%"></div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="flex items-center justify-between mt-3">
-                            <span class="text-xs text-gray-500">Suggested reorder: 20 Bags</span>
-                            <div class="flex space-x-2">
-                                <button onclick="refillStock('basmati-rice')" class="bg-blue-500 text-white px-3 py-1 rounded text-xs font-medium">
-                                    <i class="fa-solid fa-plus mr-1"></i>Refill
-                                </button>
-                                <button onclick="viewDetails('basmati-rice')" class="bg-gray-200 text-gray-700 px-3 py-1 rounded text-xs font-medium">
-                                    Details
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Quick Actions -->
-        <div class="px-4 mt-6 mb-4">
-            <div class="bg-white rounded-lg p-4 shadow-sm border border-gray-100">
-                <h3 class="font-semibold text-dark mb-3">Quick Actions</h3>
-                <div class="grid grid-cols-2 gap-3">
-                    <button onclick="bulkRefill()" class="bg-green-500 text-white p-3 rounded-lg font-medium">
-                        <i class="fa-solid fa-truck mr-2"></i>Bulk Refill
-                    </button>
-                    <button onclick="generateReport()" class="bg-blue-500 text-white p-3 rounded-lg font-medium">
-                        <i class="fa-solid fa-file-lines mr-2"></i>Export Report
-                    </button>
-                </div>
-            </div>
-        </div>
-    </main>
-
-    <!-- Bottom Navigation -->
-    <nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200">
-        <div class="flex justify-around items-end py-2">
-            <button class="flex flex-col items-center py-1 px-3" onclick="window.location.href='/dashboard'">
-                <i class="fa-solid fa-home text-gray-400 text-lg"></i>
-                <span class="text-xs mt-1 text-gray-400">Home</span>
-            </button>
-            <button class="flex flex-col items-center py-1 px-3" onclick="window.location.href='/inventory'">
-                <i class="fa-solid fa-box text-primary text-lg"></i>
-                <span class="text-xs mt-1 text-primary">Inventory</span>
-            </button>
-            <button class="relative -top-3 bg-primary rounded-full p-3 shadow-lg" onclick="window.location.href='/add-item'">
-                <i class="fa-solid fa-barcode text-white text-lg"></i>
-            </button>
-            <button class="flex flex-col items-center py-1 px-3" onclick="window.location.href='/cart'">
-                <i class="fa-solid fa-shopping-cart text-gray-400 text-lg"></i>
-                <span class="text-xs mt-1 text-gray-400">Cart</span>
-            </button>
-            <button class="flex flex-col items-center py-1 px-3" onclick="window.location.href='/profile'">
-                <i class="fa-solid fa-user text-gray-400 text-lg"></i>
-                <span class="text-xs mt-1 text-gray-400">Profile</span>
-            </button>
-        </div>
-    </nav>
-
-    <script>
-        function goBack() {
-            window.history.back();
-        }
-
-        function refreshStock() {
-            location.reload();
-        }
-
-        function refillStock(itemId) {
-            // Store the item for refill and navigate
-            localStorage.setItem('refillItem', itemId);
-            window.location.href = '/refill-stock';
-        }
-
-        function viewDetails(itemId) {
-            // Navigate to product details
-            window.location.href = '/product-details';
-        }
-
-        function bulkRefill() {
-            // Open ordering interface for multiple items
-            console.log('Opening bulk refill interface');
-        }
-
-        function generateReport() {
-            // Generate and download low stock report
-            console.log('Generating low stock report');
-        }
-
-        // Filter functionality
-        document.addEventListener('DOMContentLoaded', function() {
-            const filterBtns = document.querySelectorAll('.filter-btn');
-            const stockItems = document.querySelectorAll('.stock-item');
-
-            filterBtns.forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const filter = this.getAttribute('data-filter');
-                    
-                    // Update active button
-                    filterBtns.forEach(b => {
-                        b.classList.remove('active');
-                        if (filter === 'critical') {
-                            b.classList.remove('bg-red-500', 'text-white');
-                            b.classList.add('bg-gray-200', 'text-gray-600');
-                        } else if (filter === 'low') {
-                            b.classList.remove('bg-orange-500', 'text-white');
-                            b.classList.add('bg-gray-200', 'text-gray-600');
-                        } else if (filter === 'medium') {
-                            b.classList.remove('bg-yellow-500', 'text-white');
-                            b.classList.add('bg-gray-200', 'text-gray-600');
-                        } else {
-                            b.classList.remove('bg-blue-500', 'text-white');
-                            b.classList.add('bg-gray-200', 'text-gray-600');
-                        }
-                    });
-                    
-                    this.classList.add('active');
-                    this.classList.remove('bg-gray-200', 'text-gray-600');
-                    if (filter === 'critical') {
-                        this.classList.add('bg-red-500', 'text-white');
-                    } else if (filter === 'low') {
-                        this.classList.add('bg-orange-500', 'text-white');
-                    } else if (filter === 'medium') {
-                        this.classList.add('bg-yellow-500', 'text-white');
-                    } else {
-                        this.classList.add('bg-blue-500', 'text-white');
-                    }
-
-                    // Filter items
-                    stockItems.forEach(item => {
-                        const level = item.getAttribute('data-level');
-                        if (filter === 'all' || level === filter) {
-                            item.style.display = 'block';
-                        } else {
-                            item.style.display = 'none';
-                        }
-                    });
                 });
             });
         });

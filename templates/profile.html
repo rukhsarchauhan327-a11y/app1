@@ -338,13 +338,149 @@
                     </div>
                     <i class="fa-solid fa-chevron-right text-gray-400"></i>
                 </button>
-                <button class="w-full flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors" onclick="notificationSettings()">
+                <button class="w-full flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors" onclick="toggleNotificationSettings()">
                     <div class="flex items-center space-x-3">
                         <i class="fa-solid fa-bell text-primary text-lg"></i>
                         <span class="font-medium text-dark">Notification Settings</span>
                     </div>
-                    <i class="fa-solid fa-chevron-right text-gray-400"></i>
+                    <i id="notification-arrow" class="fa-solid fa-chevron-down text-gray-400 transition-transform"></i>
                 </button>
+            </div>
+        </div>
+
+        <!-- Notification Settings (Expandable) -->
+        <div id="notification-settings-panel" class="bg-white mt-2 px-4 py-4 hidden">
+            <h3 class="text-lg font-semibold text-dark mb-4">Notification Preferences</h3>
+            
+            <!-- Notification Tabs -->
+            <div class="flex space-x-1 bg-gray-100 rounded-lg p-1 mb-4">
+                <button id="tab-subscription" class="notification-tab flex-1 py-2 px-3 text-sm font-medium rounded-md transition-colors bg-primary text-white" onclick="switchNotificationTab('subscription')">
+                    Subscription
+                </button>
+                <button id="tab-backup" class="notification-tab flex-1 py-2 px-3 text-sm font-medium rounded-md transition-colors text-gray-600 hover:text-gray-800" onclick="switchNotificationTab('backup')">
+                    Backup
+                </button>
+                <button id="tab-app" class="notification-tab flex-1 py-2 px-3 text-sm font-medium rounded-md transition-colors text-gray-600 hover:text-gray-800" onclick="switchNotificationTab('app')">
+                    App Alerts
+                </button>
+            </div>
+
+            <!-- Subscription Notifications -->
+            <div id="subscription-notifications" class="notification-content">
+                <div class="space-y-4">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h4 class="font-medium text-dark">Subscription Alerts</h4>
+                            <p class="text-sm text-gray-500">Get notified about plan renewals and payments</p>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="subscription-alerts" class="sr-only" checked>
+                            <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                        </label>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h4 class="font-medium text-dark">Payment Reminders</h4>
+                            <p class="text-sm text-gray-500">Reminders before subscription expires</p>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="payment-reminders" class="sr-only" checked>
+                            <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                        </label>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h4 class="font-medium text-dark">Plan Updates</h4>
+                            <p class="text-sm text-gray-500">New features and plan changes</p>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="plan-updates" class="sr-only">
+                            <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Backup Notifications -->
+            <div id="backup-notifications" class="notification-content hidden">
+                <div class="space-y-4">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h4 class="font-medium text-dark">Daily Backup Status</h4>
+                            <p class="text-sm text-gray-500">Daily confirmation of data backup</p>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="daily-backup" class="sr-only" checked>
+                            <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                        </label>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h4 class="font-medium text-dark">Backup Failures</h4>
+                            <p class="text-sm text-gray-500">Alert when backup fails</p>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="backup-failures" class="sr-only" checked>
+                            <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                        </label>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h4 class="font-medium text-dark">Weekly Reports</h4>
+                            <p class="text-sm text-gray-500">Weekly backup summary report</p>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="weekly-reports" class="sr-only">
+                            <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- App Notifications -->
+            <div id="app-notifications" class="notification-content hidden">
+                <div class="space-y-4">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h4 class="font-medium text-dark">Low Stock Alerts</h4>
+                            <p class="text-sm text-gray-500">When products are running low</p>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="low-stock-alerts" class="sr-only" checked>
+                            <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                        </label>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h4 class="font-medium text-dark">Expiry Alerts</h4>
+                            <p class="text-sm text-gray-500">Products expiring soon</p>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="expiry-alerts" class="sr-only" checked>
+                            <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                        </label>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h4 class="font-medium text-dark">Payment Notifications</h4>
+                            <p class="text-sm text-gray-500">Customer payment reminders</p>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="payment-notifications" class="sr-only">
+                            <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                        </label>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h4 class="font-medium text-dark">Daily Summary</h4>
+                            <p class="text-sm text-gray-500">End of day business summary</p>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="daily-summary" class="sr-only" checked>
+                            <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                        </label>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -1516,8 +1652,78 @@
             }
         }
 
+        // Notification Settings Functions
+        function toggleNotificationSettings() {
+            const panel = document.getElementById('notification-settings-panel');
+            const arrow = document.getElementById('notification-arrow');
+            
+            if (panel.classList.contains('hidden')) {
+                panel.classList.remove('hidden');
+                arrow.classList.add('rotate-180');
+            } else {
+                panel.classList.add('hidden');
+                arrow.classList.remove('rotate-180');
+            }
+        }
+
+        function switchNotificationTab(tabName) {
+            // Update tab buttons
+            const tabs = document.querySelectorAll('.notification-tab');
+            tabs.forEach(tab => {
+                tab.classList.remove('bg-primary', 'text-white');
+                tab.classList.add('text-gray-600');
+            });
+            
+            const activeTab = document.getElementById(`tab-${tabName}`);
+            activeTab.classList.add('bg-primary', 'text-white');
+            activeTab.classList.remove('text-gray-600');
+            
+            // Update content
+            const contents = document.querySelectorAll('.notification-content');
+            contents.forEach(content => content.classList.add('hidden'));
+            
+            const activeContent = document.getElementById(`${tabName}-notifications`);
+            activeContent.classList.remove('hidden');
+        }
+
+        // Check URL parameters for highlighting
+        function checkHighlightParam() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const highlight = urlParams.get('highlight');
+            
+            if (highlight === 'backup') {
+                // Expand notification settings and switch to backup tab
+                const panel = document.getElementById('notification-settings-panel');
+                const arrow = document.getElementById('notification-arrow');
+                panel.classList.remove('hidden');
+                arrow.classList.add('rotate-180');
+                switchNotificationTab('backup');
+                
+                // Scroll to notification settings
+                setTimeout(() => {
+                    panel.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }, 100);
+            } else if (highlight === 'subscription') {
+                // Scroll to subscription plan section
+                const subscriptionSection = document.getElementById('subscription-plan');
+                if (subscriptionSection) {
+                    setTimeout(() => {
+                        subscriptionSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        // Add temporary highlight effect
+                        subscriptionSection.classList.add('ring-2', 'ring-accent', 'ring-opacity-50');
+                        setTimeout(() => {
+                            subscriptionSection.classList.remove('ring-2', 'ring-accent', 'ring-opacity-50');
+                        }, 3000);
+                    }, 100);
+                }
+            }
+        }
+
         // Handle password change form submission
         document.addEventListener('DOMContentLoaded', function() {
+            // Check for highlight parameter on page load
+            checkHighlightParam();
+            
             const form = document.getElementById('changePasswordForm');
             form.addEventListener('submit', function(e) {
                 e.preventDefault();
