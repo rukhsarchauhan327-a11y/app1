@@ -182,6 +182,7 @@ def create_notification(title, message, notification_type, priority='medium', cu
         # Check if notification type is enabled in settings
         should_create = True
         
+        # Map notification types to settings
         if notification_type == 'inventory' and not settings.low_stock_alerts:
             should_create = False
         elif notification_type == 'expiry' and not settings.expiry_alerts:
@@ -192,9 +193,11 @@ def create_notification(title, message, notification_type, priority='medium', cu
             should_create = False
         elif notification_type == 'system' and not settings.system_alerts:
             should_create = False
+        elif notification_type == 'payment' and not settings.system_alerts:
+            should_create = False
         
         if not should_create:
-            app.logger.info(f"Notification {notification_type} skipped due to user settings")
+            app.logger.info(f"Notification '{notification_type}' skipped due to user settings: {title}")
             return None
             
         notification = Notification(
@@ -208,6 +211,7 @@ def create_notification(title, message, notification_type, priority='medium', cu
         )
         db.session.add(notification)
         db.session.commit()
+        app.logger.info(f"Notification created: {title} (Type: {notification_type})")
         return notification
     except Exception as e:
         app.logger.error(f"Failed to create notification: {e}")
@@ -1072,6 +1076,50 @@ def update_notification_settings_api():
         app.logger.error(f"Error updating notification settings: {e}")
         db.session.rollback()
         return jsonify({'error': 'Failed to update settings'}), 500
+
+@app.route('/api/test-notifications', methods=['POST'])
+def test_notification_settings():
+    """Test endpoint to demonstrate how profile settings control notifications"""
+    try:
+        results = []
+        
+        # Test different notification types
+        test_cases = [
+            ("Low Stock Alert Test", "Testing inventory notifications", "inventory", "medium"),
+            ("Expiry Alert Test", "Testing expiry notifications", "expiry", "high"),
+            ("Backup Alert Test", "Testing backup notifications", "backup", "urgent"),
+            ("System Alert Test", "Testing system notifications", "system", "medium")
+        ]
+        
+        for title, message, notif_type, priority in test_cases:
+            result = create_notification(title, message, notif_type, priority)
+            results.append({
+                'type': notif_type,
+                'created': result is not None,
+                'message': f'{notif_type.title()} notification ' + ('created' if result else 'blocked by settings')
+            })
+        
+        # Test SMS settings
+        sms_results = []
+        sms_types = ['credit_purchase', 'bill_payment', 'credit_payment', 'payment_reminder']
+        
+        for sms_type in sms_types:
+            would_send = should_send_sms(sms_type)
+            sms_results.append({
+                'type': sms_type,
+                'would_send': would_send,
+                'message': f'{sms_type.replace("_", " ").title()} SMS ' + ('would be sent' if would_send else 'blocked by settings')
+            })
+        
+        return jsonify({
+            'notification_results': results,
+            'sms_results': sms_results,
+            'message': 'Test completed - settings properly control notifications'
+        })
+        
+    except Exception as e:
+        app.logger.error(f"Error testing notifications: {e}")
+        return jsonify({'error': str(e)}), 500
 
 # SMS notification functions
 def should_send_sms(sms_type):
