@@ -519,7 +519,7 @@
                 <i class="fa-solid fa-box text-gray-400 text-xl"></i>
                 <span class="text-xs mt-1 text-gray-400">Inventory</span>
             </button>
-            <button onclick="window.location.href='/add-item'" class="relative -top-4 bg-primary rounded-full p-4 shadow-lg">
+            <button onclick="openScanner()" class="relative -top-4 bg-primary rounded-full p-4 shadow-lg">
                 <i class="fa-solid fa-barcode text-white text-xl"></i>
             </button>
             <button class="flex flex-col items-center py-1 px-3 relative" onclick="goToCart()">
@@ -784,10 +784,25 @@
         }
 
         function simulateScanning() {
+            // Add scanning animation
+            const scanArea = document.querySelector('#scanner-modal .w-64');
+            if (scanArea) {
+                scanArea.classList.add('animate-pulse');
+            }
+            
+            // Show scanning feedback
+            showStyledNotification('Scanning for barcode...', 'info');
+            
             // Simulate barcode detection after 3 seconds
             setTimeout(() => {
+                if (scanArea) {
+                    scanArea.classList.remove('animate-pulse');
+                }
+                
                 const sampleBarcodes = ['8901030870391', '8901030827604', '8901030870384'];
                 const randomBarcode = sampleBarcodes[Math.floor(Math.random() * sampleBarcodes.length)];
+                
+                showStyledNotification('Barcode detected!', 'success');
                 performBarcodeSearch(randomBarcode);
                 closeScanner();
             }, 3000);
@@ -912,6 +927,39 @@
                 if (notification.parentNode) {
                     notification.parentNode.removeChild(notification);
                 }
+            }, 3000);
+        }
+
+        function showStyledNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `fixed top-4 right-4 z-50 p-4 rounded-lg text-white font-medium shadow-lg transform transition-all duration-300 ${
+                type === 'success' ? 'bg-green-500' : 
+                type === 'error' ? 'bg-red-500' : 
+                type === 'warning' ? 'bg-orange-500' : 'bg-blue-500'
+            }`;
+            notification.style.transform = 'translateX(100%)';
+            notification.innerHTML = `
+                <div class="flex items-center space-x-2">
+                    <i class="fa-solid ${type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-times-circle' : type === 'warning' ? 'fa-exclamation-triangle' : 'fa-info-circle'}"></i>
+                    <span>${message}</span>
+                </div>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // Animate in
+            setTimeout(() => {
+                notification.style.transform = 'translateX(0)';
+            }, 10);
+            
+            // Remove after 3 seconds
+            setTimeout(() => {
+                notification.style.transform = 'translateX(100%)';
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        notification.parentNode.removeChild(notification);
+                    }
+                }, 300);
             }, 3000);
         }
 
