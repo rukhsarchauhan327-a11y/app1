@@ -293,6 +293,14 @@
         const productId = urlParams.get('id') || 'weight-product-' + Date.now();
         const mfgDate = urlParams.get('mfgDate') || '';
         const expDate = urlParams.get('expDate') || '';
+        
+        // Debug logging to track the price value
+        console.log('Weight-based product data:', {
+            name: productName,
+            unitPrice: unitPrice,
+            stock: maxStock,
+            id: productId
+        });
 
         // Update page content with product data
         function updateProductDisplay() {
@@ -358,6 +366,16 @@
                 cartItem.quantityDisplay = `${weight.toFixed(unit === 'kg' ? 3 : 0)} ${unit}`;
                 cartItem.totalPrice = weightInKg * productData.sellingPrice;
                 cartItem.pricePerKg = productData.sellingPrice;
+                
+                // Debug logging for price calculation
+                console.log('Price calculation debug:', {
+                    weight: weight,
+                    unit: unit,
+                    weightInKg: weightInKg,
+                    sellingPrice: productData.sellingPrice,
+                    totalPrice: cartItem.totalPrice,
+                    quantityDisplay: cartItem.quantityDisplay
+                });
             } else {
                 const price = parseFloat(priceInput.value) || 0;
                 const weightInKg = price / productData.sellingPrice;

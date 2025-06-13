@@ -1174,9 +1174,23 @@
             let finalPrice = newItem.totalPrice || newItem.price;
             let finalUnitPrice = newItem.unitPrice || newItem.pricePerKg;
             
+            // Debug logging for cart price calculation
+            console.log('Cart item debug:', {
+                name: newItem.name,
+                quantity: newItem.quantity,
+                totalPrice: newItem.totalPrice,
+                price: newItem.price,
+                unitPrice: newItem.unitPrice,
+                pricePerKg: newItem.pricePerKg,
+                type: newItem.type,
+                finalPrice: finalPrice,
+                finalUnitPrice: finalUnitPrice
+            });
+            
             // For weight-based items, ensure price is calculated correctly
             if (newItem.type === 'weight-based' && finalUnitPrice) {
                 finalPrice = newItem.quantity * finalUnitPrice;
+                console.log('Recalculated weight-based price:', finalPrice);
             }
             
             // Add to cartItems data
