@@ -212,7 +212,7 @@
                 </div>
 
                 <!-- Inventory Health -->
-                <div class="bg-white p-4 rounded-xl shadow-sm border-l-4 border-danger cursor-pointer hover:shadow-lg transition-shadow" onclick="window.location.href='/inventory'">
+                <div class="bg-white p-4 rounded-xl shadow-sm border-l-4 border-danger cursor-pointer hover:shadow-lg transition-shadow" onclick="goToInventory()">
                     <div class="flex items-center justify-between">
                         <div class="flex-1">
                             <p class="text-xs text-gray-500 uppercase tracking-wide font-medium">Inventory</p>
@@ -914,6 +914,10 @@
             if (modal) {
                 modal.remove();
             }
+        }
+
+        function goToInventory() {
+            window.location.href = '/inventory';
         }
 
         // Initialize dashboard
