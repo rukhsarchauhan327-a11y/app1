@@ -1190,7 +1190,36 @@
             if (cartData) {
                 const storedItems = JSON.parse(cartData);
                 if (storedItems.length > 0) {
-                    loadCartItems();
+                    // Add each new item to cartItems
+                    storedItems.forEach(item => {
+                        const nextItemId = Object.keys(cartItems).length > 0 ? Math.max(...Object.keys(cartItems).map(Number)) + 1 : 1;
+                        
+                        const newItem = {
+                            id: nextItemId,
+                            name: item.name,
+                            price: item.price || item.totalPrice,
+                            quantity: item.quantity,
+                            unit: item.unit,
+                            unitPrice: item.unitPrice,
+                            type: item.type || 'unit',
+                            mfgDate: item.mfgDate || '',
+                            expDate: item.expDate || '',
+                            datesHidden: false,
+                            quantityDisplay: item.quantityDisplay
+                        };
+                        
+                        cartItems[nextItemId] = newItem;
+                        console.log('New item added from inventory:', newItem);
+                    });
+                    
+                    // Clear temporary cart storage
+                    localStorage.removeItem('kiranakonnect_cart');
+                    
+                    // Save to persistent storage
+                    saveCartToPersistentStorage();
+                    
+                    // Re-render entire cart
+                    renderCartItems();
                     calculateTotals();
                 }
             }
@@ -2000,8 +2029,32 @@
                         };
                     }
                     
-                    // Clear old localStorage data to prevent structure conflicts
-                    localStorage.removeItem('kiranakonnect_persistent_cart');
+                    // Load existing cart data from persistent storage if available
+                    const persistentData = localStorage.getItem('kiranakonnect_persistent_cart');
+                    if (persistentData) {
+                        try {
+                            const savedItems = JSON.parse(persistentData);
+                            savedItems.forEach((item, index) => {
+                                const itemId = index + 1;
+                                cartItems[itemId] = {
+                                    id: itemId,
+                                    name: item.name,
+                                    price: item.price,
+                                    quantity: item.quantity,
+                                    unit: item.unit || 'piece',
+                                    unitPrice: item.unitPrice,
+                                    type: item.type || 'unit',
+                                    mfgDate: item.mfgDate || '',
+                                    expDate: item.expDate || '',
+                                    datesHidden: false,
+                                    quantityDisplay: item.quantityDisplay
+                                };
+                            });
+                            console.log('Loaded persistent cart items:', cartItems);
+                        } catch (error) {
+                            console.error('Error loading persistent cart:', error);
+                        }
+                    }
                     
                     // Render cart items dynamically to prevent duplicates
                     console.log('About to render cart items:', cartItems);
