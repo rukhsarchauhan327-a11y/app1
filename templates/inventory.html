@@ -83,7 +83,7 @@
 
     <!-- Main Content -->
     <main class="px-4 pt-4 pb-20">
-        <div id="inventory-items" class="space-y-3">
+        <div id="inventory-items" class="grid grid-cols-2 gap-4">
             <!-- Products will be loaded here -->
         </div>
     </main>
@@ -206,7 +206,7 @@
 
             if (filteredProducts.length === 0) {
                 container.innerHTML = `
-                    <div class="text-center py-8">
+                    <div class="col-span-full text-center py-8">
                         <i class="fa-solid fa-box-open text-gray-400 text-4xl mb-4"></i>
                         <h3 class="text-lg font-semibold text-gray-700 mb-2">No Products Found</h3>
                         <p class="text-gray-500">Try adjusting your filters or search terms.</p>
@@ -216,54 +216,39 @@
             }
 
             container.innerHTML = filteredProducts.map(product => {
-                const statusClass = product.is_expired ? 'bg-red-500' : 
-                                  product.is_low_stock ? 'bg-accent' : 'bg-primary';
-                const statusText = product.is_expired ? 'Expired' :
-                                 product.is_low_stock ? 'Low Stock' : 'In Stock';
+                const stockClass = product.is_expired ? 'bg-red-500' : 
+                                 product.is_low_stock ? 'bg-orange-500' : 'bg-green-500';
+                const stockText = product.is_expired ? 'Expired' :
+                                product.is_low_stock ? 'Low Stock' : 'In Stock';
 
                 const priceDisplay = product.is_weight_based ? 
                     `₹${product.price_per_kg}/kg` : 
-                    `₹${product.price}/Piece`;
+                    `₹${product.price}/${product.unit}`;
 
                 const stockDisplay = product.is_weight_based ? 
-                    `${product.stock_quantity} kg Available` :
-                    `${product.stock_quantity} Pieces Available`;
+                    `${product.stock_quantity} kg in stock` :
+                    `${product.stock_quantity} ${product.unit}s in stock`;
 
                 return `
-                    <div id="product-${product.id}" class="bg-white rounded-xl p-4 shadow-sm border hover:shadow-md transition-shadow cursor-pointer" 
-                         data-category="${product.category.toLowerCase()}" 
-                         data-status="${product.is_expired ? 'expired' : 'available'}" 
-                         onclick="viewProductDetails(${product.id})">
-                        <div class="flex items-center space-x-4">
-                            <div class="w-16 h-16 rounded-xl overflow-hidden bg-gray-100 flex items-center justify-center">
-                                <i class="fa-solid fa-box text-gray-400 text-2xl"></i>
-                            </div>
-                            <div class="flex-1">
-                                <div class="flex items-start justify-between">
-                                    <div class="flex-1">
-                                        <h3 class="font-bold text-dark text-lg">${product.name}</h3>
-                                        ${product.expiry_date ? `
-                                            <div class="text-xs text-gray-500 mt-1">
-                                                <p>EXP: ${product.expiry_date}</p>
-                                            </div>
-                                        ` : ''}
-                                    </div>
-                                    <div class="text-right">
-                                        <span class="${statusClass} text-white text-xs px-2 py-1 rounded-full font-semibold">${statusText}</span>
-                                        <p class="text-lg font-bold text-primary mt-2">${priceDisplay}</p>
-                                        <p class="text-sm text-gray-600">${stockDisplay}</p>
-                                    </div>
-                                </div>
-                                <div class="flex items-center justify-end space-x-2 mt-3">
-                                    <button class="p-2 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors" 
-                                            onclick="event.stopPropagation(); refillItem(${product.id})" title="Refill Stock">
-                                        <i class="fa-solid fa-plus text-blue-600 text-sm"></i>
-                                    </button>
-                                    <button class="p-2 bg-green-50 hover:bg-green-100 rounded-lg transition-colors" 
-                                            onclick="event.stopPropagation(); addToCart(${product.id})" title="Add to Cart">
-                                        <i class="fa-solid fa-shopping-cart text-green-600 text-sm"></i>
-                                    </button>
-                                </div>
+                    <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow cursor-pointer" 
+                         onclick="openCart('${product.id}')">
+                        <div class="relative">
+                            <img src="https://via.placeholder.com/150?text=${encodeURIComponent(product.name)}" 
+                                 alt="${product.name}" class="w-full h-32 object-cover">
+                            ${product.is_low_stock || product.is_expired ? 
+                                `<div class="absolute top-2 right-2 ${stockClass} text-white text-xs px-2 py-1 rounded-full">${stockText}</div>` : 
+                                ''}
+                        </div>
+                        <div class="p-4">
+                            <h3 class="font-semibold text-gray-800 mb-1 truncate">${product.name}</h3>
+                            <p class="text-primary font-bold text-lg">${priceDisplay}</p>
+                            <p class="text-sm text-gray-600 mt-1">${stockDisplay}</p>
+                            ${product.expiry_date ? `<p class="text-xs text-gray-500 mt-1">EXP: ${product.expiry_date}</p>` : ''}
+                            <div class="flex justify-between items-center mt-3">
+                                <span class="text-xs px-2 py-1 bg-gray-100 text-gray-600 rounded-full capitalize">${product.category}</span>
+                                <button class="bg-primary text-white px-3 py-1 rounded-lg text-sm hover:bg-primary-dark">
+                                    Add to Cart
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -334,6 +319,37 @@
         }
 
         // Product interaction functions
+        function openCart(productId) {
+            const product = products.find(p => p.id == productId);
+            if (!product) {
+                showNotification('Product not found', 'error');
+                return;
+            }
+
+            // Navigate to appropriate product details page
+            if (product.is_weight_based) {
+                const params = new URLSearchParams({
+                    id: product.id,
+                    name: product.name,
+                    price: product.price_per_kg,
+                    stock: product.stock_quantity,
+                    unit: product.unit,
+                    expDate: product.expiry_date || ''
+                });
+                window.location.href = `/product-details-weight?${params.toString()}`;
+            } else {
+                const params = new URLSearchParams({
+                    id: product.id,
+                    name: product.name,
+                    price: product.price,
+                    unit: 'Piece',
+                    stock: product.stock_quantity,
+                    expDate: product.expiry_date || ''
+                });
+                window.location.href = `/product-details?${params.toString()}`;
+            }
+        }
+
         function addToCart(productId) {
             const product = products.find(p => p.id === productId);
             if (!product) {
