@@ -2272,25 +2272,77 @@
             }, 3000);
         }
 
-        function saveNotificationSetting(setting, enabled) {
-            const settings = JSON.parse(localStorage.getItem('notificationSettings') || '{}');
-            settings[setting] = enabled;
-            localStorage.setItem('notificationSettings', JSON.stringify(settings));
+        async function saveNotificationSetting(setting, enabled) {
+            // Map frontend setting names to backend field names
+            const settingMap = {
+                'low-stock': 'low_stock_alerts',
+                'expiry-alerts': 'expiry_alerts',
+                'daily-summary': 'daily_summary',
+                'credit-purchase-sms': 'credit_purchase_sms',
+                'bill-payment-sms': 'bill_payment_sms',
+                'credit-payment-sms': 'credit_payment_sms',
+                'credit-balance-sms': 'credit_balance_sms',
+                'payment-reminder-sms': 'payment_reminder_sms',
+                'system-alerts': 'system_alerts',
+                'backup-alerts': 'backup_alerts',
+                'subscription-alerts': 'subscription_alerts'
+            };
+            
+            const backendSetting = settingMap[setting];
+            if (!backendSetting) {
+                console.error('Unknown setting:', setting);
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/notification-settings', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        [backendSetting]: enabled
+                    })
+                });
+                
+                if (!response.ok) {
+                    console.error('Failed to save notification setting');
+                }
+            } catch (error) {
+                console.error('Error saving notification setting:', error);
+            }
         }
 
-        function loadNotificationSettings() {
-            const settings = JSON.parse(localStorage.getItem('notificationSettings') || '{}');
-            
-            Object.keys(settings).forEach(setting => {
-                const toggle = document.querySelector(`[data-setting="${setting}"]`);
-                if (toggle) {
-                    if (settings[setting]) {
-                        toggle.classList.add('active');
-                    } else {
-                        toggle.classList.remove('active');
-                    }
+        async function loadNotificationSettings() {
+            try {
+                const response = await fetch('/api/notification-settings');
+                if (response.ok) {
+                    const settings = await response.json();
+                    
+                    // Update toggle states based on backend settings
+                    updateToggleState('low-stock', settings.low_stock_alerts);
+                    updateToggleState('expiry-alerts', settings.expiry_alerts);
+                    updateToggleState('daily-summary', settings.daily_summary);
+                    updateToggleState('credit-purchase-sms', settings.credit_purchase_sms);
+                    updateToggleState('bill-payment-sms', settings.bill_payment_sms);
+                    updateToggleState('credit-payment-sms', settings.credit_payment_sms);
+                    updateToggleState('credit-balance-sms', settings.credit_balance_sms);
+                    updateToggleState('payment-reminder-sms', settings.payment_reminder_sms);
                 }
-            });
+            } catch (error) {
+                console.error('Error loading notification settings:', error);
+            }
+        }
+
+        function updateToggleState(setting, isEnabled) {
+            const toggle = document.querySelector(`[data-setting="${setting}"]`);
+            if (toggle) {
+                if (isEnabled) {
+                    toggle.classList.add('active');
+                } else {
+                    toggle.classList.remove('active');
+                }
+            }
         }
 
         function resetNotificationSettings() {

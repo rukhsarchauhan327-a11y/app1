@@ -141,10 +141,62 @@ class Notification(db.Model):
     bill_id = db.Column(db.Integer, db.ForeignKey('bill.id'), nullable=True)
     product_id = db.Column(db.Integer, db.ForeignKey('product.id'), nullable=True)
 
+class NotificationSettings(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    
+    # Business alerts settings
+    low_stock_alerts = db.Column(db.Boolean, default=True)
+    expiry_alerts = db.Column(db.Boolean, default=True)
+    daily_summary = db.Column(db.Boolean, default=True)
+    
+    # Customer SMS settings
+    credit_purchase_sms = db.Column(db.Boolean, default=True)
+    bill_payment_sms = db.Column(db.Boolean, default=True)
+    credit_payment_sms = db.Column(db.Boolean, default=True)
+    credit_balance_sms = db.Column(db.Boolean, default=True)
+    payment_reminder_sms = db.Column(db.Boolean, default=False)
+    
+    # System notifications
+    system_alerts = db.Column(db.Boolean, default=True)
+    backup_alerts = db.Column(db.Boolean, default=True)
+    subscription_alerts = db.Column(db.Boolean, default=True)
+    
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow)
+
 # Notification helper functions
+def get_notification_settings():
+    """Get current notification settings, create default if not exists"""
+    settings = NotificationSettings.query.first()
+    if not settings:
+        settings = NotificationSettings()
+        db.session.add(settings)
+        db.session.commit()
+    return settings
+
 def create_notification(title, message, notification_type, priority='medium', customer_id=None, bill_id=None, product_id=None):
-    """Create a new notification in the database"""
+    """Create a new notification in the database if user settings allow it"""
     try:
+        settings = get_notification_settings()
+        
+        # Check if notification type is enabled in settings
+        should_create = True
+        
+        if notification_type == 'inventory' and not settings.low_stock_alerts:
+            should_create = False
+        elif notification_type == 'expiry' and not settings.expiry_alerts:
+            should_create = False
+        elif notification_type == 'backup' and not settings.backup_alerts:
+            should_create = False
+        elif notification_type == 'subscription' and not settings.subscription_alerts:
+            should_create = False
+        elif notification_type == 'system' and not settings.system_alerts:
+            should_create = False
+        
+        if not should_create:
+            app.logger.info(f"Notification {notification_type} skipped due to user settings")
+            return None
+            
         notification = Notification(
             title=title,
             message=message,
@@ -939,6 +991,69 @@ def mark_notification_read(notification_id):
     except Exception as e:
         app.logger.error(f"Error marking notification as read: {e}")
         return jsonify({'error': 'Failed to update notification'}), 500
+
+@app.route('/api/notification-settings', methods=['GET'])
+def get_notification_settings_api():
+    """Get current notification settings"""
+    try:
+        settings = get_notification_settings()
+        return jsonify({
+            'low_stock_alerts': settings.low_stock_alerts,
+            'expiry_alerts': settings.expiry_alerts,
+            'daily_summary': settings.daily_summary,
+            'credit_purchase_sms': settings.credit_purchase_sms,
+            'bill_payment_sms': settings.bill_payment_sms,
+            'credit_payment_sms': settings.credit_payment_sms,
+            'credit_balance_sms': settings.credit_balance_sms,
+            'payment_reminder_sms': settings.payment_reminder_sms,
+            'system_alerts': settings.system_alerts,
+            'backup_alerts': settings.backup_alerts,
+            'subscription_alerts': settings.subscription_alerts
+        })
+    except Exception as e:
+        app.logger.error(f"Error fetching notification settings: {e}")
+        return jsonify({'error': 'Failed to fetch settings'}), 500
+
+@app.route('/api/notification-settings', methods=['POST'])
+def update_notification_settings_api():
+    """Update notification settings"""
+    try:
+        data = request.get_json()
+        settings = get_notification_settings()
+        
+        # Update settings based on provided data
+        if 'low_stock_alerts' in data:
+            settings.low_stock_alerts = data['low_stock_alerts']
+        if 'expiry_alerts' in data:
+            settings.expiry_alerts = data['expiry_alerts']
+        if 'daily_summary' in data:
+            settings.daily_summary = data['daily_summary']
+        if 'credit_purchase_sms' in data:
+            settings.credit_purchase_sms = data['credit_purchase_sms']
+        if 'bill_payment_sms' in data:
+            settings.bill_payment_sms = data['bill_payment_sms']
+        if 'credit_payment_sms' in data:
+            settings.credit_payment_sms = data['credit_payment_sms']
+        if 'credit_balance_sms' in data:
+            settings.credit_balance_sms = data['credit_balance_sms']
+        if 'payment_reminder_sms' in data:
+            settings.payment_reminder_sms = data['payment_reminder_sms']
+        if 'system_alerts' in data:
+            settings.system_alerts = data['system_alerts']
+        if 'backup_alerts' in data:
+            settings.backup_alerts = data['backup_alerts']
+        if 'subscription_alerts' in data:
+            settings.subscription_alerts = data['subscription_alerts']
+            
+        settings.updated_at = datetime.utcnow()
+        db.session.commit()
+        
+        return jsonify({'message': 'Settings updated successfully'})
+        
+    except Exception as e:
+        app.logger.error(f"Error updating notification settings: {e}")
+        db.session.rollback()
+        return jsonify({'error': 'Failed to update settings'}), 500
 
 def get_time_ago(datetime_obj):
     """Calculate human-readable time difference"""
