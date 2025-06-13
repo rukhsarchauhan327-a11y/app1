@@ -161,7 +161,7 @@
         }
 
         function markAllAsRead() {
-            showConfirmModal('Mark all notifications as read?', function() {
+            if (confirm('Mark all notifications as read?')) {
                 fetch('/api/notifications/mark-all-read', {
                     method: 'POST',
                     headers: {
@@ -174,14 +174,14 @@
                 .then(function(data) {
                     if (data.success) {
                         loadNotifications();
-                        showStyledNotification('All notifications marked as read successfully!', 'success');
+                        alert('All notifications marked as read successfully!');
                     }
                 })
                 .catch(function(error) {
                     console.error('Error marking notifications as read:', error);
-                    showStyledNotification('Error marking notifications as read', 'error');
+                    alert('Error marking notifications as read');
                 });
-            });
+            }
         }
 
         function filterNotifications(filter) {
@@ -206,30 +206,45 @@
         }
 
         function loadNotifications() {
-            Promise.all([
-                fetch('/api/notifications').then(function(r) { return r.json(); }),
-                fetch('/api/notification-settings').then(function(r) { return r.json(); })
-            ])
-            .then(function(results) {
-                var notificationData = results[0];
-                notificationSettings = results[1];
-                
-                if (notificationData.notifications) {
-                    allNotifications = notificationData.notifications;
-                    
-                    // Add backup notification if needed and enabled
-                    addSystemNotifications();
-                    
-                    displayNotifications(allNotifications, currentFilter);
-                    updateNotificationBadge(getUnreadCount());
+            // Load notifications
+            fetch('/api/notifications')
+                .then(function(response) {
+                    return response.json();
+                })
+                .then(function(notificationData) {
+                    if (notificationData.notifications) {
+                        allNotifications = notificationData.notifications;
+                        
+                        // Load settings separately 
+                        loadNotificationSettings();
+                        
+                        displayNotifications(allNotifications, currentFilter);
+                        updateNotificationBadge(getUnreadCount());
+                        document.getElementById('loading-state').style.display = 'none';
+                    }
+                })
+                .catch(function(error) {
+                    console.error('Error loading notifications:', error);
                     document.getElementById('loading-state').style.display = 'none';
-                }
-            })
-            .catch(function(error) {
-                console.error('Error loading notifications:', error);
-                document.getElementById('loading-state').style.display = 'none';
-                showStyledNotification('Error loading notifications', 'error');
-            });
+                    alert('Error loading notifications');
+                });
+        }
+
+        function loadNotificationSettings() {
+            fetch('/api/notification-settings')
+                .then(function(response) {
+                    return response.json();
+                })
+                .then(function(settings) {
+                    notificationSettings = settings;
+                    addSystemNotifications();
+                    displayNotifications(allNotifications, currentFilter);
+                })
+                .catch(function(error) {
+                    console.error('Error loading notification settings:', error);
+                    // Continue without settings
+                    notificationSettings = {};
+                });
         }
 
         function addSystemNotifications() {
@@ -237,7 +252,14 @@
             
             // Add backup notification if backup is disabled and backup alerts are enabled
             if (!backupEnabled && notificationSettings.backup_alerts) {
-                var hasBackupNotification = allNotifications.some(function(n) { return n.type === 'backup'; });
+                var hasBackupNotification = false;
+                for (var i = 0; i < allNotifications.length; i++) {
+                    if (allNotifications[i].type === 'backup') {
+                        hasBackupNotification = true;
+                        break;
+                    }
+                }
+                
                 if (!hasBackupNotification) {
                     allNotifications.unshift({
                         id: 'backup-local',
@@ -416,20 +438,26 @@
         }
 
         function enableBackup() {
-            showConfirmModal('Enable email backup to protect your business data?', function() {
+            if (confirm('Enable email backup to protect your business data?')) {
                 localStorage.setItem('emailBackupEnabled', 'true');
                 loadNotifications();
-                showStyledNotification('Email backup enabled successfully!', 'success');
-            });
+                alert('Email backup enabled successfully!');
+            }
         }
 
         function dismissBackupNotification() {
-            showConfirmModal('Dismiss backup notification? You can enable it later in Profile settings.', function() {
-                allNotifications = allNotifications.filter(function(n) { return n.type !== 'backup'; });
+            if (confirm('Dismiss backup notification? You can enable it later in Profile settings.')) {
+                var newNotifications = [];
+                for (var i = 0; i < allNotifications.length; i++) {
+                    if (allNotifications[i].type !== 'backup') {
+                        newNotifications.push(allNotifications[i]);
+                    }
+                }
+                allNotifications = newNotifications;
                 displayNotifications(allNotifications, currentFilter);
                 updateNotificationBadge(getUnreadCount());
-                showStyledNotification('Backup notification dismissed', 'info');
-            });
+                alert('Backup notification dismissed');
+            }
         }
 
         function handleNotificationAction(type) {
@@ -454,32 +482,7 @@
             }
         }
 
-        function showStyledNotification(message, type) {
-            var toast = document.getElementById('notification-toast');
-            var toastMessage = document.getElementById('toast-message');
-            
-            toastMessage.textContent = message;
-            toast.classList.remove('hidden');
-            
-            setTimeout(function() {
-                toast.style.transform = 'translateY(0)';
-                toast.style.opacity = '1';
-            }, 100);
-            
-            setTimeout(function() {
-                toast.style.transform = 'translateY(-100%)';
-                toast.style.opacity = '0';
-                setTimeout(function() {
-                    toast.classList.add('hidden');
-                }, 300);
-            }, 3000);
-        }
 
-        function showConfirmModal(message, onConfirm) {
-            if (confirm(message)) {
-                onConfirm();
-            }
-        }
 
         // Initialize page
         document.addEventListener('DOMContentLoaded', function() {
