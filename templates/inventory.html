@@ -1005,6 +1005,36 @@
                 category: 'medical',
                 threshold: 5,
                 barcode: '8901030878901'
+            },
+            {
+                id: '8',
+                name: 'Fresh Milk',
+                image: 'https://storage.googleapis.com/uxpilot-auth.appspot.com/fresh-milk-bottle.png',
+                price: 60,
+                unit: 'L',
+                type: 'weight-based',
+                stock: 4.5,
+                stockUnit: 'L',
+                category: 'dairy',
+                threshold: 1,
+                barcode: '8901030889012',
+                mfgDate: '13 Jun 2025',
+                expDate: '15 Jun 2025'
+            },
+            {
+                id: '9',
+                name: 'Cooking Oil',
+                image: 'https://storage.googleapis.com/uxpilot-auth.appspot.com/cooking-oil-bottle.png',
+                price: 150,
+                unit: 'L',
+                type: 'weight-based',
+                stock: 2.8,
+                stockUnit: 'L',
+                category: 'oil',
+                threshold: 1,
+                barcode: '8901030890123',
+                mfgDate: '01 May 2025',
+                expDate: '01 May 2026'
             }
         ];
 
@@ -1016,7 +1046,9 @@
             'item-4': inventoryItems[3],
             'item-5': inventoryItems[4],
             'item-6': inventoryItems[5],
-            'item-7': inventoryItems[6]
+            'item-7': inventoryItems[6],
+            'item-8': inventoryItems[7],
+            'item-9': inventoryItems[8]
         };
 
         let currentProduct = null;

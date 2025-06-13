@@ -206,6 +206,8 @@
                             <select id="unit-select" class="w-16 px-1 py-2 border border-gray-300 rounded-lg font-medium text-sm">
                                 <option value="kg">Kg</option>
                                 <option value="gm">Gm</option>
+                                <option value="l">L</option>
+                                <option value="ml">ml</option>
                             </select>
                         </div>
                     </div>
@@ -347,24 +349,36 @@
             };
 
             if (selectedMethod === 'quantity') {
-                const inputWeight = parseFloat(quantityInput.value) || 0;
+                const inputQuantity = parseFloat(quantityInput.value) || 0;
                 const inputUnit = unitSelect.value;
-                const finalWeightKg = inputUnit === 'gm' ? inputWeight / 1000 : inputWeight;
                 
-                // Calculate the total price: weight × price per kg
-                const calculatedPrice = finalWeightKg * unitPrice;
+                // Convert all units to base unit (kg for weight, L for volume)
+                let baseQuantity;
+                let isVolumeProduct = inputUnit === 'l' || inputUnit === 'ml';
                 
-                cartItem.quantity = finalWeightKg;
-                cartItem.quantityDisplay = `${inputWeight.toFixed(inputUnit === 'kg' ? 3 : 0)} ${inputUnit}`;
+                if (isVolumeProduct) {
+                    // Volume conversion: ml to L
+                    baseQuantity = inputUnit === 'ml' ? inputQuantity / 1000 : inputQuantity;
+                } else {
+                    // Weight conversion: gm to kg
+                    baseQuantity = inputUnit === 'gm' ? inputQuantity / 1000 : inputQuantity;
+                }
+                
+                // Calculate the total price: quantity × price per unit
+                const calculatedPrice = baseQuantity * unitPrice;
+                
+                cartItem.quantity = baseQuantity;
+                cartItem.quantityDisplay = `${inputQuantity.toFixed(inputUnit === 'kg' || inputUnit === 'l' ? 3 : 0)} ${inputUnit}`;
                 cartItem.price = calculatedPrice;
                 cartItem.totalPrice = calculatedPrice;
                 cartItem.unitPrice = unitPrice;
                 
-                console.log('RECREATED: Weight-based cart calculation:', {
-                    inputWeight: inputWeight,
+                console.log('RECREATED: Multi-unit cart calculation:', {
+                    inputQuantity: inputQuantity,
                     inputUnit: inputUnit,
-                    finalWeightKg: finalWeightKg,
-                    unitPricePerKg: unitPrice,
+                    baseQuantity: baseQuantity,
+                    isVolumeProduct: isVolumeProduct,
+                    unitPrice: unitPrice,
                     calculatedPrice: calculatedPrice
                 });
             } else {
@@ -492,31 +506,39 @@
         priceInput.addEventListener('input', updateFromPrice);
 
         function updateFromQuantity() {
-            let qty = parseFloat(quantityInput.value) || 0;
+            const inputQty = parseFloat(quantityInput.value) || 0;
             const unit = unitSelect.value;
             
-            if (unit === 'gm') {
-                qty = qty / 1000;
+            // Convert to base unit (kg for weight, L for volume)
+            let baseQty;
+            let isVolume = unit === 'l' || unit === 'ml';
+            
+            if (isVolume) {
+                baseQty = unit === 'ml' ? inputQty / 1000 : inputQty;
+            } else {
+                baseQty = unit === 'gm' ? inputQty / 1000 : inputQty;
             }
             
-            const total = qty * unitPrice;
+            const total = baseQty * unitPrice;
             
-            let displayQty = qty;
-            let displayUnit = 'Kg';
+            // Display in original input format
+            let displayQty = inputQty;
+            let displayUnit = unit.toUpperCase();
             
-            if (qty < 1) {
-                displayQty = qty * 1000;
-                displayUnit = 'gm';
+            // Show base unit conversion for very small quantities
+            if (baseQty < 1 && (unit === 'kg' || unit === 'l')) {
+                displayQty = baseQty * 1000;
+                displayUnit = unit === 'kg' ? 'gm' : 'ml';
             }
             
             calculatedQuantity.textContent = `${displayQty.toFixed(displayQty < 1 ? 0 : 3)} ${displayUnit}`;
             calculatedPrice.textContent = `₹${total.toFixed(2)}`;
             
-            // Debug log for price preview calculation
-            console.log('Price preview calculation:', {
-                inputQty: parseFloat(quantityInput.value),
+            console.log('Multi-unit preview calculation:', {
+                inputQty: inputQty,
                 unit: unit,
-                convertedQty: qty,
+                baseQty: baseQty,
+                isVolume: isVolume,
                 unitPrice: unitPrice,
                 total: total
             });
