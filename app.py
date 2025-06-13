@@ -798,7 +798,7 @@ def create_bill():
         )
         db.session.add(bill_item)
     
-    # If payment is made, create payment record
+    # If payment is made, create payment record and send SMS
     if data['payment_mode'] != 'credit' and data.get('customer_id'):
         payment = Payment(
             customer_id=data['customer_id'],
@@ -808,6 +808,18 @@ def create_bill():
             reference_number=data.get('reference_number')
         )
         db.session.add(payment)
+        
+        # Send bill payment SMS if enabled
+        customer = Customer.query.get(data['customer_id'])
+        if customer and customer.phone:
+            send_bill_payment_sms(customer.phone, customer.name, data['total_amount'], bill.bill_number)
+    
+    # If credit purchase, send credit purchase SMS
+    elif data['payment_mode'] == 'credit' and data.get('customer_id'):
+        customer = Customer.query.get(data['customer_id'])
+        if customer and customer.phone:
+            new_balance = customer.outstanding_balance() + data['total_amount']
+            send_credit_purchase_sms(customer.phone, customer.name, data['total_amount'], new_balance)
     
     db.session.commit()
     
@@ -921,6 +933,12 @@ def create_payment():
         
         db.session.add(payment)
         db.session.commit()
+        
+        # Send credit payment SMS if enabled
+        customer = Customer.query.get(customer_id)
+        if customer and customer.phone:
+            remaining_balance = customer.outstanding_balance() - amount
+            send_credit_payment_sms(customer.phone, customer.name, amount, remaining_balance)
         
         return jsonify({'message': 'Payment recorded successfully', 'payment_id': payment.id}), 201
         
@@ -1054,6 +1072,68 @@ def update_notification_settings_api():
         app.logger.error(f"Error updating notification settings: {e}")
         db.session.rollback()
         return jsonify({'error': 'Failed to update settings'}), 500
+
+# SMS notification functions
+def should_send_sms(sms_type):
+    """Check if SMS should be sent based on user settings"""
+    try:
+        settings = get_notification_settings()
+        
+        if sms_type == 'credit_purchase' and not settings.credit_purchase_sms:
+            return False
+        elif sms_type == 'bill_payment' and not settings.bill_payment_sms:
+            return False
+        elif sms_type == 'credit_payment' and not settings.credit_payment_sms:
+            return False
+        elif sms_type == 'credit_balance' and not settings.credit_balance_sms:
+            return False
+        elif sms_type == 'payment_reminder' and not settings.payment_reminder_sms:
+            return False
+        
+        return True
+    except Exception as e:
+        app.logger.error(f"Error checking SMS settings: {e}")
+        return False
+
+def send_credit_purchase_sms(customer_phone, customer_name, amount, balance):
+    """Send SMS for credit purchase if enabled"""
+    if not should_send_sms('credit_purchase'):
+        app.logger.info("Credit purchase SMS skipped due to user settings")
+        return False
+    
+    # In production, this would use Twilio or SMS service
+    app.logger.info(f"SMS: Credit purchase of ₹{amount} for {customer_name}. Balance: ₹{balance}")
+    return True
+
+def send_bill_payment_sms(customer_phone, customer_name, amount, bill_number):
+    """Send SMS for bill payment if enabled"""
+    if not should_send_sms('bill_payment'):
+        app.logger.info("Bill payment SMS skipped due to user settings")
+        return False
+    
+    # In production, this would use Twilio or SMS service
+    app.logger.info(f"SMS: Payment of ₹{amount} received for bill {bill_number}. Thank you {customer_name}!")
+    return True
+
+def send_credit_payment_sms(customer_phone, customer_name, amount, remaining_balance):
+    """Send SMS for credit payment if enabled"""
+    if not should_send_sms('credit_payment'):
+        app.logger.info("Credit payment SMS skipped due to user settings")
+        return False
+    
+    # In production, this would use Twilio or SMS service
+    app.logger.info(f"SMS: Credit payment of ₹{amount} received from {customer_name}. Remaining balance: ₹{remaining_balance}")
+    return True
+
+def send_payment_reminder_sms(customer_phone, customer_name, amount):
+    """Send SMS payment reminder if enabled"""
+    if not should_send_sms('payment_reminder'):
+        app.logger.info("Payment reminder SMS skipped due to user settings")
+        return False
+    
+    # In production, this would use Twilio or SMS service
+    app.logger.info(f"SMS: Payment reminder to {customer_name} for ₹{amount}")
+    return True
 
 def get_time_ago(datetime_obj):
     """Calculate human-readable time difference"""
