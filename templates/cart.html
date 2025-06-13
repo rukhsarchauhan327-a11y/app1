@@ -810,18 +810,23 @@
         function removeItem(itemId) {
             const item = cartItems[itemId];
             if (item && confirm(`Remove ${item.name} from cart?`)) {
-                // Remove from localStorage
-                const cartData = localStorage.getItem('kiranakonnect_cart');
-                let storedItems = cartData ? JSON.parse(cartData) : [];
-                storedItems = storedItems.filter(storedItem => storedItem.id !== item.id);
-                localStorage.setItem('kiranakonnect_cart', JSON.stringify(storedItems));
+                // Remove from cart items
+                delete cartItems[itemId];
+                
+                // Save updated cart to persistent storage
+                saveCartToPersistentStorage();
                 
                 // Remove from UI and recalculate
-                delete cartItems[itemId];
                 renderCartItems();
                 calculateTotals();
                 showNotification(`${item.name} removed from cart`, 'info');
             }
+        }
+
+        function saveCartToPersistentStorage() {
+            const cartArray = Object.values(cartItems);
+            localStorage.setItem('kiranakonnect_persistent_cart', JSON.stringify(cartArray));
+            console.log('Cart saved to persistent storage:', cartArray);
         }
 
         function removeDates(itemId) {
@@ -1178,6 +1183,9 @@
             };
             
             console.log('RECREATED: New cart item added:', cartItems[nextItemId]);
+            
+            // Save to persistent storage immediately
+            saveCartToPersistentStorage();
             
             // Create HTML exactly like existing cart items
             const cartContainer = document.getElementById('cart-items');
@@ -1747,6 +1755,9 @@
             item.quantity = newQuantity;
             item.price = newPrice;
             
+            // Save updated cart to persistent storage
+            saveCartToPersistentStorage();
+            
             // Update display
             updateCartDisplay(currentEditingItem);
             calculateTotals();
@@ -2151,13 +2162,38 @@
                         };
                     }
                     
-                    // EMERGENCY FIX: Clear all cart data and start fresh
-                    cartItems = {};
-                    localStorage.removeItem('kiranakonnect_cart');
-                    localStorage.removeItem('kiranakonnect_persistent_cart');
+                    // Load existing cart data from persistent storage
+                    const persistentData = localStorage.getItem('kiranakonnect_persistent_cart');
+                    if (persistentData) {
+                        try {
+                            const savedItems = JSON.parse(persistentData);
+                            savedItems.forEach((item, index) => {
+                                const itemId = index + 1;
+                                cartItems[itemId] = {
+                                    id: itemId,
+                                    name: item.name,
+                                    price: item.price,
+                                    quantity: item.quantity,
+                                    unit: item.unit || 'piece',
+                                    unitPrice: item.unitPrice,
+                                    type: item.type || 'unit',
+                                    mfgDate: item.mfgDate || '',
+                                    expDate: item.expDate || '',
+                                    datesHidden: false,
+                                    quantityDisplay: item.quantityDisplay
+                                };
+                            });
+                            console.log('Loaded persistent cart items:', cartItems);
+                        } catch (error) {
+                            console.error('Error loading persistent cart:', error);
+                        }
+                    }
                     
                     // Only load new items from inventory (disable duplicate loading)
                     loadCartItems();
+                    
+                    // Render loaded cart items
+                    renderCartItems();
                     
                     // Set up periodic check for new items from inventory
                     setInterval(checkForNewItems, 1000);
