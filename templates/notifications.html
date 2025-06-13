@@ -20,7 +20,7 @@
                 "extend": {
                     "colors": {
                         "primary": "#4CAF50",
-                        "secondary": "#2196F3",
+                        "secondary": "#2196F3", 
                         "accent": "#FF9800",
                         "danger": "#F44336",
                         "dark": "#333333",
@@ -55,23 +55,9 @@
             box-shadow: 0 4px 12px rgba(0,0,0,0.15);
         }
 
-        .filter-btn {
-            transition: all 0.2s ease;
-        }
-
         .filter-btn.active {
-            background-color: #4CAF50;
-            color: white;
-        }
-
-        .filter-btn:not(.active) {
-            background-color: #f3f4f6;
-            color: #6b7280;
-        }
-
-        .filter-btn:not(.active):hover {
-            background-color: #e5e7eb;
-            color: #374151;
+            background-color: #4CAF50 !important;
+            color: white !important;
         }
     </style>
 </head>
@@ -95,16 +81,16 @@
     <!-- Filter Navigation -->
     <div class="bg-white mt-16 px-4 py-3 border-b">
         <div class="flex space-x-2 overflow-x-auto">
-            <button class="filter-btn px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap active" data-filter="all" onclick="filterNotifications('all')">
+            <button class="filter-btn px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap bg-primary text-white" data-filter="all" onclick="filterNotifications('all')">
                 All
             </button>
-            <button class="filter-btn px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap" data-filter="critical" onclick="filterNotifications('critical')">
+            <button class="filter-btn px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap bg-gray-100 text-gray-600" data-filter="critical" onclick="filterNotifications('critical')">
                 Critical
             </button>
-            <button class="filter-btn px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap" data-filter="inventory" onclick="filterNotifications('inventory')">
+            <button class="filter-btn px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap bg-gray-100 text-gray-600" data-filter="inventory" onclick="filterNotifications('inventory')">
                 Inventory
             </button>
-            <button class="filter-btn px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap" data-filter="payment" onclick="filterNotifications('payment')">
+            <button class="filter-btn px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap bg-gray-100 text-gray-600" data-filter="payment" onclick="filterNotifications('payment')">
                 Payment
             </button>
         </div>
@@ -153,16 +139,29 @@
         </div>
     </nav>
 
+    <!-- Styled Notification Toast -->
+    <div id="notification-toast" class="fixed top-20 left-4 right-4 bg-white border-l-4 border-primary shadow-lg rounded-lg p-4 transform -translate-y-full opacity-0 transition-all duration-300 z-50 hidden">
+        <div class="flex items-center">
+            <div class="bg-primary/10 p-2 rounded-full mr-3">
+                <i class="fa-solid fa-check text-primary"></i>
+            </div>
+            <div>
+                <p id="toast-message" class="text-sm font-medium text-dark"></p>
+            </div>
+        </div>
+    </div>
+
     <script>
         var currentFilter = 'all';
         var allNotifications = [];
+        var notificationSettings = {};
 
         function goBack() {
             window.location.href = '/dashboard';
         }
 
         function markAllAsRead() {
-            if (confirm('Mark all notifications as read?')) {
+            showConfirmModal('Mark all notifications as read?', function() {
                 fetch('/api/notifications/mark-all-read', {
                     method: 'POST',
                     headers: {
@@ -175,14 +174,14 @@
                 .then(function(data) {
                     if (data.success) {
                         loadNotifications();
-                        showNotification('All notifications marked as read', 'success');
+                        showStyledNotification('All notifications marked as read successfully!', 'success');
                     }
                 })
                 .catch(function(error) {
                     console.error('Error marking notifications as read:', error);
-                    showNotification('Error marking notifications as read', 'error');
+                    showStyledNotification('Error marking notifications as read', 'error');
                 });
-            }
+            });
         }
 
         function filterNotifications(filter) {
@@ -191,36 +190,65 @@
             // Update filter buttons
             var filterButtons = document.querySelectorAll('.filter-btn');
             for (var i = 0; i < filterButtons.length; i++) {
-                filterButtons[i].classList.remove('active');
+                var btn = filterButtons[i];
+                btn.classList.remove('bg-primary', 'text-white');
+                btn.classList.add('bg-gray-100', 'text-gray-600');
             }
             
             var activeButton = document.querySelector('[data-filter="' + filter + '"]');
             if (activeButton) {
-                activeButton.classList.add('active');
+                activeButton.classList.remove('bg-gray-100', 'text-gray-600');
+                activeButton.classList.add('bg-primary', 'text-white');
             }
             
-            // Filter notifications
+            // Filter and display notifications
             displayNotifications(allNotifications, filter);
         }
 
         function loadNotifications() {
-            fetch('/api/notifications')
-                .then(function(response) {
-                    return response.json();
-                })
-                .then(function(data) {
-                    if (data.notifications) {
-                        allNotifications = data.notifications;
-                        displayNotifications(data.notifications, currentFilter);
-                        updateNotificationBadge(data.count || 0);
-                        document.getElementById('loading-state').style.display = 'none';
-                    }
-                })
-                .catch(function(error) {
-                    console.error('Error loading notifications:', error);
+            Promise.all([
+                fetch('/api/notifications').then(function(r) { return r.json(); }),
+                fetch('/api/notification-settings').then(function(r) { return r.json(); })
+            ])
+            .then(function(results) {
+                var notificationData = results[0];
+                notificationSettings = results[1];
+                
+                if (notificationData.notifications) {
+                    allNotifications = notificationData.notifications;
+                    
+                    // Add backup notification if needed and enabled
+                    addSystemNotifications();
+                    
+                    displayNotifications(allNotifications, currentFilter);
+                    updateNotificationBadge(getUnreadCount());
                     document.getElementById('loading-state').style.display = 'none';
-                    showNotification('Error loading notifications', 'error');
-                });
+                }
+            })
+            .catch(function(error) {
+                console.error('Error loading notifications:', error);
+                document.getElementById('loading-state').style.display = 'none';
+                showStyledNotification('Error loading notifications', 'error');
+            });
+        }
+
+        function addSystemNotifications() {
+            var backupEnabled = localStorage.getItem('emailBackupEnabled') === 'true';
+            
+            // Add backup notification if backup is disabled and backup alerts are enabled
+            if (!backupEnabled && notificationSettings.backup_alerts) {
+                var hasBackupNotification = allNotifications.some(function(n) { return n.type === 'backup'; });
+                if (!hasBackupNotification) {
+                    allNotifications.unshift({
+                        id: 'backup-local',
+                        type: 'backup',
+                        priority: 'medium',
+                        title: 'Backup Disabled',
+                        message: 'Enable backup to protect your business data from loss',
+                        time_ago: '2 days ago'
+                    });
+                }
+            }
         }
 
         function displayNotifications(notifications, filter) {
@@ -228,20 +256,35 @@
             var loadingState = document.getElementById('loading-state');
             var emptyState = document.getElementById('empty-state');
             
-            // Filter notifications
-            var filteredNotifications = notifications;
-            if (filter !== 'all') {
-                filteredNotifications = notifications.filter(function(notification) {
-                    return notification.type === filter;
-                });
+            // Filter notifications properly
+            var filteredNotifications = [];
+            for (var i = 0; i < notifications.length; i++) {
+                var notification = notifications[i];
+                var include = false;
+                
+                if (filter === 'all') {
+                    include = true;
+                } else if (filter === 'critical') {
+                    include = (notification.priority === 'urgent' || 
+                              notification.type === 'expiry' || 
+                              notification.type === 'critical');
+                } else if (filter === 'inventory') {
+                    include = (notification.type === 'inventory' || notification.type === 'expiry');
+                } else if (filter === 'payment') {
+                    include = (notification.type === 'payment');
+                }
+                
+                if (include) {
+                    filteredNotifications.push(notification);
+                }
             }
             
-            // Clear container except loading/empty states
-            var elementsToKeep = [loadingState, emptyState];
+            // Clear container content except fixed elements
             var children = Array.from(container.children);
-            for (var i = 0; i < children.length; i++) {
-                if (elementsToKeep.indexOf(children[i]) === -1) {
-                    container.removeChild(children[i]);
+            for (var j = 0; j < children.length; j++) {
+                var child = children[j];
+                if (child.id !== 'loading-state' && child.id !== 'empty-state') {
+                    container.removeChild(child);
                 }
             }
             
@@ -253,8 +296,8 @@
             }
             
             // Create notification elements
-            for (var j = 0; j < filteredNotifications.length; j++) {
-                var notification = filteredNotifications[j];
+            for (var k = 0; k < filteredNotifications.length; k++) {
+                var notification = filteredNotifications[k];
                 var notificationElement = createNotificationElement(notification);
                 container.appendChild(notificationElement);
             }
@@ -262,55 +305,19 @@
 
         function createNotificationElement(notification) {
             var div = document.createElement('div');
-            div.className = 'notification-item bg-white rounded-xl shadow-sm border-l-4 p-4 cursor-pointer';
+            div.className = 'notification-item bg-white rounded-xl shadow-sm border-l-4 p-4';
             div.setAttribute('data-type', notification.type);
             div.setAttribute('data-id', notification.id);
             
-            var borderColor = 'border-gray-300';
-            var iconBg = 'bg-gray-100';
-            var iconColor = 'text-gray-600';
-            var icon = 'fa-bell';
-            var badgeColor = 'bg-gray-500';
+            var colors = getNotificationColors(notification);
+            div.classList.add(colors.borderColor);
             
-            // Set colors and icons based on type and priority
-            if (notification.type === 'critical' || notification.priority === 'urgent') {
-                borderColor = 'border-danger';
-                iconBg = 'bg-danger/10';
-                iconColor = 'text-danger';
-                icon = 'fa-triangle-exclamation';
-                badgeColor = 'bg-danger';
-            } else if (notification.type === 'inventory') {
-                borderColor = 'border-secondary';
-                iconBg = 'bg-secondary/10';
-                iconColor = 'text-secondary';
-                icon = 'fa-box';
-                badgeColor = 'bg-secondary';
-            } else if (notification.type === 'payment') {
-                borderColor = 'border-primary';
-                iconBg = 'bg-primary/10';
-                iconColor = 'text-primary';
-                icon = 'fa-money-bill';
-                badgeColor = 'bg-primary';
-            } else if (notification.type === 'expiry') {
-                borderColor = 'border-danger';
-                iconBg = 'bg-danger/10';
-                iconColor = 'text-danger';
-                icon = 'fa-calendar-times';
-                badgeColor = 'bg-danger';
-            } else if (notification.type === 'backup' || notification.type === 'system') {
-                borderColor = 'border-accent';
-                iconBg = 'bg-accent/10';
-                iconColor = 'text-accent';
-                icon = 'fa-shield-exclamation';
-                badgeColor = 'bg-accent';
-            }
-            
-            div.classList.add(borderColor);
+            var actionButtons = getActionButtons(notification, colors.badgeColor);
             
             div.innerHTML = 
                 '<div class="flex items-start space-x-3">' +
-                    '<div class="' + iconBg + ' p-2 rounded-full">' +
-                        '<i class="fa-solid ' + icon + ' ' + iconColor + ' text-lg"></i>' +
+                    '<div class="' + colors.iconBg + ' p-2 rounded-full">' +
+                        '<i class="fa-solid ' + colors.icon + ' ' + colors.iconColor + ' text-lg"></i>' +
                     '</div>' +
                     '<div class="flex-1">' +
                         '<div class="flex items-start justify-between">' +
@@ -319,68 +326,124 @@
                                 '<p class="text-xs text-gray-600 mt-1">' + notification.message + '</p>' +
                                 '<p class="text-xs text-gray-400 mt-2">' + (notification.time_ago || 'Just now') + '</p>' +
                             '</div>' +
-                            '<span class="' + badgeColor + ' text-white text-xs px-2 py-1 rounded-full">' + 
+                            '<span class="' + colors.badgeColor + ' text-white text-xs px-2 py-1 rounded-full">' + 
                                 notification.priority.toUpperCase() + 
                             '</span>' +
                         '</div>' +
+                        actionButtons +
                     '</div>' +
                 '</div>';
-            
-            // Add click handler
-            div.onclick = function() {
-                handleNotificationClick(notification);
-            };
             
             return div;
         }
 
-        function handleNotificationClick(notification) {
-            // Mark as read first
-            markNotificationAsRead(notification.id);
-            
-            // Navigate based on type
-            if (notification.type === 'inventory' || notification.type === 'expiry') {
-                if (notification.type === 'expiry') {
-                    window.location.href = '/expiry-alert';
-                } else {
-                    window.location.href = '/low-stock';
-                }
+        function getNotificationColors(notification) {
+            if (notification.type === 'critical' || notification.priority === 'urgent' || notification.type === 'expiry') {
+                return {
+                    borderColor: 'border-danger',
+                    iconBg: 'bg-danger/10',
+                    iconColor: 'text-danger',
+                    icon: 'fa-triangle-exclamation',
+                    badgeColor: 'bg-danger'
+                };
+            } else if (notification.type === 'inventory') {
+                return {
+                    borderColor: 'border-secondary',
+                    iconBg: 'bg-secondary/10',
+                    iconColor: 'text-secondary',
+                    icon: 'fa-box',
+                    badgeColor: 'bg-secondary'
+                };
             } else if (notification.type === 'payment') {
-                if (notification.customer_id) {
-                    window.location.href = '/customer-ledger?customer_id=' + notification.customer_id;
-                } else {
-                    window.location.href = '/pending-credits';
-                }
+                return {
+                    borderColor: 'border-primary',
+                    iconBg: 'bg-primary/10',
+                    iconColor: 'text-primary',
+                    icon: 'fa-money-bill',
+                    badgeColor: 'bg-primary'
+                };
             } else if (notification.type === 'backup' || notification.type === 'system') {
-                window.location.href = '/profile';
-            } else {
-                window.location.href = '/dashboard';
+                return {
+                    borderColor: 'border-accent',
+                    iconBg: 'bg-accent/10',
+                    iconColor: 'text-accent',
+                    icon: 'fa-shield-exclamation',
+                    badgeColor: 'bg-accent'
+                };
+            } else if (notification.type === 'subscription') {
+                return {
+                    borderColor: 'border-secondary',
+                    iconBg: 'bg-secondary/10',
+                    iconColor: 'text-secondary',
+                    icon: 'fa-crown',
+                    badgeColor: 'bg-secondary'
+                };
+            }
+            
+            return {
+                borderColor: 'border-gray-300',
+                iconBg: 'bg-gray-100',
+                iconColor: 'text-gray-600',
+                icon: 'fa-bell',
+                badgeColor: 'bg-gray-500'
+            };
+        }
+
+        function getActionButtons(notification, badgeColor) {
+            if (notification.type === 'backup') {
+                return '<div class="mt-3 flex space-x-2">' +
+                    '<button class="bg-accent text-white px-3 py-1 rounded-lg text-xs font-medium" onclick="enableBackup(); event.stopPropagation();">' +
+                        'Enable Backup' +
+                    '</button>' +
+                    '<button class="bg-gray-200 text-gray-700 px-3 py-1 rounded-lg text-xs font-medium" onclick="dismissBackupNotification(); event.stopPropagation();">' +
+                        'Dismiss' +
+                    '</button>' +
+                '</div>';
+            } else if (notification.type === 'inventory' || notification.type === 'expiry') {
+                return '<div class="mt-3">' +
+                    '<button class="' + badgeColor + ' text-white px-3 py-1 rounded-lg text-xs font-medium" onclick="handleNotificationAction(\'' + notification.type + '\'); event.stopPropagation();">' +
+                        (notification.type === 'expiry' ? 'Remove Items' : 'View Items') +
+                    '</button>' +
+                '</div>';
+            } else if (notification.type === 'payment') {
+                return '<div class="mt-3">' +
+                    '<button class="' + badgeColor + ' text-white px-3 py-1 rounded-lg text-xs font-medium" onclick="handleNotificationAction(\'' + notification.type + '\'); event.stopPropagation();">' +
+                        'View Details' +
+                    '</button>' +
+                '</div>';
+            }
+            return '';
+        }
+
+        function enableBackup() {
+            showConfirmModal('Enable email backup to protect your business data?', function() {
+                localStorage.setItem('emailBackupEnabled', 'true');
+                loadNotifications();
+                showStyledNotification('Email backup enabled successfully!', 'success');
+            });
+        }
+
+        function dismissBackupNotification() {
+            showConfirmModal('Dismiss backup notification? You can enable it later in Profile settings.', function() {
+                allNotifications = allNotifications.filter(function(n) { return n.type !== 'backup'; });
+                displayNotifications(allNotifications, currentFilter);
+                updateNotificationBadge(getUnreadCount());
+                showStyledNotification('Backup notification dismissed', 'info');
+            });
+        }
+
+        function handleNotificationAction(type) {
+            if (type === 'inventory') {
+                window.location.href = '/low-stock';
+            } else if (type === 'expiry') {
+                window.location.href = '/expiry-alert';
+            } else if (type === 'payment') {
+                window.location.href = '/pending-credits';
             }
         }
 
-        function markNotificationAsRead(notificationId) {
-            fetch('/api/notifications/' + notificationId + '/mark-read', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            })
-            .then(function(response) {
-                return response.json();
-            })
-            .then(function(data) {
-                if (data.success) {
-                    // Update badge count
-                    var badge = document.getElementById('notification-badge');
-                    var currentCount = parseInt(badge.textContent) || 0;
-                    if (currentCount > 0) {
-                        badge.textContent = currentCount - 1;
-                    }
-                }
-            })
-            .catch(function(error) {
-                console.error('Error marking notification as read:', error);
-            });
+        function getUnreadCount() {
+            return allNotifications.length;
         }
 
         function updateNotificationBadge(count) {
@@ -391,41 +454,36 @@
             }
         }
 
-        function showNotification(message, type) {
-            // Simple alert for now - can be enhanced with custom toast
-            alert(message);
+        function showStyledNotification(message, type) {
+            var toast = document.getElementById('notification-toast');
+            var toastMessage = document.getElementById('toast-message');
+            
+            toastMessage.textContent = message;
+            toast.classList.remove('hidden');
+            
+            setTimeout(function() {
+                toast.style.transform = 'translateY(0)';
+                toast.style.opacity = '1';
+            }, 100);
+            
+            setTimeout(function() {
+                toast.style.transform = 'translateY(-100%)';
+                toast.style.opacity = '0';
+                setTimeout(function() {
+                    toast.classList.add('hidden');
+                }, 300);
+            }, 3000);
         }
 
-        // Check backup status and create notification if needed
-        function checkBackupStatus() {
-            var backupEnabled = localStorage.getItem('emailBackupEnabled') === 'true';
-            if (!backupEnabled) {
-                // This would normally come from the backend
-                var backupNotification = {
-                    id: 'backup-local',
-                    type: 'backup',
-                    priority: 'medium',
-                    title: 'Backup Disabled',
-                    message: 'Enable backup to protect your business data from loss',
-                    time_ago: '2 days ago'
-                };
-                
-                // Add to notifications if not already present
-                var hasBackupNotification = allNotifications.some(function(n) {
-                    return n.type === 'backup';
-                });
-                
-                if (!hasBackupNotification) {
-                    allNotifications.unshift(backupNotification);
-                    displayNotifications(allNotifications, currentFilter);
-                }
+        function showConfirmModal(message, onConfirm) {
+            if (confirm(message)) {
+                onConfirm();
             }
         }
 
         // Initialize page
         document.addEventListener('DOMContentLoaded', function() {
             loadNotifications();
-            checkBackupStatus();
             
             // Auto-refresh notifications every 30 seconds
             setInterval(loadNotifications, 30000);
