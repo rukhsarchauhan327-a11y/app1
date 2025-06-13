@@ -331,90 +331,69 @@
             cartModal.classList.add('hidden');
         });
 
-        // Add to cart functionality for weight-based products
+        // Add to cart functionality for weight-based products (RECREATED)
         const addCartBtn = document.getElementById('add-cart-btn');
         addCartBtn.addEventListener('click', () => {
-            const productData = {
+            const selectedMethod = document.querySelector('input[name="inputMethod"]:checked')?.value || 'quantity';
+            
+            let cartItem = {
                 id: productId,
                 name: productName,
                 image: productImage,
-                sellingPrice: unitPrice,
-                unit: 'kg',
                 type: 'weight-based',
-                stock: maxStock,
+                addedAt: new Date().toISOString(),
                 mfgDate: mfgDate,
                 expDate: expDate
             };
 
-            const selectedMethod = document.querySelector('input[name="inputMethod"]:checked')?.value || 'quantity';
-            let cartItem = {
-                id: productData.id,
-                name: productData.name,
-                image: productData.image,
-                unitPrice: productData.sellingPrice,
-                unit: productData.unit,
-                type: productData.type,
-                addedAt: new Date().toISOString()
-            };
-
             if (selectedMethod === 'quantity') {
-                const weight = parseFloat(quantityInput.value) || 0;
-                const unit = unitSelect.value;
-                const weightInKg = unit === 'gm' ? weight / 1000 : weight;
+                const inputWeight = parseFloat(quantityInput.value) || 0;
+                const inputUnit = unitSelect.value;
+                const finalWeightKg = inputUnit === 'gm' ? inputWeight / 1000 : inputWeight;
                 
-                cartItem.quantity = weightInKg;
-                // Preserve the exact input format for display
-                cartItem.quantityDisplay = `${weight.toFixed(unit === 'kg' ? 3 : 0)} ${unit}`;
-                cartItem.totalPrice = weightInKg * productData.sellingPrice;
-                cartItem.pricePerKg = productData.sellingPrice;
+                // Calculate the total price: weight × price per kg
+                const calculatedPrice = finalWeightKg * unitPrice;
                 
-                // Debug logging for price calculation
-                console.log('Price calculation debug:', {
-                    weight: weight,
-                    unit: unit,
-                    weightInKg: weightInKg,
-                    sellingPrice: productData.sellingPrice,
-                    totalPrice: cartItem.totalPrice,
-                    quantityDisplay: cartItem.quantityDisplay
+                cartItem.quantity = finalWeightKg;
+                cartItem.quantityDisplay = `${inputWeight.toFixed(inputUnit === 'kg' ? 3 : 0)} ${inputUnit}`;
+                cartItem.price = calculatedPrice;
+                cartItem.totalPrice = calculatedPrice;
+                cartItem.unitPrice = unitPrice;
+                
+                console.log('RECREATED: Weight-based cart calculation:', {
+                    inputWeight: inputWeight,
+                    inputUnit: inputUnit,
+                    finalWeightKg: finalWeightKg,
+                    unitPricePerKg: unitPrice,
+                    calculatedPrice: calculatedPrice
                 });
             } else {
-                const price = parseFloat(priceInput.value) || 0;
-                const weightInKg = price / productData.sellingPrice;
+                const inputPrice = parseFloat(priceInput.value) || 0;
+                const calculatedWeight = inputPrice / unitPrice;
                 
-                cartItem.quantity = weightInKg;
-                // Show weight calculated from price with proper formatting
-                if (weightInKg >= 1) {
-                    cartItem.quantityDisplay = `${weightInKg.toFixed(3)} kg`;
-                } else {
-                    cartItem.quantityDisplay = `${(weightInKg * 1000).toFixed(0)} gm`;
-                }
-                cartItem.totalPrice = price;
-                cartItem.pricePerKg = productData.sellingPrice;
+                cartItem.quantity = calculatedWeight;
+                cartItem.quantityDisplay = calculatedWeight >= 1 ? 
+                    `${calculatedWeight.toFixed(3)} kg` : 
+                    `${(calculatedWeight * 1000).toFixed(0)} gm`;
+                cartItem.price = inputPrice;
+                cartItem.totalPrice = inputPrice;
+                cartItem.unitPrice = unitPrice;
             }
-
-            // Add manufacturing and expiry dates if available
-            cartItem.mfgDate = productData.mfgDate || '';
-            cartItem.expDate = productData.expDate || '';
-            cartItem.price = cartItem.totalPrice;
-            cartItem.unitPrice = productData.sellingPrice;
             
-            // Save to localStorage using the same system as inventory
-            let existingCart = JSON.parse(localStorage.getItem('kiranakonnect_cart') || '[]');
+            // Clear any existing cart data to prevent interference
+            let currentCart = JSON.parse(localStorage.getItem('kiranakonnect_cart') || '[]');
             
-            // Check if same product already exists
-            const existingIndex = existingCart.findIndex(item => item.id === cartItem.id);
+            // Find if this exact product already exists
+            const existingIndex = currentCart.findIndex(item => item.id === cartItem.id);
             if (existingIndex > -1) {
-                // Update existing item
-                existingCart[existingIndex].quantity += cartItem.quantity;
-                existingCart[existingIndex].totalPrice = existingCart[existingIndex].quantity * existingCart[existingIndex].unitPrice;
-                existingCart[existingIndex].price = existingCart[existingIndex].totalPrice;
-                existingCart[existingIndex].quantityDisplay = updateQuantityDisplay(existingCart[existingIndex]);
+                // Replace the existing item completely
+                currentCart[existingIndex] = cartItem;
             } else {
-                // Add new item
-                existingCart.push(cartItem);
+                // Add as new item
+                currentCart.push(cartItem);
             }
             
-            localStorage.setItem('kiranakonnect_cart', JSON.stringify(existingCart));
+            localStorage.setItem('kiranakonnect_cart', JSON.stringify(currentCart));
             
             showNotification(`Added ${cartItem.quantityDisplay} of ${cartItem.name} to cart!`, 'success');
             cartModal.classList.add('hidden');

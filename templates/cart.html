@@ -1132,81 +1132,28 @@
             }
         };
 
-        // Direct cart addition function using exact HTML structure
+        // RECREATED: Simplified cart addition function
         function addNewItemToCart(newItem) {
-            // Check if item already exists in cart
-            const existingItemId = Object.keys(cartItems).find(id => 
-                cartItems[id].name === newItem.name && 
-                cartItems[id].unitPrice === newItem.unitPrice
-            );
-            
-            if (existingItemId) {
-                // Update existing item quantity instead of adding duplicate
-                const existingItem = cartItems[existingItemId];
-                existingItem.quantity += newItem.quantity;
-                existingItem.price = existingItem.quantity * existingItem.unitPrice;
-                
-                // Update the display preserving weight format
-                const quantityElement = document.getElementById(`quantity-${existingItemId}`);
-                const priceElement = document.getElementById(`price-${existingItemId}`);
-                if (quantityElement) {
-                    let displayText;
-                    if (existingItem.type === 'weight-based') {
-                        // Use the quantityDisplay if available, otherwise calculate
-                        displayText = newItem.quantityDisplay || (existingItem.quantity >= 1 ? 
-                            `${existingItem.quantity.toFixed(3)} kg` : 
-                            `${(existingItem.quantity * 1000).toFixed(0)} gm`);
-                    } else {
-                        displayText = `${existingItem.quantity} ${existingItem.unit}`;
-                    }
-                    quantityElement.textContent = displayText;
-                }
-                if (priceElement) priceElement.textContent = `₹${existingItem.price.toFixed(2)}`;
-                
-                calculateTotals();
-                console.log(`Updated existing item ${newItem.name} quantity to ${existingItem.quantity}`);
-                return existingItemId;
-            }
+            console.log('RECREATED: Adding item to cart:', newItem);
             
             const nextItemId = Math.max(...Object.keys(cartItems).map(k => parseInt(k)), 0) + 1;
             
-            // Ensure proper price calculation for weight-based items
-            let finalPrice = newItem.totalPrice || newItem.price;
-            let finalUnitPrice = newItem.unitPrice || newItem.pricePerKg;
-            
-            // Debug logging for cart price calculation
-            console.log('Cart item debug:', {
-                name: newItem.name,
-                quantity: newItem.quantity,
-                totalPrice: newItem.totalPrice,
-                price: newItem.price,
-                unitPrice: newItem.unitPrice,
-                pricePerKg: newItem.pricePerKg,
-                type: newItem.type,
-                finalPrice: finalPrice,
-                finalUnitPrice: finalUnitPrice
-            });
-            
-            // For weight-based items, use the totalPrice directly (already calculated correctly)
-            if (newItem.type === 'weight-based') {
-                finalPrice = newItem.totalPrice || newItem.price;
-                console.log('Using direct weight-based price:', finalPrice);
-            }
-            
-            // Add to cartItems data
+            // Use the exact values from the weight-based product without any modification
             cartItems[nextItemId] = {
                 id: nextItemId,
                 name: newItem.name,
-                price: finalPrice,
+                price: newItem.price, // Use exact price from product page
                 quantity: newItem.quantity,
-                unit: newItem.unit,
-                unitPrice: finalUnitPrice,
+                unit: newItem.unit || 'kg',
+                unitPrice: newItem.unitPrice,
                 type: newItem.type || 'unit',
-                mfgDate: newItem.mfgDate,
-                expDate: newItem.expDate,
+                mfgDate: newItem.mfgDate || '',
+                expDate: newItem.expDate || '',
                 datesHidden: false,
                 quantityDisplay: newItem.quantityDisplay
             };
+            
+            console.log('RECREATED: Cart item added:', cartItems[nextItemId]);
             
             // Create HTML exactly like existing cart items
             const cartContainer = document.getElementById('cart-items');
@@ -1223,13 +1170,10 @@
             return nextItemId;
         }
         
-        // Create exact HTML structure matching existing cart items
+        // RECREATED: Create cart item HTML with exact values
         function createExactCartItemHTML(itemId, item) {
-            // Use the exact quantityDisplay provided, don't override it
             const quantityDisplay = item.quantityDisplay || `${item.quantity} ${item.unit}`;
-            
-            // Use the already calculated total price for weight-based items
-            let totalPrice = item.totalPrice || item.price;
+            const displayPrice = item.price; // Use exact price without modification
             
             let dateSection = '';
             if (item.mfgDate && item.expDate && item.mfgDate !== '' && item.expDate !== '') {
@@ -1271,7 +1215,7 @@
                     <h3 class="font-semibold text-dark text-sm">${item.name}</h3>
                     <div class="flex justify-between items-center mt-1">
                         <span class="text-sm text-gray-700 font-medium" id="quantity-${itemId}">${quantityDisplay}</span>
-                        <span class="text-lg font-bold text-primary" id="price-${itemId}">₹${totalPrice}</span>
+                        <span class="text-lg font-bold text-primary" id="price-${itemId}">₹${displayPrice.toFixed(2)}</span>
                     </div>${dateSection}
                 </div>
                 <button class="text-danger text-sm ml-3 p-1" onclick="removeItem(${itemId})">
