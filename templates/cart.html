@@ -1770,6 +1770,39 @@
             saveEditedItem();
         }
 
+        function renderCartItems() {
+            const cartContainer = document.getElementById('cart-items');
+            if (!cartContainer) return;
+            
+            // Clear existing content completely
+            cartContainer.innerHTML = '';
+            
+            // Render each cart item
+            Object.values(cartItems).forEach(item => {
+                const itemHTML = createExactCartItemHTML(item.id, item);
+                cartContainer.insertAdjacentHTML('beforeend', itemHTML);
+            });
+            
+            // Add single "Add More Items" button at the end
+            const addItemsHTML = `
+                <div id="add-items-section" class="py-4">
+                    <button class="w-full bg-blue-500 text-white py-3 rounded-xl font-medium text-sm flex items-center justify-center space-x-2 hover:bg-blue-600 transition-colors" onclick="addMoreItems()">
+                        <i class="fa-solid fa-plus text-white"></i>
+                        <span>Add More Items to Cart</span>
+                    </button>
+                </div>
+            `;
+            cartContainer.insertAdjacentHTML('beforeend', addItemsHTML);
+            
+            // Initialize date toggles after rendering
+            setTimeout(() => {
+                initializeDateToggles();
+                calculateTotals();
+            }, 100);
+            
+            console.log('Cart rendered with', Object.keys(cartItems).length, 'items and single Add More button');
+        }
+
 
 
         function editDecreaseQuantity() {
@@ -2165,37 +2198,10 @@
                         };
                     }
                     
-                    // Load existing cart data from persistent storage
-                    const persistentData = localStorage.getItem('kiranakonnect_persistent_cart');
-                    if (persistentData) {
-                        try {
-                            const savedItems = JSON.parse(persistentData);
-                            savedItems.forEach((item, index) => {
-                                const itemId = index + 1;
-                                cartItems[itemId] = {
-                                    id: itemId,
-                                    name: item.name,
-                                    price: item.price,
-                                    quantity: item.quantity,
-                                    unit: item.unit || 'piece',
-                                    unitPrice: item.unitPrice,
-                                    type: item.type || 'unit',
-                                    mfgDate: item.mfgDate || '',
-                                    expDate: item.expDate || '',
-                                    datesHidden: false,
-                                    quantityDisplay: item.quantityDisplay
-                                };
-                            });
-                            console.log('Loaded persistent cart items:', cartItems);
-                        } catch (error) {
-                            console.error('Error loading persistent cart:', error);
-                        }
-                    }
+                    // Clear old localStorage data to prevent structure conflicts
+                    localStorage.removeItem('kiranakonnect_persistent_cart');
                     
-                    // Only load new items from inventory (disable duplicate loading)
-                    loadCartItems();
-                    
-                    // Render loaded cart items
+                    // Render cart items dynamically to prevent duplicates
                     renderCartItems();
                     
                     // Set up periodic check for new items from inventory
