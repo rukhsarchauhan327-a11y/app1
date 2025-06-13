@@ -932,11 +932,6 @@
         }
 
         // Filter and category functions
-        function filterBy(status) {
-            currentFilter = status;
-            applyFilters();
-        }
-        
         function filterItems(status) {
             currentFilter = status;
             applyFilters();
@@ -954,7 +949,7 @@
                 const statusMatch = currentFilter === 'all' || 
                     (currentFilter === 'available' && !product.is_expired && !product.is_low_stock) ||
                     (currentFilter === 'low' && product.is_low_stock) ||
-                    (currentFilter === 'expiring' && product.is_expired);
+                    (currentFilter === 'expired' && product.is_expired);
                 
                 const categoryMatch = currentCategory === 'all' || 
                     product.category.toLowerCase() === currentCategory.toLowerCase();
