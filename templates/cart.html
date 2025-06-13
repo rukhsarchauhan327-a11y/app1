@@ -45,6 +45,27 @@
       .fa, .fas, .far, .fal, .fab {
         font-family: "Font Awesome 6 Free", "Font Awesome 6 Brands" !important;
       }
+      
+      .edit-button {
+        position: absolute;
+        z-index: 1000;
+        top: 8px;
+        right: 40px;
+        background: rgba(255, 255, 255, 0.9);
+        border: 1px solid #e5e7eb;
+        border-radius: 6px;
+        padding: 4px 8px;
+        font-size: 11px;
+        color: #4CAF50;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+      
+      .edit-button:hover {
+        background: #4CAF50;
+        color: white;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      }
     </style>
     <style>
       ::-webkit-scrollbar {
@@ -453,12 +474,15 @@
 
             cartItems.forEach((item, index) => {
                 const itemDiv = document.createElement('div');
-                itemDiv.className = 'bg-white rounded-xl shadow-sm p-3';
+                itemDiv.className = 'bg-white rounded-xl shadow-sm p-3 relative';
                 itemDiv.id = `cart-item-${item.id}`;
                 
                 let html = `
+                    <button class="edit-button" onclick="editItem(${index})">
+                        <i class="fa-solid fa-edit mr-1"></i>Edit
+                    </button>
                     <div class="flex items-start justify-between">
-                        <div class="flex-1">
+                        <div class="flex-1 pr-20">
                             <h3 class="font-semibold text-dark text-sm">${item.name}</h3>
                             <div class="flex justify-between items-center mt-1">
                                 <span class="text-sm text-gray-700 font-medium">${item.quantity} ${item.unit}</span>
@@ -477,24 +501,9 @@
                                     <i class="fa-solid fa-clock mr-1"></i>
                                     <span>EXP: ${item.expDate}</span>
                                 </div>
-                                <div class="flex items-center space-x-3 mt-2">
-                                    <button class="text-xs text-primary hover:underline flex items-center font-medium" onclick="editItem(${index})">
-                                        <i class="fa-solid fa-edit mr-1"></i>
-                                        Edit
-                                    </button>
-                                    <button class="text-xs text-danger hover:underline flex items-center" onclick="removeDates(${index})">
-                                        <i class="fa-solid fa-times mr-1"></i>
-                                        Remove Dates
-                                    </button>
-                                </div>
-                            </div>
-                    `;
-                } else {
-                    html += `
-                            <div class="mt-2">
-                                <button class="text-xs text-primary hover:underline flex items-center font-medium" onclick="editItem(${index})">
-                                    <i class="fa-solid fa-edit mr-1"></i>
-                                    Edit
+                                <button class="text-xs text-danger hover:underline flex items-center mt-1" onclick="removeDates(${index})">
+                                    <i class="fa-solid fa-times mr-1"></i>
+                                    Remove Dates
                                 </button>
                             </div>
                     `;
