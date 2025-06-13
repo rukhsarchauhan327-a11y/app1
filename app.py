@@ -210,6 +210,11 @@ def customer_ledger():
     """Serve the customer ledger page"""
     return render_template('customer_ledger.html')
 
+@app.route('/notifications')
+def notifications():
+    """Serve the notifications page"""
+    return render_template('notifications.html')
+
 @app.route('/receipt')
 def receipt():
     """Serve the receipt page"""
