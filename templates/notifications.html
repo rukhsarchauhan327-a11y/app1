@@ -311,16 +311,10 @@
             var colors = getNotificationColors(notification);
             div.classList.add(colors.borderColor);
             
-            // Special handling for backup notifications
-            if (notification.type === 'backup') {
-                div.onclick = function() {
-                    showBackupPrompt();
-                };
-            } else {
-                div.onclick = function() {
-                    handleNotificationClick(notification.type);
-                };
-            }
+            // Make notification clickable - navigate to relevant page
+            div.onclick = function() {
+                handleNotificationClick(notification.type);
+            };
             
             div.innerHTML = 
                 '<div class="flex items-start space-x-3">' +
@@ -404,7 +398,7 @@
             } else if (type === 'payment') {
                 window.location.href = '/pending-credits';
             } else if (type === 'backup') {
-                showBackupPrompt();
+                window.location.href = '/profile?highlight=backup';
             } else if (type === 'subscription') {
                 window.location.href = '/pricing';
             } else {
@@ -412,100 +406,7 @@
             }
         }
 
-        function showBackupPrompt() {
-            var modal = document.createElement('div');
-            modal.className = 'fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4';
-            modal.id = 'backup-prompt-modal';
-            
-            modal.innerHTML = 
-                '<div class="bg-white rounded-xl p-6 w-full max-w-md">' +
-                    '<div class="text-center">' +
-                        '<div class="bg-accent/10 p-3 rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center">' +
-                            '<i class="fa-solid fa-shield-exclamation text-accent text-2xl"></i>' +
-                        '</div>' +
-                        '<h3 class="text-lg font-bold text-dark mb-2">Enable Data Backup</h3>' +
-                        '<p class="text-gray-600 text-sm mb-6">Protect your business data from loss by enabling automatic email backup. Your data will be safely stored and can be recovered if needed.</p>' +
-                        '<div class="flex space-x-3">' +
-                            '<button onclick="dismissBackupPrompt()" class="flex-1 bg-gray-200 text-gray-700 py-3 px-4 rounded-lg font-medium hover:bg-gray-300">' +
-                                'Maybe Later' +
-                            '</button>' +
-                            '<button onclick="enableBackupFromPrompt()" class="flex-1 bg-accent text-white py-3 px-4 rounded-lg font-medium hover:bg-accent/90">' +
-                                'Enable Backup' +
-                            '</button>' +
-                        '</div>' +
-                    '</div>' +
-                '</div>';
-            
-            document.body.appendChild(modal);
-        }
 
-        function enableBackupFromPrompt() {
-            localStorage.setItem('emailBackupEnabled', 'true');
-            
-            // Call backend API to enable backup
-            fetch('/api/backup/enable', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            })
-            .then(function(response) {
-                return response.json();
-            })
-            .then(function(data) {
-                if (data.success) {
-                    closeBackupPrompt();
-                    showToast('Email backup enabled successfully!', 'success');
-                    loadNotifications(); // Refresh to remove backup notification
-                } else {
-                    showToast('Error enabling backup', 'error');
-                }
-            })
-            .catch(function(error) {
-                console.error('Error enabling backup:', error);
-                closeBackupPrompt();
-                showToast('Email backup enabled successfully!', 'success');
-                loadNotifications();
-            });
-        }
-
-        function dismissBackupPrompt() {
-            closeBackupPrompt();
-            showToast('You can enable backup later in Profile settings', 'info');
-        }
-
-        function closeBackupPrompt() {
-            var modal = document.getElementById('backup-prompt-modal');
-            if (modal) {
-                document.body.removeChild(modal);
-            }
-        }
-
-        function showToast(message, type) {
-            var toast = document.getElementById('notification-toast');
-            var toastMessage = document.getElementById('toast-message');
-            
-            if (!toast || !toastMessage) {
-                alert(message); // Fallback if toast elements not found
-                return;
-            }
-            
-            toastMessage.textContent = message;
-            
-            if (type === 'success') {
-                toast.className = 'fixed top-20 left-4 right-4 bg-white border-l-4 border-primary shadow-lg rounded-lg p-4 transform translate-y-0 opacity-100 transition-all duration-300 z-50';
-            } else if (type === 'info') {
-                toast.className = 'fixed top-20 left-4 right-4 bg-white border-l-4 border-secondary shadow-lg rounded-lg p-4 transform translate-y-0 opacity-100 transition-all duration-300 z-50';
-            } else if (type === 'error') {
-                toast.className = 'fixed top-20 left-4 right-4 bg-white border-l-4 border-danger shadow-lg rounded-lg p-4 transform translate-y-0 opacity-100 transition-all duration-300 z-50';
-            }
-            
-            toast.classList.remove('hidden');
-            
-            setTimeout(function() {
-                toast.classList.add('hidden');
-            }, 3000);
-        }
 
         function getUnreadCount() {
             return allNotifications.length;

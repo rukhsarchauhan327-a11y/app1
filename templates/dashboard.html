@@ -115,7 +115,7 @@
                 </div>
             </div>
             
-            <div id="backup-notification" class="p-4 border-b hover:bg-gray-50 cursor-pointer" onclick="showDashboardBackupPrompt()" style="display: none;">
+            <div id="backup-notification" class="p-4 border-b hover:bg-gray-50 cursor-pointer" onclick="window.location.href='/profile?highlight=backup'" style="display: none;">
                 <div class="flex items-start space-x-3">
                     <div class="bg-orange-100 p-2 rounded-full">
                         <i class="fa-solid fa-shield-exclamation text-orange-600 text-sm"></i>
@@ -743,78 +743,7 @@
             }
         }
 
-        // Dashboard backup prompt functions
-        function showDashboardBackupPrompt() {
-            var modal = document.createElement('div');
-            modal.className = 'fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4';
-            modal.id = 'dashboard-backup-modal';
-            
-            modal.innerHTML = 
-                '<div class="bg-white rounded-xl p-6 w-full max-w-md">' +
-                    '<div class="text-center">' +
-                        '<div class="bg-accent/10 p-3 rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center">' +
-                            '<i class="fa-solid fa-shield-exclamation text-accent text-2xl"></i>' +
-                        '</div>' +
-                        '<h3 class="text-lg font-bold text-dark mb-2">Enable Data Backup</h3>' +
-                        '<p class="text-gray-600 text-sm mb-6">Protect your business data from loss by enabling automatic email backup. Your data will be safely stored and can be recovered if needed.</p>' +
-                        '<div class="flex space-x-3">' +
-                            '<button onclick="dismissDashboardBackup()" class="flex-1 bg-gray-200 text-gray-700 py-3 px-4 rounded-lg font-medium hover:bg-gray-300">' +
-                                'Maybe Later' +
-                            '</button>' +
-                            '<button onclick="enableDashboardBackup()" class="flex-1 bg-accent text-white py-3 px-4 rounded-lg font-medium hover:bg-accent/90">' +
-                                'Enable Backup' +
-                            '</button>' +
-                        '</div>' +
-                    '</div>' +
-                '</div>';
-            
-            document.body.appendChild(modal);
-            
-            // Close dropdown when modal opens
-            document.getElementById('notification-dropdown').classList.add('hidden');
-        }
 
-        function enableDashboardBackup() {
-            localStorage.setItem('emailBackupEnabled', 'true');
-            
-            // Call backend API to enable backup
-            fetch('/api/backup/enable', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            })
-            .then(function(response) {
-                return response.json();
-            })
-            .then(function(data) {
-                if (data.success) {
-                    closeDashboardBackupModal();
-                    updateNotificationCount(); // Refresh to remove backup notification
-                    showStyledNotification('Email backup enabled successfully!', 'success');
-                } else {
-                    showStyledNotification('Error enabling backup', 'error');
-                }
-            })
-            .catch(function(error) {
-                console.error('Error enabling backup:', error);
-                closeDashboardBackupModal();
-                updateNotificationCount();
-                showStyledNotification('Email backup enabled successfully!', 'success');
-            });
-        }
-
-        function dismissDashboardBackup() {
-            closeDashboardBackupModal();
-            showStyledNotification('You can enable backup later in Profile settings', 'info');
-        }
-
-        function closeDashboardBackupModal() {
-            var modal = document.getElementById('dashboard-backup-modal');
-            if (modal) {
-                document.body.removeChild(modal);
-            }
-        }
 
         // Notification dropdown toggle
         document.getElementById('notification-bell').addEventListener('click', function() {
