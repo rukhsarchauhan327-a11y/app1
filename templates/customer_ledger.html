@@ -54,100 +54,347 @@
                 <i class="fa-solid fa-arrow-left text-gray-600 text-lg"></i>
             </button>
             <div class="text-center">
-                <h1 class="text-lg font-semibold text-dark">Customer Ledger</h1>
-                <p class="text-xs text-gray-500">Rajesh Kumar</p>
+                <h1 class="text-lg font-semibold text-dark">Udhar Ledger</h1>
+                <p class="text-xs text-gray-500">Outstanding Credits</p>
             </div>
-            <button class="p-2 hover:bg-gray-100 rounded-lg">
-                <i class="fa-solid fa-plus text-gray-600 text-lg"></i>
+            <button onclick="showAddPaymentModal()" class="p-2 hover:bg-gray-100 rounded-lg">
+                <i class="fa-solid fa-rupee-sign text-gray-600 text-lg"></i>
             </button>
         </div>
     </header>
 
     <!-- Main Content -->
     <main class="pt-16 pb-20 bg-gray-50">
-        <!-- Customer Summary Card -->
+        <!-- Summary Card -->
         <div class="px-4 py-4">
             <div class="bg-white rounded-lg p-4 shadow-sm border border-gray-100">
-                <div class="flex items-center space-x-3 mb-4">
-                    <div class="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center">
-                        <span class="text-white font-bold text-lg">RK</span>
-                    </div>
-                    <div class="flex-1">
-                        <h2 class="text-lg font-bold text-dark">Rajesh Kumar</h2>
-                        <p class="text-sm text-gray-600">+91 98765 43210</p>
+                <div class="flex items-center justify-between mb-4">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-12 h-12 bg-accent/10 rounded-full flex items-center justify-center">
+                            <i class="fa-solid fa-credit-card text-accent text-xl"></i>
+                        </div>
+                        <div>
+                            <h2 class="text-lg font-bold text-dark">Udhar Summary</h2>
+                            <p class="text-sm text-gray-600" id="summary-subtitle">Loading...</p>
+                        </div>
                     </div>
                 </div>
                 
                 <div class="grid grid-cols-2 gap-3">
                     <div class="text-center p-3 bg-red-50 rounded-lg">
-                        <p class="text-xl font-bold text-red-600">₹2,150</p>
+                        <p class="text-xl font-bold text-red-600" id="total-outstanding">₹0</p>
                         <p class="text-xs text-red-500">Total Outstanding</p>
                     </div>
-                    <div class="text-center p-3 bg-green-50 rounded-lg">
-                        <p class="text-xl font-bold text-green-600">₹800</p>
-                        <p class="text-xs text-green-500">Cash Advanced</p>
+                    <div class="text-center p-3 bg-blue-50 rounded-lg">
+                        <p class="text-xl font-bold text-blue-600" id="customers-count">0</p>
+                        <p class="text-xs text-blue-500">Customers with Credit</p>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Filter Section -->
+        <!-- Search & Filter Section -->
         <div class="px-4 mb-4">
             <div class="bg-white rounded-lg p-3 shadow-sm border border-gray-100">
-                <div class="flex items-center justify-between mb-3">
-                    <h3 class="font-medium text-dark">Filter Transactions</h3>
-                    <button id="clear-filters" class="text-xs text-gray-500">Clear All</button>
+                <div class="flex items-center space-x-3 mb-3">
+                    <div class="flex-1 relative">
+                        <i class="fa-solid fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                        <input type="text" id="customer-search" placeholder="Search customers..." 
+                               class="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/20">
+                    </div>
+                    <button onclick="refreshCustomers()" class="p-2 text-gray-500 hover:text-primary">
+                        <i class="fa-solid fa-refresh"></i>
+                    </button>
                 </div>
                 <div class="flex space-x-2 overflow-x-auto">
                     <button class="filter-btn active px-3 py-1 bg-primary text-white text-sm rounded-full whitespace-nowrap" data-filter="all">All</button>
-                    <button class="filter-btn px-3 py-1 bg-gray-200 text-gray-600 text-sm rounded-full whitespace-nowrap" data-filter="purchase">Purchases</button>
-                    <button class="filter-btn px-3 py-1 bg-gray-200 text-gray-600 text-sm rounded-full whitespace-nowrap" data-filter="payment">Payments</button>
-                    <button class="filter-btn px-3 py-1 bg-gray-200 text-gray-600 text-sm rounded-full whitespace-nowrap" data-filter="cash-advance">Cash Advance</button>
-                    <button class="filter-btn px-3 py-1 bg-gray-200 text-gray-600 text-sm rounded-full whitespace-nowrap" data-filter="split">Split Payment</button>
+                    <button class="filter-btn px-3 py-1 bg-gray-200 text-gray-600 text-sm rounded-full whitespace-nowrap" data-filter="high">High (>₹1000)</button>
+                    <button class="filter-btn px-3 py-1 bg-gray-200 text-gray-600 text-sm rounded-full whitespace-nowrap" data-filter="medium">Medium (₹500-1000)</button>
+                    <button class="filter-btn px-3 py-1 bg-gray-200 text-gray-600 text-sm rounded-full whitespace-nowrap" data-filter="low">Low (<₹500)</button>
                 </div>
             </div>
         </div>
 
-        <!-- Ledger Entries -->
-        <div class="px-4 space-y-3">
-            <!-- Purchase Entry -->
-            <div class="transaction-entry bg-white rounded-lg p-4 shadow-sm border-l-4 border-red-400" data-type="purchase">
-                <div class="flex items-start justify-between mb-3">
-                    <div class="flex-1">
-                        <div class="flex items-center space-x-2 mb-1">
-                            <i class="fa-solid fa-shopping-cart text-red-500 text-sm"></i>
-                            <h3 class="font-semibold text-dark">Purchase - Bill #001234</h3>
-                        </div>
-                        <p class="text-xs text-gray-500">Today, 2:30 PM</p>
-                        <div class="flex items-center space-x-1 mt-1">
-                            <i class="fa-solid fa-user text-gray-400 text-xs"></i>
-                            <p class="text-xs text-gray-600">Served by: Anil Kumar</p>
-                        </div>
-                    </div>
-                    <div class="text-right">
-                        <p class="font-bold text-red-600">₹450</p>
-                        <span class="text-xs bg-red-100 text-red-600 px-2 py-1 rounded">Credit</span>
-                    </div>
+        <!-- Customer List -->
+        <div class="px-4 space-y-3" id="customers-list">
+            <!-- Customers with outstanding balances will be loaded here -->
+            <div id="loading-indicator" class="text-center py-8">
+                <i class="fa-solid fa-spinner fa-spin text-gray-400 text-2xl mb-2"></i>
+                <p class="text-gray-500">Loading customers...</p>
+            </div>
+        </div>
+
+        <!-- No Customers Message -->
+        <div id="no-customers-message" class="hidden px-4 py-8 text-center">
+            <i class="fa-solid fa-credit-card text-gray-300 text-4xl mb-3"></i>
+            <h3 class="text-lg font-semibold text-gray-600 mb-2">No Outstanding Credits</h3>
+            <p class="text-gray-500 text-sm">All customers have cleared their dues!</p>
+        </div>
+    </main>
+
+    <!-- Payment Collection Modal -->
+    <div id="payment-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-xl p-6 w-full max-w-md">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-bold text-dark">Collect Payment</h3>
+                <button onclick="closePaymentModal()" class="text-gray-500 hover:text-gray-700">
+                    <i class="fa-solid fa-times text-xl"></i>
+                </button>
+            </div>
+            
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Customer</label>
+                    <input type="text" id="payment-customer" readonly 
+                           class="w-full px-3 py-2 border border-gray-200 rounded-lg bg-gray-50">
                 </div>
-                <div class="text-sm text-gray-600 mb-2">
-                    <p>Aashirvaad Atta 5kg, Tata Salt 1kg, Good Day Biscuits</p>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Outstanding Amount</label>
+                    <input type="text" id="payment-outstanding" readonly 
+                           class="w-full px-3 py-2 border border-gray-200 rounded-lg bg-gray-50">
                 </div>
-                <div class="flex items-center justify-between text-xs text-gray-500">
-                    <span>Running Balance: ₹2,150</span>
-                    <button onclick="window.location.href='/receipt?bill=001234'" class="text-primary">View Details</button>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Payment Amount</label>
+                    <input type="number" id="payment-amount" placeholder="Enter amount" 
+                           class="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20">
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Payment Mode</label>
+                    <select id="payment-mode" class="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20">
+                        <option value="cash">Cash</option>
+                        <option value="upi">UPI</option>
+                        <option value="card">Card</option>
+                        <option value="cheque">Cheque</option>
+                    </select>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Reference Number (Optional)</label>
+                    <input type="text" id="payment-reference" placeholder="Transaction ID / Cheque No." 
+                           class="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20">
+                </div>
+                
+                <div class="flex space-x-3 pt-4">
+                    <button onclick="closePaymentModal()" class="flex-1 bg-gray-200 text-gray-700 py-2 rounded-lg font-medium">
+                        Cancel
+                    </button>
+                    <button onclick="submitPayment()" class="flex-1 bg-primary text-white py-2 rounded-lg font-medium">
+                        Record Payment
+                    </button>
                 </div>
             </div>
+        </div>
+    </div>
 
-            <!-- Split Payment Entry -->
-            <div class="transaction-entry bg-white rounded-lg p-4 shadow-sm border-l-4 border-orange-400" data-type="split">
-                <div class="flex items-start justify-between mb-3">
-                    <div class="flex-1">
-                        <div class="flex items-center space-x-2 mb-1">
-                            <i class="fa-solid fa-arrows-split-up-and-left text-orange-500 text-sm"></i>
-                            <h3 class="font-semibold text-dark">Split Payment - Bill #001198</h3>
+    <script>
+        let currentCustomerId = null;
+        let customers = [];
+
+        // Load customers with outstanding balances
+        async function loadCustomers() {
+            try {
+                const response = await fetch('/api/customers/search');
+                const allCustomers = await response.json();
+                
+                // Filter customers with outstanding balances
+                customers = allCustomers.filter(customer => customer.outstanding_balance > 0);
+                
+                displayCustomers(customers);
+                updateSummary();
+                
+            } catch (error) {
+                console.error('Error loading customers:', error);
+                document.getElementById('loading-indicator').innerHTML = 
+                    '<p class="text-red-500">Error loading customers</p>';
+            }
+        }
+
+        function displayCustomers(customersToShow) {
+            const container = document.getElementById('customers-list');
+            const loadingIndicator = document.getElementById('loading-indicator');
+            const noCustomersMessage = document.getElementById('no-customers-message');
+            
+            loadingIndicator.style.display = 'none';
+            
+            if (customersToShow.length === 0) {
+                container.innerHTML = '';
+                noCustomersMessage.classList.remove('hidden');
+                return;
+            }
+            
+            noCustomersMessage.classList.add('hidden');
+            
+            container.innerHTML = customersToShow.map(customer => {
+                const initials = customer.name.split(' ').map(n => n[0]).join('').toUpperCase();
+                const balanceColor = customer.outstanding_balance > 1000 ? 'text-red-600' : 
+                                   customer.outstanding_balance > 500 ? 'text-orange-600' : 'text-yellow-600';
+                const borderColor = customer.outstanding_balance > 1000 ? 'border-red-400' : 
+                                   customer.outstanding_balance > 500 ? 'border-orange-400' : 'border-yellow-400';
+                
+                return `
+                    <div class="bg-white rounded-lg p-4 shadow-sm border-l-4 ${borderColor}">
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center">
+                                    <span class="text-primary font-bold">${initials}</span>
+                                </div>
+                                <div class="flex-1">
+                                    <h3 class="font-bold text-dark">${customer.name}</h3>
+                                    <p class="text-sm text-gray-600">${customer.phone}</p>
+                                    ${customer.address ? `<p class="text-xs text-gray-500">${customer.address}</p>` : ''}
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <p class="font-bold ${balanceColor}">₹${customer.outstanding_balance.toFixed(2)}</p>
+                                <span class="text-xs bg-red-100 text-red-600 px-2 py-1 rounded">Outstanding</span>
+                            </div>
                         </div>
-                        <p class="text-xs text-gray-500">Yesterday, 11:45 AM</p>
-                        <div class="flex items-center space-x-1 mt-1">
+                        
+                        <div class="flex items-center justify-between">
+                            <div class="text-xs text-gray-500">
+                                <span>Member since: ${new Date(customer.created_at).toLocaleDateString()}</span>
+                            </div>
+                            <div class="flex space-x-2">
+                                <button onclick="collectPayment(${customer.id}, '${customer.name}', ${customer.outstanding_balance})" 
+                                        class="text-primary hover:bg-primary/10 px-3 py-1 rounded text-sm font-medium">
+                                    Collect Payment
+                                </button>
+                                <button onclick="viewCustomerDetails(${customer.id})" 
+                                        class="text-secondary hover:bg-secondary/10 px-3 py-1 rounded text-sm font-medium">
+                                    View Details
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function updateSummary() {
+            const totalOutstanding = customers.reduce((sum, customer) => sum + customer.outstanding_balance, 0);
+            const customersCount = customers.length;
+            
+            document.getElementById('total-outstanding').textContent = `₹${totalOutstanding.toFixed(2)}`;
+            document.getElementById('customers-count').textContent = customersCount;
+            document.getElementById('summary-subtitle').textContent = 
+                customersCount > 0 ? `${customersCount} customers with pending payments` : 'All dues cleared';
+        }
+
+        // Filter functionality
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.filter-btn').forEach(b => {
+                    b.classList.remove('active', 'bg-primary', 'text-white');
+                    b.classList.add('bg-gray-200', 'text-gray-600');
+                });
+                
+                this.classList.add('active', 'bg-primary', 'text-white');
+                this.classList.remove('bg-gray-200', 'text-gray-600');
+                
+                const filter = this.dataset.filter;
+                let filteredCustomers = [...customers];
+                
+                if (filter === 'high') {
+                    filteredCustomers = customers.filter(c => c.outstanding_balance > 1000);
+                } else if (filter === 'medium') {
+                    filteredCustomers = customers.filter(c => c.outstanding_balance >= 500 && c.outstanding_balance <= 1000);
+                } else if (filter === 'low') {
+                    filteredCustomers = customers.filter(c => c.outstanding_balance < 500);
+                }
+                
+                displayCustomers(filteredCustomers);
+            });
+        });
+
+        // Search functionality
+        document.getElementById('customer-search').addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase();
+            const filteredCustomers = customers.filter(customer => 
+                customer.name.toLowerCase().includes(searchTerm) || 
+                customer.phone.includes(searchTerm)
+            );
+            displayCustomers(filteredCustomers);
+        });
+
+        // Payment collection functions
+        function collectPayment(customerId, customerName, outstandingAmount) {
+            currentCustomerId = customerId;
+            document.getElementById('payment-customer').value = customerName;
+            document.getElementById('payment-outstanding').value = `₹${outstandingAmount.toFixed(2)}`;
+            document.getElementById('payment-amount').value = '';
+            document.getElementById('payment-reference').value = '';
+            document.getElementById('payment-modal').classList.remove('hidden');
+        }
+
+        function closePaymentModal() {
+            document.getElementById('payment-modal').classList.add('hidden');
+            currentCustomerId = null;
+        }
+
+        async function submitPayment() {
+            const amount = document.getElementById('payment-amount').value;
+            const mode = document.getElementById('payment-mode').value;
+            const reference = document.getElementById('payment-reference').value;
+            
+            if (!amount || amount <= 0) {
+                alert('Please enter a valid payment amount');
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/payments', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        customer_id: currentCustomerId,
+                        amount: parseFloat(amount),
+                        payment_mode: mode,
+                        reference_number: reference,
+                        notes: 'Udhar payment collection'
+                    })
+                });
+                
+                if (response.ok) {
+                    alert('Payment recorded successfully!');
+                    closePaymentModal();
+                    loadCustomers(); // Refresh the list
+                } else {
+                    alert('Error recording payment. Please try again.');
+                }
+                
+            } catch (error) {
+                console.error('Error submitting payment:', error);
+                alert('Error recording payment. Please try again.');
+            }
+        }
+
+        function showAddPaymentModal() {
+            // Show customer selection modal or redirect to add new customer
+            alert('Feature coming soon: Add new customer with credit');
+        }
+
+        function refreshCustomers() {
+            document.getElementById('loading-indicator').style.display = 'block';
+            loadCustomers();
+        }
+
+        function viewCustomerDetails(customerId) {
+            window.location.href = `/api/customer/${customerId}/ledger`;
+        }
+
+        function goBack() {
+            window.location.href = '/dashboard';
+        }
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            loadCustomers();
+        });
                             <i class="fa-solid fa-user text-gray-400 text-xs"></i>
                             <p class="text-xs text-gray-600">Served by: Priya Sharma</p>
                         </div>

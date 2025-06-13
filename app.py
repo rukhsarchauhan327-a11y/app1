@@ -78,7 +78,6 @@ class Bill(db.Model):
     # Staff and metadata
     generated_by = db.Column(db.String(100))
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    include_dates = db.Column(db.Boolean, default=True)
     
     # Relationships
     items = db.relationship('BillItem', backref='bill', lazy=True, cascade='all, delete-orphan')
