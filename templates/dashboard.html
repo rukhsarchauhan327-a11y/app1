@@ -167,8 +167,11 @@
                 </div>
             </div>
         </div>
-        <div class="p-3 border-t">
-            <button onclick="window.location.href='/notifications'" class="text-secondary text-sm font-semibold w-full text-center hover:text-secondary/80">View All Notifications</button>
+        <div class="p-3 border-t flex justify-between">
+            <button onclick="markAllNotificationsRead()" class="text-gray-600 text-sm font-medium hover:text-gray-800">
+                <i class="fa-solid fa-check-double mr-1"></i>Mark All Read
+            </button>
+            <button onclick="window.location.href='/profile'" class="text-secondary text-sm font-semibold hover:text-secondary/80">Settings</button>
         </div>
     </div>
 
@@ -654,22 +657,146 @@
             document.getElementById('current-time').textContent = now.toLocaleTimeString('en-US', timeOptions);
         }
 
-        // Fast notification count update
+        // Load real-time notification count and data
         function updateNotificationCount() {
-            const notificationBadge = document.getElementById('notification-count');
-            const backupEnabled = localStorage.getItem('emailBackupEnabled') === 'true';
-            const backupNotification = document.getElementById('backup-notification');
+            fetch('/api/notifications')
+                .then(function(response) {
+                    return response.json();
+                })
+                .then(function(data) {
+                    const notificationBadge = document.getElementById('notification-count');
+                    const backupEnabled = localStorage.getItem('emailBackupEnabled') === 'true';
+                    const backupNotification = document.getElementById('backup-notification');
+                    
+                    var count = data.count || 0;
+                    
+                    // Show/hide backup notification in dropdown
+                    if (!backupEnabled) {
+                        backupNotification.style.display = 'block';
+                        count += 1; // Add backup notification to count
+                    } else {
+                        backupNotification.style.display = 'none';
+                    }
+                    
+                    // Update badge
+                    notificationBadge.textContent = count;
+                    if (count > 0) {
+                        notificationBadge.style.display = 'flex';
+                    } else {
+                        notificationBadge.style.display = 'none';
+                    }
+                    
+                    // Update dropdown with real notifications
+                    updateNotificationDropdown(data.notifications || []);
+                })
+                .catch(function(error) {
+                    console.error('Error loading notifications:', error);
+                });
+        }
+
+        // Update notification dropdown with real data
+        function updateNotificationDropdown(notifications) {
+            const dropdown = document.getElementById('notification-dropdown');
+            const container = dropdown.querySelector('.max-h-80');
             
-            // Show/hide backup notification in dropdown
-            if (!backupEnabled) {
-                backupNotification.style.display = 'block';
-                notificationBadge.textContent = '6';
-                notificationBadge.style.display = 'flex';
-            } else {
-                backupNotification.style.display = 'none';
-                notificationBadge.textContent = '5';
-                notificationBadge.style.display = 'flex';
+            // Keep the premium and backup notifications, add real ones
+            var realNotificationsHTML = '';
+            
+            for (var i = 0; i < Math.min(notifications.length, 3); i++) {
+                var notification = notifications[i];
+                var iconColor = 'text-gray-600';
+                var bgColor = 'bg-gray-100';
+                var icon = 'fa-bell';
+                var targetUrl = '/dashboard';
+                
+                if (notification.type === 'expiry' || notification.priority === 'urgent') {
+                    iconColor = 'text-danger';
+                    bgColor = 'bg-danger/10';
+                    icon = 'fa-triangle-exclamation';
+                    targetUrl = '/expiry-alert';
+                } else if (notification.type === 'inventory') {
+                    iconColor = 'text-accent';
+                    bgColor = 'bg-accent/10';
+                    icon = 'fa-box';
+                    targetUrl = '/low-stock';
+                } else if (notification.type === 'payment') {
+                    iconColor = 'text-secondary';
+                    bgColor = 'bg-secondary/10';
+                    icon = 'fa-money-bill';
+                    targetUrl = '/pending-credits';
+                } else if (notification.type === 'subscription') {
+                    iconColor = 'text-purple-600';
+                    bgColor = 'bg-purple-100';
+                    icon = 'fa-crown';
+                    targetUrl = '/pricing';
+                }
+                
+                realNotificationsHTML += 
+                    '<div class="p-4 border-b hover:bg-gray-50 cursor-pointer" onclick="window.location.href=\'' + targetUrl + '\'">' +
+                        '<div class="flex items-start space-x-3">' +
+                            '<div class="' + bgColor + ' p-2 rounded-full">' +
+                                '<i class="fa-solid ' + icon + ' ' + iconColor + ' text-sm"></i>' +
+                            '</div>' +
+                            '<div class="flex-1">' +
+                                '<p class="font-semibold ' + iconColor + ' text-sm">' + notification.title + '</p>' +
+                                '<p class="text-xs text-gray-600 mt-1">' + (notification.message || '') + '</p>' +
+                                '<p class="text-xs text-gray-400 mt-1">' + (notification.time_ago || 'Just now') + '</p>' +
+                            '</div>' +
+                        '</div>' +
+                    '</div>';
             }
+            
+            // Find the existing static notifications and add real ones after them
+            var existingNotifications = container.children;
+            var staticCount = existingNotifications.length;
+            
+            // Remove old dynamic notifications (keep first few static ones)
+            while (existingNotifications.length > staticCount) {
+                container.removeChild(existingNotifications[existingNotifications.length - 1]);
+            }
+            
+            // Add new real notifications
+            if (realNotificationsHTML) {
+                container.insertAdjacentHTML('beforeend', realNotificationsHTML);
+            }
+        }
+
+        // Mark all notifications as read
+        function markAllNotificationsRead() {
+            fetch('/api/notifications/mark-all-read', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(function(response) {
+                return response.json();
+            })
+            .then(function(data) {
+                if (data.success) {
+                    // Update notification count to 0 (except backup if not enabled)
+                    const backupEnabled = localStorage.getItem('emailBackupEnabled') === 'true';
+                    const notificationBadge = document.getElementById('notification-count');
+                    
+                    if (!backupEnabled) {
+                        notificationBadge.textContent = '1'; // Only backup notification remains
+                    } else {
+                        notificationBadge.style.display = 'none'; // Hide badge completely
+                    }
+                    
+                    // Close dropdown
+                    document.getElementById('notification-dropdown').classList.add('hidden');
+                    
+                    // Show success message
+                    showStyledNotification('All notifications marked as read', 'success');
+                } else {
+                    showStyledNotification('Failed to mark notifications as read', 'error');
+                }
+            })
+            .catch(function(error) {
+                console.error('Error marking notifications as read:', error);
+                showStyledNotification('Error updating notifications', 'error');
+            });
         }
 
         // Notification dropdown toggle
