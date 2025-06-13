@@ -1231,6 +1231,9 @@
             }
         }
         
+        // Global array to track items that have been processed
+        let processedItemIds = new Set();
+        
         // Load cart items from localStorage and merge with existing cart
         function loadCartItems() {
             const cartData = localStorage.getItem('kiranakonnect_cart');
@@ -1240,22 +1243,48 @@
                 return cartItems;
             }
             
+            let newItemsAdded = 0;
+            
             // Process each stored item
             storedItems.forEach((item) => {
-                addItemToCart(item);
+                const itemId = item.addedAt || `${item.name}-${Date.now()}`;
+                
+                // Only add if not already processed
+                if (!processedItemIds.has(itemId)) {
+                    addItemToCart(item);
+                    processedItemIds.add(itemId);
+                    newItemsAdded++;
+                }
             });
             
-            // Clear localStorage after processing
-            localStorage.removeItem('kiranakonnect_cart');
-            console.log(`Loaded ${storedItems.length} items from localStorage`);
+            // Only clear localStorage if we actually added items
+            if (newItemsAdded > 0) {
+                localStorage.removeItem('kiranakonnect_cart');
+                console.log(`Loaded ${newItemsAdded} new items from localStorage`);
+            }
             
             return cartItems;
         }
 
+        // Check for new items from inventory periodically
+        function checkForNewItems() {
+            const cartData = localStorage.getItem('kiranakonnect_cart');
+            if (cartData) {
+                const storedItems = JSON.parse(cartData);
+                if (storedItems.length > 0) {
+                    loadCartItems();
+                }
+            }
+        }
+
+        // Global function for real-time updates from inventory
+        window.updateCartFromInventory = function(newItem) {
+            addItemToCart(newItem);
+        };
+
         // Initialize cart with localStorage data
         function initializeCart() {
             loadCartItems();
-            // renderCartItems(); // Disabled to keep hardcoded cart items
             calculateTotals();
         }
 
@@ -1896,6 +1925,9 @@
                     
                     // Load and merge any new items from inventory
                     loadCartItems();
+                    
+                    // Set up periodic check for new items from inventory
+                    setInterval(checkForNewItems, 1000);
                     
                     calculateTotals();
                     initializeDateToggles();
