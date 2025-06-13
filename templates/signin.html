@@ -208,6 +208,120 @@
         </div>
     </div>
 
+    <!-- Forgot Password Modal -->
+    <div id="forgotPasswordModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-2xl p-8 mx-6 w-full max-w-md">
+            <div class="text-center mb-6">
+                <div class="w-16 h-16 mx-auto bg-secondary rounded-full flex items-center justify-center mb-4">
+                    <i class="fa-solid fa-key text-white text-2xl"></i>
+                </div>
+                <h3 class="text-dark text-xl font-bold mb-2">Reset Password</h3>
+                <p class="text-gray-600 text-sm">Enter your phone number or email to receive reset instructions</p>
+            </div>
+            
+            <form id="forgotPasswordForm" class="space-y-4">
+                <div>
+                    <label class="text-dark text-sm font-medium mb-2 block">Phone Number or Email</label>
+                    <div class="relative">
+                        <i class="fa-solid fa-envelope absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500"></i>
+                        <input type="text" id="resetContact" placeholder="Enter phone number or email" class="w-full bg-white border border-gray-300 rounded-xl pl-12 pr-4 py-3 text-dark placeholder-gray-500 focus:border-secondary focus:outline-none" required>
+                    </div>
+                </div>
+                
+                <div class="space-y-3">
+                    <button type="submit" class="w-full bg-secondary text-white font-bold py-3 px-6 rounded-xl hover:bg-blue-600 transition-all duration-300">
+                        <i class="fa-solid fa-paper-plane mr-2"></i>
+                        Send Reset Instructions
+                    </button>
+                    <button type="button" onclick="closeForgotPasswordModal()" class="w-full bg-gray-200 text-dark font-medium py-3 px-6 rounded-xl hover:bg-gray-300 transition-all duration-300">
+                        Cancel
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Reset Code Verification Modal -->
+    <div id="resetCodeModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-2xl p-8 mx-6 w-full max-w-md">
+            <div class="text-center mb-6">
+                <div class="w-16 h-16 mx-auto bg-accent rounded-full flex items-center justify-center mb-4">
+                    <i class="fa-solid fa-shield-alt text-white text-2xl"></i>
+                </div>
+                <h3 class="text-dark text-xl font-bold mb-2">Enter Reset Code</h3>
+                <p class="text-gray-600 text-sm">We've sent a 6-digit code to <span id="sentToContact" class="font-medium"></span></p>
+            </div>
+            
+            <form id="resetCodeForm" class="space-y-4">
+                <div class="flex space-x-2 justify-center mb-6">
+                    <input type="text" maxlength="1" class="w-12 h-12 text-center border border-gray-300 rounded-lg text-dark font-bold text-lg focus:border-accent focus:outline-none reset-code-input">
+                    <input type="text" maxlength="1" class="w-12 h-12 text-center border border-gray-300 rounded-lg text-dark font-bold text-lg focus:border-accent focus:outline-none reset-code-input">
+                    <input type="text" maxlength="1" class="w-12 h-12 text-center border border-gray-300 rounded-lg text-dark font-bold text-lg focus:border-accent focus:outline-none reset-code-input">
+                    <input type="text" maxlength="1" class="w-12 h-12 text-center border border-gray-300 rounded-lg text-dark font-bold text-lg focus:border-accent focus:outline-none reset-code-input">
+                    <input type="text" maxlength="1" class="w-12 h-12 text-center border border-gray-300 rounded-lg text-dark font-bold text-lg focus:border-accent focus:outline-none reset-code-input">
+                    <input type="text" maxlength="1" class="w-12 h-12 text-center border border-gray-300 rounded-lg text-dark font-bold text-lg focus:border-accent focus:outline-none reset-code-input">
+                </div>
+                
+                <div class="space-y-3">
+                    <button type="submit" class="w-full bg-accent text-white font-bold py-3 px-6 rounded-xl hover:bg-orange-600 transition-all duration-300">
+                        Verify Code
+                    </button>
+                    <button type="button" onclick="closeResetCodeModal()" class="w-full bg-gray-200 text-dark font-medium py-3 px-6 rounded-xl hover:bg-gray-300 transition-all duration-300">
+                        Cancel
+                    </button>
+                </div>
+                
+                <div class="text-center mt-4">
+                    <p class="text-gray-600 text-sm">Didn't receive code? <span class="text-secondary underline cursor-pointer" onclick="resendResetCode()">Resend</span></p>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- New Password Modal -->
+    <div id="newPasswordModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-2xl p-8 mx-6 w-full max-w-md">
+            <div class="text-center mb-6">
+                <div class="w-16 h-16 mx-auto bg-primary rounded-full flex items-center justify-center mb-4">
+                    <i class="fa-solid fa-lock text-white text-2xl"></i>
+                </div>
+                <h3 class="text-dark text-xl font-bold mb-2">Create New Password</h3>
+                <p class="text-gray-600 text-sm">Choose a strong password for your account</p>
+            </div>
+            
+            <form id="newPasswordForm" class="space-y-4">
+                <div>
+                    <label class="text-dark text-sm font-medium mb-2 block">New Password</label>
+                    <div class="relative">
+                        <i class="fa-solid fa-lock absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500"></i>
+                        <input type="password" id="newPassword" placeholder="Enter new password" class="w-full bg-white border border-gray-300 rounded-xl pl-12 pr-12 py-3 text-dark placeholder-gray-500 focus:border-primary focus:outline-none" required>
+                        <i class="fa-solid fa-eye-slash absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-500 cursor-pointer toggle-password" data-target="newPassword"></i>
+                    </div>
+                    <p class="text-xs text-gray-500 mt-1">Password must be at least 8 characters long</p>
+                </div>
+                
+                <div>
+                    <label class="text-dark text-sm font-medium mb-2 block">Confirm New Password</label>
+                    <div class="relative">
+                        <i class="fa-solid fa-lock absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500"></i>
+                        <input type="password" id="confirmNewPassword" placeholder="Confirm new password" class="w-full bg-white border border-gray-300 rounded-xl pl-12 pr-12 py-3 text-dark placeholder-gray-500 focus:border-primary focus:outline-none" required>
+                        <i class="fa-solid fa-eye-slash absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-500 cursor-pointer toggle-password" data-target="confirmNewPassword"></i>
+                    </div>
+                </div>
+                
+                <div class="space-y-3">
+                    <button type="submit" class="w-full bg-primary text-white font-bold py-3 px-6 rounded-xl hover:bg-green-600 transition-all duration-300">
+                        <i class="fa-solid fa-check mr-2"></i>
+                        Reset Password
+                    </button>
+                    <button type="button" onclick="closeNewPasswordModal()" class="w-full bg-gray-200 text-dark font-medium py-3 px-6 rounded-xl hover:bg-gray-300 transition-all duration-300">
+                        Cancel
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <script>
         // Navigation functions
         function goBack() {
@@ -219,12 +333,183 @@
         }
 
         function forgotPassword() {
-            showNotification('Forgot password feature will be implemented soon.', 'info');
+            document.getElementById('forgotPasswordModal').classList.remove('hidden');
         }
 
         function resendOTP() {
             showNotification('OTP resent successfully!', 'success');
         }
+
+        // Forgot Password Modal Functions
+        function closeForgotPasswordModal() {
+            document.getElementById('forgotPasswordModal').classList.add('hidden');
+            document.getElementById('forgotPasswordForm').reset();
+        }
+
+        function closeResetCodeModal() {
+            document.getElementById('resetCodeModal').classList.add('hidden');
+            document.querySelectorAll('.reset-code-input').forEach(input => input.value = '');
+        }
+
+        function closeNewPasswordModal() {
+            document.getElementById('newPasswordModal').classList.add('hidden');
+            document.getElementById('newPasswordForm').reset();
+        }
+
+        function resendResetCode() {
+            showNotification('Reset code resent successfully!', 'success');
+        }
+
+        // Handle forgot password form submission
+        document.addEventListener('DOMContentLoaded', function() {
+            // Forgot Password Form
+            document.getElementById('forgotPasswordForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const contact = document.getElementById('resetContact').value.trim();
+                
+                if (!contact) {
+                    showNotification('Please enter your phone number or email.', 'error');
+                    return;
+                }
+
+                // Validate email or phone format
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                const phoneRegex = /^[+]?[0-9\s\-()]{10,}$/;
+                
+                if (!emailRegex.test(contact) && !phoneRegex.test(contact)) {
+                    showNotification('Please enter a valid email or phone number.', 'error');
+                    return;
+                }
+
+                // Show loading state
+                const submitBtn = this.querySelector('button[type="submit"]');
+                const originalText = submitBtn.innerHTML;
+                submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i>Sending...';
+                submitBtn.disabled = true;
+
+                // Simulate API call
+                setTimeout(() => {
+                    // Hide forgot password modal and show code verification modal
+                    closeForgotPasswordModal();
+                    document.getElementById('resetCodeModal').classList.remove('hidden');
+                    document.getElementById('sentToContact').textContent = contact;
+                    
+                    // Reset button
+                    submitBtn.innerHTML = originalText;
+                    submitBtn.disabled = false;
+                    
+                    showNotification('Reset code sent successfully!', 'success');
+                }, 2000);
+            });
+
+            // Reset Code Form
+            document.getElementById('resetCodeForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const codeInputs = document.querySelectorAll('.reset-code-input');
+                const code = Array.from(codeInputs).map(input => input.value).join('');
+                
+                if (code.length !== 6) {
+                    showNotification('Please enter the complete 6-digit code.', 'error');
+                    return;
+                }
+
+                // Show loading state
+                const submitBtn = this.querySelector('button[type="submit"]');
+                const originalText = submitBtn.innerHTML;
+                submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i>Verifying...';
+                submitBtn.disabled = true;
+
+                // Simulate API call
+                setTimeout(() => {
+                    // Hide code modal and show new password modal
+                    closeResetCodeModal();
+                    document.getElementById('newPasswordModal').classList.remove('hidden');
+                    
+                    // Reset button
+                    submitBtn.innerHTML = originalText;
+                    submitBtn.disabled = false;
+                    
+                    showNotification('Code verified successfully!', 'success');
+                }, 1500);
+            });
+
+            // New Password Form
+            document.getElementById('newPasswordForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const newPassword = document.getElementById('newPassword').value;
+                const confirmPassword = document.getElementById('confirmNewPassword').value;
+                
+                if (!newPassword || !confirmPassword) {
+                    showNotification('Please fill in all password fields.', 'error');
+                    return;
+                }
+
+                if (newPassword.length < 8) {
+                    showNotification('Password must be at least 8 characters long.', 'error');
+                    return;
+                }
+
+                if (newPassword !== confirmPassword) {
+                    showNotification('Passwords do not match.', 'error');
+                    return;
+                }
+
+                // Show loading state
+                const submitBtn = this.querySelector('button[type="submit"]');
+                const originalText = submitBtn.innerHTML;
+                submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i>Updating...';
+                submitBtn.disabled = true;
+
+                // Simulate API call
+                setTimeout(() => {
+                    // Close modal and show success
+                    closeNewPasswordModal();
+                    
+                    // Reset button
+                    submitBtn.innerHTML = originalText;
+                    submitBtn.disabled = false;
+                    
+                    showNotification('Password reset successfully! Please sign in with your new password.', 'success');
+                }, 2000);
+            });
+
+            // Auto-focus next input for reset code
+            const codeInputs = document.querySelectorAll('.reset-code-input');
+            codeInputs.forEach((input, index) => {
+                input.addEventListener('input', function(e) {
+                    if (e.target.value.length === 1 && index < codeInputs.length - 1) {
+                        codeInputs[index + 1].focus();
+                    }
+                });
+                
+                input.addEventListener('keydown', function(e) {
+                    if (e.key === 'Backspace' && e.target.value === '' && index > 0) {
+                        codeInputs[index - 1].focus();
+                    }
+                });
+            });
+
+            // Password visibility toggles for new password form
+            document.querySelectorAll('.toggle-password').forEach(toggle => {
+                toggle.addEventListener('click', function() {
+                    const targetId = this.getAttribute('data-target');
+                    const targetInput = document.getElementById(targetId);
+                    
+                    if (targetInput.type === 'password') {
+                        targetInput.type = 'text';
+                        this.classList.remove('fa-eye-slash');
+                        this.classList.add('fa-eye');
+                    } else {
+                        targetInput.type = 'password';
+                        this.classList.remove('fa-eye');
+                        this.classList.add('fa-eye-slash');
+                    }
+                });
+            });
+        });
 
         // Password visibility toggle
         document.querySelector('.fa-eye-slash').addEventListener('click', function() {
