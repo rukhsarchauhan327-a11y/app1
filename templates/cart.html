@@ -1187,10 +1187,10 @@
                 finalUnitPrice: finalUnitPrice
             });
             
-            // For weight-based items, ensure price is calculated correctly
-            if (newItem.type === 'weight-based' && finalUnitPrice) {
-                finalPrice = newItem.quantity * finalUnitPrice;
-                console.log('Recalculated weight-based price:', finalPrice);
+            // For weight-based items, use the totalPrice directly (already calculated correctly)
+            if (newItem.type === 'weight-based') {
+                finalPrice = newItem.totalPrice || newItem.price;
+                console.log('Using direct weight-based price:', finalPrice);
             }
             
             // Add to cartItems data
@@ -1228,11 +1228,8 @@
             // Use the exact quantityDisplay provided, don't override it
             const quantityDisplay = item.quantityDisplay || `${item.quantity} ${item.unit}`;
             
-            // Calculate correct total price for weight-based items
+            // Use the already calculated total price for weight-based items
             let totalPrice = item.totalPrice || item.price;
-            if (item.type === 'weight-based' && item.unitPrice) {
-                totalPrice = item.quantity * item.unitPrice;
-            }
             
             let dateSection = '';
             if (item.mfgDate && item.expDate && item.mfgDate !== '' && item.expDate !== '') {
@@ -1479,11 +1476,8 @@
             const hasDate = item.mfgDate && item.expDate;
             const quantityDisplay = item.quantityDisplay || `${item.quantity} ${item.unit}`;
             
-            // Calculate correct price for weight-based items
+            // Use the already calculated price for weight-based items
             let displayPrice = item.price;
-            if (item.type === 'weight-based' && item.unitPrice) {
-                displayPrice = item.quantity * item.unitPrice;
-            }
 
             return `<div class="bg-white rounded-xl shadow-sm p-3" id="cart-item-${itemId}">
             <div class="flex items-start justify-between">

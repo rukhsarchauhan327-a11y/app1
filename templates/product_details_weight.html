@@ -531,6 +531,15 @@
             
             calculatedQuantity.textContent = `${displayQty.toFixed(displayQty < 1 ? 0 : 3)} ${displayUnit}`;
             calculatedPrice.textContent = `₹${total.toFixed(2)}`;
+            
+            // Debug log for price preview calculation
+            console.log('Price preview calculation:', {
+                inputQty: parseFloat(quantityInput.value),
+                unit: unit,
+                convertedQty: qty,
+                unitPrice: unitPrice,
+                total: total
+            });
         }
 
         function updateFromPrice() {
