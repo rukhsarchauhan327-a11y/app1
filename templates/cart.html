@@ -1714,7 +1714,7 @@
             // Add single "Add More Items" button at the end
             const addItemsHTML = `
                 <div id="add-items-section" class="py-4">
-                    <button class="w-full bg-blue-500 text-white py-3 rounded-xl font-medium text-sm flex items-center justify-center space-x-2 hover:bg-blue-600 transition-colors" onclick="addMoreItems()">
+                    <button id="working-add-items-btn" class="w-full bg-blue-500 text-white py-3 rounded-xl font-medium text-sm flex items-center justify-center space-x-2 hover:bg-blue-600 transition-colors" onclick="window.location.href='/inventory';">
                         <i class="fa-solid fa-plus text-white"></i>
                         <span>Add More Items to Cart</span>
                     </button>
