@@ -311,7 +311,7 @@ def check_low_stock():
         app.logger.error(f"Error checking low stock: {e}")
 
 def check_expiring_products():
-    """Check for products expiring soon and create notifications"""
+    """Check for products expiring soon and create summary notification"""
     try:
         from datetime import date, timedelta
         expiry_threshold = date.today() + timedelta(days=7)
@@ -321,23 +321,31 @@ def check_expiring_products():
             Product.expiry_date <= expiry_threshold
         ).all()
         
-        for product in expiring_products:
-            # Check if notification already exists for this product
+        if expiring_products:
+            # Check if summary notification already exists
             existing = Notification.query.filter_by(
                 type='expiry', 
-                product_id=product.id, 
                 is_read=False
-            ).first()
+            ).filter(Notification.product_id.is_(None)).first()
             
             if not existing:
-                days_to_expiry = (product.expiry_date - date.today()).days
-                create_notification(
-                    f"Product Expiring: {product.name}",
-                    f"Expires in {days_to_expiry} days on {product.expiry_date.strftime('%d/%m/%Y')}",
-                    "expiry",
-                    "urgent" if days_to_expiry <= 3 else "high",
-                    product_id=product.id
-                )
+                count = len(expiring_products)
+                expired_count = len([p for p in expiring_products if p.expiry_date <= date.today()])
+                
+                if expired_count > 0:
+                    create_notification(
+                        f"{expired_count} items expired",
+                        f"Remove from inventory immediately to avoid health risks",
+                        "expiry",
+                        "urgent"
+                    )
+                elif count > 0:
+                    create_notification(
+                        f"{count} items expiring soon",
+                        f"Check expiry dates and manage inventory",
+                        "expiry",
+                        "high"
+                    )
     except Exception as e:
         app.logger.error(f"Error checking expiring products: {e}")
 

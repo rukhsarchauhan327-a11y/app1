@@ -304,14 +304,17 @@
 
         function createNotificationElement(notification) {
             var div = document.createElement('div');
-            div.className = 'notification-item bg-white rounded-xl shadow-sm border-l-4 p-4';
+            div.className = 'notification-item bg-white rounded-xl shadow-sm border-l-4 p-4 cursor-pointer hover:bg-gray-50';
             div.setAttribute('data-type', notification.type);
             div.setAttribute('data-id', notification.id);
             
             var colors = getNotificationColors(notification);
             div.classList.add(colors.borderColor);
             
-            var actionButtons = getActionButtons(notification, colors.badgeColor);
+            // Make notification clickable - navigate to relevant page
+            div.onclick = function() {
+                handleNotificationClick(notification.type);
+            };
             
             div.innerHTML = 
                 '<div class="flex items-start space-x-3">' +
@@ -329,7 +332,6 @@
                                 notification.priority.toUpperCase() + 
                             '</span>' +
                         '</div>' +
-                        actionButtons +
                     '</div>' +
                 '</div>';
             
@@ -388,62 +390,19 @@
             };
         }
 
-        function getActionButtons(notification, badgeColor) {
-            if (notification.type === 'backup') {
-                return '<div class="mt-3 flex space-x-2">' +
-                    '<button class="bg-accent text-white px-3 py-1 rounded-lg text-xs font-medium" onclick="enableBackup(); event.stopPropagation();">' +
-                        'Enable Backup' +
-                    '</button>' +
-                    '<button class="bg-gray-200 text-gray-700 px-3 py-1 rounded-lg text-xs font-medium" onclick="dismissBackupNotification(); event.stopPropagation();">' +
-                        'Dismiss' +
-                    '</button>' +
-                '</div>';
-            } else if (notification.type === 'inventory' || notification.type === 'expiry') {
-                return '<div class="mt-3">' +
-                    '<button class="' + badgeColor + ' text-white px-3 py-1 rounded-lg text-xs font-medium" onclick="handleNotificationAction(\'' + notification.type + '\'); event.stopPropagation();">' +
-                        (notification.type === 'expiry' ? 'Remove Items' : 'View Items') +
-                    '</button>' +
-                '</div>';
-            } else if (notification.type === 'payment') {
-                return '<div class="mt-3">' +
-                    '<button class="' + badgeColor + ' text-white px-3 py-1 rounded-lg text-xs font-medium" onclick="handleNotificationAction(\'' + notification.type + '\'); event.stopPropagation();">' +
-                        'View Details' +
-                    '</button>' +
-                '</div>';
-            }
-            return '';
-        }
-
-        function enableBackup() {
-            if (confirm('Enable email backup to protect your business data?')) {
-                localStorage.setItem('emailBackupEnabled', 'true');
-                loadNotifications();
-                alert('Email backup enabled successfully!');
-            }
-        }
-
-        function dismissBackupNotification() {
-            if (confirm('Dismiss backup notification? You can enable it later in Profile settings.')) {
-                var newNotifications = [];
-                for (var i = 0; i < allNotifications.length; i++) {
-                    if (allNotifications[i].type !== 'backup') {
-                        newNotifications.push(allNotifications[i]);
-                    }
-                }
-                allNotifications = newNotifications;
-                displayNotifications(allNotifications, currentFilter);
-                updateNotificationBadge(getUnreadCount());
-                alert('Backup notification dismissed');
-            }
-        }
-
-        function handleNotificationAction(type) {
+        function handleNotificationClick(type) {
             if (type === 'inventory') {
                 window.location.href = '/low-stock';
             } else if (type === 'expiry') {
                 window.location.href = '/expiry-alert';
             } else if (type === 'payment') {
                 window.location.href = '/pending-credits';
+            } else if (type === 'backup') {
+                window.location.href = '/profile';
+            } else if (type === 'subscription') {
+                window.location.href = '/pricing';
+            } else {
+                window.location.href = '/dashboard';
             }
         }
 

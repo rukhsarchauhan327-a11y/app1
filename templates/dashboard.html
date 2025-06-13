@@ -692,70 +692,54 @@
                 });
         }
 
-        // Update notification dropdown with real data
+        // Update notification dropdown with summary notifications only
         function updateNotificationDropdown(notifications) {
-            const dropdown = document.getElementById('notification-dropdown');
-            const container = dropdown.querySelector('.max-h-80');
+            // Don't add individual notifications to dropdown
+            // The dropdown already has static summary notifications that are clickable
+            // Individual notifications should only appear on the notifications page
             
-            // Keep the premium and backup notifications, add real ones
-            var realNotificationsHTML = '';
+            // Update counts in existing summary notifications based on real data
+            updateSummaryNotifications(notifications);
+        }
+        
+        function updateSummaryNotifications(notifications) {
+            // Count different types of notifications
+            var expiredCount = 0;
+            var lowStockCount = 0;
+            var paymentCount = 0;
             
-            for (var i = 0; i < Math.min(notifications.length, 3); i++) {
-                var notification = notifications[i];
-                var iconColor = 'text-gray-600';
-                var bgColor = 'bg-gray-100';
-                var icon = 'fa-bell';
-                var targetUrl = '/dashboard';
-                
-                if (notification.type === 'expiry' || notification.priority === 'urgent') {
-                    iconColor = 'text-danger';
-                    bgColor = 'bg-danger/10';
-                    icon = 'fa-triangle-exclamation';
-                    targetUrl = '/expiry-alert';
-                } else if (notification.type === 'inventory') {
-                    iconColor = 'text-accent';
-                    bgColor = 'bg-accent/10';
-                    icon = 'fa-box';
-                    targetUrl = '/low-stock';
-                } else if (notification.type === 'payment') {
-                    iconColor = 'text-secondary';
-                    bgColor = 'bg-secondary/10';
-                    icon = 'fa-money-bill';
-                    targetUrl = '/pending-credits';
-                } else if (notification.type === 'subscription') {
-                    iconColor = 'text-purple-600';
-                    bgColor = 'bg-purple-100';
-                    icon = 'fa-crown';
-                    targetUrl = '/pricing';
+            for (var i = 0; i < notifications.length; i++) {
+                var notif = notifications[i];
+                if (notif.type === 'expiry') {
+                    expiredCount++;
+                } else if (notif.type === 'inventory') {
+                    lowStockCount++;
+                } else if (notif.type === 'payment') {
+                    paymentCount++;
+                }
+            }
+            
+            // Update the static summary notifications with real counts
+            // This keeps the original design but shows real data
+            var container = document.querySelector('#notification-dropdown .max-h-80');
+            var notifications = container.children;
+            
+            // Update expired items notification (assuming it's the 2nd notification after backup)
+            for (var j = 0; j < notifications.length; j++) {
+                var notification = notifications[j];
+                if (notification.onclick && notification.onclick.toString().includes('expiry-alert')) {
+                    var titleElement = notification.querySelector('.font-semibold');
+                    if (titleElement && expiredCount > 0) {
+                        titleElement.textContent = expiredCount + ' items expired';
+                    }
                 }
                 
-                realNotificationsHTML += 
-                    '<div class="p-4 border-b hover:bg-gray-50 cursor-pointer" onclick="window.location.href=\'' + targetUrl + '\'">' +
-                        '<div class="flex items-start space-x-3">' +
-                            '<div class="' + bgColor + ' p-2 rounded-full">' +
-                                '<i class="fa-solid ' + icon + ' ' + iconColor + ' text-sm"></i>' +
-                            '</div>' +
-                            '<div class="flex-1">' +
-                                '<p class="font-semibold ' + iconColor + ' text-sm">' + notification.title + '</p>' +
-                                '<p class="text-xs text-gray-600 mt-1">' + (notification.message || '') + '</p>' +
-                                '<p class="text-xs text-gray-400 mt-1">' + (notification.time_ago || 'Just now') + '</p>' +
-                            '</div>' +
-                        '</div>' +
-                    '</div>';
-            }
-            
-            // Find the existing static notifications and add real ones after them
-            var existingNotifications = container.children;
-            var staticCount = existingNotifications.length;
-            
-            // Remove old dynamic notifications (keep first few static ones)
-            while (existingNotifications.length > staticCount) {
-                container.removeChild(existingNotifications[existingNotifications.length - 1]);
-            }
-            
-            // Add new real notifications
-            if (realNotificationsHTML) {
-                container.insertAdjacentHTML('beforeend', realNotificationsHTML);
+                if (notification.onclick && notification.onclick.toString().includes('low-stock')) {
+                    var titleElement = notification.querySelector('.font-semibold');
+                    if (titleElement && lowStockCount > 0) {
+                        titleElement.textContent = lowStockCount + ' items low stock';
+                    }
+                }
             }
         }
 
