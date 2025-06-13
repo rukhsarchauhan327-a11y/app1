@@ -162,7 +162,7 @@
             </div>
 
             <!-- Critical Alert - Data Backup Needed -->
-            <div id="backup-notification-full" class="notification-item bg-white rounded-lg shadow-sm border-l-4 border-orange-500 cursor-pointer hover:shadow-md transition-shadow" data-type="critical" onclick="window.location.href='/profile?highlight=backup'" style="display: none;">
+            <div id="backup-notification-full" class="notification-item bg-white rounded-lg shadow-sm border-l-4 border-orange-500 cursor-pointer hover:shadow-md transition-shadow" data-type="backup" onclick="window.location.href='/profile?highlight=backup'" style="display: none;">
                 <div class="p-4">
                     <div class="flex items-start space-x-3">
                         <div class="bg-orange-100 p-2 rounded-full">
@@ -512,6 +512,7 @@
                     
                 case 'backup':
                     // Go to profile page with backup highlight
+                    console.log('Navigating to backup profile page');
                     window.location.href = '/profile?highlight=backup';
                     break;
                     
@@ -541,6 +542,7 @@
         // Filter functionality
         document.addEventListener('DOMContentLoaded', function() {
             const filterBtns = document.querySelectorAll('.filter-btn');
+            console.log('Found filter buttons:', filterBtns.length);
             
             // Load real notifications on page load
             loadNotifications();
@@ -558,9 +560,12 @@
             // Refresh notifications every 30 seconds
             setInterval(loadNotifications, 30000);
 
-            filterBtns.forEach(btn => {
-                btn.addEventListener('click', function() {
+            filterBtns.forEach((btn, index) => {
+                console.log('Adding click listener to button', index, btn.textContent);
+                btn.addEventListener('click', function(e) {
+                    e.preventDefault();
                     const filter = this.getAttribute('data-filter');
+                    console.log('Filter button clicked:', filter);
                     
                     // Update button states
                     filterBtns.forEach(b => {
@@ -574,15 +579,23 @@
                     const allNotifications = document.querySelectorAll('.notification-item');
                     allNotifications.forEach(notification => {
                         const type = notification.getAttribute('data-type');
-                        if (filter === 'all' || type === filter || 
-                            (filter === 'critical' && (type === 'expiry' || type === 'backup')) ||
-                            (filter === 'inventory' && (type === 'expiry' || type === 'inventory')) ||
-                            (filter === 'payments' && type === 'payment') ||
-                            (filter === 'system' && (type === 'subscription' || type === 'backup'))) {
-                            notification.style.display = 'block';
+                        let shouldShow = false;
+                        
+                        if (filter === 'all') {
+                            shouldShow = true;
+                        } else if (filter === 'critical') {
+                            shouldShow = (type === 'expiry' || type === 'backup');
+                        } else if (filter === 'inventory') {
+                            shouldShow = (type === 'expiry' || type === 'inventory');
+                        } else if (filter === 'payments') {
+                            shouldShow = (type === 'payment');
+                        } else if (filter === 'system') {
+                            shouldShow = (type === 'subscription' || type === 'backup' || type === 'system');
                         } else {
-                            notification.style.display = 'none';
+                            shouldShow = (type === filter);
                         }
+                        
+                        notification.style.display = shouldShow ? 'block' : 'none';
                     });
                 });
             });
