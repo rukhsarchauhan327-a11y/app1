@@ -2004,6 +2004,7 @@
                     localStorage.removeItem('kiranakonnect_persistent_cart');
                     
                     // Render cart items dynamically to prevent duplicates
+                    console.log('About to render cart items:', cartItems);
                     renderCartItems();
                     
                     // Set up periodic check for new items from inventory
