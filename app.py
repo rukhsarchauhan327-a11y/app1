@@ -537,6 +537,40 @@ def api_get_bill(bill_number):
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)}), 500
 
+@app.route('/api/payments', methods=['POST'])
+def create_payment():
+    """Record a payment for a customer"""
+    try:
+        data = request.get_json()
+        
+        customer_id = data.get('customer_id')
+        amount = data.get('amount')
+        payment_mode = data.get('payment_mode', 'cash')
+        reference_number = data.get('reference_number', '')
+        notes = data.get('notes', '')
+        
+        if not customer_id or not amount:
+            return jsonify({'error': 'Customer ID and amount are required'}), 400
+        
+        # Create new payment record
+        payment = Payment(
+            customer_id=customer_id,
+            amount=amount,
+            payment_mode=payment_mode,
+            reference_number=reference_number,
+            notes=notes,
+            created_at=datetime.utcnow()
+        )
+        
+        db.session.add(payment)
+        db.session.commit()
+        
+        return jsonify({'message': 'Payment recorded successfully', 'payment_id': payment.id}), 201
+        
+    except Exception as e:
+        logging.error(f"Error creating payment: {str(e)}")
+        return jsonify({'error': 'Failed to record payment'}), 500
+
 @app.route('/export-business-data')
 def export_business_data():
     """Export comprehensive business data as PDF"""
