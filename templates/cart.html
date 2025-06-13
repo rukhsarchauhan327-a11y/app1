@@ -2165,32 +2165,10 @@
                         };
                     }
                     
-                    // Load existing cart data from persistent storage
-                    const persistentData = localStorage.getItem('kiranakonnect_persistent_cart');
-                    if (persistentData) {
-                        try {
-                            const savedItems = JSON.parse(persistentData);
-                            savedItems.forEach((item, index) => {
-                                const itemId = index + 1;
-                                cartItems[itemId] = {
-                                    id: itemId,
-                                    name: item.name,
-                                    price: item.price,
-                                    quantity: item.quantity,
-                                    unit: item.unit || 'piece',
-                                    unitPrice: item.unitPrice,
-                                    type: item.type || 'unit',
-                                    mfgDate: item.mfgDate || '',
-                                    expDate: item.expDate || '',
-                                    datesHidden: false,
-                                    quantityDisplay: item.quantityDisplay
-                                };
-                            });
-                            console.log('Loaded persistent cart items:', cartItems);
-                        } catch (error) {
-                            console.error('Error loading persistent cart:', error);
-                        }
-                    }
+                    // Clear all localStorage to prevent duplicates
+                    localStorage.removeItem('kiranakonnect_cart');
+                    localStorage.removeItem('kiranakonnect_persistent_cart');
+                    cartItems = {};
                     
                     // Only load new items from inventory (disable duplicate loading)
                     loadCartItems();
