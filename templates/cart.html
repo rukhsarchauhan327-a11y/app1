@@ -1246,10 +1246,16 @@
             const existingItemIds = Array.from(document.querySelectorAll('#cart-items > div[id^="cart-item-"]'))
                 .map(div => parseInt(div.id.replace('cart-item-', '')));
             
+            console.log('Existing cart item IDs:', existingItemIds);
+            console.log('All cart items in memory:', Object.keys(cartItems));
+            
+            let itemsAdded = 0;
             Object.keys(cartItems).forEach(itemId => {
                 const numericId = parseInt(itemId);
                 if (!existingItemIds.includes(numericId)) {
                     const item = cartItems[itemId];
+                    console.log(`Need to add item ${itemId}: ${item.name}`);
+                    
                     const addMoreSection = document.getElementById('add-items-section');
                     
                     // Create the cart item element
@@ -1280,15 +1286,22 @@
                     // Insert before "Add More Items" section
                     if (addMoreSection) {
                         addMoreSection.parentNode.insertBefore(cartItemDiv, addMoreSection);
+                        console.log(`Successfully inserted ${item.name} before add-more section`);
                     } else {
                         document.getElementById('cart-items').appendChild(cartItemDiv);
+                        console.log(`Successfully appended ${item.name} to cart`);
                     }
                     
-                    console.log(`Added ${item.name} to cart display`);
+                    itemsAdded++;
                 }
             });
             
-            calculateTotals();
+            if (itemsAdded > 0) {
+                console.log(`Added ${itemsAdded} items to DOM, recalculating totals`);
+                calculateTotals();
+            } else {
+                console.log('No new items to add to DOM');
+            }
         }
 
         // Render only new cart items that aren't in the HTML yet
@@ -1874,15 +1887,10 @@
                     }
                     
                     // Load and merge any new items from inventory
-                    const itemsBeforeLoad = Object.keys(cartItems).length;
                     loadCartItems();
-                    const itemsAfterLoad = Object.keys(cartItems).length;
                     
-                    // If new items were loaded, render them immediately
-                    if (itemsAfterLoad > itemsBeforeLoad) {
-                        console.log(`${itemsAfterLoad - itemsBeforeLoad} new items loaded, rendering now`);
-                        addNewItemsToDOM();
-                    }
+                    // Always check for new items and render them
+                    addNewItemsToDOM();
                     
                     calculateTotals();
                     initializeDateToggles();
