@@ -5,77 +5,35 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Inventory - Kirana Konnect</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script> window.FontAwesomeConfig = { autoReplaceSvg: 'nest'};</script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    <style>::-webkit-scrollbar { display: none;}</style>
-    
-    <script>tailwind.config = {
-  "theme": {
-    "extend": {
-      "colors": {
-        "primary": "#4CAF50",
-        "secondary": "#2196F3",
-        "accent": "#FF9800",
-        "danger": "#F44336",
-        "dark": "#333333",
-        "light": "#F5F5F5"
-      },
-      "fontFamily": {
-        "poppins": [
-          "Poppins",
-          "sans-serif"
-        ],
-        "sans": [
-          "Inter",
-          "sans-serif"
-        ]
-      }
-    }
-  }
-};</script>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;500;600;700;800;900&display=swap">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap">
-<style>
-      body {
-        font-family: 'Inter', sans-serif !important;
-      }
-      
-      /* Preserve Font Awesome icons */
-      .fa, .fas, .far, .fal, .fab {
-        font-family: "Font Awesome 6 Free", "Font Awesome 6 Brands" !important;
-      }
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .font-poppins { font-family: 'Poppins', sans-serif; }
+        .text-primary { color: #10B981; }
+        .bg-primary { background-color: #10B981; }
+        .text-accent { color: #F59E0B; }
+        .bg-accent { background-color: #F59E0B; }
+        .text-danger { color: #EF4444; }
+        .bg-danger { background-color: #EF4444; }
+        .text-dark { color: #1F2937; }
+        .bg-primary-dark { background-color: #059669; }
     </style>
-<style>
-  .highlighted-section {
-    outline: 2px solid #3F20FB;
-    background-color: rgba(63, 32, 251, 0.1);
-  }
-
-  .edit-button {
-    position: absolute;
-    z-index: 1000;
-  }
-
-  ::-webkit-scrollbar {
-    display: none;
-  }
-
-  html, body {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-  }
-
-  .scrollbar-hide {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-  }
-  .scrollbar-hide::-webkit-scrollbar {
-    display: none;
-  }
-</style>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#10B981',
+                        accent: '#F59E0B',
+                        danger: '#EF4444',
+                        dark: '#1F2937'
+                    }
+                }
+            }
+        }
+    </script>
 </head>
+
 <body class="font-poppins bg-gray-50">
     <!-- Header Section -->
     <header id="header" class="bg-white shadow-sm fixed top-0 left-0 right-0 z-10">
@@ -94,501 +52,105 @@
     <div id="inventory-stats" class="bg-white px-4 py-3 mt-16 shadow-sm border-b">
         <div class="grid grid-cols-4 gap-2">
             <div class="text-center cursor-pointer hover:bg-gray-50 p-2 rounded-lg transition-colors" onclick="filterBy('all')">
-                <p class="text-2xl font-bold text-dark">156</p>
+                <p class="text-2xl font-bold text-dark" id="total-products">0</p>
                 <p class="text-xs text-gray-500">Total Products</p>
             </div>
             <div class="text-center cursor-pointer hover:bg-gray-50 p-2 rounded-lg transition-colors" onclick="filterBy('available')">
-                <p class="text-2xl font-bold text-primary">142</p>
+                <p class="text-2xl font-bold text-primary" id="available-products">0</p>
                 <p class="text-xs text-gray-500">Available</p>
             </div>
-            <div class="text-center cursor-pointer hover:bg-gray-50 p-2 rounded-lg transition-colors" onclick="filterBy('expiring')">
-                <p class="text-2xl font-bold text-danger">6</p>
-                <p class="text-xs text-gray-500">Expiring</p>
-            </div>
-            <div class="text-center cursor-pointer hover:bg-gray-50 p-2 rounded-lg transition-colors" onclick="filterBy('lowstock')">
-                <p class="text-2xl font-bold text-accent">8</p>
+            <div class="text-center cursor-pointer hover:bg-gray-50 p-2 rounded-lg transition-colors" onclick="filterBy('low-stock')">
+                <p class="text-2xl font-bold text-accent" id="low-stock-products">0</p>
                 <p class="text-xs text-gray-500">Low Stock</p>
             </div>
+            <div class="text-center cursor-pointer hover:bg-gray-50 p-2 rounded-lg transition-colors" onclick="filterBy('expired')">
+                <p class="text-2xl font-bold text-danger" id="expired-products">0</p>
+                <p class="text-xs text-gray-500">Expired</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filter Tabs -->
+    <div class="bg-white px-4 py-3 border-b">
+        <div class="flex space-x-2 overflow-x-auto">
+            <button class="category-btn bg-primary text-white px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap" onclick="filterByCategory('all')" data-category="all">All</button>
+            <button class="category-btn bg-gray-100 text-gray-600 px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap" onclick="filterByCategory('staples')" data-category="staples">Staples</button>
+            <button class="category-btn bg-gray-100 text-gray-600 px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap" onclick="filterByCategory('beverages')" data-category="beverages">Beverages</button>
+            <button class="category-btn bg-gray-100 text-gray-600 px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap" onclick="filterByCategory('snacks')" data-category="snacks">Snacks</button>
+            <button class="category-btn bg-gray-100 text-gray-600 px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap" onclick="filterByCategory('dairy')" data-category="dairy">Dairy</button>
         </div>
     </div>
 
     <!-- Main Content -->
-    <main id="main-content" class="pb-24">
-        <!-- Category Tabs -->
-        <div id="category-tabs" class="bg-white px-4 py-3 shadow-sm">
-            <div class="flex space-x-4 overflow-x-auto scrollbar-hide">
-                <button class="category-tab active bg-primary text-white px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap hover:bg-primary/90 transition-colors" onclick="filterCategory('all')">All</button>
-                <button class="category-tab bg-gray-100 text-gray-600 px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap hover:bg-gray-200 transition-colors" onclick="filterCategory('grains')">Grains</button>
-                <button class="category-tab bg-gray-100 text-gray-600 px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap hover:bg-gray-200 transition-colors" onclick="filterCategory('snacks')">Snacks</button>
-                <button class="category-tab bg-gray-100 text-gray-600 px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap hover:bg-gray-200 transition-colors" onclick="filterCategory('oils')">Oils</button>
-                <button class="category-tab bg-gray-100 text-gray-600 px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap hover:bg-gray-200 transition-colors" onclick="filterCategory('beverages')">Beverages</button>
-                <button class="category-tab bg-gray-100 text-gray-600 px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap hover:bg-gray-200 transition-colors" onclick="filterCategory('household')">Household</button>
-                <button class="category-tab bg-gray-100 text-gray-600 px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap hover:bg-gray-200 transition-colors" onclick="filterCategory('medical')">Medical</button>
-                <button class="category-tab bg-gray-100 text-gray-600 px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap hover:bg-gray-200 transition-colors" onclick="filterCategory('others')">Others</button>
-            </div>
-        </div>
-
-        <!-- Inventory Items List -->
-        <div id="inventory-list" class="p-4 space-y-4">
-            <!-- Weight-Based Item - Wheat Flour -->
-            <div id="item-1" class="bg-white rounded-xl p-4 shadow-sm border hover:shadow-md transition-shadow cursor-pointer" data-category="grains" data-status="lowstock" onclick="viewProductDetails('item-1')">
-                <div class="flex items-center space-x-4">
-                    <div class="w-16 h-16 rounded-xl overflow-hidden">
-                        <img class="w-full h-full object-cover" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/ad8aa6cee1-b621e3cd72c9ea714c53.png" alt="wheat flour bag packaging product">
-                    </div>
-                    <div class="flex-1">
-                        <div class="flex items-start justify-between">
-                            <div class="flex-1">
-                                <h3 class="font-bold text-dark text-lg">Wheat Flour</h3>
-                                <div class="text-xs text-gray-500 mt-1">
-                                    <p>MFG: 10 Jan 2025</p>
-                                    <p>EXP: 10 Jan 2026</p>
-                                </div>
-                            </div>
-                            <div class="text-right">
-                                <span class="bg-danger text-white text-xs px-2 py-1 rounded-full font-semibold">Low Stock</span>
-                                <p class="text-lg font-bold text-primary mt-2">₹50/Kg</p>
-                                <p class="text-sm text-gray-600">100 Kg</p>
-                            </div>
-                        </div>
-                        <div class="flex items-center justify-end space-x-2 mt-3">
-                            <button class="p-2 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors" onclick="event.stopPropagation(); refillItem('item-1')" title="Refill Stock">
-                                <i class="fa-solid fa-plus text-blue-600 text-sm"></i>
-                            </button>
-                            <button class="p-2 bg-green-50 hover:bg-green-100 rounded-lg transition-colors" onclick="event.stopPropagation(); addToCart('item-1')" title="Add to Cart">
-                                <i class="fa-solid fa-shopping-cart text-green-600 text-sm"></i>
-                            </button>
-                            <button class="p-2 bg-red-50 hover:bg-red-100 rounded-lg transition-colors" onclick="event.stopPropagation(); deleteItem('item-1')" title="Delete Item">
-                                <i class="fa-solid fa-trash text-red-600 text-sm"></i>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Bottle-Based Item - Coconut Oil -->
-            <div id="item-2" class="bg-white rounded-xl p-4 shadow-sm border hover:shadow-md transition-shadow cursor-pointer" data-category="oils" data-status="available" onclick="viewProductDetails('item-2')">
-                <div class="flex items-center space-x-4">
-                    <div class="w-16 h-16 rounded-xl overflow-hidden">
-                        <img class="w-full h-full object-cover" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/02cda64d32-ca63fc32eaab87b7db4c.png" alt="coconut oil bottle product packaging">
-                    </div>
-                    <div class="flex-1">
-                        <div class="flex items-start justify-between">
-                            <div class="flex-1">
-                                <h3 class="font-bold text-dark text-lg">Coconut Oil</h3>
-                                <div class="text-xs text-gray-500 mt-1">
-                                    <p>MFG: 15 Feb 2025</p>
-                                    <p>EXP: 15 Feb 2027</p>
-                                </div>
-                            </div>
-                            <div class="text-right">
-                                <span class="bg-primary text-white text-xs px-2 py-1 rounded-full font-semibold">In Stock</span>
-                                <p class="text-lg font-bold text-primary mt-2">₹180/Bottle</p>
-                                <p class="text-sm text-gray-600">25 Bottles (500ml)</p>
-                            </div>
-                        </div>
-                        <div class="flex items-center justify-end space-x-2 mt-3">
-                            <button class="p-2 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors" onclick="event.stopPropagation(); refillItem('item-2')" title="Refill Stock">
-                                <i class="fa-solid fa-plus text-blue-600 text-sm"></i>
-                            </button>
-                            <button class="p-2 bg-green-50 hover:bg-green-100 rounded-lg transition-colors" onclick="event.stopPropagation(); addToCart('item-2')" title="Add to Cart">
-                                <i class="fa-solid fa-shopping-cart text-green-600 text-sm"></i>
-                            </button>
-                            <button class="p-2 bg-red-50 hover:bg-red-100 rounded-lg transition-colors" onclick="event.stopPropagation(); deleteItem('item-2')" title="Delete Item">
-                                <i class="fa-solid fa-trash text-red-600 text-sm"></i>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Packet-Based Item - Aashirvaad Atta -->
-            <div id="item-3" class="bg-white rounded-xl p-4 shadow-sm border hover:shadow-md transition-shadow cursor-pointer" data-category="grains" data-status="available" onclick="viewProductDetails('item-3')">
-                <div class="flex items-center space-x-4">
-                    <div class="w-16 h-16 rounded-xl overflow-hidden">
-                        <img class="w-full h-full object-cover" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/dd29a1f85f-469e6193e37489fc8c43.png" alt="aashirvaad atta bag packaging">
-                    </div>
-                    <div class="flex-1">
-                        <div class="flex items-start justify-between">
-                            <div class="flex-1">
-                                <h3 class="font-bold text-dark text-lg">Aashirvaad Atta</h3>
-                                <div class="text-xs text-gray-500 mt-1">
-                                    <p>MFG: 15 Jan 2025</p>
-                                    <p>EXP: 15 Jan 2026</p>
-                                </div>
-                            </div>
-                            <div class="text-right">
-                                <span class="bg-primary text-white text-xs px-2 py-1 rounded-full font-semibold">In Stock</span>
-                                <p class="text-lg font-bold text-primary mt-2">₹120/Bag</p>
-                                <p class="text-sm text-gray-600">5 Bags (10 Kg)</p>
-                            </div>
-                        </div>
-                        <div class="flex items-center justify-end space-x-2 mt-3">
-                            <button class="p-2 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors" onclick="event.stopPropagation(); refillItem('item-3')" title="Refill Stock">
-                                <i class="fa-solid fa-plus text-blue-600 text-sm"></i>
-                            </button>
-                            <button class="p-2 bg-green-50 hover:bg-green-100 rounded-lg transition-colors" onclick="event.stopPropagation(); addToCart('item-3')" title="Add to Cart">
-                                <i class="fa-solid fa-shopping-cart text-green-600 text-sm"></i>
-                            </button>
-                            <button class="p-2 bg-red-50 hover:bg-red-100 rounded-lg transition-colors" onclick="event.stopPropagation(); deleteItem('item-3')" title="Delete Item">
-                                <i class="fa-solid fa-trash text-red-600 text-sm"></i>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Bag-Based Item - Rice -->
-            <div id="item-4" class="bg-white rounded-xl p-4 shadow-sm border hover:shadow-md transition-shadow cursor-pointer" data-category="snacks" data-status="available" onclick="viewProductDetails('item-4')">
-                <div class="flex items-center space-x-4">
-                    <div class="w-16 h-16 rounded-xl overflow-hidden">
-                        <img class="w-full h-full object-cover" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/5fc8cd7bc4-09ff84e61b7234ca57e8.png" alt="basmati rice bag packaging product">
-                    </div>
-                    <div class="flex-1">
-                        <div class="flex items-start justify-between">
-                            <div class="flex-1">
-                                <h3 class="font-bold text-dark text-lg">Basmati Rice</h3>
-                                <div class="text-xs text-gray-500 mt-1">
-                                    <p>MFG: 05 Apr 2025</p>
-                                    <p>EXP: 05 Apr 2027</p>
-                                </div>
-                            </div>
-                            <div class="text-right">
-                                <span class="bg-accent text-white text-xs px-2 py-1 rounded-full font-semibold">Medium</span>
-                                <p class="text-lg font-bold text-primary mt-2">₹650/Bag</p>
-                                <p class="text-sm text-gray-600">8 Bags (10Kg)</p>
-                            </div>
-                        </div>
-                        <div class="flex items-center justify-end space-x-2 mt-3">
-                            <button class="p-2 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors" onclick="refillItem('item-4')" title="Refill Stock">
-                                <i class="fa-solid fa-plus text-blue-600 text-sm"></i>
-                            </button>
-                            <button class="p-2 bg-green-50 hover:bg-green-100 rounded-lg transition-colors" onclick="addToCart('item-4')" title="Add to Cart">
-                                <i class="fa-solid fa-shopping-cart text-green-600 text-sm"></i>
-                            </button>
-                            <button class="p-2 bg-red-50 hover:bg-red-100 rounded-lg transition-colors" onclick="deleteItem('item-4')" title="Delete Item">
-                                <i class="fa-solid fa-trash text-red-600 text-sm"></i>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Piece-Based Item - Soap -->
-            <div id="item-5" class="bg-white rounded-xl p-4 shadow-sm border hover:shadow-md transition-shadow cursor-pointer" data-category="household" data-status="available" onclick="viewProductDetails('item-5')">
-                <div class="flex items-center space-x-4">
-                    <div class="w-16 h-16 rounded-xl overflow-hidden">
-                        <img class="w-full h-full object-cover" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/50a0fc9b33-ba52fd7cb36100ee8a97.png" alt="soap bar household product packaging">
-                    </div>
-                    <div class="flex-1">
-                        <div class="flex items-start justify-between">
-                            <div class="flex-1">
-                                <h3 class="font-bold text-dark text-lg">Dettol Soap</h3>
-                            </div>
-                            <div class="text-right">
-                                <span class="bg-primary text-white text-xs px-2 py-1 rounded-full font-semibold">In Stock</span>
-                                <p class="text-lg font-bold text-primary mt-2">₹45/Piece</p>
-                                <p class="text-sm text-gray-600">30 Pieces (125g)</p>
-                            </div>
-                        </div>
-                        <div class="flex items-center justify-end space-x-2 mt-3">
-                            <button class="p-2 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors" onclick="refillItem('item-5')" title="Refill Stock">
-                                <i class="fa-solid fa-plus text-blue-600 text-sm"></i>
-                            </button>
-                            <button class="p-2 bg-green-50 hover:bg-green-100 rounded-lg transition-colors" onclick="addToCart('item-5')" title="Add to Cart">
-                                <i class="fa-solid fa-shopping-cart text-green-600 text-sm"></i>
-                            </button>
-                            <button class="p-2 bg-red-50 hover:bg-red-100 rounded-lg transition-colors" onclick="deleteItem('item-5')" title="Delete Item">
-                                <i class="fa-solid fa-trash text-red-600 text-sm"></i>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Volume-Based Item - Milk -->
-            <div id="item-6" class="bg-white rounded-xl p-4 shadow-sm border hover:shadow-md transition-shadow cursor-pointer" data-category="snacks" data-status="available" onclick="viewProductDetails('item-6')">
-                <div class="flex items-center space-x-4">
-                    <div class="w-16 h-16 rounded-xl overflow-hidden">
-                        <img class="w-full h-full object-cover" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/4dbd7f8565-a15492fc004780da6dd6.png" alt="milk carton dairy product packaging">
-                    </div>
-                    <div class="flex-1">
-                        <div class="flex items-start justify-between">
-                            <div class="flex-1">
-                                <h3 class="font-bold text-dark text-lg">Fresh Milk</h3>
-                                <div class="text-xs text-gray-500 mt-1">
-                                    <p>MFG: 08 Jun 2025</p>
-                                    <p>EXP: 10 Jun 2025</p>
-                                </div>
-                            </div>
-                            <div class="text-right">
-                                <span class="bg-danger text-white text-xs px-2 py-1 rounded-full font-semibold">Expiring</span>
-                                <p class="text-lg font-bold text-primary mt-2">₹65/Litre</p>
-                                <p class="text-sm text-gray-600">15 Litres</p>
-                            </div>
-                        </div>
-                        <div class="flex items-center justify-end space-x-2 mt-3">
-                            <button class="p-2 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors" onclick="refillItem('item-6')" title="Refill Stock">
-                                <i class="fa-solid fa-plus text-blue-600 text-sm"></i>
-                            </button>
-                            <button class="p-2 bg-green-50 hover:bg-green-100 rounded-lg transition-colors" onclick="addToCart('item-6')" title="Add to Cart">
-                                <i class="fa-solid fa-shopping-cart text-green-600 text-sm"></i>
-                            </button>
-                            <button class="p-2 bg-red-50 hover:bg-red-100 rounded-lg transition-colors" onclick="deleteItem('item-6')" title="Delete Item">
-                                <i class="fa-solid fa-trash text-red-600 text-sm"></i>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Box-Based Item - Medicine -->
-            <div id="item-7" class="bg-white rounded-xl p-4 shadow-sm border hover:shadow-md transition-shadow cursor-pointer" data-category="medical" data-status="available" onclick="viewProductDetails('item-7')">
-                <div class="flex items-center space-x-4">
-                    <div class="w-16 h-16 rounded-xl overflow-hidden bg-blue-100 flex items-center justify-center">
-                        <i class="fa-solid fa-pills text-blue-600 text-2xl"></i>
-                    </div>
-                    <div class="flex-1">
-                        <div class="flex items-start justify-between">
-                            <div class="flex-1">
-                                <h3 class="font-bold text-dark text-lg">Paracetamol</h3>
-                                <div class="text-xs text-gray-500 mt-1">
-                                    <p>MFG: 01 Mar 2025</p>
-                                    <p>EXP: 01 Mar 2028</p>
-                                </div>
-                            </div>
-                            <div class="text-right">
-                                <span class="bg-primary text-white text-xs px-2 py-1 rounded-full font-semibold">In Stock</span>
-                                <p class="text-lg font-bold text-primary mt-2">₹25/Box</p>
-                                <p class="text-sm text-gray-600">12 Boxes (10 tablets)</p>
-                            </div>
-                        </div>
-                        <div class="flex items-center justify-end space-x-2 mt-3">
-                            <button class="p-2 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors" onclick="refillItem('item-7')" title="Refill Stock">
-                                <i class="fa-solid fa-plus text-blue-600 text-sm"></i>
-                            </button>
-                            <button class="p-2 bg-green-50 hover:bg-green-100 rounded-lg transition-colors" onclick="addToCart('item-7')" title="Add to Cart">
-                                <i class="fa-solid fa-shopping-cart text-green-600 text-sm"></i>
-                            </button>
-                            <button class="p-2 bg-red-50 hover:bg-red-100 rounded-lg transition-colors" onclick="deleteItem('item-7')" title="Delete Item">
-                                <i class="fa-solid fa-trash text-red-600 text-sm"></i>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
+    <main class="px-4 pt-4 pb-20">
+        <div id="inventory-items" class="space-y-3">
+            <!-- Products will be loaded here -->
         </div>
     </main>
 
-    <!-- Add to Cart Modal -->
-    <div id="cart-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden">
-        <div class="flex items-center justify-center min-h-screen p-4 pb-24">
-            <div class="bg-white rounded-lg w-full max-w-sm mx-auto max-h-screen overflow-y-auto">
-                <!-- Modal Header -->
-                <div class="flex items-center justify-between p-4 border-b border-gray-200">
-                    <h3 class="text-lg font-bold text-dark">Add to Cart</h3>
-                    <button id="close-modal" class="p-1 hover:bg-gray-100 rounded">
-                        <i class="fa-solid fa-times text-gray-600"></i>
-                    </button>
-                </div>
-
-                <!-- Modal Content -->
-                <div class="p-4">
-                    <!-- Product Info -->
-                    <div class="flex items-center space-x-3 mb-4 p-3 bg-gray-50 rounded-lg">
-                        <img id="modal-product-img" class="w-12 h-12 rounded object-cover" src="" alt="Product">
-                        <div class="flex-1">
-                            <h4 id="modal-product-name" class="font-medium text-dark"></h4>
-                            <p id="modal-product-price" class="text-sm text-gray-600"></p>
-                            <p id="modal-product-stock" class="text-xs text-green-600"></p>
-                        </div>
-                    </div>
-
-                    <!-- Input Method Selection (for weight-based products) -->
-                    <div id="input-method" class="mb-4 hidden">
-                        <label class="block text-sm font-medium text-dark mb-3">Select Input Method</label>
-                        <div class="space-y-2">
-                            <label class="flex items-center space-x-3 cursor-pointer p-3 bg-gray-50 rounded-lg hover:bg-gray-100">
-                                <input type="radio" name="inputMethod" value="quantity" class="text-orange-500 focus:ring-orange-500" checked>
-                                <span class="text-sm font-medium text-dark">Enter Quantity</span>
-                            </label>
-                            <label class="flex items-center space-x-3 cursor-pointer p-3 bg-gray-50 rounded-lg hover:bg-gray-100">
-                                <input type="radio" name="inputMethod" value="price" class="text-orange-500 focus:ring-orange-500">
-                                <span class="text-sm font-medium text-dark">Enter Price</span>
-                            </label>
-                        </div>
-                    </div>
-
-                    <!-- Quantity Input Section -->
-                    <div id="quantity-section" class="mb-4">
-                        <label id="quantity-label" class="block text-sm font-medium text-dark mb-3">Quantity</label>
-                        <div id="bag-based-input" class="flex items-center space-x-2">
-                            <button id="decrease-qty" class="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center hover:bg-gray-200">
-                                <i class="fa-solid fa-minus text-gray-600 text-sm"></i>
-                            </button>
-                            <input type="number" id="quantity-input" value="1" min="1" class="w-20 px-2 py-2 border border-gray-300 rounded-lg text-center font-medium text-base">
-                            <button id="increase-qty" class="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center hover:bg-gray-200">
-                                <i class="fa-solid fa-plus text-gray-600 text-sm"></i>
-                            </button>
-                        </div>
-                        <div id="weight-based-input" class="flex items-center space-x-2 hidden">
-                            <input type="number" id="weight-quantity-input" value="1" min="0" step="0.001" class="w-20 px-2 py-2 border border-gray-300 rounded-lg text-center font-medium text-base">
-                            <select id="unit-select" class="w-16 px-1 py-2 border border-gray-300 rounded-lg font-medium text-sm">
-                                <option value="kg">Kg</option>
-                                <option value="gm">Gm</option>
-                            </select>
-                        </div>
-                        <p class="text-xs text-gray-500 mt-2 text-center" id="quantity-help">Tap + or - to adjust quantity</p>
-                    </div>
-
-                    <!-- Price Input Section (for weight-based products) -->
-                    <div id="price-section" class="mb-4 hidden">
-                        <label class="block text-sm font-medium text-dark mb-3">Price</label>
-                        <div class="flex items-center space-x-2 mb-3">
-                            <span class="text-lg font-medium text-gray-600 flex-shrink-0">₹</span>
-                            <input type="number" id="price-input" value="110" min="0" step="0.01" class="flex-1 px-3 py-3 border border-orange-300 rounded-lg text-center font-medium text-lg border-2 min-w-0">
-                        </div>
-                    </div>
-
-                    <!-- Auto-calculated Display -->
-                    <div class="mb-6 p-4 bg-blue-50 rounded-lg">
-                        <div class="flex justify-between items-center mb-2">
-                            <span class="text-sm text-gray-600">Quantity:</span>
-                            <span id="calculated-quantity" class="text-sm font-medium text-dark">1 Unit</span>
-                        </div>
-                        <div class="flex justify-between items-center">
-                            <span class="text-sm text-gray-600">Total Price:</span>
-                            <span id="calculated-price" class="text-lg font-bold text-green-600">₹0</span>
-                        </div>
-                    </div>
-
-                    <!-- Modal Actions -->
-                    <div class="flex space-x-3">
-                        <button id="cancel-btn" class="flex-1 py-3 px-4 bg-gray-200 text-gray-700 rounded-lg font-medium hover:bg-gray-300 transition-colors">
-                            Cancel
-                        </button>
-                        <button id="add-cart-btn" class="flex-1 py-3 px-4 bg-orange-500 text-white rounded-lg font-medium hover:bg-orange-600 transition-colors">
-                            Add to Cart
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
+    <!-- Floating Action Button -->
+    <div class="fixed bottom-20 right-4 z-20">
+        <button class="bg-primary text-white w-14 h-14 rounded-full shadow-lg hover:bg-primary-dark transition-colors flex items-center justify-center" onclick="window.location.href='/add-item'">
+            <i class="fa-solid fa-plus text-xl"></i>
+        </button>
     </div>
 
-    <!-- Search Modal -->
-    <div id="search-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden">
-        <div class="fixed inset-0 flex flex-col">
-            <div class="bg-white p-4">
-                <div class="flex items-center space-x-3">
-                    <button onclick="closeSearch()" class="p-2 hover:bg-gray-100 rounded-lg">
-                        <i class="fa-solid fa-arrow-left text-gray-600"></i>
-                    </button>
-                    <div class="flex-1 relative">
-                        <input type="text" id="search-input" placeholder="Search products to add..." class="w-full px-4 py-3 border border-gray-300 rounded-lg text-sm">
-                        <button onclick="clearSearch()" class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600">
-                            <i class="fa-solid fa-times"></i>
-                        </button>
-                    </div>
-                    <button onclick="openScanner()" class="p-2 bg-primary text-white rounded-lg hover:bg-primary-dark">
-                        <i class="fa-solid fa-barcode"></i>
-                    </button>
-                </div>
-            </div>
-            <div class="flex-1 bg-white px-4 pb-4 overflow-y-auto">
-                <div id="search-results" class="space-y-3">
-                    <!-- Search results will appear here -->
-                </div>
-                <div id="search-empty" class="text-center py-12 hidden">
-                    <i class="fa-solid fa-search text-gray-300 text-4xl mb-4"></i>
-                    <p class="text-gray-500">No products found</p>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Scanner Modal -->
-    <div id="scanner-modal" class="fixed inset-0 bg-black bg-opacity-90 z-50 hidden">
-        <div class="fixed inset-0 flex flex-col">
-            <div class="bg-black text-white p-4">
-                <div class="flex items-center justify-between">
-                    <button onclick="closeScanner()" class="p-2 hover:bg-gray-800 rounded-lg">
-                        <i class="fa-solid fa-times text-white"></i>
-                    </button>
-                    <h2 class="text-lg font-semibold">Scan to Add Product</h2>
-                    <button onclick="toggleFlashlight()" class="p-2 hover:bg-gray-800 rounded-lg">
-                        <i class="fa-solid fa-flashlight text-white"></i>
-                    </button>
-                </div>
-            </div>
-            <div class="flex-1 relative bg-black">
-                <div class="absolute inset-0 flex items-center justify-center">
-                    <div class="relative">
-                        <div class="w-64 h-64 border-2 border-white border-dashed rounded-lg flex items-center justify-center">
-                            <div class="text-center text-white">
-                                <i class="fa-solid fa-barcode text-4xl mb-4"></i>
-                                <p class="text-sm">Point camera at barcode</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="absolute bottom-8 left-1/2 transform -translate-x-1/2">
-                    <button onclick="manualBarcodeEntry()" class="bg-white text-black px-4 py-2 rounded-lg font-medium">
-                        Enter Manually
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Manual Barcode Entry Modal -->
-    <div id="manual-barcode-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden">
-        <div class="flex items-center justify-center min-h-screen p-4">
-            <div class="bg-white rounded-lg p-6 w-full max-w-md">
-                <h3 class="text-lg font-semibold mb-4">Enter Barcode</h3>
-                <input type="text" id="manual-barcode-input" placeholder="Enter barcode number" class="w-full px-4 py-3 border border-gray-300 rounded-lg mb-4">
-                <div class="flex space-x-3">
-                    <button onclick="closeManualBarcode()" class="flex-1 bg-gray-500 text-white py-2 px-4 rounded-lg hover:bg-gray-600">
-                        Cancel
-                    </button>
-                    <button onclick="searchByBarcode()" class="flex-1 bg-primary text-white py-2 px-4 rounded-lg hover:bg-primary-dark">
-                        Search
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Floating Add Button -->
-    <button id="add-item-btn" class="fixed bottom-20 right-4 bg-primary text-white rounded-full w-14 h-14 shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center" onclick="addNewItem()">
-        <i class="fa-solid fa-plus text-xl"></i>
-    </button>
-
-    <!-- Bottom Navigation -->
-    <nav id="footer" class="fixed bottom-0 left-0 right-0 bg-white shadow-lg border-t">
-        <div class="flex justify-around items-end py-2">
-            <button class="flex flex-col items-center py-1 px-3" onclick="goToDashboard()">
-                <i class="fa-solid fa-home text-gray-400 text-xl"></i>
-                <span class="text-xs mt-1 text-gray-400">Home</span>
+    <!-- Navigation -->
+    <nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-4 py-2 z-10">
+        <div class="flex justify-around">
+            <button class="flex flex-col items-center p-2 text-gray-400" onclick="window.location.href='/dashboard'">
+                <i class="fa-solid fa-house text-xl mb-1"></i>
+                <span class="text-xs mt-1">Home</span>
             </button>
-            <button class="flex flex-col items-center py-1 px-3">
-                <i class="fa-solid fa-box text-primary text-xl"></i>
-                <span class="text-xs mt-1 text-primary font-semibold">Inventory</span>
+            <button class="flex flex-col items-center p-2 text-primary" onclick="window.location.href='/inventory'">
+                <i class="fa-solid fa-boxes-stacked text-xl mb-1"></i>
+                <span class="text-xs mt-1">Inventory</span>
             </button>
-            <button class="relative -top-4 bg-primary rounded-full p-4 shadow-lg" onclick="openScanner()">
-                <i class="fa-solid fa-barcode text-white text-xl"></i>
+            <button class="flex flex-col items-center p-2 text-gray-400 relative" onclick="window.location.href='/cart'">
+                <i class="fa-solid fa-shopping-cart text-xl mb-1"></i>
+                <span class="text-xs mt-1">Cart</span>
+                <div id="cart-badge" class="absolute -top-1 -right-1 bg-danger text-white text-xs rounded-full h-5 w-5 flex items-center justify-center" style="display: none;">0</div>
             </button>
-            <button class="flex flex-col items-center py-1 px-3 relative" onclick="goToCart()">
-                <i class="fa-solid fa-shopping-cart text-gray-400 text-xl"></i>
-                <span class="text-xs mt-1 text-gray-400">Cart</span>
-                <span class="absolute -top-1 -right-1 bg-danger text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold">7</span>
-            </button>
-            <button class="flex flex-col items-center py-1 px-3" onclick="goToProfile()">
-                <i class="fa-solid fa-user text-gray-400 text-xl"></i>
-                <span class="text-xs mt-1 text-gray-400">Profile</span>
+            <button class="flex flex-col items-center p-2 text-gray-400" onclick="window.location.href='/profile'">
+                <i class="fa-solid fa-user text-xl mb-1"></i>
+                <span class="text-xs mt-1">Profile</span>
             </button>
         </div>
     </nav>
+
+    <!-- Search Modal -->
+    <div id="search-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden">
+        <div class="absolute inset-0 flex items-start justify-center pt-16">
+            <div class="bg-white w-full max-w-md mx-4 rounded-lg shadow-lg">
+                <div class="p-4 border-b">
+                    <div class="flex items-center space-x-3">
+                        <i class="fa-solid fa-search text-gray-400"></i>
+                        <input type="text" id="search-input" placeholder="Search products..." class="flex-1 outline-none text-lg">
+                        <button onclick="closeSearch()" class="text-gray-400 hover:text-gray-600">
+                            <i class="fa-solid fa-times"></i>
+                        </button>
+                    </div>
+                </div>
+                <div id="search-results" class="max-h-64 overflow-y-auto p-4">
+                    <!-- Search results will appear here -->
+                </div>
+                <div id="search-empty" class="text-center py-8 text-gray-500 hidden">
+                    <i class="fa-solid fa-search text-4xl mb-2"></i>
+                    <p>No products found</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification -->
+    <div id="notification" class="fixed top-20 left-4 right-4 bg-green-500 text-white px-4 py-3 rounded-lg shadow-lg transform -translate-y-full transition-transform duration-300 z-50">
+        <div class="flex items-center justify-between">
+            <span id="notification-text">Notification message</span>
+            <button onclick="hideNotification()" class="text-white">
+                <i class="fa-solid fa-times"></i>
+            </button>
+        </div>
+    </div>
 
     <script>
         let currentFilter = 'all';
@@ -596,7 +158,7 @@
         let products = [];
         let filteredProducts = [];
 
-        // Load products from database on page load
+        // Load products from database
         async function loadProducts() {
             try {
                 const response = await fetch('/api/products');
@@ -606,14 +168,14 @@
                 products = await response.json();
                 filteredProducts = products;
                 renderProducts();
+                updateStats();
                 updateCartCount();
             } catch (error) {
                 console.error('Error loading products:', error);
-                // Show a more user-friendly error message
                 const container = document.getElementById('inventory-items');
                 if (container) {
                     container.innerHTML = `
-                        <div class="col-span-full text-center py-8">
+                        <div class="text-center py-8">
                             <i class="fa-solid fa-exclamation-triangle text-orange-500 text-4xl mb-4"></i>
                             <h3 class="text-lg font-semibold text-gray-700 mb-2">Unable to Load Products</h3>
                             <p class="text-gray-500 mb-4">Please check your connection and try again</p>
@@ -629,23 +191,34 @@
         // Render products in the inventory grid
         function renderProducts() {
             const container = document.getElementById('inventory-items');
-            container.innerHTML = '';
+            if (!container) return;
 
-            filteredProducts.forEach((product, index) => {
+            if (filteredProducts.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-8">
+                        <i class="fa-solid fa-box-open text-gray-400 text-4xl mb-4"></i>
+                        <h3 class="text-lg font-semibold text-gray-700 mb-2">No Products Found</h3>
+                        <p class="text-gray-500">Try adjusting your filters or search terms.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = filteredProducts.map(product => {
                 const statusClass = product.is_expired ? 'bg-red-500' : 
                                   product.is_low_stock ? 'bg-accent' : 'bg-primary';
                 const statusText = product.is_expired ? 'Expired' :
                                  product.is_low_stock ? 'Low Stock' : 'In Stock';
 
                 const priceDisplay = product.is_weight_based ? 
-                    `₹${product.price_per_kg}/${product.unit}` : 
+                    `₹${product.price_per_kg}/kg` : 
                     `₹${product.price}/Piece`;
 
                 const stockDisplay = product.is_weight_based ? 
-                    `${product.stock_quantity} ${product.unit} Available` :
+                    `${product.stock_quantity} kg Available` :
                     `${product.stock_quantity} Pieces Available`;
 
-                const productCard = `
+                return `
                     <div id="product-${product.id}" class="bg-white rounded-xl p-4 shadow-sm border hover:shadow-md transition-shadow cursor-pointer" 
                          data-category="${product.category.toLowerCase()}" 
                          data-status="${product.is_expired ? 'expired' : 'available'}" 
@@ -679,24 +252,77 @@
                                             onclick="event.stopPropagation(); addToCart(${product.id})" title="Add to Cart">
                                         <i class="fa-solid fa-shopping-cart text-green-600 text-sm"></i>
                                     </button>
-                                    <button class="p-2 bg-red-50 hover:bg-red-100 rounded-lg transition-colors" 
-                                            onclick="event.stopPropagation(); deleteItem(${product.id})" title="Delete Item">
-                                        <i class="fa-solid fa-trash text-red-600 text-sm"></i>
-                                    </button>
                                 </div>
                             </div>
                         </div>
                     </div>
                 `;
-                container.innerHTML += productCard;
+            }).join('');
+        }
+
+        // Update inventory statistics
+        function updateStats() {
+            const total = products.length;
+            const available = products.filter(p => !p.is_expired && !p.is_low_stock).length;
+            const lowStock = products.filter(p => p.is_low_stock).length;
+            const expired = products.filter(p => p.is_expired).length;
+
+            document.getElementById('total-products').textContent = total;
+            document.getElementById('available-products').textContent = available;
+            document.getElementById('low-stock-products').textContent = lowStock;
+            document.getElementById('expired-products').textContent = expired;
+        }
+
+        // Filter functions
+        function filterBy(status) {
+            currentFilter = status;
+            applyFilters();
+        }
+
+        function filterByCategory(category) {
+            currentCategory = category;
+            
+            // Update button states
+            document.querySelectorAll('.category-btn').forEach(btn => {
+                btn.classList.remove('bg-primary', 'text-white');
+                btn.classList.add('bg-gray-100', 'text-gray-600');
             });
+            
+            const activeBtn = document.querySelector(`[data-category="${category}"]`);
+            if (activeBtn) {
+                activeBtn.classList.remove('bg-gray-100', 'text-gray-600');
+                activeBtn.classList.add('bg-primary', 'text-white');
+            }
+            
+            applyFilters();
         }
 
-        function goBack() {
-            window.history.back();
+        function applyFilters() {
+            filteredProducts = products.filter(product => {
+                let matchesStatus = true;
+                let matchesCategory = true;
+
+                // Filter by status
+                if (currentFilter === 'available') {
+                    matchesStatus = !product.is_expired && !product.is_low_stock;
+                } else if (currentFilter === 'low-stock') {
+                    matchesStatus = product.is_low_stock;
+                } else if (currentFilter === 'expired') {
+                    matchesStatus = product.is_expired;
+                }
+
+                // Filter by category
+                if (currentCategory !== 'all') {
+                    matchesCategory = product.category.toLowerCase() === currentCategory;
+                }
+
+                return matchesStatus && matchesCategory;
+            });
+
+            renderProducts();
         }
 
-        // Cart functionality
+        // Product interaction functions
         function addToCart(productId) {
             const product = products.find(p => p.id === productId);
             if (!product) {
@@ -704,7 +330,6 @@
                 return;
             }
 
-            // Get existing cart from localStorage
             let cart = [];
             try {
                 const existingCart = localStorage.getItem('kiranakonnect_cart');
@@ -715,13 +340,12 @@
                 console.error('Error loading cart:', error);
             }
 
-            // Add product to cart
             const cartItem = {
                 id: product.id,
                 name: product.name,
                 price: product.is_weight_based ? product.price_per_kg : product.price,
                 unit: product.is_weight_based ? product.unit : 'Piece',
-                quantity: product.is_weight_based ? 1 : 1,
+                quantity: 1,
                 mfgDate: '',
                 expDate: product.expiry_date || '',
                 showDates: false,
@@ -735,20 +359,6 @@
             showNotification(`${product.name} added to cart`, 'success');
         }
 
-        function updateCartCount() {
-            try {
-                const cart = JSON.parse(localStorage.getItem('kiranakonnect_cart') || '[]');
-                const cartCount = cart.length;
-                const cartBadge = document.querySelector('.fa-shopping-cart').parentElement.querySelector('.bg-danger');
-                if (cartBadge) {
-                    cartBadge.textContent = cartCount;
-                    cartBadge.style.display = cartCount > 0 ? 'flex' : 'none';
-                }
-            } catch (error) {
-                console.error('Error updating cart count:', error);
-            }
-        }
-
         function viewProductDetails(productId) {
             const product = products.find(p => p.id === productId);
             if (!product) {
@@ -756,7 +366,6 @@
                 return;
             }
 
-            // Navigate to appropriate product details page based on product type
             if (product.is_weight_based) {
                 const params = new URLSearchParams({
                     id: product.id,
@@ -780,7 +389,50 @@
             }
         }
 
-        // Search and Scanner functionality
+        function refillItem(productId) {
+            const product = products.find(p => p.id === productId);
+            if (!product) {
+                showNotification('Product not found', 'error');
+                return;
+            }
+
+            const refillData = {
+                id: product.id,
+                name: product.name,
+                category: product.category,
+                type: product.is_weight_based ? 'weight-based' : 'unit',
+                unit: product.unit,
+                stock: product.stock_quantity,
+                threshold: product.reorder_level,
+                price: product.is_weight_based ? product.price_per_kg : product.price,
+                barcode: product.barcode
+            };
+            
+            localStorage.setItem('refillProductData', JSON.stringify(refillData));
+            
+            if (product.is_weight_based) {
+                window.location.href = '/refill-stock-weight';
+            } else {
+                window.location.href = '/refill-stock';
+            }
+        }
+
+        // Cart functions
+        function updateCartCount() {
+            try {
+                const cart = JSON.parse(localStorage.getItem('kiranakonnect_cart') || '[]');
+                const cartCount = cart.length;
+                const cartBadge = document.getElementById('cart-badge');
+                if (cartBadge) {
+                    cartBadge.textContent = cartCount;
+                    cartBadge.style.display = cartCount > 0 ? 'flex' : 'none';
+                }
+            } catch (error) {
+                console.error('Error updating cart count:', error);
+            }
+        }
+
+        // Search functions
         function openSearch() {
             document.getElementById('search-modal').classList.remove('hidden');
             document.getElementById('search-input').focus();
@@ -799,259 +451,6 @@
             document.getElementById('search-empty').classList.add('hidden');
         }
 
-        function openScanner() {
-            document.getElementById('scanner-modal').classList.remove('hidden');
-            simulateScanning();
-        }
-
-        function closeScanner() {
-            document.getElementById('scanner-modal').classList.add('hidden');
-        }
-
-        function manualBarcodeEntry() {
-            document.getElementById('manual-barcode-modal').classList.remove('hidden');
-            document.getElementById('manual-barcode-input').focus();
-        }
-
-        function closeManualBarcode() {
-            document.getElementById('manual-barcode-modal').classList.add('hidden');
-            document.getElementById('manual-barcode-input').value = '';
-        }
-
-        function searchByBarcode() {
-            const barcode = document.getElementById('manual-barcode-input').value.trim();
-            if (barcode) {
-                performBarcodeSearch(barcode);
-                closeManualBarcode();
-                closeScanner();
-            }
-        }
-
-        function toggleFlashlight() {
-            // Simulate flashlight toggle
-            const button = event.target.closest('button');
-            button.classList.toggle('text-yellow-400');
-        }
-
-        // Add remaining utility functions
-        function refillItem(productId) {
-            const product = products.find(p => p.id === productId);
-            if (product && product.is_weight_based) {
-                window.location.href = `/refill-stock-weight?id=${productId}`;
-            } else {
-                window.location.href = `/refill-stock?id=${productId}`;
-            }
-        }
-
-        function deleteItem(productId) {
-            if (confirm('Are you sure you want to delete this item?')) {
-                showNotification('Item deleted successfully', 'success');
-                // In a real app, this would call an API to delete the product
-            }
-        }
-
-        function showNotification(message, type = 'info') {
-            // Create notification element
-            const notification = document.createElement('div');
-            notification.className = `fixed top-4 right-4 z-50 p-4 rounded-lg text-white font-medium ${
-                type === 'success' ? 'bg-green-500' : 
-                type === 'error' ? 'bg-red-500' : 'bg-blue-500'
-            }`;
-            notification.textContent = message;
-            
-            document.body.appendChild(notification);
-            
-            // Remove after 3 seconds
-            setTimeout(() => {
-                if (notification.parentNode) {
-                    notification.parentNode.removeChild(notification);
-                }
-            }, 3000);
-        }
-
-        // Navigation functions
-        function goToDashboard() {
-            window.location.href = '/dashboard';
-        }
-
-        function goToCart() {
-            window.location.href = '/cart';
-        }
-
-        function goToProfile() {
-            window.location.href = '/profile';
-        }
-
-        function addNewItem() {
-            window.location.href = '/add-item';
-        }
-
-        // Search functionality
-        function performSearch() {
-            const query = document.getElementById('search-input').value.toLowerCase().trim();
-            const resultsContainer = document.getElementById('search-results');
-            const emptyState = document.getElementById('search-empty');
-            
-            if (query.length < 2) {
-                resultsContainer.innerHTML = '';
-                emptyState.classList.add('hidden');
-                return;
-            }
-
-            const results = products.filter(product => 
-                product.name.toLowerCase().includes(query) ||
-                product.category.toLowerCase().includes(query)
-            );
-
-            if (results.length === 0) {
-                resultsContainer.innerHTML = '';
-                emptyState.classList.remove('hidden');
-                return;
-            }
-
-            emptyState.classList.add('hidden');
-            resultsContainer.innerHTML = results.map(product => `
-                <div class="p-3 hover:bg-gray-50 cursor-pointer border-b border-gray-100 last:border-b-0"
-                     onclick="selectSearchResult(${product.id})">
-                    <div class="flex items-center space-x-3">
-                        <div class="w-8 h-8 bg-gray-100 rounded flex items-center justify-center">
-                            <i class="fa-solid fa-box text-gray-400 text-xs"></i>
-                        </div>
-                        <div class="flex-1">
-                            <h4 class="font-medium text-dark text-sm">${product.name}</h4>
-                            <p class="text-xs text-gray-500">${product.category}</p>
-                        </div>
-                        <p class="text-sm font-medium text-primary">
-                            ${product.is_weight_based ? `₹${product.price_per_kg}/${product.unit}` : `₹${product.price}/Piece`}
-                        </p>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        function selectSearchResult(productId) {
-            closeSearch();
-            viewProductDetails(productId);
-        }
-
-        function performBarcodeSearch(barcode) {
-            // Search for product by barcode in database
-            const product = products.find(p => p.barcode === barcode);
-            if (product) {
-                showNotification(`Found: ${product.name}`, 'success');
-                setTimeout(() => {
-                    viewProductDetails(product.id);
-                }, 1000);
-            } else {
-                showNotification('Product not found', 'error');
-            }
-        }
-
-        // Filter and category functions
-        function filterItems(status) {
-            currentFilter = status;
-            applyFilters();
-            updateFilterButtons();
-        }
-
-        function filterByCategory(category) {
-            currentCategory = category;
-            applyFilters();
-            updateCategoryButtons();
-        }
-
-        function applyFilters() {
-            filteredProducts = products.filter(product => {
-                const statusMatch = currentFilter === 'all' || 
-                    (currentFilter === 'available' && !product.is_expired && !product.is_low_stock) ||
-                    (currentFilter === 'low' && product.is_low_stock) ||
-                    (currentFilter === 'expired' && product.is_expired);
-                
-                const categoryMatch = currentCategory === 'all' || 
-                    product.category.toLowerCase() === currentCategory.toLowerCase();
-                
-                return statusMatch && categoryMatch;
-            });
-            
-            renderProducts();
-        }
-
-        function updateFilterButtons() {
-            document.querySelectorAll('[onclick^="filterItems"]').forEach(btn => {
-                btn.classList.remove('bg-primary', 'text-white');
-                btn.classList.add('bg-gray-100', 'text-gray-600');
-            });
-            
-            const activeBtn = document.querySelector(`[onclick="filterItems('${currentFilter}')"]`);
-            if (activeBtn) {
-                activeBtn.classList.remove('bg-gray-100', 'text-gray-600');
-                activeBtn.classList.add('bg-primary', 'text-white');
-            }
-        }
-
-        function updateCategoryButtons() {
-            document.querySelectorAll('[onclick^="filterByCategory"]').forEach(btn => {
-                btn.classList.remove('bg-primary', 'text-white');
-                btn.classList.add('bg-gray-100', 'text-gray-600');
-            });
-            
-            const activeBtn = document.querySelector(`[onclick="filterByCategory('${currentCategory}')"]`);
-            if (activeBtn) {
-                activeBtn.classList.remove('bg-gray-100', 'text-gray-600');
-                activeBtn.classList.add('bg-primary', 'text-white');
-            }
-        }
-
-        // This initialization is handled by the main DOMContentLoaded listener below
-
-        function performBarcodeSearch(barcode) {
-            // Search for product by barcode in database
-            const barcodeProducts = {
-                '8901030823456': 'item-2', // Coconut Oil
-                '8901030834567': 'item-3', // Aashirvaad Atta
-                '8901030845678': 'item-4', // Maggi Noodles
-                '8901030856789': 'item-5', // Dairy Milk
-                '8901030867890': 'item-6'  // Uncle Chips
-            };
-
-            const productId = barcodeProducts[barcode];
-            if (productId) {
-                const product = productData[productId];
-                if (product) {
-                    showNotification(`Found ${product.name}`, 'success');
-                    // Navigate to product details page
-                    setTimeout(() => {
-                        viewProductDetails(productId);
-                    }, 1000);
-                } else {
-                    showNotification('Product data not found', 'error');
-                }
-            } else {
-                showNotification('Product not found in inventory', 'error');
-            }
-        }
-
-        function simulateScanning() {
-            // Simulate successful scan after 3 seconds
-            setTimeout(() => {
-                const randomBarcodes = ['8901030823456', '8901030834567', '8901030845678'];
-                const randomBarcode = randomBarcodes[Math.floor(Math.random() * randomBarcodes.length)];
-                performBarcodeSearch(randomBarcode);
-                closeScanner();
-            }, 3000);
-        }
-
-        // Real-time search functionality
-        document.addEventListener('DOMContentLoaded', function() {
-            const searchInput = document.getElementById('search-input');
-            if (searchInput) {
-                searchInput.addEventListener('input', function() {
-                    const query = this.value.toLowerCase().trim();
-                    performSearch(query);
-                });
-            }
-        });
-
         function performSearch(query) {
             const resultsContainer = document.getElementById('search-results');
             const emptyState = document.getElementById('search-empty');
@@ -1062,23 +461,9 @@
                 return;
             }
 
-            const searchResults = [];
-            
-            // Search through product data
-            Object.keys(productData).forEach(productId => {
-                const product = productData[productId];
-                if (product.name.toLowerCase().includes(query)) {
-                    searchResults.push({
-                        id: productId,
-                        name: product.name,
-                        price: product.price,
-                        unit: product.unit,
-                        image: product.image,
-                        stock: product.stock,
-                        stockUnit: product.stockUnit
-                    });
-                }
-            });
+            const searchResults = products.filter(product => 
+                product.name.toLowerCase().includes(query.toLowerCase())
+            );
 
             if (searchResults.length === 0) {
                 resultsContainer.innerHTML = '';
@@ -1086,456 +471,52 @@
             } else {
                 emptyState.classList.add('hidden');
                 resultsContainer.innerHTML = searchResults.map(product => `
-                    <div class="flex items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer" onclick="selectSearchResult('${product.id}')">
-                        <img src="${product.image}" alt="${product.name}" class="w-12 h-12 rounded-lg object-cover mr-3">
-                        <div class="flex-1">
-                            <h3 class="font-semibold text-dark text-sm">${product.name}</h3>
-                            <p class="text-xs text-gray-600">${product.unit}</p>
-                        </div>
-                        <div class="text-right">
-                            <p class="font-bold text-primary">₹${product.price}</p>
+                    <div class="bg-gray-50 rounded-lg p-3 cursor-pointer hover:bg-gray-100" onclick="viewProductDetails(${product.id})">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-12 h-12 bg-gray-200 rounded-lg flex items-center justify-center">
+                                <i class="fa-solid fa-box text-gray-400"></i>
+                            </div>
+                            <div class="flex-1">
+                                <h4 class="font-semibold text-gray-800">${product.name}</h4>
+                                <p class="text-sm text-gray-600">₹${product.is_weight_based ? product.price_per_kg : product.price}/${product.is_weight_based ? 'kg' : 'piece'}</p>
+                            </div>
                         </div>
                     </div>
                 `).join('');
             }
         }
 
-        function selectSearchResult(productId) {
-            closeSearch();
-            const element = document.getElementById(productId);
-            if (element) {
-                element.scrollIntoView({ behavior: 'smooth' });
-                element.style.border = '2px solid #2563eb';
-                setTimeout(() => {
-                    element.style.border = '';
-                }, 3000);
-            }
+        // Utility functions
+        function goBack() {
+            window.history.back();
         }
 
-        // Notification system for search/scanner
-        function showNotification(message, type = 'info') {
-            const existingNotifications = document.querySelectorAll('.kc-notification');
-            existingNotifications.forEach(notif => {
-                if (notif.parentNode) {
-                    notif.parentNode.removeChild(notif);
-                }
-            });
-
-            const notification = document.createElement('div');
-            const bgColor = type === 'success' ? 'bg-green-500' : 
-                           type === 'error' ? 'bg-red-500' : 
-                           type === 'warning' ? 'bg-orange-500' : 'bg-blue-500';
+        function showNotification(message, type = 'success') {
+            const notification = document.getElementById('notification');
+            const notificationText = document.getElementById('notification-text');
             
-            const icon = type === 'success' ? 'fa-check-circle' : 
-                        type === 'error' ? 'fa-exclamation-circle' : 
-                        type === 'warning' ? 'fa-exclamation-triangle' : 'fa-info-circle';
+            notificationText.textContent = message;
             
-            notification.className = `kc-notification fixed top-4 left-4 right-4 ${bgColor} text-white px-4 py-3 rounded-xl shadow-xl z-[9999] transform transition-all duration-300 ease-out opacity-0 translate-y-[-20px]`;
-            notification.style.maxWidth = 'calc(100vw - 2rem)';
-            notification.innerHTML = `
-                <div class="flex items-center space-x-3">
-                    <i class="fa-solid ${icon} text-lg flex-shrink-0"></i>
-                    <span class="text-sm font-medium flex-1">${message}</span>
-                    <button onclick="this.parentElement.parentElement.remove()" class="text-white hover:text-gray-200 ml-2 flex-shrink-0">
-                        <i class="fa-solid fa-times text-sm"></i>
-                    </button>
-                </div>
-            `;
+            // Set colors based on type
+            if (type === 'error') {
+                notification.className = notification.className.replace('bg-green-500', 'bg-red-500');
+            } else {
+                notification.className = notification.className.replace('bg-red-500', 'bg-green-500');
+            }
             
-            document.body.appendChild(notification);
+            notification.classList.remove('-translate-y-full');
             
             setTimeout(() => {
-                notification.classList.remove('opacity-0', 'translate-y-[-20px]');
-                notification.classList.add('opacity-100', 'translate-y-0');
-            }, 50);
-            
-            setTimeout(() => {
-                if (notification.parentNode) {
-                    notification.classList.add('opacity-0', 'translate-y-[-20px]');
-                    setTimeout(() => {
-                        if (notification.parentNode) {
-                            notification.parentNode.removeChild(notification);
-                        }
-                    }, 300);
-                }
-            }, 4000);
+                notification.classList.add('-translate-y-full');
+            }, 3000);
         }
 
-        function filterBy(status) {
-            currentFilter = status;
-            applyFilters();
+        function hideNotification() {
+            document.getElementById('notification').classList.add('-translate-y-full');
         }
 
-        function filterCategory(category) {
-            currentCategory = category;
-            
-            // Update active tab
-            document.querySelectorAll('.category-tab').forEach(tab => {
-                tab.classList.remove('active', 'bg-primary', 'text-white');
-                tab.classList.add('bg-gray-100', 'text-gray-600');
-            });
-            
-            event.target.classList.add('active', 'bg-primary', 'text-white');
-            event.target.classList.remove('bg-gray-100', 'text-gray-600');
-            
-            applyFilters();
-        }
-
-        function applyFilters() {
-            const items = document.querySelectorAll('#inventory-list > div');
-            
-            items.forEach(item => {
-                const itemCategory = item.getAttribute('data-category');
-                const itemStatus = item.getAttribute('data-status');
-                
-                let showItem = true;
-                
-                // Filter by category
-                if (currentCategory !== 'all' && itemCategory !== currentCategory) {
-                    showItem = false;
-                }
-                
-                // Filter by status
-                if (currentFilter !== 'all') {
-                    if (currentFilter === 'available' && itemStatus !== 'available') {
-                        showItem = false;
-                    } else if (currentFilter === 'expiring' && itemStatus !== 'expiring') {
-                        showItem = false;
-                    } else if (currentFilter === 'lowstock' && itemStatus !== 'lowstock') {
-                        showItem = false;
-                    }
-                }
-                
-                if (showItem) {
-                    item.style.display = 'block';
-                } else {
-                    item.style.display = 'none';
-                }
-            });
-        }
-
-
-
-        // Comprehensive product data structure with complete inventory items
-        const inventoryItems = [
-            {
-                id: '1',
-                name: 'Wheat Flour',
-                image: 'https://storage.googleapis.com/uxpilot-auth.appspot.com/ad8aa6cee1-b621e3cd72c9ea714c53.png',
-                price: 50,
-                unit: 'Kg',
-                type: 'weight-based',
-                stock: 2.5,
-                stockUnit: 'Kg',
-                category: 'grains',
-                threshold: 1,
-                barcode: '8901030812345'
-            },
-            {
-                id: '2',
-                name: 'Coconut Oil',
-                image: 'https://storage.googleapis.com/uxpilot-auth.appspot.com/02cda64d32-ca63fc32eaab87b7db4c.png',
-                price: 180,
-                unit: 'Bottle',
-                type: 'unit',
-                stock: 8,
-                stockUnit: 'Bottles',
-                size: '500ml',
-                category: 'oil',
-                threshold: 3,
-                barcode: '8901030823456'
-            },
-            {
-                id: '3',
-                name: 'Aashirvaad Atta',
-                image: 'https://storage.googleapis.com/uxpilot-auth.appspot.com/dd29a1f85f-469e6193e37489fc8c43.png',
-                price: 120,
-                unit: 'Bag',
-                type: 'unit',
-                stock: 3,
-                stockUnit: 'Bags',
-                size: '10 Kg',
-                category: 'grains',
-                threshold: 2,
-                barcode: '8901030834567'
-            },
-            {
-                id: '4',
-                name: 'Maggi Noodles',
-                image: 'https://storage.googleapis.com/uxpilot-auth.appspot.com/46dc2aecf3-4ae1d7f8a3bc9c8b21d6.png',
-                price: 15,
-                unit: 'Pack',
-                type: 'unit',
-                stock: 24,
-                stockUnit: 'Packs',
-                size: '70g',
-                category: 'food',
-                threshold: 10,
-                barcode: '8901030845678'
-            },
-            {
-                id: '5',
-                name: 'Dairy Milk',
-                image: 'https://storage.googleapis.com/uxpilot-auth.appspot.com/f12345-chocolate-bar.png',
-                price: 25,
-                unit: 'Bar',
-                type: 'unit',
-                stock: 30,
-                stockUnit: 'Bars',
-                size: '13g',
-                category: 'snacks',
-                threshold: 15,
-                barcode: '8901030856789'
-            },
-            {
-                id: '6',
-                name: 'Uncle Chips',
-                image: 'https://storage.googleapis.com/uxpilot-auth.appspot.com/uncle-chips-image.png',
-                price: 10,
-                unit: 'Pack',
-                type: 'unit',
-                stock: 45,
-                stockUnit: 'Packs',
-                size: '25g',
-                category: 'snacks',
-                threshold: 20,
-                barcode: '8901030867890'
-            },
-            {
-                id: '7',
-                name: 'Paracetamol',
-                image: 'https://storage.googleapis.com/uxpilot-auth.appspot.com/paracetamol-tablets.png',
-                price: 5,
-                unit: 'Strip',
-                type: 'unit',
-                stock: 12,
-                stockUnit: 'Strips',
-                size: '10 tablets',
-                category: 'medical',
-                threshold: 5,
-                barcode: '8901030878901'
-            },
-            {
-                id: '8',
-                name: 'Fresh Milk',
-                image: 'https://storage.googleapis.com/uxpilot-auth.appspot.com/fresh-milk-bottle.png',
-                price: 60,
-                unit: 'L',
-                type: 'weight-based',
-                stock: 4.5,
-                stockUnit: 'L',
-                category: 'dairy',
-                threshold: 1,
-                barcode: '8901030889012',
-                mfgDate: '13 Jun 2025',
-                expDate: '15 Jun 2025'
-            },
-            {
-                id: '9',
-                name: 'Cooking Oil',
-                image: 'https://storage.googleapis.com/uxpilot-auth.appspot.com/cooking-oil-bottle.png',
-                price: 150,
-                unit: 'L',
-                type: 'weight-based',
-                stock: 2.8,
-                stockUnit: 'L',
-                category: 'oil',
-                threshold: 1,
-                barcode: '8901030890123',
-                mfgDate: '01 May 2025',
-                expDate: '01 May 2026'
-            }
-        ];
-
-        // Legacy product data structure for backward compatibility
-        const productData = {
-            'item-1': inventoryItems[0],
-            'item-2': inventoryItems[1],
-            'item-3': inventoryItems[2],
-            'item-4': inventoryItems[3],
-            'item-5': inventoryItems[4],
-            'item-6': inventoryItems[5],
-            'item-7': inventoryItems[6],
-            'item-8': inventoryItems[7],
-            'item-9': inventoryItems[8]
-        };
-
-        let currentProduct = null;
-
-        function addToCart(itemId) {
-            currentProduct = productData[itemId];
-            if (!currentProduct) return;
-
-            openCartModal();
-        }
-
-        function openCartModal() {
-            const cartModal = document.getElementById('cart-modal');
-            const modalProductImg = document.getElementById('modal-product-img');
-            const modalProductName = document.getElementById('modal-product-name');
-            const modalProductPrice = document.getElementById('modal-product-price');
-            const modalProductStock = document.getElementById('modal-product-stock');
-            const quantityLabel = document.getElementById('quantity-label');
-            const inputMethod = document.getElementById('input-method');
-            const bagBasedInput = document.getElementById('bag-based-input');
-            const weightBasedInput = document.getElementById('weight-based-input');
-            const quantityHelp = document.getElementById('quantity-help');
-
-            // Update modal with product data
-            modalProductImg.src = currentProduct.image;
-            modalProductImg.alt = currentProduct.name;
-            modalProductName.textContent = currentProduct.name;
-            modalProductPrice.textContent = `₹${currentProduct.price}/${currentProduct.unit}`;
-            modalProductStock.textContent = `${currentProduct.stock} ${currentProduct.stockUnit} in stock`;
-
-            // Configure input based on product type
-            if (currentProduct.type === 'weight-based') {
-                quantityLabel.textContent = 'Quantity';
-                inputMethod.classList.remove('hidden');
-                bagBasedInput.classList.add('hidden');
-                weightBasedInput.classList.remove('hidden');
-                quantityHelp.textContent = 'Enter weight in Kg or Grams';
-                
-                // Reset to quantity input mode for weight-based
-                document.querySelector('input[name="inputMethod"][value="quantity"]').checked = true;
-                document.getElementById('quantity-section').classList.remove('hidden');
-                document.getElementById('price-section').classList.add('hidden');
-            } else {
-                // For all non-weight-based products (bag, bottle, pack, box, etc.)
-                quantityLabel.textContent = currentProduct.stockUnit;
-                inputMethod.classList.add('hidden');
-                bagBasedInput.classList.remove('hidden');
-                weightBasedInput.classList.add('hidden');
-                quantityHelp.textContent = 'Tap + or - to adjust quantity';
-                
-                // Ensure only quantity section is visible for unit-based products
-                document.getElementById('quantity-section').classList.remove('hidden');
-                document.getElementById('price-section').classList.add('hidden');
-            }
-
-            // Reset quantity input
-            document.getElementById('quantity-input').value = 1;
-            document.getElementById('weight-quantity-input').value = 1;
-
-            // Update calculations
-            updateCalculations();
-
-            cartModal.classList.remove('hidden');
-        }
-
-        function deleteItem(itemId) {
-            const item = document.getElementById(itemId);
-            const itemName = item.querySelector('h3').textContent;
-            
-            if (confirm(`Are you sure you want to delete ${itemName} from inventory?`)) {
-                item.remove();
-                alert(`${itemName} has been removed from inventory.`);
-            }
-        }
-
-        function addNewItem() {
-            window.location.href = '/add-item';
-        }
-
-        // Navigation functions
-        function goToDashboard() {
-            window.location.href = '/dashboard';
-        }
-
-        function goToCart() {
-            window.location.href = '/cart';
-        }
-
-        function goToProfile() {
-            window.location.href = '/profile';
-        }
-
-        function viewProductDetails(itemId) {
-            // Get product data to determine routing
-            const product = productData[itemId];
-            
-            if (product) {
-                // Store product data in localStorage for the detail page
-                localStorage.setItem('currentProduct', JSON.stringify(product));
-                localStorage.setItem('currentProductId', itemId);
-                
-                // Route to appropriate product details page based on product type
-                if (product.type === 'weight-based') {
-                    window.location.href = '/product-details-weight';
-                } else {
-                    window.location.href = '/product-details';
-                }
-            } else {
-                alert('Product data not found');
-                window.location.href = '/product-details';
-            }
-        }
-
-
-
-        function updateCalculations() {
-            if (!currentProduct) return;
-            
-            if (currentProduct.type === 'weight-based') {
-                updateWeightCalculations();
-            } else {
-                const quantity = parseInt(quantityInput.value) || 1;
-                const total = quantity * currentProduct.price;
-                const unit = currentProduct.unit + (quantity > 1 ? 's' : '');
-                
-                calculatedQuantity.textContent = `${quantity} ${unit}`;
-                calculatedPrice.textContent = `₹${total.toFixed(2)}`;
-            }
-        }
-
-        function updateWeightCalculations() {
-            if (!currentProduct || currentProduct.type !== 'weight-based') return;
-            
-            let qty = parseFloat(weightQuantityInput.value) || 0;
-            const unit = unitSelect.value;
-            
-            if (unit === 'gm') {
-                qty = qty / 1000; // Convert to kg for calculation
-            }
-            
-            const total = qty * currentProduct.price;
-            
-            let displayQty = qty;
-            let displayUnit = 'Kg';
-            
-            if (qty < 1) {
-                displayQty = qty * 1000;
-                displayUnit = 'gm';
-            }
-            
-            calculatedQuantity.textContent = `${displayQty.toFixed(displayQty < 1 ? 0 : 3)} ${displayUnit}`;
-            calculatedPrice.textContent = `₹${total.toFixed(2)}`;
-        }
-
-        function updatePriceCalculations() {
-            if (!currentProduct || currentProduct.type !== 'weight-based') return;
-            
-            const price = parseFloat(priceInput.value) || 0;
-            const qty = price / currentProduct.price;
-            
-            let displayQty = qty;
-            let displayUnit = 'Kg';
-            
-            if (qty < 1) {
-                displayQty = qty * 1000;
-                displayUnit = 'gm';
-            }
-            
-            calculatedQuantity.textContent = `${displayQty.toFixed(displayQty < 1 ? 0 : 3)} ${displayUnit}`;
-            calculatedPrice.textContent = `₹${price.toFixed(2)}`;
-        }
-
-        // Initialize page functionality
+        // Initialize page when DOM is loaded
         document.addEventListener('DOMContentLoaded', function() {
-            // Initialize filters
-            applyFilters();
-            
-            // Load products from database
             loadProducts();
             
             // Set up search functionality
@@ -1547,238 +528,6 @@
                 });
             }
         });
-
-        // Search and Scanner functionality for Inventory
-        function openSearch() {
-            document.getElementById('search-modal').classList.remove('hidden');
-            document.getElementById('search-input').focus();
-            document.body.style.overflow = 'hidden';
-        }
-
-        function closeSearch() {
-            document.getElementById('search-modal').classList.add('hidden');
-            document.body.style.overflow = 'auto';
-            clearSearch();
-        }
-
-        function clearSearch() {
-            document.getElementById('search-input').value = '';
-            document.getElementById('search-results').innerHTML = '';
-            document.getElementById('search-empty').classList.add('hidden');
-        }
-
-        function openScanner() {
-            document.getElementById('scanner-modal').classList.remove('hidden');
-            simulateScanning();
-        }
-
-        function closeScanner() {
-            document.getElementById('scanner-modal').classList.add('hidden');
-        }
-
-        function manualBarcodeEntry() {
-            document.getElementById('manual-barcode-modal').classList.remove('hidden');
-            document.getElementById('manual-barcode-input').focus();
-        }
-
-        function closeManualBarcode() {
-            document.getElementById('manual-barcode-modal').classList.add('hidden');
-            document.getElementById('manual-barcode-input').value = '';
-        }
-
-        function searchByBarcode() {
-            const barcode = document.getElementById('manual-barcode-input').value.trim();
-            if (barcode) {
-                performBarcodeSearch(barcode);
-                closeManualBarcode();
-                closeScanner();
-            }
-        }
-
-        function toggleFlashlight() {
-            const button = event.target.closest('button');
-            button.classList.toggle('text-yellow-400');
-        }
-
-        function performBarcodeSearch(barcode) {
-            const barcodeProducts = {
-                '8901030823456': { name: 'Coconut Oil', price: 180, unit: 'Bottle', id: 'coconut-oil' },
-                '8901030834567': { name: 'Aashirvaad Atta', price: 120, unit: 'Bag', id: 'aashirvaad-atta' },
-                '8901030845678': { name: 'Maggi Noodles', price: 15, unit: 'Pack', id: 'maggi-noodles' },
-                '8901030856789': { name: 'Dairy Milk', price: 25, unit: 'Bar', id: 'dairy-milk' },
-                '8901030867890': { name: 'Uncle Chips', price: 10, unit: 'Pack', id: 'uncle-chips' }
-            };
-
-            const product = barcodeProducts[barcode];
-            if (product) {
-                showNotification(`Found ${product.name}`, 'success');
-                // Redirect to product details page
-                setTimeout(() => {
-                    window.location.href = `/product-details?id=${product.id}&name=${encodeURIComponent(product.name)}&price=${product.price}&unit=${encodeURIComponent(product.unit)}`;
-                }, 1000);
-            } else {
-                showNotification('Product not found', 'error');
-            }
-        }
-
-        function simulateScanning() {
-            setTimeout(() => {
-                const randomBarcodes = ['8901030823456', '8901030834567', '8901030845678'];
-                const randomBarcode = randomBarcodes[Math.floor(Math.random() * randomBarcodes.length)];
-                performBarcodeSearch(randomBarcode);
-                closeScanner();
-            }, 3000);
-        }
-
-        // Real-time search functionality
-        document.addEventListener('DOMContentLoaded', function() {
-            const searchInput = document.getElementById('search-input');
-            if (searchInput) {
-                searchInput.addEventListener('input', function() {
-                    const query = this.value.toLowerCase().trim();
-                    performSearch(query);
-                });
-            }
-        });
-
-        function performSearch(query) {
-            const resultsContainer = document.getElementById('search-results');
-            const emptyState = document.getElementById('search-empty');
-            
-            if (!query) {
-                resultsContainer.innerHTML = '';
-                emptyState.classList.add('hidden');
-                return;
-            }
-
-            const products = [
-                { name: 'Wheat Flour', price: 50, unit: 'Kg', image: 'https://storage.googleapis.com/uxpilot-auth.appspot.com/ad8aa6cee1-b621e3cd72c9ea714c53.png', id: 'wheat-flour' },
-                { name: 'Coconut Oil', price: 180, unit: 'Bottle', image: 'https://storage.googleapis.com/uxpilot-auth.appspot.com/02cda64d32-ca63fc32eaab87b7db4c.png', id: 'coconut-oil' },
-                { name: 'Aashirvaad Atta', price: 120, unit: 'Bag', image: 'https://storage.googleapis.com/uxpilot-auth.appspot.com/dd29a1f85f-469e6193e37489fc8c43.png', id: 'aashirvaad-atta' },
-                { name: 'Maggi Noodles', price: 15, unit: 'Pack', image: 'https://storage.googleapis.com/uxpilot-auth.appspot.com/46dc2aecf3-4ae1d7f8a3bc9c8b21d6.png', id: 'maggi-noodles' },
-                { name: 'Dairy Milk', price: 25, unit: 'Bar', image: 'https://storage.googleapis.com/uxpilot-auth.appspot.com/f12345-chocolate-bar.png', id: 'dairy-milk' }
-            ];
-
-            const searchResults = products.filter(product => 
-                product.name.toLowerCase().includes(query)
-            );
-
-            if (searchResults.length === 0) {
-                resultsContainer.innerHTML = '';
-                emptyState.classList.remove('hidden');
-            } else {
-                emptyState.classList.add('hidden');
-                resultsContainer.innerHTML = searchResults.map(product => `
-                    <div class="bg-gray-50 rounded-lg p-3 cursor-pointer hover:bg-gray-100" onclick="openProductFromSearch('${product.id}', '${product.name}', ${product.price}, '${product.unit}')">
-                        <div class="flex items-center space-x-3">
-                            <img src="${product.image}" alt="${product.name}" class="w-12 h-12 rounded-lg object-cover">
-                            <div class="flex-1">
-                                <h3 class="font-semibold text-dark">${product.name}</h3>
-                                <p class="text-sm text-gray-600">₹${product.price}/${product.unit}</p>
-                            </div>
-                            <i class="fa-solid fa-external-link-alt text-primary"></i>
-                        </div>
-                    </div>
-                `).join('');
-            }
-        }
-
-        function openProductFromSearch(id, name, price, unit) {
-            showNotification(`Opening ${name} details`, 'success');
-            closeSearch();
-            setTimeout(() => {
-                window.location.href = `/product-details?id=${id}&name=${encodeURIComponent(name)}&price=${price}&unit=${encodeURIComponent(unit)}`;
-            }, 500);
-        }
-
-        // Notification system
-        function showNotification(message, type = 'info') {
-            const existingNotifications = document.querySelectorAll('.kc-notification');
-            existingNotifications.forEach(notif => {
-                if (notif.parentNode) {
-                    notif.parentNode.removeChild(notif);
-                }
-            });
-
-            const notification = document.createElement('div');
-            const bgColor = type === 'success' ? 'bg-green-500' : 
-                           type === 'error' ? 'bg-red-500' : 
-                           type === 'warning' ? 'bg-orange-500' : 'bg-blue-500';
-            
-            const icon = type === 'success' ? 'fa-check-circle' : 
-                        type === 'error' ? 'fa-exclamation-circle' : 
-                        type === 'warning' ? 'fa-exclamation-triangle' : 'fa-info-circle';
-            
-            notification.className = `kc-notification fixed top-4 left-4 right-4 ${bgColor} text-white px-4 py-3 rounded-xl shadow-xl z-[9999] transform transition-all duration-300 ease-out opacity-0 translate-y-[-20px]`;
-            notification.style.maxWidth = 'calc(100vw - 2rem)';
-            notification.innerHTML = `
-                <div class="flex items-center space-x-3">
-                    <i class="fa-solid ${icon} text-lg flex-shrink-0"></i>
-                    <span class="text-sm font-medium flex-1">${message}</span>
-                    <button onclick="this.parentElement.parentElement.remove()" class="text-white hover:text-gray-200 ml-2 flex-shrink-0">
-                        <i class="fa-solid fa-times text-sm"></i>
-                    </button>
-                </div>
-            `;
-            
-            document.body.appendChild(notification);
-            
-            setTimeout(() => {
-                notification.classList.remove('opacity-0', 'translate-y-[-20px]');
-                notification.classList.add('opacity-100', 'translate-y-0');
-            }, 50);
-            
-            setTimeout(() => {
-                if (notification.parentNode) {
-                    notification.classList.add('opacity-0', 'translate-y-[-20px]');
-                    setTimeout(() => {
-                        if (notification.parentNode) {
-                            notification.parentNode.removeChild(notification);
-                        }
-                    }, 300);
-                }
-            }, 4000);
-        }
-
-        // Refill item function
-        function refillItem(itemId) {
-            // Extract product ID from itemId (remove 'item-' prefix)
-            const productId = itemId.replace('item-', '');
-            
-            // Find the product data from inventory items
-            const productData = inventoryItems.find(item => item.id == productId);
-            
-            if (productData) {
-                // Store complete product data for refill page
-                const refillData = {
-                    id: productData.id,
-                    name: productData.name,
-                    size: productData.size || 'Standard',
-                    category: productData.category || 'Grocery',
-                    type: productData.type || 'unit',
-                    unit: productData.unit,
-                    stock: productData.stock,
-                    threshold: productData.threshold || Math.round(productData.stock * 0.2),
-                    sellingPrice: productData.price,
-                    price: productData.price,
-                    barcode: productData.barcode || null,
-                    image: productData.image
-                };
-                
-                localStorage.setItem('refillProductData', JSON.stringify(refillData));
-                localStorage.setItem('currentProductId', productData.id);
-                
-                // Navigate to appropriate refill page based on product type
-                if (productData.type === 'weight' || productData.type === 'weight-based') {
-                    window.location.href = `/refill-stock-weight?id=${productId}`;
-                } else {
-                    window.location.href = `/refill-stock?id=${productId}`;
-                }
-            } else {
-                showNotification('Product not found', 'error');
-            }
-        }
     </script>
-
 </body>
 </html>
