@@ -1501,27 +1501,62 @@
             }
         }
 
-        function toggleEmailBackup() {
+        async function toggleEmailBackup() {
             const checkbox = document.getElementById('emailBackup');
             const isEnabled = checkbox.checked;
             
             if (isEnabled) {
                 console.log('Email backup enabled');
                 localStorage.setItem('emailBackupEnabled', 'true');
-                // Dispatch storage event to notify dashboard
-                window.dispatchEvent(new StorageEvent('storage', {
-                    key: 'emailBackupEnabled',
-                    newValue: 'true'
-                }));
+                
+                // Call API to enable backup and remove notifications
+                try {
+                    const response = await fetch('/api/backup/enable', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        }
+                    });
+                    
+                    if (response.ok) {
+                        // Dispatch storage event to notify dashboard
+                        window.dispatchEvent(new StorageEvent('storage', {
+                            key: 'emailBackupEnabled',
+                            newValue: 'true'
+                        }));
+                    }
+                } catch (error) {
+                    console.error('Error enabling backup:', error);
+                }
             } else {
                 console.log('Email backup disabled');
-                if (confirm('Are you sure you want to disable email backup? Your data will not be automatically backed up.')) {
+                if (confirm('क्या आप वाकई email backup बंद करना चाहते हैं? आपका डेटा automatically backup नहीं होगा।')) {
                     localStorage.setItem('emailBackupEnabled', 'false');
-                    // Dispatch storage event to notify dashboard
-                    window.dispatchEvent(new StorageEvent('storage', {
-                        key: 'emailBackupEnabled',
-                        newValue: 'false'
-                    }));
+                    
+                    // Call API to disable backup and create notification
+                    try {
+                        const response = await fetch('/api/backup/disable', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            }
+                        });
+                        
+                        if (response.ok) {
+                            // Dispatch storage event to notify dashboard
+                            window.dispatchEvent(new StorageEvent('storage', {
+                                key: 'emailBackupEnabled',
+                                newValue: 'false'
+                            }));
+                            
+                            // Show immediate alert about backup being disabled
+                            setTimeout(() => {
+                                alert('⚠️ बैकअप बंद हो गया है! आपका डेटा अब safe नहीं है। जल्दी से backup चालू करें।');
+                            }, 500);
+                        }
+                    } catch (error) {
+                        console.error('Error disabling backup:', error);
+                    }
                 } else {
                     // Re-enable if user cancels
                     checkbox.checked = true;

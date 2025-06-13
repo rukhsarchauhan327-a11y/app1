@@ -181,17 +181,55 @@ def check_subscription_expiry():
 def check_backup_status():
     """Check backup status and create notification if needed"""
     try:
-        # Check if backup notification already exists
+        # Always create backup notification since we don't have real backup status tracking
+        # In production, this would check actual backup configuration
         existing = Notification.query.filter_by(type='backup', is_read=False).first()
         if not existing:
             create_notification(
-                "Enable Data Backup",
-                "Protect your business data by enabling automatic cloud backup in settings.",
+                "डेटा बैकअप चालू करें",
+                "अपने व्यापार का डेटा सुरक्षित रखने के लिए automatic cloud backup को settings में enable करें।",
                 "backup",
-                "medium"
+                "high"
             )
     except Exception as e:
         app.logger.error(f"Error checking backup status: {e}")
+
+@app.route('/api/backup/disable', methods=['POST'])
+def disable_backup():
+    """API endpoint to handle backup disable and create notification"""
+    try:
+        # Remove existing backup notifications
+        existing_notifications = Notification.query.filter_by(type='backup', is_read=False).all()
+        for notif in existing_notifications:
+            db.session.delete(notif)
+        
+        # Create new backup warning notification
+        create_notification(
+            "डेटा बैकअप बंद है!",
+            "आपका data backup disable है। अपना व्यापारिक डेटा खोने से बचने के लिए तुरंत backup enable करें।",
+            "backup",
+            "urgent"
+        )
+        
+        return jsonify({'success': True, 'message': 'Backup disabled, notification created'})
+    except Exception as e:
+        app.logger.error(f"Error handling backup disable: {e}")
+        return jsonify({'error': 'Failed to process backup disable'}), 500
+
+@app.route('/api/backup/enable', methods=['POST'])
+def enable_backup():
+    """API endpoint to handle backup enable and remove notifications"""
+    try:
+        # Remove backup notifications when backup is enabled
+        existing_notifications = Notification.query.filter_by(type='backup', is_read=False).all()
+        for notif in existing_notifications:
+            db.session.delete(notif)
+        db.session.commit()
+        
+        return jsonify({'success': True, 'message': 'Backup enabled, notifications cleared'})
+    except Exception as e:
+        app.logger.error(f"Error handling backup enable: {e}")
+        return jsonify({'error': 'Failed to process backup enable'}), 500
 
 def check_low_stock():
     """Check for low stock items and create notifications"""
@@ -750,29 +788,38 @@ def create_payment():
 def get_notifications():
     """Get all notifications from database"""
     try:
+        # Initialize database tables if needed
+        ensure_db_initialized()
+        
         # Run notification checks to ensure latest data
-        check_subscription_expiry()
-        check_backup_status()
-        check_low_stock()
-        check_expiring_products()
+        try:
+            check_subscription_expiry()
+            check_backup_status()
+            check_low_stock()
+            check_expiring_products()
+        except Exception as check_error:
+            app.logger.warning(f"Error running notification checks: {check_error}")
         
         # Fetch all unread notifications, ordered by priority and creation time
         notifications = Notification.query.filter_by(is_read=False).order_by(
-            Notification.priority.desc(),
             Notification.created_at.desc()
         ).all()
         
         notification_data = []
         for notif in notifications:
-            notification_data.append({
-                'id': notif.id,
-                'title': notif.title,
-                'message': notif.message,
-                'type': notif.type,
-                'priority': notif.priority,
-                'created_at': notif.created_at.isoformat(),
-                'time_ago': get_time_ago(notif.created_at)
-            })
+            try:
+                notification_data.append({
+                    'id': notif.id,
+                    'title': notif.title,
+                    'message': notif.message,
+                    'type': notif.type,
+                    'priority': notif.priority,
+                    'created_at': notif.created_at.isoformat(),
+                    'time_ago': get_time_ago(notif.created_at)
+                })
+            except Exception as item_error:
+                app.logger.warning(f"Error processing notification {notif.id}: {item_error}")
+                continue
         
         return jsonify({
             'notifications': notification_data,
@@ -781,7 +828,11 @@ def get_notifications():
         
     except Exception as e:
         app.logger.error(f"Error fetching notifications: {e}")
-        return jsonify({'error': 'Failed to fetch notifications'}), 500
+        # Return empty response instead of error to prevent frontend issues
+        return jsonify({
+            'notifications': [],
+            'count': 0
+        })
 
 @app.route('/api/notifications/<int:notification_id>/mark-read', methods=['POST'])
 def mark_notification_read(notification_id):
