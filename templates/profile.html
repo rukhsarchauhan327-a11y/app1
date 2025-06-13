@@ -125,6 +125,22 @@
         color: #10b981;
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
       }
+
+      /* Dynamic popup animations */
+      .animate-scale-in {
+        animation: scaleIn 0.3s ease-out;
+      }
+
+      @keyframes scaleIn {
+        from {
+          transform: scale(0.9);
+          opacity: 0;
+        }
+        to {
+          transform: scale(1);
+          opacity: 1;
+        }
+      }
     </style>
 <style>
   .highlighted-section {
@@ -1530,18 +1546,16 @@
                 }
             } else {
                 console.log('Email backup disabled');
-                if (confirm('क्या आप वाकई email backup बंद करना चाहते हैं? आपका डेटा automatically backup नहीं होगा।')) {
+                showBackupConfirmDialog(() => {
                     localStorage.setItem('emailBackupEnabled', 'false');
                     
                     // Call API to disable backup and create notification
-                    try {
-                        const response = await fetch('/api/backup/disable', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                            }
-                        });
-                        
+                    fetch('/api/backup/disable', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        }
+                    }).then(response => {
                         if (response.ok) {
                             // Dispatch storage event to notify dashboard
                             window.dispatchEvent(new StorageEvent('storage', {
@@ -1549,19 +1563,99 @@
                                 newValue: 'false'
                             }));
                             
-                            // Show immediate alert about backup being disabled
+                            // Show styled warning popup
                             setTimeout(() => {
-                                alert('⚠️ बैकअप बंद हो गया है! आपका डेटा अब safe नहीं है। जल्दी से backup चालू करें।');
+                                showBackupWarningPopup();
                             }, 500);
                         }
-                    } catch (error) {
+                    }).catch(error => {
                         console.error('Error disabling backup:', error);
-                    }
-                } else {
+                    });
+                }, () => {
                     // Re-enable if user cancels
                     checkbox.checked = true;
-                }
+                });
             }
+        }
+
+        // Dynamic popup functions
+        function showBackupConfirmDialog(onConfirm, onCancel) {
+            const modal = document.createElement('div');
+            modal.className = 'fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4';
+            modal.innerHTML = `
+                <div class="bg-white rounded-2xl max-w-sm w-full shadow-xl animate-scale-in">
+                    <div class="p-6 text-center">
+                        <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i class="fa-solid fa-exclamation-triangle text-red-500 text-2xl"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-dark mb-2">Disable Email Backup?</h3>
+                        <p class="text-gray-600 text-sm mb-6">Your business data will not be automatically backed up. This could result in data loss if something goes wrong.</p>
+                        <div class="flex space-x-3">
+                            <button onclick="cancelBackupDisable()" class="flex-1 px-4 py-2 border border-gray-200 text-gray-700 rounded-lg hover:bg-gray-50 font-medium">
+                                Cancel
+                            </button>
+                            <button onclick="confirmBackupDisable()" class="flex-1 px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 font-medium">
+                                Disable Backup
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+            document.body.style.overflow = 'hidden';
+            
+            window.confirmBackupDisable = () => {
+                document.body.removeChild(modal);
+                document.body.style.overflow = 'auto';
+                onConfirm();
+            };
+            
+            window.cancelBackupDisable = () => {
+                document.body.removeChild(modal);
+                document.body.style.overflow = 'auto';
+                onCancel();
+            };
+        }
+
+        function showBackupWarningPopup() {
+            const modal = document.createElement('div');
+            modal.className = 'fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4';
+            modal.innerHTML = `
+                <div class="bg-white rounded-2xl max-w-sm w-full shadow-xl animate-scale-in">
+                    <div class="p-6 text-center">
+                        <div class="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i class="fa-solid fa-shield-exclamation text-orange-500 text-2xl"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-dark mb-2">Backup Disabled!</h3>
+                        <p class="text-gray-600 text-sm mb-6">Your business data is no longer being backed up. Enable backup immediately to protect against data loss.</p>
+                        <div class="flex space-x-3">
+                            <button onclick="dismissWarning()" class="flex-1 px-4 py-2 border border-gray-200 text-gray-700 rounded-lg hover:bg-gray-50 font-medium">
+                                Remind Later
+                            </button>
+                            <button onclick="enableBackupNow()" class="flex-1 px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 font-medium">
+                                Enable Now
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+            document.body.style.overflow = 'hidden';
+            
+            window.dismissWarning = () => {
+                document.body.removeChild(modal);
+                document.body.style.overflow = 'auto';
+            };
+            
+            window.enableBackupNow = () => {
+                document.body.removeChild(modal);
+                document.body.style.overflow = 'auto';
+                const checkbox = document.getElementById('emailBackup');
+                checkbox.checked = true;
+                toggleEmailBackup();
+            };
         }
 
         // Initialize backup state on page load

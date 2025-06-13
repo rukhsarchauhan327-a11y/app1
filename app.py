@@ -186,8 +186,8 @@ def check_backup_status():
         existing = Notification.query.filter_by(type='backup', is_read=False).first()
         if not existing:
             create_notification(
-                "डेटा बैकअप चालू करें",
-                "अपने व्यापार का डेटा सुरक्षित रखने के लिए automatic cloud backup को settings में enable करें।",
+                "Enable Data Backup",
+                "Protect your business data by enabling automatic cloud backup in settings.",
                 "backup",
                 "high"
             )
@@ -205,8 +205,8 @@ def disable_backup():
         
         # Create new backup warning notification
         create_notification(
-            "डेटा बैकअप बंद है!",
-            "आपका data backup disable है। अपना व्यापारिक डेटा खोने से बचने के लिए तुरंत backup enable करें।",
+            "Data Backup Disabled!",
+            "Your business data backup is disabled. Enable backup immediately to prevent data loss.",
             "backup",
             "urgent"
         )
