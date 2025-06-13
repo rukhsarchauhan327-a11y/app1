@@ -204,7 +204,7 @@
             </div>
 
             <!-- System Notification - Backup Complete -->
-            <div class="notification-item bg-white rounded-lg shadow-sm border-l-4 border-primary cursor-pointer hover:shadow-md transition-shadow" data-type="system">
+            <div class="notification-item bg-white rounded-lg shadow-sm border-l-4 border-primary cursor-pointer hover:shadow-md transition-shadow" data-type="system" onclick="window.location.href='/settings'">
                 <div class="p-4">
                     <div class="flex items-start space-x-3">
                         <div class="bg-primary/10 p-2 rounded-full">
@@ -225,7 +225,7 @@
             </div>
 
             <!-- Payment Success -->
-            <div class="notification-item bg-white rounded-lg shadow-sm border-l-4 border-green-500 cursor-pointer hover:shadow-md transition-shadow" data-type="payments">
+            <div class="notification-item bg-white rounded-lg shadow-sm border-l-4 border-green-500 cursor-pointer hover:shadow-md transition-shadow" data-type="payments" onclick="window.location.href='/pending-credits'">
                 <div class="p-4">
                     <div class="flex items-start space-x-3">
                         <div class="bg-green-100 p-2 rounded-full">
@@ -246,7 +246,7 @@
             </div>
 
             <!-- Inventory Restocked -->
-            <div class="notification-item bg-white rounded-lg shadow-sm border-l-4 border-blue-500 cursor-pointer hover:shadow-md transition-shadow" data-type="inventory">
+            <div class="notification-item bg-white rounded-lg shadow-sm border-l-4 border-blue-500 cursor-pointer hover:shadow-md transition-shadow" data-type="inventory" onclick="window.location.href='/inventory'">
                 <div class="p-4">
                     <div class="flex items-start space-x-3">
                         <div class="bg-blue-100 p-2 rounded-full">
@@ -427,7 +427,7 @@
 
                 return `
                     <div class="notification-item bg-white rounded-lg shadow-sm border-l-4 ${priorityColors[notification.priority]} cursor-pointer hover:shadow-md transition-shadow" 
-                         data-type="${notification.type}" onclick="markAsRead(${notification.id})">
+                         data-type="${notification.type}" onclick="handleNotificationClick(${notification.id}, '${notification.type}', ${notification.customer_id}, ${notification.bill_id}, ${notification.product_id})">
                         <div class="p-4">
                             <div class="flex items-start space-x-3">
                                 <div class="${typeColor} p-2 rounded-full">
@@ -458,6 +458,66 @@
             if (badge) {
                 badge.textContent = count;
                 badge.style.display = count > 0 ? 'flex' : 'none';
+            }
+        }
+
+        async function handleNotificationClick(notificationId, type, customerId, billId, productId) {
+            // Mark notification as read first
+            await markAsRead(notificationId);
+            
+            // Navigate to appropriate page based on notification type
+            switch(type) {
+                case 'inventory':
+                    if (productId) {
+                        // Go to specific product details
+                        window.location.href = `/product-details?id=${productId}`;
+                    } else {
+                        // Go to low stock page or inventory
+                        window.location.href = '/low-stock';
+                    }
+                    break;
+                    
+                case 'expiry':
+                    if (productId) {
+                        // Go to specific product details
+                        window.location.href = `/product-details?id=${productId}`;
+                    } else {
+                        // Go to expiry alert page
+                        window.location.href = '/expiry-alert';
+                    }
+                    break;
+                    
+                case 'payment':
+                    if (customerId) {
+                        // Go to customer ledger
+                        window.location.href = `/customer-ledger?customer_id=${customerId}`;
+                    } else if (billId) {
+                        // Go to bill details
+                        window.location.href = `/receipt?bill_number=${billId}`;
+                    } else {
+                        // Go to pending credits page
+                        window.location.href = '/pending-credits';
+                    }
+                    break;
+                    
+                case 'subscription':
+                    // Go to profile/settings page
+                    window.location.href = '/profile';
+                    break;
+                    
+                case 'backup':
+                    // Go to settings page
+                    window.location.href = '/settings';
+                    break;
+                    
+                case 'system':
+                    // Go to settings page
+                    window.location.href = '/settings';
+                    break;
+                    
+                default:
+                    // Default to dashboard
+                    window.location.href = '/dashboard';
             }
         }
 
