@@ -804,15 +804,20 @@
                 // Update Today's Profit
                 document.getElementById('today-profit').textContent = `₹${stats.today_profit}`;
                 const profitGrowthElement = document.getElementById('profit-growth');
-                if (stats.profit_growth > 0) {
-                    profitGrowthElement.textContent = `+${stats.profit_growth}% from yesterday`;
-                    profitGrowthElement.className = 'text-xs text-green-600 mt-1';
-                } else if (stats.profit_growth < 0) {
-                    profitGrowthElement.textContent = `${stats.profit_growth}% from yesterday`;
-                    profitGrowthElement.className = 'text-xs text-red-600 mt-1';
+                const growth = parseFloat(stats.profit_growth);
+                
+                if (growth > 0) {
+                    profitGrowthElement.textContent = `+${growth.toFixed(1)}% from yesterday`;
+                    profitGrowthElement.className = 'text-xs text-green-600 mt-1 flex items-center';
+                    profitGrowthElement.innerHTML = `<i class="fa-solid fa-arrow-up mr-1"></i>+${growth.toFixed(1)}% from yesterday`;
+                } else if (growth < 0) {
+                    profitGrowthElement.textContent = `${growth.toFixed(1)}% from yesterday`;
+                    profitGrowthElement.className = 'text-xs text-red-600 mt-1 flex items-center';
+                    profitGrowthElement.innerHTML = `<i class="fa-solid fa-arrow-down mr-1"></i>${growth.toFixed(1)}% from yesterday`;
                 } else {
-                    profitGrowthElement.textContent = 'Same as yesterday';
-                    profitGrowthElement.className = 'text-xs text-gray-600 mt-1';
+                    profitGrowthElement.textContent = 'No change from yesterday';
+                    profitGrowthElement.className = 'text-xs text-gray-600 mt-1 flex items-center';
+                    profitGrowthElement.innerHTML = `<i class="fa-solid fa-minus mr-1"></i>No change from yesterday`;
                 }
                 
                 // Update Total Sales

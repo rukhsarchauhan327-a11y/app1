@@ -362,6 +362,10 @@ def get_dashboard_stats():
     profit_growth = 0
     if yesterday_profit > 0:
         profit_growth = ((today_profit - yesterday_profit) / yesterday_profit) * 100
+    elif yesterday_profit == 0 and today_profit > 0:
+        profit_growth = 100  # 100% increase from zero
+    elif yesterday_profit == 0 and today_profit == 0:
+        profit_growth = 0    # No change when both are zero
     
     # Get outstanding credit amounts
     outstanding_customers = Customer.query.all()
