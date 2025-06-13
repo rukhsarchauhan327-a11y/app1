@@ -350,6 +350,7 @@
             try {
                 const cartArray = Object.values(cartItems);
                 localStorage.setItem('kiranakonnect_persistent_cart', JSON.stringify(cartArray));
+                updateCartCount();
             } catch (error) {
                 console.error('Error saving cart:', error);
             }
@@ -576,14 +577,24 @@
             alert('Bill generation functionality will be implemented soon.');
         }
 
+        // Update cart count across all pages
+        function updateCartCount() {
+            const count = Object.keys(cartItems).length;
+            localStorage.setItem('cart_count', count.toString());
+        }
+
         // FIXED: Initialize on page load
         document.addEventListener('DOMContentLoaded', function() {
             loadCart();
             checkNewItems();
             renderCart();
+            updateCartCount();
             
             // Check for new items every 2 seconds
-            setInterval(checkNewItems, 2000);
+            setInterval(() => {
+                checkNewItems();
+                updateCartCount();
+            }, 2000);
         });
     </script>
 </body>
