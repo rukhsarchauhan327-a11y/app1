@@ -300,39 +300,27 @@
         }
 
         function markAllAsRead() {
-            const notifications = document.querySelectorAll('.notification-item');
-            notifications.forEach(notification => {
-                notification.style.opacity = '0.7';
-            });
-            
-            setTimeout(() => {
-                showStyledNotification('All notifications marked as read', 'success');
-                notifications.forEach(notification => {
-                    notification.style.opacity = '1';
-                });
-            }, 500);
+            alert('All notifications marked as read');
         }
 
         function filterNotifications(filter) {
-            console.log('Filtering notifications:', filter);
-            
             // Update button states
-            document.querySelectorAll('.filter-btn').forEach(btn => {
+            document.querySelectorAll('.filter-btn').forEach(function(btn) {
                 btn.classList.remove('bg-primary', 'text-white');
                 btn.classList.add('bg-gray-100', 'text-gray-600');
             });
             
-            const activeBtn = document.querySelector(`[data-filter="${filter}"]`);
+            var activeBtn = document.querySelector('[data-filter="' + filter + '"]');
             if (activeBtn) {
                 activeBtn.classList.remove('bg-gray-100', 'text-gray-600');
                 activeBtn.classList.add('bg-primary', 'text-white');
             }
             
             // Filter notifications
-            const allNotifications = document.querySelectorAll('.notification-item');
-            allNotifications.forEach(notification => {
-                const type = notification.getAttribute('data-type');
-                let shouldShow = false;
+            var allNotifications = document.querySelectorAll('.notification-item');
+            allNotifications.forEach(function(notification) {
+                var type = notification.getAttribute('data-type');
+                var shouldShow = false;
                 
                 if (filter === 'all') {
                     shouldShow = true;
@@ -352,38 +340,8 @@
             });
         }
 
-        function showStyledNotification(message, type = 'info') {
-            // Create notification element
-            const notification = document.createElement('div');
-            notification.className = `fixed top-4 right-4 z-50 p-4 rounded-lg text-white font-medium shadow-lg transform transition-all duration-300 ${
-                type === 'success' ? 'bg-green-500' : 
-                type === 'error' ? 'bg-red-500' : 
-                type === 'warning' ? 'bg-orange-500' : 'bg-blue-500'
-            }`;
-            notification.style.transform = 'translateX(100%)';
-            notification.innerHTML = `
-                <div class="flex items-center space-x-2">
-                    <i class="fa-solid ${type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-times-circle' : type === 'warning' ? 'fa-exclamation-triangle' : 'fa-info-circle'}"></i>
-                    <span>${message}</span>
-                </div>
-            `;
-            
-            document.body.appendChild(notification);
-            
-            // Animate in
-            setTimeout(() => {
-                notification.style.transform = 'translateX(0)';
-            }, 10);
-            
-            // Remove after 3 seconds
-            setTimeout(() => {
-                notification.style.transform = 'translateX(100%)';
-                setTimeout(() => {
-                    if (notification.parentNode) {
-                        notification.parentNode.removeChild(notification);
-                    }
-                }, 300);
-            }, 3000);
+        function showStyledNotification(message, type) {
+            alert(message);
         }
 
         // Check backup status and show/hide notification
