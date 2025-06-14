@@ -212,27 +212,87 @@
         }
 
         function markAllAsRead() {
-            if (confirm('Mark all notifications as read?')) {
-                fetch('/api/notifications/mark-all-read', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    }
-                })
-                .then(function(response) {
-                    return response.json();
-                })
-                .then(function(data) {
-                    if (data.success) {
-                        loadNotifications();
-                        showStyledNotification('All notifications marked as read successfully!', 'success');
-                    }
-                })
-                .catch(function(error) {
-                    console.error('Error marking notifications as read:', error);
-                    showStyledNotification('Error marking notifications as read', 'error');
-                });
+            // Show custom confirmation modal instead of browser confirm
+            showConfirmationModal(
+                'Mark all as read?',
+                'This will mark all notifications as read. Continue?',
+                function() {
+                    // User confirmed
+                    fetch('/api/notifications/mark-all-read', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    })
+                    .then(function(response) {
+                        return response.json();
+                    })
+                    .then(function(data) {
+                        if (data.success) {
+                            loadNotifications();
+                            showStyledNotification('All notifications marked as read successfully!', 'success');
+                        }
+                    })
+                    .catch(function(error) {
+                        console.error('Error marking notifications as read:', error);
+                        showStyledNotification('Error marking notifications as read', 'error');
+                    });
+                }
+            );
+        }
+
+        function showConfirmationModal(title, message, onConfirm) {
+            // Create modal overlay
+            const modal = document.createElement('div');
+            modal.className = 'fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4';
+            modal.innerHTML = `
+                <div class="bg-white rounded-xl shadow-xl max-w-sm w-full p-6">
+                    <div class="text-center">
+                        <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-primary/10 mb-4">
+                            <i class="fa-solid fa-check-double text-primary text-xl"></i>
+                        </div>
+                        <h3 class="text-lg font-semibold text-dark mb-2">${title}</h3>
+                        <p class="text-gray-600 mb-6">${message}</p>
+                        <div class="flex space-x-3">
+                            <button onclick="closeConfirmationModal()" class="flex-1 px-4 py-2 border border-gray-200 text-gray-700 rounded-lg hover:bg-gray-50 font-medium">
+                                Cancel
+                            </button>
+                            <button onclick="confirmAction()" class="flex-1 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark font-medium">
+                                Confirm
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+            document.body.style.overflow = 'hidden';
+            
+            // Store callback
+            window.currentConfirmCallback = onConfirm;
+            
+            // Add click outside to close
+            modal.addEventListener('click', function(e) {
+                if (e.target === modal) {
+                    closeConfirmationModal();
+                }
+            });
+        }
+
+        function closeConfirmationModal() {
+            const modal = document.querySelector('.fixed.inset-0.bg-black.bg-opacity-50');
+            if (modal) {
+                document.body.removeChild(modal);
+                document.body.style.overflow = 'auto';
+                window.currentConfirmCallback = null;
             }
+        }
+
+        function confirmAction() {
+            if (window.currentConfirmCallback) {
+                window.currentConfirmCallback();
+            }
+            closeConfirmationModal();
         }
 
         function filterNotifications(filter) {
