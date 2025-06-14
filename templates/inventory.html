@@ -490,7 +490,7 @@
                             <i class="fa-solid fa-times"></i>
                         </button>
                     </div>
-                    <button onclick="openScanner(); initializeCamera();" class="p-2 bg-primary text-white rounded-lg hover:bg-primary-dark">
+                    <button onclick="openScanner('Search Products')" class="p-2 bg-primary text-white rounded-lg hover:bg-primary-dark">
                         <i class="fa-solid fa-barcode"></i>
                     </button>
                 </div>
@@ -515,7 +515,7 @@
                     <button onclick="closeScanner()" class="p-2 hover:bg-gray-800 rounded-lg">
                         <i class="fa-solid fa-times text-white"></i>
                     </button>
-                    <h2 class="text-lg font-semibold">Scan to Add Product</h2>
+                    <h2 id="scanner-title" class="text-lg font-semibold">Scan Barcode</h2>
                     <button onclick="toggleFlashlight()" class="p-2 hover:bg-gray-800 rounded-lg">
                         <i class="fa-solid fa-flashlight text-white"></i>
                     </button>
@@ -838,6 +838,27 @@
                     expDate: product.expiry_date || ''
                 });
                 window.location.href = `/product-details?${params.toString()}`;
+            }
+        }
+
+        // Initialize page-specific barcode handler
+        window.onBarcodeScanned = function(barcode) {
+            performBarcodeSearch(barcode);
+        };
+
+        function performBarcodeSearch(barcode) {
+            console.log('Searching for barcode:', barcode);
+            showNotification(`Searching for barcode: ${barcode}`, 'info');
+            
+            // Search in loaded products
+            const product = products.find(p => p.barcode === barcode);
+            if (product) {
+                showNotification(`Found: ${product.name}`, 'success');
+                setTimeout(() => {
+                    viewProductDetails(product.id);
+                }, 1000);
+            } else {
+                showNotification('Product not found', 'error');
             }
         }
 
@@ -2107,6 +2128,6 @@
             }
         }
     </script>
-
+    <script src="{{ url_for('static', filename='js/universal-scanner.js') }}"></script>
 </body>
 </html>
