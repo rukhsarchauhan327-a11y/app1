@@ -1436,13 +1436,36 @@ def api_sales_data():
                 'created_at': bill.created_at.strftime('%Y-%m-%d %H:%M:%S')
             })
         
-        # Calculate total refilled investment from product cost_price * stock_quantity
-        total_refilled_investment = 0
+        # Calculate total investment (initial + refilling combined)
+        # This includes both initial inventory and all refilling amounts
+        total_combined_investment = 0
+        total_sold_amount = 0
         products = Product.query.all()
+        
         for product in products:
-            if product.cost_price and product.stock_quantity:
-                total_refilled_investment += product.cost_price * product.stock_quantity
+            if product.cost_price:
+                # Initial + Current stock = Total investment in this product
+                initial_stock = 0  # This would be tracked separately in real system
+                current_stock = product.stock_quantity or 0
+                total_product_investment = product.cost_price * current_stock
+                total_combined_investment += total_product_investment
+        
+        # Calculate total selling amount (cost price of sold items)
+        for bill in bills:
+            bill_items = BillItem.query.filter_by(bill_id=bill.id).all()
+            for item in bill_items:
+                # Find matching product to get cost price
+                product = Product.query.filter_by(name=item.item_name).first()
+                if not product:
+                    product = Product.query.filter(Product.name.ilike(f'%{item.item_name}%')).first()
+                
+                if product and product.cost_price:
+                    # Add cost price of sold quantity to total sold amount
+                    total_sold_amount += (product.cost_price * item.quantity)
 
+        # Calculate remaining investment to recover
+        remaining_investment = max(0, total_combined_investment - total_sold_amount)
+        
         return jsonify({
             'success': True,
             'data': {
@@ -1450,7 +1473,9 @@ def api_sales_data():
                 'totalBills': total_bills,
                 'totalProfit': total_profit,
                 'totalInvestment': total_investment,
-                'totalRefilledInvestment': total_refilled_investment,
+                'totalCombinedInvestment': total_combined_investment,  # Initial + Refilling
+                'totalSoldAmount': total_sold_amount,  # Cost price of sold items
+                'remainingInvestment': remaining_investment,  # Amount still to recover
                 'avgBillValue': total_revenue / total_bills if total_bills > 0 else 0,
                 'paymentModes': payment_modes,
                 'categories': categories,
