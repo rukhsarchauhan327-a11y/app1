@@ -241,23 +241,6 @@
             }
         }
 
-        // Period selection
-        function setPeriod(period) {
-            currentPeriod = period;
-            
-            // Update tab styling
-            document.querySelectorAll('[id$="-tab"]').forEach(tab => {
-                tab.classList.remove('bg-primary', 'text-white');
-                tab.classList.add('text-gray-600');
-            });
-            
-            document.getElementById(`${period}-tab`).classList.add('bg-primary', 'text-white');
-            document.getElementById(`${period}-tab`).classList.remove('text-gray-600');
-            
-            // Load data for selected period
-            loadSalesDataByPeriod(period);
-        }
-
         // Current period for data filtering
         let currentPeriod = 'weekly';
         
