@@ -1413,6 +1413,13 @@ def api_sales_data():
                 'created_at': bill.created_at.strftime('%Y-%m-%d %H:%M:%S')
             })
         
+        # Calculate total refilled investment from product cost_price * stock_quantity
+        total_refilled_investment = 0
+        products = Product.query.all()
+        for product in products:
+            if product.cost_price and product.stock_quantity:
+                total_refilled_investment += product.cost_price * product.stock_quantity
+
         return jsonify({
             'success': True,
             'data': {
@@ -1420,6 +1427,7 @@ def api_sales_data():
                 'totalBills': total_bills,
                 'totalProfit': total_profit,
                 'totalInvestment': total_investment,
+                'totalRefilledInvestment': total_refilled_investment,
                 'avgBillValue': total_revenue / total_bills if total_bills > 0 else 0,
                 'paymentModes': payment_modes,
                 'categories': categories,

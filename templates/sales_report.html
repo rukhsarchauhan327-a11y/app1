@@ -114,6 +114,34 @@
             </div>
         </div>
 
+        <!-- Investment Recovery -->
+        <div class="px-4 mb-6">
+            <div class="bg-white p-4 rounded-xl shadow-sm">
+                <h3 class="text-lg font-bold mb-4 text-dark">Investment Recovery</h3>
+                <div class="space-y-4">
+                    <div class="flex items-center justify-between">
+                        <span class="text-gray-600">Total Refilled Investment</span>
+                        <span class="font-bold text-dark" id="total-refilled-investment">₹0</span>
+                    </div>
+                    
+                    <div class="flex items-center justify-between">
+                        <span class="text-gray-600">Profit Generated</span>
+                        <span class="font-bold text-green-600" id="profit-generated">₹0</span>
+                    </div>
+                    
+                    <div class="flex items-center justify-between">
+                        <span class="text-gray-600">Remaining to Recover</span>
+                        <span class="font-bold text-red-500" id="remaining-recovery">₹0</span>
+                    </div>
+                    
+                    <div class="bg-gray-200 rounded-full h-3 mt-4">
+                        <div class="bg-green-600 h-3 rounded-full" style="width: 0%" id="recovery-progress"></div>
+                    </div>
+                    <p class="text-xs text-gray-500 text-center" id="recovery-percentage">0% recovered</p>
+                </div>
+            </div>
+        </div>
+
         <!-- 7-Day Investment vs Profit Chart -->
         <div class="px-4 mb-6">
             <div class="bg-white p-6 rounded-xl shadow-sm">
@@ -132,44 +160,12 @@
             </div>
         </div>
 
-
-
         <!-- Top Selling Items -->
         <div class="px-4 mb-6">
             <div class="bg-white p-4 rounded-xl shadow-sm">
                 <h3 class="text-lg font-bold mb-4 text-dark">Top Selling Items</h3>
-                <div class="space-y-4" id="top-selling-items">
+                <div class="max-h-64 overflow-y-auto space-y-3" id="top-selling-items">
                     <!-- Top selling items will be loaded here -->
-                </div>
-            </div>
-        </div>
-
-
-
-        <!-- Investment Recovery -->
-        <div class="px-4 mb-6">
-            <div class="bg-white p-4 rounded-xl shadow-sm">
-                <h3 class="text-lg font-bold mb-4 text-dark">Investment Recovery</h3>
-                <div class="space-y-4">
-                    <div class="flex items-center justify-between">
-                        <span class="text-gray-600">Initial Investment</span>
-                        <span class="font-bold text-dark" id="initial-investment">₹1,00,000</span>
-                    </div>
-                    
-                    <div class="flex items-center justify-between">
-                        <span class="text-gray-600">Investment Recovered</span>
-                        <span class="font-bold text-primary" id="investment-recovered">₹0</span>
-                    </div>
-                    
-                    <div class="flex items-center justify-between">
-                        <span class="text-gray-600">Remaining to Recover</span>
-                        <span class="font-bold text-red-500" id="remaining-recovery">₹1,00,000</span>
-                    </div>
-                    
-                    <div class="bg-gray-200 rounded-full h-3 mt-4">
-                        <div class="bg-primary h-3 rounded-full" style="width: 0%" id="recovery-progress"></div>
-                    </div>
-                    <p class="text-xs text-gray-500 text-center" id="recovery-percentage">0% recovered</p>
                 </div>
             </div>
         </div>
@@ -328,12 +324,24 @@
         // Update sales statistics
         function updateSalesStats(data) {
             const totalInvestment = data.totalInvestment || 0;
+            const totalProfit = data.totalProfit || 0;
             const investmentPercentage = data.totalRevenue > 0 ? Math.round((totalInvestment / data.totalRevenue) * 100) : 0;
             
             document.getElementById('total-sales').textContent = `₹${Math.round(data.totalRevenue || 0)}`;
-            document.getElementById('total-profit').textContent = `₹${Math.round(data.totalProfit || 0)}`;
+            document.getElementById('total-profit').textContent = `₹${Math.round(totalProfit)}`;
             document.getElementById('total-cost').textContent = `₹${Math.round(totalInvestment)}`;
             document.getElementById('cost-percentage').textContent = `${investmentPercentage}% investment ratio`;
+            
+            // Update Investment Recovery section using refilled investment data
+            const refilledInvestment = data.totalRefilledInvestment || 0;
+            const remainingToRecover = Math.max(0, refilledInvestment - totalProfit);
+            const recoveryPercentage = refilledInvestment > 0 ? Math.round((totalProfit / refilledInvestment) * 100) : 0;
+            
+            document.getElementById('total-refilled-investment').textContent = `₹${Math.round(refilledInvestment)}`;
+            document.getElementById('profit-generated').textContent = `₹${Math.round(totalProfit)}`;
+            document.getElementById('remaining-recovery').textContent = `₹${Math.round(remainingToRecover)}`;
+            document.getElementById('recovery-progress').style.width = `${Math.min(100, recoveryPercentage)}%`;
+            document.getElementById('recovery-percentage').textContent = `${recoveryPercentage}% recovered`;
             
             // Update period-specific growth indicators
             document.getElementById('sales-growth').textContent = '+15% growth';
