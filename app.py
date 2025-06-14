@@ -1357,27 +1357,35 @@ def api_sales_data():
             
             total_investment += bill_investment
         
-        # Process daily data for chart
+        # Process chart data based on period
         from collections import defaultdict
-        chart_data = defaultdict(lambda: {'investment': 0, 'profit': 0, 'revenue': 0})
+        from datetime import datetime, timedelta
         
-        for data in daily_data:
-            chart_data[data['date']]['investment'] += data['investment']
-            chart_data[data['date']]['profit'] += data['profit']
-            chart_data[data['date']]['revenue'] += data['revenue']
-        
-        # Convert to sorted list
-        sorted_dates = sorted(chart_data.keys())
-        investment_data = []
-        profit_data = []
-        cumulative_investment = 0
-        cumulative_profit = 0
-        
-        for date in sorted_dates:
-            cumulative_investment += chart_data[date]['investment']
-            cumulative_profit += chart_data[date]['profit']
-            investment_data.append(cumulative_investment)
-            profit_data.append(cumulative_profit)
+        if not daily_data:
+            # No sales data, return empty arrays
+            sorted_dates = []
+            investment_data = []
+            profit_data = []
+        else:
+            chart_data = defaultdict(lambda: {'investment': 0, 'profit': 0, 'revenue': 0})
+            
+            for data in daily_data:
+                chart_data[data['date']]['investment'] += data['investment']
+                chart_data[data['date']]['profit'] += data['profit']
+                chart_data[data['date']]['revenue'] += data['revenue']
+            
+            # Convert to sorted list with cumulative values
+            sorted_dates = sorted(chart_data.keys())
+            investment_data = []
+            profit_data = []
+            cumulative_investment = 0
+            cumulative_profit = 0
+            
+            for date in sorted_dates:
+                cumulative_investment += chart_data[date]['investment']
+                cumulative_profit += chart_data[date]['profit']
+                investment_data.append(cumulative_investment)
+                profit_data.append(cumulative_profit)
         
         # Sort categories by amount
         sorted_categories = sorted(category_performance.items(), key=lambda x: x[1]['amount'], reverse=True)

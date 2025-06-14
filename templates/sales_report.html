@@ -373,19 +373,21 @@
 
         // Update sales statistics
         function updateSalesStats(data) {
-            const totalCost = data.totalRevenue - data.totalProfit;
-            const costPercentage = data.totalRevenue > 0 ? Math.round((totalCost / data.totalRevenue) * 100) : 0;
+            const totalInvestment = data.totalInvestment || 0;
+            const investmentPercentage = data.totalRevenue > 0 ? Math.round((totalInvestment / data.totalRevenue) * 100) : 0;
             
-            document.getElementById('total-sales').textContent = `₹${Math.round(data.totalRevenue)}`;
-            document.getElementById('total-profit').textContent = `₹${Math.round(data.totalProfit)}`;
-            document.getElementById('total-cost').textContent = `₹${Math.round(totalCost)}`;
-            document.getElementById('total-transactions').textContent = data.totalBills;
-            document.getElementById('avg-transaction').textContent = `₹${Math.round(data.avgBillValue)} average`;
-            document.getElementById('cost-percentage').textContent = `${costPercentage}% of sales`;
+            document.getElementById('total-sales').textContent = `₹${Math.round(data.totalRevenue || 0)}`;
+            document.getElementById('total-profit').textContent = `₹${Math.round(data.totalProfit || 0)}`;
+            document.getElementById('total-cost').textContent = `₹${Math.round(totalInvestment)}`;
+            document.getElementById('total-transactions').textContent = data.totalBills || 0;
+            document.getElementById('avg-transaction').textContent = `₹${Math.round(data.avgBillValue || 0)} average`;
+            document.getElementById('cost-percentage').textContent = `${investmentPercentage}% investment ratio`;
             
-            // Calculate growth percentages (mock for now)
-            document.getElementById('sales-growth').textContent = '+15% vs yesterday';
-            document.getElementById('profit-growth').textContent = '+12% vs yesterday';
+            // Update period-specific growth indicators
+            const periodText = currentPeriod === 'daily' ? 'yesterday' : 
+                             currentPeriod === 'weekly' ? 'last week' : 'last month';
+            document.getElementById('sales-growth').textContent = `vs ${periodText}`;
+            document.getElementById('profit-growth').textContent = `vs ${periodText}`;
         }
 
         // Update payment modes
