@@ -65,9 +65,9 @@
         <!-- Period Tabs -->
         <div class="px-4 mb-6">
             <div class="flex bg-gray-100 rounded-xl p-1">
-                <button onclick="setPeriod('daily')" class="flex-1 py-3 text-center text-gray-600" id="daily-tab">Daily</button>
-                <button onclick="setPeriod('weekly')" class="flex-1 py-3 text-center bg-primary text-white rounded-lg font-semibold" id="weekly-tab">Weekly</button>
-                <button onclick="setPeriod('monthly')" class="flex-1 py-3 text-center text-gray-600" id="monthly-tab">Monthly</button>
+                <button onclick="loadPeriodData('daily')" class="period-tab flex-1 py-3 text-center text-gray-600 rounded-lg" id="daily-tab">Daily</button>
+                <button onclick="loadPeriodData('weekly')" class="period-tab flex-1 py-3 text-center bg-primary text-white rounded-lg font-semibold" id="weekly-tab">Weekly</button>
+                <button onclick="loadPeriodData('monthly')" class="period-tab flex-1 py-3 text-center text-gray-600 rounded-lg" id="monthly-tab">Monthly</button>
             </div>
         </div>
 
@@ -155,6 +155,53 @@
                 <h3 class="text-lg font-bold mb-4 text-dark">Top Selling Items</h3>
                 <div class="max-h-64 overflow-y-auto space-y-3" id="top-selling-items">
                     <!-- Top selling items will be loaded here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Category Breakdown -->
+        <div class="px-4 mb-6">
+            <div class="bg-white p-4 rounded-xl shadow-sm">
+                <h3 class="text-lg font-bold mb-4 text-dark">Category Performance</h3>
+                <div class="space-y-3" id="category-breakdown">
+                    <!-- Category data will be loaded here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Sales -->
+        <div class="px-4 mb-6">
+            <div class="bg-white p-4 rounded-xl shadow-sm">
+                <h3 class="text-lg font-bold mb-4 text-dark">Recent Sales</h3>
+                <div class="max-h-80 overflow-y-auto space-y-2" id="recent-sales">
+                    <!-- Recent sales will be loaded here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Payment Modes -->
+        <div class="px-4 mb-20">
+            <div class="bg-white p-4 rounded-xl shadow-sm">
+                <h3 class="text-lg font-bold mb-4 text-dark">Payment Methods</h3>
+                <div class="grid grid-cols-3 gap-3">
+                    <div class="text-center p-3 bg-green-50 rounded-lg">
+                        <i class="fas fa-money-bill text-green-600 text-2xl mb-2"></i>
+                        <p class="text-sm font-medium text-gray-700">Cash</p>
+                        <p class="text-lg font-bold text-green-600" id="cash-amount">₹0</p>
+                        <p class="text-xs text-gray-500" id="cash-count">0 bills</p>
+                    </div>
+                    <div class="text-center p-3 bg-blue-50 rounded-lg">
+                        <i class="fas fa-mobile-alt text-blue-600 text-2xl mb-2"></i>
+                        <p class="text-sm font-medium text-gray-700">Online</p>
+                        <p class="text-lg font-bold text-blue-600" id="online-amount">₹0</p>
+                        <p class="text-xs text-gray-500" id="online-count">0 bills</p>
+                    </div>
+                    <div class="text-center p-3 bg-orange-50 rounded-lg">
+                        <i class="fas fa-credit-card text-orange-600 text-2xl mb-2"></i>
+                        <p class="text-sm font-medium text-gray-700">Credit</p>
+                        <p class="text-lg font-bold text-orange-600" id="credit-amount">₹0</p>
+                        <p class="text-xs text-gray-500" id="credit-count">0 bills</p>
+                    </div>
                 </div>
             </div>
         </div>
@@ -402,25 +449,32 @@
         // Update metrics cards with real data
         function updateMetricsCards(data) {
             // Total Sales
-            document.getElementById('total-sales').textContent = `₹${Math.round(data.totalRevenue || 0)}`;
-            
-            // Total Investment 
-            document.getElementById('total-investment').textContent = `₹${Math.round(data.totalCombinedInvestment || 0)}`;
+            const totalSalesElement = document.getElementById('total-sales');
+            if (totalSalesElement) {
+                totalSalesElement.textContent = `₹${Math.round(data.totalRevenue || 0)}`;
+            }
             
             // Total Profit
             const totalProfit = data.totalProfit || 0;
             const profitElement = document.getElementById('total-profit');
-            profitElement.textContent = `₹${Math.round(totalProfit)}`;
-            profitElement.className = totalProfit >= 0 ? 'text-green-600 font-bold text-xl' : 'text-red-600 font-bold text-xl';
+            if (profitElement) {
+                profitElement.textContent = `₹${Math.round(totalProfit)}`;
+                profitElement.className = totalProfit >= 0 ? 'text-xl font-bold text-green-600' : 'text-xl font-bold text-red-600';
+            }
             
-            // Total Bills
-            document.getElementById('total-bills').textContent = data.totalBills || 0;
+            // Total Cost (Investment)
+            const totalCostElement = document.getElementById('total-cost');
+            if (totalCostElement) {
+                totalCostElement.textContent = `₹${Math.round(data.totalInvestment || 0)}`;
+            }
             
-            // Average Bill Value
-            document.getElementById('avg-bill-value').textContent = `₹${Math.round(data.avgBillValue || 0)}`;
-            
-            // Remaining Investment
-            document.getElementById('remaining-investment').textContent = `₹${Math.round(data.remainingInvestment || 0)}`;
+            // Update chart title with period
+            const chartTitle = document.getElementById('chart-title');
+            if (chartTitle) {
+                const periodName = data.period === 'daily' ? 'Today\'s' : 
+                                 data.period === 'weekly' ? 'This Week\'s' : 'This Month\'s';
+                chartTitle.textContent = `${periodName} Investment vs Profit Analysis`;
+            }
         }
 
         // Update top selling items
@@ -700,15 +754,40 @@
 
         // Update investment recovery based on current period
         function updateInvestmentRecovery(data) {
-            const totalInvestment = data.totalInvestment || 0;
+            const totalCombinedInvestment = data.totalCombinedInvestment || 0;
             const totalProfit = data.totalProfit || 0;
-            const recoveryPercentage = totalInvestment > 0 ? Math.min((totalProfit / totalInvestment) * 100, 100) : 0;
-            const remaining = Math.max(totalInvestment - totalProfit, 0);
+            const remainingInvestment = data.remainingInvestment || 0;
             
-            document.getElementById('investment-recovered').textContent = `₹${Math.round(totalProfit)}`;
-            document.getElementById('remaining-recovery').textContent = `₹${Math.round(remaining)}`;
-            document.getElementById('recovery-progress').style.width = `${recoveryPercentage}%`;
-            document.getElementById('recovery-percentage').textContent = `${Math.round(recoveryPercentage)}% recovered`;
+            // Update investment recovery section
+            const totalInvestmentElement = document.getElementById('total-refilled-investment');
+            if (totalInvestmentElement) {
+                totalInvestmentElement.textContent = `₹${Math.round(totalCombinedInvestment)}`;
+            }
+            
+            const profitGeneratedElement = document.getElementById('profit-generated');
+            if (profitGeneratedElement) {
+                profitGeneratedElement.textContent = `₹${Math.round(totalProfit)}`;
+                profitGeneratedElement.className = totalProfit >= 0 ? 'font-bold text-green-600' : 'font-bold text-red-600';
+            }
+            
+            const remainingRecoveryElement = document.getElementById('remaining-recovery');
+            if (remainingRecoveryElement) {
+                remainingRecoveryElement.textContent = `₹${Math.round(remainingInvestment)}`;
+            }
+            
+            // Update progress bar
+            const recoveryPercentage = totalCombinedInvestment > 0 ? 
+                Math.max(0, Math.min(100, ((totalCombinedInvestment - remainingInvestment) / totalCombinedInvestment) * 100)) : 0;
+            
+            const progressBar = document.getElementById('recovery-progress');
+            if (progressBar) {
+                progressBar.style.width = `${recoveryPercentage}%`;
+            }
+            
+            const recoveryPercentageElement = document.getElementById('recovery-percentage');
+            if (recoveryPercentageElement) {
+                recoveryPercentageElement.textContent = `${Math.round(recoveryPercentage)}% recovered`;
+            }
         }
 
         // Show notification
@@ -744,14 +823,14 @@
             
             // Update active tab
             document.querySelectorAll('.period-tab').forEach(tab => {
-                tab.classList.remove('border-primary', 'text-primary', 'bg-primary/5');
-                tab.classList.add('border-transparent', 'text-gray-500');
+                tab.classList.remove('bg-primary', 'text-white', 'font-semibold');
+                tab.classList.add('text-gray-600');
             });
             
-            const activeTab = document.querySelector(`[onclick="loadPeriodData('${period}')"]`);
+            const activeTab = document.getElementById(`${period}-tab`);
             if (activeTab) {
-                activeTab.classList.remove('border-transparent', 'text-gray-500');
-                activeTab.classList.add('border-primary', 'text-primary', 'bg-primary/5');
+                activeTab.classList.remove('text-gray-600');
+                activeTab.classList.add('bg-primary', 'text-white', 'font-semibold');
             }
             
             // Show loading state
