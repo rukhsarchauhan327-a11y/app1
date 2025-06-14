@@ -953,11 +953,30 @@
         let deleteProductId = null;
 
         function deleteItem(productId) {
+            // Handle both static HTML elements and dynamic products
+            let productName = '';
+            let elementToDelete = null;
+            
+            // Try to find in products array first (for dynamic products)
             const product = products.find(p => p.id === productId);
             if (product) {
+                productName = product.name;
+                elementToDelete = document.getElementById(`product-${productId}`);
+            } else {
+                // Handle static HTML elements
+                elementToDelete = document.getElementById(productId);
+                if (elementToDelete) {
+                    const nameElement = elementToDelete.querySelector('h3');
+                    productName = nameElement ? nameElement.textContent : 'this item';
+                }
+            }
+            
+            if (elementToDelete) {
                 deleteProductId = productId;
-                document.getElementById('delete-product-name').textContent = product.name;
+                document.getElementById('delete-product-name').textContent = productName;
                 document.getElementById('delete-modal').classList.remove('hidden');
+            } else {
+                showNotification('Product not found', 'error');
             }
         }
 
@@ -968,20 +987,28 @@
 
         function confirmDelete() {
             if (deleteProductId) {
-                // Remove from products array
+                // Remove from products array if it exists there
                 const productIndex = products.findIndex(p => p.id === deleteProductId);
                 if (productIndex > -1) {
                     products.splice(productIndex, 1);
                 }
 
-                // Remove from DOM
-                const productElement = document.getElementById(`product-${deleteProductId}`);
-                if (productElement) {
-                    productElement.remove();
+                // Remove from DOM - try both static and dynamic element IDs
+                let elementToRemove = document.getElementById(`product-${deleteProductId}`) || 
+                                   document.getElementById(deleteProductId);
+                
+                if (elementToRemove) {
+                    elementToRemove.remove();
+                    showNotification('Product deleted successfully', 'success');
+                    
+                    // Update stats only if products array was modified
+                    if (productIndex > -1) {
+                        updateStats();
+                    }
+                } else {
+                    showNotification('Error deleting product', 'error');
                 }
 
-                showNotification('Product deleted successfully', 'success');
-                updateStats();
                 closeDeleteModal();
 
                 // In a real app, this would call an API to delete the product
