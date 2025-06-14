@@ -449,11 +449,94 @@ def ensure_sample_products():
         db.session.rollback()
         app.logger.error(f"Error adding sample products: {e}")
 
+def add_sample_sales_data():
+    """Add sample bills and sales data for testing analytics"""
+    try:
+        from datetime import datetime, timedelta
+        import random
+        
+        # Check if we already have bills
+        if Bill.query.count() > 0:
+            return
+            
+        # Get some products for creating bills
+        products = Product.query.limit(5).all()
+        if not products:
+            return
+            
+        # Create sample bills for different periods
+        today = datetime.now()
+        
+        # Create bills for the last 30 days
+        for days_ago in range(30):
+            bill_date = today - timedelta(days=days_ago)
+            
+            # Create 1-3 bills per day (random)
+            bills_per_day = random.randint(1, 3)
+            
+            for bill_num in range(bills_per_day):
+                # Generate bill number
+                bill_number = f"B{bill_date.strftime('%Y%m%d')}{bill_num+1:02d}"
+                
+                # Random customer name
+                customer_names = ["Walk-in Customer", "Rajesh Kumar", "Priya Sharma", "Amit Singh", "Sunita Devi"]
+                customer_name = random.choice(customer_names)
+                
+                # Create bill
+                bill = Bill(
+                    bill_number=bill_number,
+                    customer_name=customer_name,
+                    subtotal=0,
+                    tax_amount=0,
+                    discount_amount=0,
+                    total_amount=0,
+                    payment_mode=random.choice(['cash', 'online', 'upi']),
+                    payment_status='paid',
+                    created_at=bill_date,
+                    generated_by="Test Data"
+                )
+                db.session.add(bill)
+                db.session.flush()  # Get the bill ID
+                
+                # Add 1-4 items to each bill
+                items_count = random.randint(1, 4)
+                bill_total = 0
+                
+                for _ in range(items_count):
+                    product = random.choice(products)
+                    quantity = random.randint(1, 5)
+                    unit_price = product.price
+                    total_price = quantity * unit_price
+                    
+                    bill_item = BillItem(
+                        bill_id=bill.id,
+                        item_name=product.name,
+                        quantity=quantity,
+                        unit_price=unit_price,
+                        total_price=total_price,
+                        weight=quantity if product.is_weight_based else None,
+                        price_per_kg=product.price_per_kg if product.is_weight_based else None
+                    )
+                    db.session.add(bill_item)
+                    bill_total += total_price
+                
+                # Update bill totals
+                bill.subtotal = bill_total
+                bill.total_amount = bill_total
+        
+        db.session.commit()
+        app.logger.info("Sample sales data added for analytics testing")
+        
+    except Exception as e:
+        db.session.rollback()
+        app.logger.error(f"Error adding sample sales data: {e}")
+
 # Initialize database tables once at startup
 try:
     with app.app_context():
         db.create_all()
         ensure_sample_products()
+        add_sample_sales_data()
         app.logger.info("Database initialized successfully")
 except Exception as e:
     app.logger.error(f"Database initialization failed: {e}")
