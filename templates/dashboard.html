@@ -557,7 +557,7 @@
             </button>
             
             <!-- Scan Barcode -->
-            <button onclick="openQuickScanner()" class="absolute w-12 h-12 bg-orange-500 rounded-full shadow-lg flex items-center justify-center text-white transition-all duration-300" 
+            <button onclick="openScanner('Quick Scan')" class="absolute w-12 h-12 bg-orange-500 rounded-full shadow-lg flex items-center justify-center text-white transition-all duration-300" 
                     style="transform: translate(-50px, -50px) scale(0);" data-action="scan">
                 <i class="fa-solid fa-barcode text-sm"></i>
             </button>
@@ -622,8 +622,8 @@
                             <i class="fa-solid fa-times"></i>
                         </button>
                     </div>
-                    <button onclick="openCustomerSearch()" class="p-2 bg-primary text-white rounded-lg hover:bg-primary-dark">
-                        <i class="fa-solid fa-user-plus"></i>
+                    <button onclick="openScanner('Search Products')" class="p-2 bg-primary text-white rounded-lg hover:bg-primary-dark">
+                        <i class="fa-solid fa-barcode"></i>
                     </button>
                 </div>
             </div>
@@ -834,6 +834,53 @@
         window.onBarcodeScanned = function(barcode) {
             performBarcodeSearch(barcode);
         };
+
+        // Ensure performBarcodeSearch function exists
+        function performBarcodeSearch(barcode) {
+            console.log('Searching for barcode:', barcode);
+            showStyledNotification(`Searching for barcode: ${barcode}`, 'info');
+            
+            // Search in actual products from database
+            fetch('/api/products')
+                .then(response => response.json())
+                .then(data => {
+                    const product = data.products.find(p => p.barcode === barcode);
+                    if (product) {
+                        showStyledNotification(`Found: ${product.name}`, 'success');
+                        setTimeout(() => {
+                            viewProductDetails(product);
+                        }, 1000);
+                    } else {
+                        showStyledNotification('Product not found', 'error');
+                    }
+                })
+                .catch(error => {
+                    console.error('Search error:', error);
+                    showStyledNotification('Search failed', 'error');
+                });
+        }
+
+        function viewProductDetails(product) {
+            if (product.is_weight_based) {
+                const params = new URLSearchParams({
+                    id: product.id,
+                    name: product.name,
+                    price: product.price_per_kg,
+                    stock: product.stock_quantity,
+                    barcode: product.barcode || ''
+                });
+                window.location.href = `/product-details-weight?${params.toString()}`;
+            } else {
+                const params = new URLSearchParams({
+                    id: product.id,
+                    name: product.name,
+                    price: product.price,
+                    stock: product.stock_quantity,
+                    barcode: product.barcode || ''
+                });
+                window.location.href = `/product-details?${params.toString()}`;
+            }
+        }
 
         function manualBarcodeEntry() {
             document.getElementById('manual-barcode-modal').classList.remove('hidden');
@@ -1454,6 +1501,6 @@
             });
         });
     </script>
-
+    <script src="{{ url_for('static', filename='js/universal-scanner.js') }}"></script>
 </body>
 </html>
