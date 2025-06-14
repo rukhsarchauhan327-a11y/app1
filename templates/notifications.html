@@ -477,8 +477,46 @@
         // Scanner functionality
         function openScanner() {
             document.getElementById('scanner-modal').classList.remove('hidden');
-            // In a real app, this would start the camera
-            console.log('Scanner opened');
+            simulateScanning();
+        }
+
+        function simulateScanning() {
+            // Simulate successful scan after 3 seconds using real database barcodes
+            setTimeout(() => {
+                const realBarcodes = ['8901030789012', '8901030567890', '8901030345678', '8901030234567', '8901030456789', '8901030845371', '8901786101234', '8901030825456', '8901030123456', '8901030678901'];
+                const randomBarcode = realBarcodes[Math.floor(Math.random() * realBarcodes.length)];
+                performBarcodeSearch(randomBarcode);
+                closeScanner();
+            }, 3000);
+        }
+
+        function performBarcodeSearch(barcode) {
+            // Search for product by barcode in inventory
+            fetch('/api/products')
+                .then(response => response.json())
+                .then(data => {
+                    const product = data.products.find(p => p.barcode === barcode);
+                    if (product) {
+                        // Navigate to product details page
+                        const params = new URLSearchParams({
+                            id: product.id,
+                            name: product.name,
+                            price: product.price,
+                            category: product.category || 'General',
+                            barcode: product.barcode || '',
+                            unit: product.is_weight_based ? 'Kg' : 'Piece',
+                            stock: product.stock_quantity,
+                            expDate: product.expiry_date || ''
+                        });
+                        window.location.href = `/product-details?${params.toString()}`;
+                    } else {
+                        alert('Product not found in inventory');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error searching for product:', error);
+                    alert('Error searching for product');
+                });
         }
 
         function closeScanner() {
