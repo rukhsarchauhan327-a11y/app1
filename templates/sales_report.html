@@ -203,7 +203,7 @@
     <script src="/static/js/universal-scanner.js"></script>
 
     <script>
-        let currentPeriod = 'daily';
+        let currentPeriod = 'weekly';
         let salesChart = null;
         
         // Navigation functions
@@ -240,9 +240,6 @@
                 loadSalesData(selectedDate, selectedDate);
             }
         }
-
-        // Current period for data filtering
-        let currentPeriod = 'weekly';
         
         // Set period and update data
         async function setPeriod(period) {
