@@ -251,51 +251,66 @@
         </div>
     </div>
 
-    <!-- Camera Scanner Modal -->
-    <div id="scanner-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden">
+    <!-- Universal Scanner Modal -->
+    <div id="scanner-modal" class="fixed inset-0 bg-black bg-opacity-90 z-50 hidden">
+        <div class="fixed inset-0 flex flex-col">
+            <div class="bg-black text-white p-4">
+                <div class="flex items-center justify-between">
+                    <button onclick="closeScanner()" class="p-2 hover:bg-gray-800 rounded-lg">
+                        <i class="fa-solid fa-times text-white"></i>
+                    </button>
+                    <h2 id="scanner-title" class="text-lg font-semibold">Scan Barcode</h2>
+                    <button onclick="toggleFlashlight()" class="p-2 hover:bg-gray-800 rounded-lg">
+                        <i class="fa-solid fa-flashlight text-white"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="flex-1 relative bg-black">
+                <video id="scanner-video" class="w-full h-full object-cover" autoplay playsinline muted></video>
+                <div class="absolute inset-0 flex items-center justify-center">
+                    <div class="relative">
+                        <div class="w-64 h-64 border-2 border-white border-dashed rounded-lg bg-transparent">
+                            <div class="absolute top-0 left-0 w-4 h-4 border-t-4 border-l-4 border-white"></div>
+                            <div class="absolute top-0 right-0 w-4 h-4 border-t-4 border-r-4 border-white"></div>
+                            <div class="absolute bottom-0 left-0 w-4 h-4 border-b-4 border-l-4 border-white"></div>
+                            <div class="absolute bottom-0 right-0 w-4 h-4 border-b-4 border-r-4 border-white"></div>
+                        </div>
+                    </div>
+                </div>
+                <div id="scanner-status" class="absolute top-4 left-4 right-4 text-center">
+                    <span class="bg-primary text-white px-3 py-1 rounded-full text-sm">Position barcode in frame</span>
+                </div>
+                <div class="absolute bottom-8 left-1/2 transform -translate-x-1/2 flex space-x-3">
+                    <button onclick="manualBarcodeEntry()" class="bg-white text-black px-4 py-2 rounded-lg font-medium">
+                        Enter Manually
+                    </button>
+                    <button onclick="toggleFlashlight()" class="bg-gray-800 text-white px-4 py-2 rounded-lg font-medium">
+                        <i class="fa-solid fa-flashlight"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Manual Barcode Entry Modal -->
+    <div id="manual-barcode-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden">
         <div class="flex items-center justify-center min-h-screen p-4">
             <div class="bg-white rounded-lg p-6 w-full max-w-md">
                 <div class="flex items-center justify-between mb-4">
-                    <h3 class="text-lg font-semibold">Scan Barcode</h3>
-                    <button onclick="closeCameraScanner()" class="text-gray-500 hover:text-gray-700">
+                    <h3 class="text-lg font-semibold">Enter Barcode</h3>
+                    <button onclick="closeManualBarcode()" class="text-gray-500 hover:text-gray-700">
                         <i class="fa-solid fa-times text-xl"></i>
                     </button>
                 </div>
-                <!-- Camera View -->
-                <div class="relative mb-4">
-                    <video id="scanner-video" class="w-full h-64 bg-gray-200 rounded-lg object-cover" autoplay playsinline muted></video>
-                    <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
-                        <div class="w-48 h-32 border-2 border-red-500 bg-transparent rounded-lg">
-                            <div class="absolute top-0 left-0 w-4 h-4 border-t-4 border-l-4 border-red-500"></div>
-                            <div class="absolute top-0 right-0 w-4 h-4 border-t-4 border-r-4 border-red-500"></div>
-                            <div class="absolute bottom-0 left-0 w-4 h-4 border-b-4 border-l-4 border-red-500"></div>
-                            <div class="absolute bottom-0 right-0 w-4 h-4 border-b-4 border-r-4 border-red-500"></div>
-                        </div>
-                    </div>
-                    <!-- Status overlay -->
-                    <div id="scanner-status" class="absolute top-2 left-2 right-2 text-center">
-                        <span class="bg-blue-500 text-white px-3 py-1 rounded-full text-sm">Starting camera...</span>
-                    </div>
+                <div class="mb-4">
+                    <input type="text" id="manual-barcode-input" class="w-full px-3 py-2 border border-gray-300 rounded-lg" placeholder="Enter barcode manually">
                 </div>
-                
-                <!-- Instructions and Actions -->
-                <div class="text-center">
-                    <p class="text-sm text-gray-600 mb-4">Position the barcode within the frame or enter manually below</p>
-                    
-                    <!-- Manual entry option -->
-                    <div class="mb-4">
-                        <input type="text" id="scanner-manual-input" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm" placeholder="Or type barcode manually">
-                    </div>
-                    
-                    <!-- Action buttons -->
-                    <div class="flex space-x-2">
-                        <button onclick="closeCameraScanner()" class="flex-1 bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 text-sm">
-                            Cancel
-                        </button>
-                        <button onclick="setScannerManualBarcode()" class="flex-1 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 text-sm">
-                            Set Barcode
-                        </button>
-                    </div>
+                <div class="flex space-x-3">
+                    <button onclick="closeManualBarcode()" class="flex-1 bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600">
+                        Cancel
+                    </button>
+                    <button onclick="processManualBarcode()" class="flex-1 bg-primary text-white px-4 py-2 rounded-lg hover:bg-primary/90">
+                        Set Barcode
+                    </button>
                 </div>
             </div>
         </div>
@@ -989,5 +1004,6 @@
         // Initialize page when loaded
         window.addEventListener('load', initializePage);
     </script>
+    <script src="{{ url_for('static', filename='js/universal-scanner.js') }}"></script>
 </body>
 </html>
