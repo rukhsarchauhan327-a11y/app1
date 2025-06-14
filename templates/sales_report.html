@@ -216,19 +216,7 @@
             window.location.href = '/profile';
         }
 
-        // Date picker
-        function openDatePicker() {
-            const today = new Date().toISOString().split('T')[0];
-            const selectedDate = prompt('Select date (YYYY-MM-DD):', today);
-            if (selectedDate) {
-                document.getElementById('current-date').textContent = new Date(selectedDate).toLocaleDateString('en-GB', {
-                    day: 'numeric',
-                    month: 'long',
-                    year: 'numeric'
-                });
-                loadSalesData(selectedDate, selectedDate);
-            }
-        }
+        // Date picker removed - Daily mode is real-time only
         
         // Set period and update data
         async function setPeriod(period) {
@@ -380,9 +368,9 @@
             // Remove percentage from cost card as requested
             document.getElementById('cost-percentage').textContent = 'Cost of goods sold';
             
-            // Update Investment Recovery section with new logic
-            const combinedInvestment = data.totalCombinedInvestment || 0;  // Static - Initial + Refilling
-            const remainingInvestment = data.remainingInvestment || 0;  // Static - Amount still to recover
+            // Update Investment Recovery section with dynamic investment
+            const combinedInvestment = data.totalCombinedInvestment || 0;  // Dynamic - Updates with refilling
+            const remainingInvestment = data.remainingInvestment || 0;  // Dynamic - Updates with sales
             const recoveryPercentage = combinedInvestment > 0 ? Math.round(((combinedInvestment - remainingInvestment) / combinedInvestment) * 100) : 0;
             
             document.getElementById('total-refilled-investment').textContent = `₹${Math.round(combinedInvestment)}`;
