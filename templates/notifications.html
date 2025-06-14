@@ -79,7 +79,7 @@
     </header>
 
     <!-- Filter Navigation -->
-    <div class="bg-white mt-16 px-4 py-3 border-b">
+    <div class="bg-white mt-20 px-4 py-3 border-b">
         <div class="flex space-x-2 overflow-x-auto">
             <button class="filter-btn px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap bg-primary text-white" data-filter="all" onclick="filterNotifications('all')">
                 All
@@ -97,7 +97,7 @@
     </div>
 
     <!-- Notifications Container -->
-    <div id="notifications-container" class="px-4 py-4 space-y-3 pb-20">
+    <div id="notifications-container" class="px-4 pt-4 pb-20 space-y-3">
         <!-- Loading state -->
         <div id="loading-state" class="text-center py-12">
             <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
@@ -225,12 +225,12 @@
                 .then(function(data) {
                     if (data.success) {
                         loadNotifications();
-                        alert('All notifications marked as read successfully!');
+                        showStyledNotification('All notifications marked as read successfully!', 'success');
                     }
                 })
                 .catch(function(error) {
                     console.error('Error marking notifications as read:', error);
-                    alert('Error marking notifications as read');
+                    showStyledNotification('Error marking notifications as read', 'error');
                 });
             }
         }
