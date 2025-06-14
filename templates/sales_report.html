@@ -156,15 +156,7 @@
             </div>
         </div>
 
-        <!-- Payment Methods -->
-        <div class="px-4 mb-6">
-            <div class="bg-white p-4 rounded-xl shadow-sm">
-                <h3 class="text-lg font-bold mb-4 text-dark">Payment Methods</h3>
-                <div class="space-y-3" id="payment-methods">
-                    <!-- Payment methods will be loaded here -->
-                </div>
-            </div>
-        </div>
+
 
         <!-- Investment Recovery -->
         <div class="px-4 mb-6">
@@ -336,7 +328,6 @@
                 console.log('Received sales data:', salesData);
                 
                 updateSalesStats(salesData);
-                updatePaymentModes(salesData.paymentModes);
                 updateCategoryPerformance(salesData.categories);
                 updateTopSellingItems(salesData.topItems);
                 updateSalesChart(salesData);
@@ -391,52 +382,7 @@
             document.getElementById('profit-growth').textContent = '+12% growth';
         }
 
-        // Update payment modes
-        function updatePaymentModes(paymentModes) {
-            const paymentMethodsContainer = document.getElementById('payment-methods');
-            
-            if (!paymentModes) {
-                paymentMethodsContainer.innerHTML = '<p class="text-gray-500 text-center">No payment data available</p>';
-                return;
-            }
-            
-            const total = (paymentModes.cash?.amount || 0) + (paymentModes.online?.amount || 0) + (paymentModes.credit?.amount || 0);
-            
-            paymentMethodsContainer.innerHTML = `
-                <div class="flex items-center justify-between">
-                    <div class="flex items-center space-x-3">
-                        <i class="fa-solid fa-money-bill text-primary text-lg"></i>
-                        <span class="font-medium text-dark">Cash</span>
-                    </div>
-                    <div class="text-right">
-                        <p class="font-bold text-dark">₹${Math.round(paymentModes.cash?.amount || 0)}</p>
-                        <p class="text-xs text-gray-500">${total > 0 ? Math.round(((paymentModes.cash?.amount || 0) / total) * 100) : 0}% • ${paymentModes.cash?.count || 0} transactions</p>
-                    </div>
-                </div>
-                
-                <div class="flex items-center justify-between">
-                    <div class="flex items-center space-x-3">
-                        <i class="fa-solid fa-qrcode text-secondary text-lg"></i>
-                        <span class="font-medium text-dark">UPI</span>
-                    </div>
-                    <div class="text-right">
-                        <p class="font-bold text-dark">₹${Math.round(paymentModes.online?.amount || 0)}</p>
-                        <p class="text-xs text-gray-500">${total > 0 ? Math.round(((paymentModes.online?.amount || 0) / total) * 100) : 0}% • ${paymentModes.online?.count || 0} transactions</p>
-                    </div>
-                </div>
-                
-                <div class="flex items-center justify-between">
-                    <div class="flex items-center space-x-3">
-                        <i class="fa-solid fa-credit-card text-accent text-lg"></i>
-                        <span class="font-medium text-dark">Credit</span>
-                    </div>
-                    <div class="text-right">
-                        <p class="font-bold text-dark">₹${Math.round(paymentModes.credit?.amount || 0)}</p>
-                        <p class="text-xs text-gray-500">${total > 0 ? Math.round(((paymentModes.credit?.amount || 0) / total) * 100) : 0}% • ${paymentModes.credit?.count || 0} transactions</p>
-                    </div>
-                </div>
-            `;
-        }
+
 
         // Update category performance
         function updateCategoryPerformance(categories) {
