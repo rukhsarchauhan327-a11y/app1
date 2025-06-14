@@ -567,6 +567,31 @@
         </div>
     </div>
 
+    <!-- Delete Confirmation Modal -->
+    <div id="delete-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-white rounded-lg p-6 w-full max-w-md">
+                <div class="text-center">
+                    <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100 mb-4">
+                        <i class="fa-solid fa-trash text-red-600 text-xl"></i>
+                    </div>
+                    <h3 class="text-lg font-semibold text-gray-900 mb-2">Delete Product</h3>
+                    <p class="text-sm text-gray-500 mb-6">
+                        Are you sure you want to delete "<span id="delete-product-name" class="font-medium text-gray-900"></span>"? This action cannot be undone.
+                    </p>
+                    <div class="flex space-x-3">
+                        <button onclick="closeDeleteModal()" class="flex-1 bg-gray-500 text-white py-2 px-4 rounded-lg hover:bg-gray-600 transition-colors">
+                            Cancel
+                        </button>
+                        <button onclick="confirmDelete()" class="flex-1 bg-red-600 text-white py-2 px-4 rounded-lg hover:bg-red-700 transition-colors">
+                            Delete
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Floating Add Button -->
     <button id="add-item-btn" class="fixed bottom-20 right-4 bg-primary text-white rounded-full w-14 h-14 shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center" onclick="addNewItem()">
         <i class="fa-solid fa-plus text-xl"></i>
@@ -925,10 +950,42 @@
             }
         }
 
+        let deleteProductId = null;
+
         function deleteItem(productId) {
-            if (confirm('Are you sure you want to delete this item?')) {
-                showNotification('Item deleted successfully', 'success');
+            const product = products.find(p => p.id === productId);
+            if (product) {
+                deleteProductId = productId;
+                document.getElementById('delete-product-name').textContent = product.name;
+                document.getElementById('delete-modal').classList.remove('hidden');
+            }
+        }
+
+        function closeDeleteModal() {
+            document.getElementById('delete-modal').classList.add('hidden');
+            deleteProductId = null;
+        }
+
+        function confirmDelete() {
+            if (deleteProductId) {
+                // Remove from products array
+                const productIndex = products.findIndex(p => p.id === deleteProductId);
+                if (productIndex > -1) {
+                    products.splice(productIndex, 1);
+                }
+
+                // Remove from DOM
+                const productElement = document.getElementById(`product-${deleteProductId}`);
+                if (productElement) {
+                    productElement.remove();
+                }
+
+                showNotification('Product deleted successfully', 'success');
+                updateStats();
+                closeDeleteModal();
+
                 // In a real app, this would call an API to delete the product
+                // fetch(`/api/products/${deleteProductId}`, { method: 'DELETE' })
             }
         }
 
@@ -1653,15 +1710,7 @@
             cartModal.classList.remove('hidden');
         }
 
-        function deleteItem(itemId) {
-            const item = document.getElementById(itemId);
-            const itemName = item.querySelector('h3').textContent;
-            
-            if (confirm(`Are you sure you want to delete ${itemName} from inventory?`)) {
-                item.remove();
-                alert(`${itemName} has been removed from inventory.`);
-            }
-        }
+        // Duplicate function removed - using styled modal version above
 
         function addNewItem() {
             window.location.href = '/add-item';
