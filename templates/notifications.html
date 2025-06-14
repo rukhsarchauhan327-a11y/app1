@@ -242,22 +242,28 @@
         }
 
         function showConfirmationModal(title, message, onConfirm) {
+            // Remove any existing modals first
+            const existingModal = document.querySelector('.confirmation-modal');
+            if (existingModal) {
+                document.body.removeChild(existingModal);
+            }
+            
             // Create modal overlay
             const modal = document.createElement('div');
-            modal.className = 'fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4';
+            modal.className = 'confirmation-modal fixed inset-0 bg-black bg-opacity-50 z-[9999] flex items-center justify-center p-4';
             modal.innerHTML = `
-                <div class="bg-white rounded-xl shadow-xl max-w-sm w-full p-6">
+                <div class="bg-white rounded-xl shadow-xl w-full max-w-xs mx-auto p-5 transform scale-95 opacity-0 transition-all duration-200">
                     <div class="text-center">
-                        <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-primary/10 mb-4">
-                            <i class="fa-solid fa-check-double text-primary text-xl"></i>
+                        <div class="mx-auto flex items-center justify-center h-10 w-10 rounded-full bg-blue-100 mb-3">
+                            <i class="fa-solid fa-check-double text-blue-600 text-lg"></i>
                         </div>
-                        <h3 class="text-lg font-semibold text-dark mb-2">${title}</h3>
-                        <p class="text-gray-600 mb-6">${message}</p>
-                        <div class="flex space-x-3">
-                            <button onclick="closeConfirmationModal()" class="flex-1 px-4 py-2 border border-gray-200 text-gray-700 rounded-lg hover:bg-gray-50 font-medium">
+                        <h3 class="text-base font-semibold text-gray-900 mb-2">${title}</h3>
+                        <p class="text-sm text-gray-600 mb-5">${message}</p>
+                        <div class="flex space-x-2">
+                            <button id="cancel-btn" class="flex-1 px-3 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 text-sm font-medium">
                                 Cancel
                             </button>
-                            <button onclick="confirmAction()" class="flex-1 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark font-medium">
+                            <button id="confirm-btn" class="flex-1 px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm font-medium">
                                 Confirm
                             </button>
                         </div>
@@ -268,8 +274,19 @@
             document.body.appendChild(modal);
             document.body.style.overflow = 'hidden';
             
-            // Store callback
-            window.currentConfirmCallback = onConfirm;
+            // Animate in
+            setTimeout(() => {
+                const modalContent = modal.querySelector('div > div');
+                modalContent.style.transform = 'scale(1)';
+                modalContent.style.opacity = '1';
+            }, 10);
+            
+            // Add event listeners
+            modal.querySelector('#cancel-btn').addEventListener('click', closeConfirmationModal);
+            modal.querySelector('#confirm-btn').addEventListener('click', () => {
+                if (onConfirm) onConfirm();
+                closeConfirmationModal();
+            });
             
             // Add click outside to close
             modal.addEventListener('click', function(e) {
@@ -280,19 +297,18 @@
         }
 
         function closeConfirmationModal() {
-            const modal = document.querySelector('.fixed.inset-0.bg-black.bg-opacity-50');
+            const modal = document.querySelector('.confirmation-modal');
             if (modal) {
-                document.body.removeChild(modal);
-                document.body.style.overflow = 'auto';
-                window.currentConfirmCallback = null;
+                const modalContent = modal.querySelector('div > div');
+                modalContent.style.transform = 'scale(0.95)';
+                modalContent.style.opacity = '0';
+                setTimeout(() => {
+                    if (modal.parentNode) {
+                        document.body.removeChild(modal);
+                    }
+                    document.body.style.overflow = 'auto';
+                }, 200);
             }
-        }
-
-        function confirmAction() {
-            if (window.currentConfirmCallback) {
-                window.currentConfirmCallback();
-            }
-            closeConfirmationModal();
         }
 
         function filterNotifications(filter) {
