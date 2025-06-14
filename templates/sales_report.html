@@ -329,9 +329,12 @@
         // Load sales data
         async function loadSalesData(fromDate = null, toDate = null) {
             try {
+                console.log('Loading sales data...');
                 showNotification('Loading sales data...', 'info');
                 
                 const salesData = await fetchSalesData(fromDate, toDate);
+                console.log('Received sales data:', salesData);
+                
                 updateSalesStats(salesData);
                 updatePaymentModes(salesData.paymentModes);
                 updateCategoryPerformance(salesData.categories);
@@ -342,7 +345,7 @@
                 showNotification('Sales data loaded successfully', 'success');
             } catch (error) {
                 console.error('Error loading sales data:', error);
-                showNotification('Error loading sales data', 'error');
+                showNotification('Error loading sales data: ' + error.message, 'error');
             }
         }
 
@@ -512,29 +515,37 @@
         // Update investment vs profit chart
         function updateSalesChart(data) {
             try {
+                console.log('Updating chart with data:', data);
                 const ctx = document.getElementById('salesChart');
-                if (!ctx) return;
+                if (!ctx) {
+                    console.error('Chart canvas not found');
+                    return;
+                }
                 
                 if (salesChart) {
                     salesChart.destroy();
                 }
                 
                 let labels, investmentData, profitData;
+                const totalInvestment = Math.abs(data.totalInvestment || 0);
+                const totalProfit = data.totalProfit || 0;
                 
                 // Generate simple labels based on period
                 if (currentPeriod === 'daily') {
                     labels = ['Morning', 'Afternoon', 'Evening'];
-                    investmentData = [0, data.totalInvestment * 0.6, data.totalInvestment];
-                    profitData = [0, data.totalProfit * 0.4, data.totalProfit];
+                    investmentData = [0, totalInvestment * 0.6, totalInvestment];
+                    profitData = [0, totalProfit * 0.4, totalProfit];
                 } else if (currentPeriod === 'weekly') {
                     labels = ['Week Start', 'Mid Week', 'Week End'];
-                    investmentData = [0, data.totalInvestment * 0.5, data.totalInvestment];
-                    profitData = [0, data.totalProfit * 0.3, data.totalProfit];
+                    investmentData = [0, totalInvestment * 0.5, totalInvestment];
+                    profitData = [0, totalProfit * 0.3, totalProfit];
                 } else {
                     labels = ['Month Start', 'Mid Month', 'Month End'];
-                    investmentData = [0, data.totalInvestment * 0.4, data.totalInvestment];
-                    profitData = [0, data.totalProfit * 0.2, data.totalProfit];
+                    investmentData = [0, totalInvestment * 0.4, totalInvestment];
+                    profitData = [0, totalProfit * 0.2, totalProfit];
                 }
+                
+                console.log('Chart data:', { labels, investmentData, profitData });
                 
                 salesChart = new Chart(ctx, {
                     type: 'line',
@@ -577,6 +588,7 @@
                         }
                     }
                 });
+                console.log('Chart created successfully');
             } catch (error) {
                 console.error('Error updating investment vs profit chart:', error);
             }
