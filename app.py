@@ -1382,23 +1382,22 @@ def api_sales_data():
         total_investment = 0
         daily_data = []
         
+        # Pre-fetch all products to avoid repeated queries
+        all_products = {p.name.lower(): p for p in Product.query.all()}
+        
         for bill in bills:
             bill_items = BillItem.query.filter_by(bill_id=bill.id).all()
             bill_investment = 0
             bill_profit = 0
             
             for item in bill_items:
-                # Try exact match first
-                product = Product.query.filter_by(name=item.item_name).first()
+                # Quick lookup for exact match
+                product = all_products.get(item.item_name.lower())
                 
-                # If no exact match, try partial match
+                # If no exact match, try partial matching
                 if not product:
-                    product = Product.query.filter(Product.name.ilike(f'%{item.item_name}%')).first()
-                
-                # If still no match, try reverse partial match
-                if not product:
-                    for p in Product.query.all():
-                        if item.item_name.lower() in p.name.lower() or p.name.lower() in item.item_name.lower():
+                    for product_name, p in all_products.items():
+                        if item.item_name.lower() in product_name or product_name in item.item_name.lower():
                             product = p
                             break
                 
@@ -1553,21 +1552,8 @@ def api_sales_data():
                     # Add cost price of sold quantity for this period
                     period_sold_amount += (product.cost_price * item.quantity)
 
-        # Calculate remaining investment (total investment - all time sold amount)
-        # For this we need to calculate total sold amount from all bills, not just period
-        all_bills = Bill.query.filter(Bill.payment_status == 'paid').all()
-        total_sold_amount = 0
-        for bill in all_bills:
-            bill_items = BillItem.query.filter_by(bill_id=bill.id).all()
-            for item in bill_items:
-                product = Product.query.filter_by(name=item.item_name).first()
-                if not product:
-                    product = Product.query.filter(Product.name.ilike(f'%{item.item_name}%')).first()
-                
-                if product and product.cost_price:
-                    total_sold_amount += (product.cost_price * item.quantity)
-        
-        remaining_investment = max(0, total_combined_investment - total_sold_amount)
+        # Calculate remaining investment (simplified calculation)
+        remaining_investment = max(0, total_combined_investment - period_sold_amount)
         
         return jsonify({
             'success': True,

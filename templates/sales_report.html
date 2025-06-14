@@ -631,6 +631,76 @@
             });
         }
 
+        // Load data for specific period
+        function loadPeriodData(period = 'weekly') {
+            console.log(`Loading ${period} data...`);
+            
+            // Update active tab
+            document.querySelectorAll('.period-tab').forEach(tab => {
+                tab.classList.remove('border-primary', 'text-primary', 'bg-primary/5');
+                tab.classList.add('border-transparent', 'text-gray-500');
+            });
+            
+            const activeTab = document.querySelector(`[onclick="loadPeriodData('${period}')"]`);
+            if (activeTab) {
+                activeTab.classList.remove('border-transparent', 'text-gray-500');
+                activeTab.classList.add('border-primary', 'text-primary', 'bg-primary/5');
+            }
+            
+            // Show loading state
+            showLoadingState();
+            
+            // Fetch data from API
+            fetch(`/api/sales-data?period=${period}`)
+                .then(response => response.json())
+                .then(result => {
+                    if (result.success) {
+                        console.log('Data loaded successfully:', result.data);
+                        updateAllElements(result.data, period);
+                    } else {
+                        console.error('API returned error:', result.message);
+                        showNotification('Failed to load sales data', 'error');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading sales data:', error);
+                    showNotification('Error loading data. Please try again.', 'error');
+                })
+                .finally(() => {
+                    hideLoadingState();
+                });
+        }
+        
+        // Update all elements with new data
+        function updateAllElements(data, period) {
+            updateMetricsCards(data);
+            updateSalesChart(data, period);
+            updateTopSellingItems(data.topItems || []);
+            updateCategoryBreakdown(data.categories || []);
+            updateRecentSales(data.recentSales || []);
+            updatePaymentModes(data.paymentModes || {});
+            updateInvestmentRecovery(data);
+            setCurrentDate();
+        }
+        
+        // Show loading state
+        function showLoadingState() {
+            const loadingElements = document.querySelectorAll('.metric-card, #top-selling-items, #category-breakdown, #recent-sales');
+            loadingElements.forEach(el => {
+                el.style.opacity = '0.5';
+                el.style.pointerEvents = 'none';
+            });
+        }
+        
+        // Hide loading state
+        function hideLoadingState() {
+            const loadingElements = document.querySelectorAll('.metric-card, #top-selling-items, #category-breakdown, #recent-sales');
+            loadingElements.forEach(el => {
+                el.style.opacity = '1';
+                el.style.pointerEvents = 'auto';
+            });
+        }
+
         // Initialize page
         document.addEventListener('DOMContentLoaded', function() {
             console.log('Initializing analytics page...');
