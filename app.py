@@ -1245,11 +1245,13 @@ def api_sales_data():
         query = Bill.query.filter(Bill.payment_status == 'paid')
         
         if from_date:
-            from_datetime = datetime.strptime(from_date, '%Y-%m-%d')
+            from datetime import datetime as dt
+            from_datetime = dt.strptime(from_date, '%Y-%m-%d')
             query = query.filter(Bill.created_at >= from_datetime)
         
         if to_date:
-            to_datetime = datetime.strptime(to_date, '%Y-%m-%d')
+            from datetime import datetime as dt
+            to_datetime = dt.strptime(to_date, '%Y-%m-%d')
             # Add 23:59:59 to include the entire day
             to_datetime = to_datetime.replace(hour=23, minute=59, second=59)
             query = query.filter(Bill.created_at <= to_datetime)
@@ -1359,7 +1361,6 @@ def api_sales_data():
         
         # Process chart data based on period
         from collections import defaultdict
-        from datetime import datetime, timedelta
         
         if not daily_data:
             # No sales data, return empty arrays
