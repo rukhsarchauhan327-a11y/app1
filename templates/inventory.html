@@ -781,22 +781,7 @@
 
         function openScanner() {
             document.getElementById('scanner-modal').classList.remove('hidden');
-            const modal = document.getElementById("scanner-modal");
-            const video = document.getElementById("scanner-video");
-            modal.classList.remove("hidden");
-            if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-                navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
-                .then(function(stream) {
-                    video.srcObject = stream;
-                    video.play();
-                    simulateScanning();
-                })
-                .catch(function(err) {
-                    simulateScanning();
-                });
-            } else {
-                simulateScanning();
-            }
+            simulateScanning();
         }
 
         function closeScanner() {
