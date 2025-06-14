@@ -1441,14 +1441,17 @@ def api_sales_data():
                 'created_at': bill.created_at.strftime('%Y-%m-%d %H:%M:%S')
             })
         
-        # Calculate dynamic total combined investment (changes as stock is refilled)
-        # This represents current total investment including all refilling
+        # Calculate dynamic total combined investment 
+        # This includes: 1) Initial inventory, 2) Refilling of existing products, 3) New products added
         total_combined_investment = 0
         products = Product.query.all()
         
         for product in products:
             if product.cost_price:
-                # Current stock represents total investment (initial + all refilling done till now)
+                # Current stock represents total investment:
+                # - Initial stock when product was first added
+                # - All refilling amounts added over time
+                # - Any new products added to inventory
                 current_stock = product.stock_quantity or 0
                 total_product_investment = product.cost_price * current_stock
                 total_combined_investment += total_product_investment
