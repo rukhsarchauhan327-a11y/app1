@@ -592,6 +592,75 @@
         let products = [];
         let filteredProducts = [];
 
+        // Navigation functions
+        function goBack() {
+            window.location.href = '/dashboard';
+        }
+
+        function goToDashboard() {
+            window.location.href = '/dashboard';
+        }
+
+        function goToInventory() {
+            // Already on inventory page
+        }
+
+        function goToCart() {
+            window.location.href = '/cart';
+        }
+
+        function goToProfile() {
+            window.location.href = '/profile';
+        }
+
+        // Search and filter functions
+        function openSearch() {
+            document.getElementById('search-modal').classList.remove('hidden');
+            document.getElementById('search-input').focus();
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeSearch() {
+            document.getElementById('search-modal').classList.add('hidden');
+            document.body.style.overflow = 'auto';
+            clearSearch();
+        }
+
+        function clearSearch() {
+            document.getElementById('search-input').value = '';
+            document.getElementById('search-results').innerHTML = '';
+            document.getElementById('search-empty').classList.add('hidden');
+        }
+
+        function filterProducts(filter) {
+            currentFilter = filter;
+            
+            // Update filter buttons
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('bg-primary', 'text-white');
+                btn.classList.add('bg-gray-100', 'text-gray-600');
+            });
+            
+            const activeButton = document.querySelector(`[data-filter="${filter}"]`);
+            if (activeButton) {
+                activeButton.classList.remove('bg-gray-100', 'text-gray-600');
+                activeButton.classList.add('bg-primary', 'text-white');
+            }
+            
+            // Filter products based on category
+            if (filter === 'all') {
+                filteredProducts = products;
+            } else if (filter === 'expired') {
+                filteredProducts = products.filter(product => product.is_expired);
+            } else {
+                filteredProducts = products.filter(product => 
+                    product.category.toLowerCase() === filter
+                );
+            }
+            
+            renderProducts();
+        }
+
         // Load products from database on page load
         async function loadProducts() {
             try {
@@ -1032,8 +1101,6 @@
                 closeSearch.addEventListener('click', closeSearch);
             }
         });
-
-        let products = [];
 
         function performBarcodeSearch(barcode) {
             // Ensure products are loaded before searching
