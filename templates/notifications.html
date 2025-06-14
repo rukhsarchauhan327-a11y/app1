@@ -506,26 +506,45 @@
             }, 3000);
         }
 
+        let products = [];
+
         function performBarcodeSearch(barcode) {
-            // Load products if not already loaded
-            fetch('/api/products')
-                .then(response => response.json())
-                .then(data => {
-                    const products = data.products || [];
-                    const product = products.find(p => p.barcode === barcode);
-                    if (product) {
-                        showStyledNotification(`Found: ${product.name}`, 'success');
-                        setTimeout(() => {
-                            viewProductDetails(product);
-                        }, 1000);
-                    } else {
-                        showStyledNotification('Product not found', 'error');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error searching for product:', error);
-                    showStyledNotification('Error searching for product', 'error');
+            // Ensure products are loaded before searching
+            if (products.length === 0) {
+                showStyledNotification('Loading products...', 'info');
+                loadProductsForSearch().then(() => {
+                    performBarcodeSearchInternal(barcode);
                 });
+                return;
+            }
+            performBarcodeSearchInternal(barcode);
+        }
+
+        function performBarcodeSearchInternal(barcode) {
+            const product = products.find(p => p.barcode === barcode);
+            if (product) {
+                showStyledNotification(`Found: ${product.name}`, 'success');
+                setTimeout(() => {
+                    viewProductDetails(product);
+                }, 1000);
+            } else {
+                showStyledNotification('Product not found', 'error');
+            }
+        }
+
+        // Load products for search functionality
+        async function loadProductsForSearch() {
+            try {
+                const response = await fetch('/api/products');
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const data = await response.json();
+                products = data.products || [];
+            } catch (error) {
+                console.error('Error loading products:', error);
+                products = [];
+            }
         }
 
         function viewProductDetails(product) {

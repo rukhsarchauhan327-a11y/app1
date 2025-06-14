@@ -1037,30 +1037,44 @@
             }
         });
 
-        function performBarcodeSearch(barcode) {
-            // Search for product by barcode in database
-            const barcodeProducts = {
-                '8901030823456': 'item-2', // Coconut Oil
-                '8901030834567': 'item-3', // Aashirvaad Atta
-                '8901030845678': 'item-4', // Maggi Noodles
-                '8901030856789': 'item-5', // Dairy Milk
-                '8901030867890': 'item-6'  // Uncle Chips
-            };
+        let products = [];
 
-            const productId = barcodeProducts[barcode];
-            if (productId) {
-                const product = productData[productId];
-                if (product) {
-                    showNotification(`Found ${product.name}`, 'success');
-                    // Navigate to product details page
-                    setTimeout(() => {
-                        viewProductDetails(productId);
-                    }, 1000);
-                } else {
-                    showNotification('Product data not found', 'error');
-                }
+        function performBarcodeSearch(barcode) {
+            // Ensure products are loaded before searching
+            if (products.length === 0) {
+                showStyledNotification('Loading products...', 'info');
+                loadProductsForSearch().then(() => {
+                    performBarcodeSearchInternal(barcode);
+                });
+                return;
+            }
+            performBarcodeSearchInternal(barcode);
+        }
+
+        function performBarcodeSearchInternal(barcode) {
+            const product = products.find(p => p.barcode === barcode);
+            if (product) {
+                showStyledNotification(`Found: ${product.name}`, 'success');
+                setTimeout(() => {
+                    viewProductDetails(product.id);
+                }, 1000);
             } else {
-                showNotification('Product not found in inventory', 'error');
+                showStyledNotification('Product not found', 'error');
+            }
+        }
+
+        // Load products for search functionality
+        async function loadProductsForSearch() {
+            try {
+                const response = await fetch('/api/products');
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const data = await response.json();
+                products = data.products || [];
+            } catch (error) {
+                console.error('Error loading products:', error);
+                products = [];
             }
         }
 
@@ -1158,6 +1172,36 @@
                 setTimeout(() => {
                     element.style.border = '';
                 }, 3000);
+            }
+        }
+
+        function viewProductDetails(productId) {
+            const product = products.find(p => p.id === productId);
+            if (!product) {
+                showStyledNotification('Product not found', 'error');
+                return;
+            }
+
+            if (product.is_weight_based) {
+                const params = new URLSearchParams({
+                    id: product.id,
+                    name: product.name,
+                    price: product.price_per_kg,
+                    stock: product.stock_quantity,
+                    unit: product.unit,
+                    expDate: product.expiry_date || ''
+                });
+                window.location.href = `/product-details-weight?${params.toString()}`;
+            } else {
+                const params = new URLSearchParams({
+                    id: product.id,
+                    name: product.name,
+                    price: product.price,
+                    unit: 'Piece',
+                    stock: product.stock_quantity,
+                    expDate: product.expiry_date || ''
+                });
+                window.location.href = `/product-details?${params.toString()}`;
             }
         }
 
