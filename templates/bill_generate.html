@@ -1135,13 +1135,42 @@
             document.getElementById('search-empty').classList.add('hidden');
         }
 
+        let billCurrentStream = null;
+
         function openScanner() {
             document.getElementById('scanner-modal').classList.remove('hidden');
+            
+            // Initialize camera to fix black screen
+            const video = document.getElementById('scanner-video');
+            if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                navigator.mediaDevices.getUserMedia({ 
+                    video: { 
+                        facingMode: 'environment',
+                        width: { ideal: 640 },
+                        height: { ideal: 480 }
+                    } 
+                })
+                .then(function(stream) {
+                    video.srcObject = stream;
+                    video.play();
+                    billCurrentStream = stream;
+                })
+                .catch(function(err) {
+                    console.error('Camera error:', err);
+                });
+            }
+            
             simulateScanning();
         }
 
         function closeScanner() {
             document.getElementById('scanner-modal').classList.add('hidden');
+            
+            // Stop camera stream
+            if (billCurrentStream) {
+                billCurrentStream.getTracks().forEach(track => track.stop());
+                billCurrentStream = null;
+            }
         }
 
         function manualBarcodeEntry() {
