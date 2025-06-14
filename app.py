@@ -554,6 +554,11 @@ def pending_credits():
     """Serve the pending credits page"""
     return render_template('pending_credits.html')
 
+@app.route('/sales-report')
+def sales_report():
+    """Serve the sales report page"""
+    return render_template('sales_report.html')
+
 @app.route('/settings')
 def settings():
     """Serve the settings page"""
@@ -1228,6 +1233,110 @@ def get_time_ago(datetime_obj):
         return f"{minutes} minute{'s' if minutes != 1 else ''} ago"
     else:
         return "Just now"
+
+@app.route('/api/sales-data')
+def api_sales_data():
+    """Get sales data with optional date filtering"""
+    try:
+        from_date = request.args.get('from_date')
+        to_date = request.args.get('to_date')
+        
+        # Build query based on date filters
+        query = Bill.query.filter(Bill.payment_status == 'paid')
+        
+        if from_date:
+            from_datetime = datetime.strptime(from_date, '%Y-%m-%d')
+            query = query.filter(Bill.created_at >= from_datetime)
+        
+        if to_date:
+            to_datetime = datetime.strptime(to_date, '%Y-%m-%d')
+            # Add 23:59:59 to include the entire day
+            to_datetime = to_datetime.replace(hour=23, minute=59, second=59)
+            query = query.filter(Bill.created_at <= to_datetime)
+        
+        bills = query.all()
+        
+        # Calculate statistics
+        total_revenue = sum(bill.total_amount for bill in bills)
+        total_bills = len(bills)
+        
+        # Calculate profit
+        total_cost = 0
+        total_actual_revenue = 0
+        
+        for bill in bills:
+            bill_items = BillItem.query.filter_by(bill_id=bill.id).all()
+            for item in bill_items:
+                product = Product.query.filter_by(name=item.item_name).first()
+                if product and product.cost_price > 0:
+                    if product.is_weight_based and item.weight:
+                        item_cost = (product.cost_price / 1000) * item.weight if product.price_per_kg else product.cost_price * item.quantity
+                    else:
+                        item_cost = product.cost_price * item.quantity
+                    total_cost += item_cost
+                    total_actual_revenue += item.total_price
+                elif product:
+                    # Estimate cost as 65% of selling price
+                    item_cost = item.unit_price * 0.65 * item.quantity
+                    total_cost += item_cost
+                    total_actual_revenue += item.total_price
+        
+        total_profit = total_actual_revenue - total_cost
+        
+        # Payment mode distribution
+        payment_modes = {
+            'cash': {'amount': 0, 'count': 0},
+            'online': {'amount': 0, 'count': 0},
+            'credit': {'amount': 0, 'count': 0}
+        }
+        
+        for bill in bills:
+            mode = bill.payment_mode.lower()
+            if mode in ['cash']:
+                payment_modes['cash']['amount'] += bill.total_amount
+                payment_modes['cash']['count'] += 1
+            elif mode in ['online', 'upi', 'card']:
+                payment_modes['online']['amount'] += bill.total_amount
+                payment_modes['online']['count'] += 1
+            elif mode in ['credit']:
+                payment_modes['credit']['amount'] += bill.total_amount
+                payment_modes['credit']['count'] += 1
+        
+        # Recent sales (last 10)
+        recent_bills = Bill.query.order_by(Bill.created_at.desc()).limit(10).all()
+        recent_sales = []
+        
+        for bill in recent_bills:
+            customer_name = bill.customer_name if bill.customer_name else "Walk-in Customer"
+            if bill.customer_id:
+                customer = Customer.query.get(bill.customer_id)
+                if customer:
+                    customer_name = customer.name
+            
+            recent_sales.append({
+                'bill_number': bill.bill_number,
+                'customer_name': customer_name,
+                'amount': bill.total_amount,
+                'payment_mode': bill.payment_mode,
+                'payment_status': bill.payment_status,
+                'created_at': bill.created_at.strftime('%Y-%m-%d %H:%M:%S')
+            })
+        
+        return jsonify({
+            'success': True,
+            'data': {
+                'totalRevenue': total_revenue,
+                'totalBills': total_bills,
+                'totalProfit': total_profit,
+                'avgBillValue': total_revenue / total_bills if total_bills > 0 else 0,
+                'paymentModes': payment_modes,
+                'recentSales': recent_sales
+            }
+        })
+        
+    except Exception as e:
+        app.logger.error(f"Error fetching sales data: {e}")
+        return jsonify({'success': False, 'error': str(e)}), 500
 
 @app.route('/export-business-data')
 def export_business_data():

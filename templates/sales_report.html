@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sales Report - Kirana Konnect</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#10B981',
+                        secondary: '#3B82F6',
+                        accent: '#F59E0B',
+                        danger: '#EF4444',
+                        dark: '#1F2937'
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-gray-50">
+    <!-- Header -->
+    <header class="fixed top-0 left-0 right-0 bg-white shadow-sm z-50">
+        <div class="flex items-center justify-between p-4">
+            <div class="flex items-center space-x-3">
+                <button onclick="goBack()" class="p-2 hover:bg-gray-100 rounded-full">
+                    <i class="fa-solid fa-arrow-left text-gray-600 text-lg"></i>
+                </button>
+                <div>
+                    <h1 class="text-lg font-bold text-gray-800">Sales Report</h1>
+                    <p class="text-xs text-gray-500">Detailed sales analysis</p>
+                </div>
+            </div>
+            <div class="flex items-center space-x-2">
+                <button onclick="exportSalesReport()" class="bg-primary text-white px-3 py-2 rounded-lg text-sm font-medium hover:bg-primary/80 transition-colors">
+                    <i class="fa-solid fa-download mr-1"></i>
+                    Export
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="pt-20 pb-20 px-4">
+        <!-- Date Filter -->
+        <div class="bg-white rounded-xl p-4 mb-6 shadow-sm">
+            <h2 class="text-sm font-semibold text-gray-800 mb-3">Filter by Date</h2>
+            <div class="grid grid-cols-2 gap-3">
+                <div>
+                    <label class="text-xs text-gray-600 block mb-1">From Date</label>
+                    <input type="date" id="from-date" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm">
+                </div>
+                <div>
+                    <label class="text-xs text-gray-600 block mb-1">To Date</label>
+                    <input type="date" id="to-date" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm">
+                </div>
+            </div>
+            <button onclick="applyDateFilter()" class="w-full bg-primary text-white py-2 rounded-lg text-sm font-medium mt-3 hover:bg-primary/80 transition-colors">
+                Apply Filter
+            </button>
+        </div>
+
+        <!-- Summary Cards -->
+        <div class="grid grid-cols-2 gap-4 mb-6">
+            <div class="bg-white p-4 rounded-xl shadow-sm border-l-4 border-secondary">
+                <div class="flex items-center justify-between">
+                    <div class="flex-1">
+                        <p class="text-xs text-gray-500 uppercase tracking-wide font-medium">Total Revenue</p>
+                        <p class="text-xl font-bold text-secondary mt-1" id="total-revenue">₹0</p>
+                        <p class="text-xs text-gray-500 mt-1" id="revenue-period">Today</p>
+                    </div>
+                    <div class="bg-secondary/10 p-2 rounded-full">
+                        <i class="fa-solid fa-rupee-sign text-secondary text-sm"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white p-4 rounded-xl shadow-sm border-l-4 border-primary">
+                <div class="flex items-center justify-between">
+                    <div class="flex-1">
+                        <p class="text-xs text-gray-500 uppercase tracking-wide font-medium">Total Bills</p>
+                        <p class="text-xl font-bold text-primary mt-1" id="total-bills">0</p>
+                        <p class="text-xs text-gray-500 mt-1" id="bills-period">Today</p>
+                    </div>
+                    <div class="bg-primary/10 p-2 rounded-full">
+                        <i class="fa-solid fa-receipt text-primary text-sm"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white p-4 rounded-xl shadow-sm border-l-4 border-accent">
+                <div class="flex items-center justify-between">
+                    <div class="flex-1">
+                        <p class="text-xs text-gray-500 uppercase tracking-wide font-medium">Avg Bill Value</p>
+                        <p class="text-xl font-bold text-accent mt-1" id="avg-bill-value">₹0</p>
+                        <p class="text-xs text-gray-500 mt-1" id="avg-period">Today</p>
+                    </div>
+                    <div class="bg-accent/10 p-2 rounded-full">
+                        <i class="fa-solid fa-chart-bar text-accent text-sm"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white p-4 rounded-xl shadow-sm border-l-4 border-green-500">
+                <div class="flex items-center justify-between">
+                    <div class="flex-1">
+                        <p class="text-xs text-gray-500 uppercase tracking-wide font-medium">Total Profit</p>
+                        <p class="text-xl font-bold text-green-500 mt-1" id="total-profit">₹0</p>
+                        <p class="text-xs text-gray-500 mt-1" id="profit-period">Today</p>
+                    </div>
+                    <div class="bg-green-500/10 p-2 rounded-full">
+                        <i class="fa-solid fa-chart-line text-green-500 text-sm"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Payment Mode Distribution -->
+        <div class="bg-white rounded-xl p-4 mb-6 shadow-sm">
+            <h2 class="text-sm font-semibold text-gray-800 mb-3">Payment Mode Distribution</h2>
+            <div class="space-y-3" id="payment-modes">
+                <div class="payment-mode-item">
+                    <div class="flex items-center justify-between mb-1">
+                        <span class="text-sm text-gray-600">Cash</span>
+                        <span class="text-sm font-semibold text-gray-800" id="cash-amount">₹0</span>
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full h-2">
+                        <div class="bg-primary h-2 rounded-full" style="width: 0%" id="cash-percentage"></div>
+                    </div>
+                    <p class="text-xs text-gray-500 mt-1" id="cash-count">0 transactions</p>
+                </div>
+
+                <div class="payment-mode-item">
+                    <div class="flex items-center justify-between mb-1">
+                        <span class="text-sm text-gray-600">Online/UPI</span>
+                        <span class="text-sm font-semibold text-gray-800" id="online-amount">₹0</span>
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full h-2">
+                        <div class="bg-secondary h-2 rounded-full" style="width: 0%" id="online-percentage"></div>
+                    </div>
+                    <p class="text-xs text-gray-500 mt-1" id="online-count">0 transactions</p>
+                </div>
+
+                <div class="payment-mode-item">
+                    <div class="flex items-center justify-between mb-1">
+                        <span class="text-sm text-gray-600">Credit</span>
+                        <span class="text-sm font-semibold text-gray-800" id="credit-amount">₹0</span>
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full h-2">
+                        <div class="bg-accent h-2 rounded-full" style="width: 0%" id="credit-percentage"></div>
+                    </div>
+                    <p class="text-xs text-gray-500 mt-1" id="credit-count">0 transactions</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Sales -->
+        <div class="bg-white rounded-xl shadow-sm">
+            <div class="p-4 border-b border-gray-100">
+                <h2 class="text-sm font-semibold text-gray-800">Recent Sales</h2>
+                <p class="text-xs text-gray-500">Latest transactions</p>
+            </div>
+
+            <div id="recent-sales-list" class="divide-y divide-gray-100">
+                <!-- Sample sales data will be loaded here -->
+                <div class="p-4">
+                    <div class="flex items-center justify-between">
+                        <div class="flex-1">
+                            <div class="flex items-center space-x-2 mb-1">
+                                <p class="text-sm font-semibold text-gray-800">Bill #KK001</p>
+                                <span class="bg-primary/10 text-primary px-2 py-1 rounded-full text-xs font-medium">Paid</span>
+                            </div>
+                            <p class="text-xs text-gray-600">Customer: Walk-in Customer</p>
+                            <p class="text-xs text-gray-500">Today, 2:30 PM</p>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-sm font-bold text-primary">₹245</p>
+                            <p class="text-xs text-gray-500">Cash</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="p-4">
+                    <div class="flex items-center justify-between">
+                        <div class="flex-1">
+                            <div class="flex items-center space-x-2 mb-1">
+                                <p class="text-sm font-semibold text-gray-800">Bill #KK002</p>
+                                <span class="bg-secondary/10 text-secondary px-2 py-1 rounded-full text-xs font-medium">Paid</span>
+                            </div>
+                            <p class="text-xs text-gray-600">Customer: Priya Sharma</p>
+                            <p class="text-xs text-gray-500">Today, 1:15 PM</p>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-sm font-bold text-secondary">₹180</p>
+                            <p class="text-xs text-gray-500">UPI</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="p-4">
+                    <div class="flex items-center justify-between">
+                        <div class="flex-1">
+                            <div class="flex items-center space-x-2 mb-1">
+                                <p class="text-sm font-semibold text-gray-800">Bill #KK003</p>
+                                <span class="bg-accent/10 text-accent px-2 py-1 rounded-full text-xs font-medium">Credit</span>
+                            </div>
+                            <p class="text-xs text-gray-600">Customer: Amit Kumar</p>
+                            <p class="text-xs text-gray-500">Today, 12:45 PM</p>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-sm font-bold text-accent">₹320</p>
+                            <p class="text-xs text-gray-500">Credit</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="p-4">
+                    <div class="flex items-center justify-between">
+                        <div class="flex-1">
+                            <div class="flex items-center space-x-2 mb-1">
+                                <p class="text-sm font-semibold text-gray-800">Bill #KK004</p>
+                                <span class="bg-primary/10 text-primary px-2 py-1 rounded-full text-xs font-medium">Paid</span>
+                            </div>
+                            <p class="text-xs text-gray-600">Customer: Walk-in Customer</p>
+                            <p class="text-xs text-gray-500">Today, 11:30 AM</p>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-sm font-bold text-primary">₹95</p>
+                            <p class="text-xs text-gray-500">Cash</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="p-4">
+                    <div class="flex items-center justify-between">
+                        <div class="flex-1">
+                            <div class="flex items-center space-x-2 mb-1">
+                                <p class="text-sm font-semibold text-gray-800">Bill #KK005</p>
+                                <span class="bg-secondary/10 text-secondary px-2 py-1 rounded-full text-xs font-medium">Paid</span>
+                            </div>
+                            <p class="text-xs text-gray-600">Customer: Sunita Devi</p>
+                            <p class="text-xs text-gray-500">Today, 10:15 AM</p>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-sm font-bold text-secondary">₹450</p>
+                            <p class="text-xs text-gray-500">UPI</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="p-4 border-t border-gray-100">
+                <button onclick="loadMoreSales()" class="w-full text-secondary text-sm font-semibold hover:text-secondary/80">
+                    Load More Sales
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <!-- Bottom Navigation -->
+    <nav class="fixed bottom-0 left-0 right-0 bg-white shadow-lg border-t">
+        <div class="flex justify-around items-end py-2">
+            <button class="flex flex-col items-center py-1 px-3" onclick="goToDashboard()">
+                <i class="fa-solid fa-home text-primary text-xl"></i>
+                <span class="text-xs mt-1 text-primary font-semibold">Home</span>
+            </button>
+            <button class="flex flex-col items-center py-1 px-3" onclick="goToInventory()">
+                <i class="fa-solid fa-box text-gray-400 text-xl"></i>
+                <span class="text-xs mt-1 text-gray-400">Inventory</span>
+            </button>
+            <button class="relative -top-4 bg-primary rounded-full p-4 shadow-lg" onclick="openScanner()">
+                <i class="fa-solid fa-barcode text-white text-xl"></i>
+            </button>
+            <button class="flex flex-col items-center py-1 px-3 relative" onclick="goToCart()">
+                <i class="fa-solid fa-shopping-cart text-gray-400 text-xl"></i>
+                <span class="text-xs mt-1 text-gray-400">Cart</span>
+                <span class="absolute -top-1 -right-1 bg-danger text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold">7</span>
+            </button>
+            <button class="flex flex-col items-center py-1 px-3" onclick="goToProfile()">
+                <i class="fa-solid fa-user text-gray-400 text-xl"></i>
+                <span class="text-xs mt-1 text-gray-400">Profile</span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Include Universal Scanner -->
+    <script src="/static/js/universal-scanner.js"></script>
+
+    <script>
+        // Navigation functions
+        function goBack() {
+            window.location.href = '/dashboard';
+        }
+
+        function goToDashboard() {
+            window.location.href = '/dashboard';
+        }
+
+        function goToInventory() {
+            window.location.href = '/inventory';
+        }
+
+        function goToCart() {
+            window.location.href = '/cart';
+        }
+
+        function goToProfile() {
+            window.location.href = '/profile';
+        }
+
+        // Set default dates
+        function setDefaultDates() {
+            const today = new Date();
+            const fromDate = new Date(today);
+            fromDate.setDate(today.getDate() - 7); // Last 7 days
+
+            document.getElementById('from-date').value = fromDate.toISOString().split('T')[0];
+            document.getElementById('to-date').value = today.toISOString().split('T')[0];
+        }
+
+        // Apply date filter
+        function applyDateFilter() {
+            const fromDate = document.getElementById('from-date').value;
+            const toDate = document.getElementById('to-date').value;
+            
+            if (!fromDate || !toDate) {
+                showNotification('Please select both from and to dates', 'error');
+                return;
+            }
+
+            if (new Date(fromDate) > new Date(toDate)) {
+                showNotification('From date cannot be later than to date', 'error');
+                return;
+            }
+
+            loadSalesData(fromDate, toDate);
+        }
+
+        // Load sales data
+        async function loadSalesData(fromDate = null, toDate = null) {
+            try {
+                showNotification('Loading sales data...', 'info');
+                
+                const salesData = await fetchSalesData(fromDate, toDate);
+                updateSalesStats(salesData);
+                updatePaymentModes(salesData.paymentModes);
+                updateRecentSales(salesData.recentSales);
+                
+                showNotification('Sales data loaded successfully', 'success');
+            } catch (error) {
+                console.error('Error loading sales data:', error);
+                showNotification('Error loading sales data', 'error');
+            }
+        }
+
+        // Fetch sales data from API
+        async function fetchSalesData(fromDate, toDate) {
+            let url = '/api/sales-data';
+            const params = new URLSearchParams();
+            
+            if (fromDate) params.append('from_date', fromDate);
+            if (toDate) params.append('to_date', toDate);
+            
+            if (params.toString()) {
+                url += '?' + params.toString();
+            }
+            
+            const response = await fetch(url);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            
+            const result = await response.json();
+            if (!result.success) {
+                throw new Error(result.error || 'Failed to fetch sales data');
+            }
+            
+            return result.data;
+        }
+
+        // Update sales statistics
+        function updateSalesStats(data) {
+            document.getElementById('total-revenue').textContent = `₹${Math.round(data.totalRevenue)}`;
+            document.getElementById('total-bills').textContent = data.totalBills;
+            document.getElementById('total-profit').textContent = `₹${Math.round(data.totalProfit)}`;
+            document.getElementById('avg-bill-value').textContent = `₹${Math.round(data.avgBillValue)}`;
+        }
+
+        // Update recent sales list
+        function updateRecentSales(recentSales) {
+            if (!recentSales || recentSales.length === 0) return;
+            
+            const salesList = document.getElementById('recent-sales-list');
+            salesList.innerHTML = '';
+            
+            recentSales.forEach(sale => {
+                const saleElement = document.createElement('div');
+                saleElement.className = 'p-4 border-b border-gray-100';
+                
+                const statusColor = sale.payment_status === 'paid' ? 'primary' : 
+                                  sale.payment_status === 'credit' ? 'accent' : 'secondary';
+                
+                const paymentModeText = sale.payment_mode === 'online' ? 'UPI' : 
+                                      sale.payment_mode.charAt(0).toUpperCase() + sale.payment_mode.slice(1);
+                
+                const createdDate = new Date(sale.created_at);
+                const timeAgo = getTimeAgo(createdDate);
+                
+                saleElement.innerHTML = `
+                    <div class="flex items-center justify-between">
+                        <div class="flex-1">
+                            <div class="flex items-center space-x-2 mb-1">
+                                <p class="text-sm font-semibold text-gray-800">${sale.bill_number}</p>
+                                <span class="bg-${statusColor}/10 text-${statusColor} px-2 py-1 rounded-full text-xs font-medium">
+                                    ${sale.payment_status.charAt(0).toUpperCase() + sale.payment_status.slice(1)}
+                                </span>
+                            </div>
+                            <p class="text-xs text-gray-600">Customer: ${sale.customer_name}</p>
+                            <p class="text-xs text-gray-500">${timeAgo}</p>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-sm font-bold text-${statusColor}">₹${Math.round(sale.amount)}</p>
+                            <p class="text-xs text-gray-500">${paymentModeText}</p>
+                        </div>
+                    </div>
+                `;
+                
+                salesList.appendChild(saleElement);
+            });
+            
+            // Add load more button
+            const loadMoreDiv = document.createElement('div');
+            loadMoreDiv.className = 'p-4 border-t border-gray-100';
+            loadMoreDiv.innerHTML = `
+                <button onclick="loadMoreSales()" class="w-full text-secondary text-sm font-semibold hover:text-secondary/80">
+                    Load More Sales
+                </button>
+            `;
+            salesList.appendChild(loadMoreDiv);
+        }
+
+        // Helper function to get time ago
+        function getTimeAgo(date) {
+            const now = new Date();
+            const diff = now - date;
+            const seconds = Math.floor(diff / 1000);
+            const minutes = Math.floor(seconds / 60);
+            const hours = Math.floor(minutes / 60);
+            const days = Math.floor(hours / 24);
+            
+            if (days > 0) return `${days} day${days > 1 ? 's' : ''} ago`;
+            if (hours > 0) return `${hours} hour${hours > 1 ? 's' : ''} ago`;
+            if (minutes > 0) return `${minutes} minute${minutes > 1 ? 's' : ''} ago`;
+            return 'Just now';
+        }
+
+        // Update payment mode distribution
+        function updatePaymentModes(paymentModes) {
+            const total = paymentModes.cash.amount + paymentModes.online.amount + paymentModes.credit.amount;
+            
+            // Cash
+            const cashPercentage = total > 0 ? Math.round((paymentModes.cash.amount / total) * 100) : 0;
+            document.getElementById('cash-amount').textContent = `₹${paymentModes.cash.amount}`;
+            document.getElementById('cash-percentage').style.width = `${cashPercentage}%`;
+            document.getElementById('cash-count').textContent = `${paymentModes.cash.count} transactions`;
+            
+            // Online
+            const onlinePercentage = total > 0 ? Math.round((paymentModes.online.amount / total) * 100) : 0;
+            document.getElementById('online-amount').textContent = `₹${paymentModes.online.amount}`;
+            document.getElementById('online-percentage').style.width = `${onlinePercentage}%`;
+            document.getElementById('online-count').textContent = `${paymentModes.online.count} transactions`;
+            
+            // Credit
+            const creditPercentage = total > 0 ? Math.round((paymentModes.credit.amount / total) * 100) : 0;
+            document.getElementById('credit-amount').textContent = `₹${paymentModes.credit.amount}`;
+            document.getElementById('credit-percentage').style.width = `${creditPercentage}%`;
+            document.getElementById('credit-count').textContent = `${paymentModes.credit.count} transactions`;
+        }
+
+        // Export sales report
+        function exportSalesReport() {
+            window.location.href = '/export-business-data';
+        }
+
+        // Load more sales
+        function loadMoreSales() {
+            showNotification('Loading more sales...', 'info');
+            // In real app, this would load more data from backend
+            setTimeout(() => {
+                showNotification('No more sales to load', 'info');
+            }, 1000);
+        }
+
+        // Show notification
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `fixed top-20 left-4 right-4 z-50 p-3 rounded-lg text-white text-sm font-medium ${
+                type === 'success' ? 'bg-primary' : 
+                type === 'error' ? 'bg-danger' : 
+                'bg-gray-600'
+            }`;
+            notification.textContent = message;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+        }
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            setDefaultDates();
+            loadSalesData();
+        });
+    </script>
+</body>
+</html>
