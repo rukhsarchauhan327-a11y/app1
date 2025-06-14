@@ -126,11 +126,19 @@
             </div>
         </div>
 
-        <!-- Sales Chart -->
+        <!-- 7-Day Investment vs Profit Chart -->
         <div class="px-4 mb-6">
-            <div class="bg-white p-4 rounded-xl shadow-sm">
-                <h3 class="text-lg font-bold mb-4 text-dark">Sales Trend</h3>
-                <div style="height: 250px;">
+            <div class="bg-white p-6 rounded-xl shadow-sm">
+                <div class="flex items-center justify-between mb-6">
+                    <div>
+                        <h3 class="text-xl font-bold text-dark">7-Day Investment vs Profit Analysis</h3>
+                        <p class="text-sm text-gray-600 mt-1">Real-time tracking of your business performance</p>
+                    </div>
+                    <div class="bg-gradient-to-r from-primary to-secondary text-white px-3 py-1 rounded-full text-xs font-medium">
+                        Live Data
+                    </div>
+                </div>
+                <div style="height: 320px;">
                     <canvas id="salesChart"></canvas>
                 </div>
             </div>
@@ -287,33 +295,19 @@
             loadSalesDataByPeriod(period);
         }
 
-        // Load sales data by period
-        async function loadSalesDataByPeriod(period) {
+        // Load 7-day sales data
+        async function load7DaySalesData() {
             try {
                 const today = new Date();
-                let fromDate, toDate;
+                const sevenDaysAgo = new Date(today);
+                sevenDaysAgo.setDate(today.getDate() - 6);
                 
-                switch(period) {
-                    case 'daily':
-                        fromDate = toDate = today.toISOString().split('T')[0];
-                        break;
-                    case 'weekly':
-                        const weekAgo = new Date(today);
-                        weekAgo.setDate(today.getDate() - 7);
-                        fromDate = weekAgo.toISOString().split('T')[0];
-                        toDate = new Date().toISOString().split('T')[0];
-                        break;
-                    case 'monthly':
-                        fromDate = new Date(today.getFullYear(), today.getMonth(), 1).toISOString().split('T')[0];
-                        toDate = new Date().toISOString().split('T')[0];
-                        break;
-                    default:
-                        fromDate = toDate = today.toISOString().split('T')[0];
-                }
+                const fromDate = sevenDaysAgo.toISOString().split('T')[0];
+                const toDate = today.toISOString().split('T')[0];
                 
                 await loadSalesData(fromDate, toDate);
             } catch (error) {
-                console.error('Error loading sales data by period:', error);
+                console.error('Error loading 7-day sales data:', error);
                 showNotification('Error loading sales data', 'error');
             }
         }
@@ -458,7 +452,7 @@
             }
         }
 
-        // Update investment vs profit chart
+        // Update investment vs profit chart with 7-day real data
         function updateSalesChart(data) {
             try {
                 console.log('Updating chart with data:', data);
@@ -473,22 +467,20 @@
                 }
                 
                 let labels, investmentData, profitData;
-                const totalInvestment = Math.abs(data.totalInvestment || 0);
-                const totalProfit = data.totalProfit || 0;
                 
-                // Generate simple labels based on period
-                if (currentPeriod === 'daily') {
-                    labels = ['Morning', 'Afternoon', 'Evening'];
-                    investmentData = [0, totalInvestment * 0.6, totalInvestment];
-                    profitData = [0, totalProfit * 0.4, totalProfit];
-                } else if (currentPeriod === 'weekly') {
-                    labels = ['Week Start', 'Mid Week', 'Week End'];
-                    investmentData = [0, totalInvestment * 0.5, totalInvestment];
-                    profitData = [0, totalProfit * 0.3, totalProfit];
+                // Use real 7-day data from API
+                if (data.chartData && data.chartData.dates && data.chartData.dates.length > 0) {
+                    labels = data.chartData.dates.map(date => {
+                        const d = new Date(date);
+                        return d.toLocaleDateString('en-US', { weekday: 'short' });
+                    });
+                    investmentData = data.chartData.investment;
+                    profitData = data.chartData.profit;
                 } else {
-                    labels = ['Month Start', 'Mid Month', 'Month End'];
-                    investmentData = [0, totalInvestment * 0.4, totalInvestment];
-                    profitData = [0, totalProfit * 0.2, totalProfit];
+                    // Empty chart with 7 days
+                    labels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+                    investmentData = [0, 0, 0, 0, 0, 0, 0];
+                    profitData = [0, 0, 0, 0, 0, 0, 0];
                 }
                 
                 console.log('Chart data:', { labels, investmentData, profitData });
@@ -498,37 +490,81 @@
                     data: {
                         labels: labels,
                         datasets: [{
-                            label: 'Investment',
+                            label: 'Investment ₹',
                             data: investmentData,
-                            borderColor: '#ff6b6b',
-                            backgroundColor: 'rgba(255, 107, 107, 0.1)',
+                            borderColor: '#e74c3c',
+                            backgroundColor: 'rgba(231, 76, 60, 0.05)',
+                            borderWidth: 3,
                             tension: 0.4,
-                            fill: false
+                            fill: true,
+                            pointBackgroundColor: '#e74c3c',
+                            pointBorderColor: '#ffffff',
+                            pointBorderWidth: 2,
+                            pointRadius: 6,
+                            pointHoverRadius: 8
                         }, {
-                            label: 'Profit Generated',
+                            label: 'Profit ₹',
                             data: profitData,
-                            borderColor: '#4CAF50',
-                            backgroundColor: 'rgba(76, 175, 80, 0.1)',
+                            borderColor: '#27ae60',
+                            backgroundColor: 'rgba(39, 174, 96, 0.05)',
+                            borderWidth: 3,
                             tension: 0.4,
-                            fill: false
+                            fill: true,
+                            pointBackgroundColor: '#27ae60',
+                            pointBorderColor: '#ffffff',
+                            pointBorderWidth: 2,
+                            pointRadius: 6,
+                            pointHoverRadius: 8
                         }]
                     },
                     options: {
                         responsive: true,
                         maintainAspectRatio: false,
+                        interaction: {
+                            mode: 'index',
+                            intersect: false,
+                        },
                         plugins: {
                             legend: {
                                 display: true,
-                                position: 'top'
+                                position: 'top',
+                                labels: {
+                                    usePointStyle: true,
+                                    padding: 20,
+                                    font: {
+                                        size: 12,
+                                        weight: 'bold'
+                                    }
+                                }
                             }
                         },
                         scales: {
+                            x: {
+                                grid: {
+                                    display: false
+                                },
+                                ticks: {
+                                    font: {
+                                        size: 11,
+                                        weight: 'bold'
+                                    },
+                                    color: '#666'
+                                }
+                            },
                             y: {
                                 beginAtZero: true,
+                                grid: {
+                                    color: 'rgba(0,0,0,0.05)',
+                                    drawBorder: false
+                                },
                                 ticks: {
                                     callback: function(value) {
-                                        return '₹' + Math.round(value);
-                                    }
+                                        return '₹' + (value >= 1000 ? (value/1000).toFixed(1) + 'K' : Math.round(value));
+                                    },
+                                    font: {
+                                        size: 11
+                                    },
+                                    color: '#666'
                                 }
                             }
                         }
@@ -607,7 +643,7 @@
         // Initialize page
         document.addEventListener('DOMContentLoaded', function() {
             setCurrentDate();
-            loadSalesDataByPeriod('daily');
+            load7DaySalesData();
         });
     </script>
 </body>

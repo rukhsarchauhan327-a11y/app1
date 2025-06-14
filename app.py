@@ -1351,34 +1351,39 @@ def api_sales_data():
             total_investment += bill_investment
             total_profit += bill_profit
         
-        # Process chart data based on period
+        # Generate real-time 7-day chart data
         from collections import defaultdict
+        from datetime import datetime, timedelta
         
-        if not daily_data:
-            # No sales data, return empty arrays
-            sorted_dates = []
-            investment_data = []
-            profit_data = []
-        else:
-            chart_data = defaultdict(lambda: {'investment': 0, 'profit': 0, 'revenue': 0})
-            
-            for data in daily_data:
-                chart_data[data['date']]['investment'] += data['investment']
-                chart_data[data['date']]['profit'] += data['profit']
-                chart_data[data['date']]['revenue'] += data['revenue']
-            
-            # Convert to sorted list with cumulative values
-            sorted_dates = sorted(chart_data.keys())
-            investment_data = []
-            profit_data = []
-            cumulative_investment = 0
-            cumulative_profit = 0
-            
-            for date in sorted_dates:
-                cumulative_investment += chart_data[date]['investment']
-                cumulative_profit += chart_data[date]['profit']
-                investment_data.append(cumulative_investment)
-                profit_data.append(cumulative_profit)
+        # Get last 7 days including today
+        today = datetime.now().date()
+        seven_days = [(today - timedelta(days=i)) for i in range(6, -1, -1)]
+        
+        # Initialize chart data for 7 days
+        chart_data = {}
+        for day in seven_days:
+            chart_data[day.strftime('%Y-%m-%d')] = {'investment': 0, 'profit': 0, 'revenue': 0}
+        
+        # Fill with real data
+        for data in daily_data:
+            date_key = data['date']
+            if date_key in chart_data:
+                chart_data[date_key]['investment'] += data['investment']
+                chart_data[date_key]['profit'] += data['profit']
+                chart_data[date_key]['revenue'] += data['revenue']
+        
+        # Convert to arrays for chart
+        sorted_dates = [day.strftime('%Y-%m-%d') for day in seven_days]
+        investment_data = []
+        profit_data = []
+        cumulative_investment = 0
+        cumulative_profit = 0
+        
+        for date in sorted_dates:
+            cumulative_investment += chart_data[date]['investment']
+            cumulative_profit += chart_data[date]['profit']
+            investment_data.append(cumulative_investment)
+            profit_data.append(cumulative_profit)
         
         # Sort categories by amount
         sorted_categories = sorted(category_performance.items(), key=lambda x: x[1]['amount'], reverse=True)
