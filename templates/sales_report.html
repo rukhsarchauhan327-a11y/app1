@@ -144,15 +144,7 @@
             </div>
         </div>
 
-        <!-- Category Performance -->
-        <div class="px-4 mb-6">
-            <div class="bg-white p-4 rounded-xl shadow-sm">
-                <h3 class="text-lg font-bold mb-4 text-dark">Category Performance</h3>
-                <div class="space-y-4" id="category-performance">
-                    <!-- Categories will be loaded here -->
-                </div>
-            </div>
-        </div>
+
 
         <!-- Top Selling Items -->
         <div class="px-4 mb-6">
@@ -322,7 +314,6 @@
                 console.log('Received sales data:', salesData);
                 
                 updateSalesStats(salesData);
-                updateCategoryPerformance(salesData.categories);
                 updateTopSellingItems(salesData.topItems);
                 updateSalesChart(salesData);
                 updateInvestmentRecovery(salesData);
@@ -378,35 +369,7 @@
 
 
 
-        // Update category performance
-        function updateCategoryPerformance(categories) {
-            const categoryContainer = document.getElementById('category-performance');
-            categoryContainer.innerHTML = '';
-            
-            if (!categories || categories.length === 0) {
-                categoryContainer.innerHTML = '<p class="text-gray-500 text-center">No category data available</p>';
-                return;
-            }
-            
-            const colors = ['primary', 'secondary', 'accent', 'purple-500', 'pink-500'];
-            
-            categories.forEach((category, index) => {
-                const color = colors[index % colors.length];
-                const categoryElement = document.createElement('div');
-                categoryElement.className = 'flex items-center justify-between';
-                categoryElement.innerHTML = `
-                    <div class="flex items-center space-x-3">
-                        <div class="w-4 h-4 bg-${color} rounded-full"></div>
-                        <span class="font-medium text-dark">${category.name}</span>
-                    </div>
-                    <div class="text-right">
-                        <p class="font-bold text-dark">₹${Math.round(category.amount)}</p>
-                        <p class="text-xs text-gray-500">${category.percentage}% of sales</p>
-                    </div>
-                `;
-                categoryContainer.appendChild(categoryElement);
-            });
-        }
+
 
         // Update top selling items
         function updateTopSellingItems(topItems) {
