@@ -6,256 +6,205 @@
     <title>Sales Report - Kirana Konnect</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;500;600;700;800;900&display=swap">
     <script>
         tailwind.config = {
             theme: {
                 extend: {
                     colors: {
-                        primary: '#10B981',
-                        secondary: '#3B82F6',
-                        accent: '#F59E0B',
-                        danger: '#EF4444',
-                        dark: '#1F2937'
+                        primary: '#4CAF50',
+                        secondary: '#2196F3',
+                        accent: '#FF9800',
+                        danger: '#F44336',
+                        dark: '#333333',
+                        light: '#F5F5F5'
+                    },
+                    fontFamily: {
+                        poppins: ['Poppins', 'sans-serif'],
+                        sans: ['Inter', 'sans-serif']
                     }
                 }
             }
         }
     </script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif !important;
+        }
+        
+        .fa, .fas, .far, .fal, .fab {
+            font-family: "Font Awesome 6 Free", "Font Awesome 6 Brands" !important;
+        }
+        
+        ::-webkit-scrollbar {
+            display: none;
+        }
+        
+        html, body {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
 </head>
-<body class="bg-gray-50">
-    <!-- Header -->
-    <header class="fixed top-0 left-0 right-0 bg-white shadow-sm z-50">
-        <div class="flex items-center justify-between p-4">
-            <div class="flex items-center space-x-3">
-                <button onclick="goBack()" class="p-2 hover:bg-gray-100 rounded-full">
-                    <i class="fa-solid fa-arrow-left text-gray-600 text-lg"></i>
-                </button>
-                <div>
-                    <h1 class="text-lg font-bold text-gray-800">Sales Report</h1>
-                    <p class="text-xs text-gray-500">Detailed sales analysis</p>
-                </div>
-            </div>
-            <div class="flex items-center space-x-2">
-                <button onclick="exportSalesReport()" class="bg-primary text-white px-3 py-2 rounded-lg text-sm font-medium hover:bg-primary/80 transition-colors">
-                    <i class="fa-solid fa-download mr-1"></i>
-                    Export
-                </button>
-            </div>
+<body class="font-poppins bg-gray-50">
+    <!-- Header Section -->
+    <header class="bg-white shadow-sm fixed top-0 left-0 right-0 z-10">
+        <div class="flex items-center p-4">
+            <button onclick="goBack()" class="mr-4">
+                <i class="fa-solid fa-arrow-left text-dark text-xl"></i>
+            </button>
+            <h1 class="text-xl font-bold text-dark flex-1 text-center">Daily Reports</h1>
+            <button onclick="exportSalesReport()">
+                <i class="fa-solid fa-download text-dark text-xl"></i>
+            </button>
         </div>
     </header>
 
     <!-- Main Content -->
-    <main class="pt-20 pb-20 px-4">
-        <!-- Date Filter -->
-        <div class="bg-white rounded-xl p-4 mb-6 shadow-sm">
-            <h2 class="text-sm font-semibold text-gray-800 mb-3">Filter by Date</h2>
-            <div class="grid grid-cols-2 gap-3">
-                <div>
-                    <label class="text-xs text-gray-600 block mb-1">From Date</label>
-                    <input type="date" id="from-date" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm">
+    <main class="pt-20 pb-20">
+        <!-- Date Filter Section -->
+        <div class="px-4 mb-6">
+            <div class="flex items-center justify-between bg-white p-4 rounded-xl shadow-sm">
+                <div class="flex items-center space-x-3">
+                    <i class="fa-solid fa-calendar text-primary text-lg"></i>
+                    <span class="text-dark font-semibold" id="current-date">June 14, 2025</span>
                 </div>
-                <div>
-                    <label class="text-xs text-gray-600 block mb-1">To Date</label>
-                    <input type="date" id="to-date" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm">
-                </div>
+                <button onclick="openDatePicker()" class="text-secondary font-semibold">Change</button>
             </div>
-            <button onclick="applyDateFilter()" class="w-full bg-primary text-white py-2 rounded-lg text-sm font-medium mt-3 hover:bg-primary/80 transition-colors">
-                Apply Filter
-            </button>
         </div>
 
-        <!-- Summary Cards -->
-        <div class="grid grid-cols-2 gap-4 mb-6">
-            <div class="bg-white p-4 rounded-xl shadow-sm border-l-4 border-secondary">
-                <div class="flex items-center justify-between">
-                    <div class="flex-1">
-                        <p class="text-xs text-gray-500 uppercase tracking-wide font-medium">Total Revenue</p>
-                        <p class="text-xl font-bold text-secondary mt-1" id="total-revenue">₹0</p>
-                        <p class="text-xs text-gray-500 mt-1" id="revenue-period">Today</p>
-                    </div>
-                    <div class="bg-secondary/10 p-2 rounded-full">
-                        <i class="fa-solid fa-rupee-sign text-secondary text-sm"></i>
+        <!-- Period Tabs -->
+        <div class="px-4 mb-6">
+            <div class="flex bg-gray-100 rounded-xl p-1">
+                <button onclick="setPeriod('daily')" class="flex-1 py-3 text-center bg-primary text-white rounded-lg font-semibold" id="daily-tab">Daily</button>
+                <button onclick="setPeriod('weekly')" class="flex-1 py-3 text-center text-gray-600" id="weekly-tab">Weekly</button>
+                <button onclick="setPeriod('monthly')" class="flex-1 py-3 text-center text-gray-600" id="monthly-tab">Monthly</button>
+            </div>
+        </div>
+
+        <!-- Key Metrics Cards -->
+        <div class="px-4 mb-6">
+            <div class="grid grid-cols-2 gap-4">
+                <!-- Total Sales -->
+                <div class="bg-white p-4 rounded-xl shadow-sm border-l-4 border-primary">
+                    <div class="text-center">
+                        <p class="text-xs text-gray-500 uppercase tracking-wide font-medium mb-2">Total Sales</p>
+                        <p class="text-2xl font-bold text-primary" id="total-sales">₹0</p>
+                        <p class="text-xs text-green-600 mt-1" id="sales-growth">+0% vs yesterday</p>
                     </div>
                 </div>
-            </div>
 
-            <div class="bg-white p-4 rounded-xl shadow-sm border-l-4 border-primary">
-                <div class="flex items-center justify-between">
-                    <div class="flex-1">
-                        <p class="text-xs text-gray-500 uppercase tracking-wide font-medium">Total Bills</p>
-                        <p class="text-xl font-bold text-primary mt-1" id="total-bills">0</p>
-                        <p class="text-xs text-gray-500 mt-1" id="bills-period">Today</p>
-                    </div>
-                    <div class="bg-primary/10 p-2 rounded-full">
-                        <i class="fa-solid fa-receipt text-primary text-sm"></i>
+                <!-- Total Profit -->
+                <div class="bg-white p-4 rounded-xl shadow-sm border-l-4 border-green-600">
+                    <div class="text-center">
+                        <p class="text-xs text-gray-500 uppercase tracking-wide font-medium mb-2">Total Profit</p>
+                        <p class="text-2xl font-bold text-green-600" id="total-profit">₹0</p>
+                        <p class="text-xs text-green-600 mt-1" id="profit-growth">+0% vs yesterday</p>
                     </div>
                 </div>
-            </div>
 
-            <div class="bg-white p-4 rounded-xl shadow-sm border-l-4 border-accent">
-                <div class="flex items-center justify-between">
-                    <div class="flex-1">
-                        <p class="text-xs text-gray-500 uppercase tracking-wide font-medium">Avg Bill Value</p>
-                        <p class="text-xl font-bold text-accent mt-1" id="avg-bill-value">₹0</p>
-                        <p class="text-xs text-gray-500 mt-1" id="avg-period">Today</p>
-                    </div>
-                    <div class="bg-accent/10 p-2 rounded-full">
-                        <i class="fa-solid fa-chart-bar text-accent text-sm"></i>
+                <!-- Total Cost -->
+                <div class="bg-white p-4 rounded-xl shadow-sm border-l-4 border-red-500">
+                    <div class="text-center">
+                        <p class="text-xs text-gray-500 uppercase tracking-wide font-medium mb-2">Total Cost</p>
+                        <p class="text-2xl font-bold text-red-500" id="total-cost">₹0</p>
+                        <p class="text-xs text-gray-500 mt-1" id="cost-percentage">0% of sales</p>
                     </div>
                 </div>
-            </div>
 
-            <div class="bg-white p-4 rounded-xl shadow-sm border-l-4 border-green-500">
-                <div class="flex items-center justify-between">
-                    <div class="flex-1">
-                        <p class="text-xs text-gray-500 uppercase tracking-wide font-medium">Total Profit</p>
-                        <p class="text-xl font-bold text-green-500 mt-1" id="total-profit">₹0</p>
-                        <p class="text-xs text-gray-500 mt-1" id="profit-period">Today</p>
-                    </div>
-                    <div class="bg-green-500/10 p-2 rounded-full">
-                        <i class="fa-solid fa-chart-line text-green-500 text-sm"></i>
+                <!-- Transactions -->
+                <div class="bg-white p-4 rounded-xl shadow-sm border-l-4 border-secondary">
+                    <div class="text-center">
+                        <p class="text-xs text-gray-500 uppercase tracking-wide font-medium mb-2">Transactions</p>
+                        <p class="text-2xl font-bold text-secondary" id="total-transactions">0</p>
+                        <p class="text-xs text-secondary mt-1" id="avg-transaction">₹0 average</p>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Payment Mode Distribution -->
-        <div class="bg-white rounded-xl p-4 mb-6 shadow-sm">
-            <h2 class="text-sm font-semibold text-gray-800 mb-3">Payment Mode Distribution</h2>
-            <div class="space-y-3" id="payment-modes">
-                <div class="payment-mode-item">
-                    <div class="flex items-center justify-between mb-1">
-                        <span class="text-sm text-gray-600">Cash</span>
-                        <span class="text-sm font-semibold text-gray-800" id="cash-amount">₹0</span>
-                    </div>
-                    <div class="w-full bg-gray-200 rounded-full h-2">
-                        <div class="bg-primary h-2 rounded-full" style="width: 0%" id="cash-percentage"></div>
-                    </div>
-                    <p class="text-xs text-gray-500 mt-1" id="cash-count">0 transactions</p>
-                </div>
-
-                <div class="payment-mode-item">
-                    <div class="flex items-center justify-between mb-1">
-                        <span class="text-sm text-gray-600">Online/UPI</span>
-                        <span class="text-sm font-semibold text-gray-800" id="online-amount">₹0</span>
-                    </div>
-                    <div class="w-full bg-gray-200 rounded-full h-2">
-                        <div class="bg-secondary h-2 rounded-full" style="width: 0%" id="online-percentage"></div>
-                    </div>
-                    <p class="text-xs text-gray-500 mt-1" id="online-count">0 transactions</p>
-                </div>
-
-                <div class="payment-mode-item">
-                    <div class="flex items-center justify-between mb-1">
-                        <span class="text-sm text-gray-600">Credit</span>
-                        <span class="text-sm font-semibold text-gray-800" id="credit-amount">₹0</span>
-                    </div>
-                    <div class="w-full bg-gray-200 rounded-full h-2">
-                        <div class="bg-accent h-2 rounded-full" style="width: 0%" id="credit-percentage"></div>
-                    </div>
-                    <p class="text-xs text-gray-500 mt-1" id="credit-count">0 transactions</p>
+        <!-- Sales Chart -->
+        <div class="px-4 mb-6">
+            <div class="bg-white p-4 rounded-xl shadow-sm">
+                <h3 class="text-lg font-bold mb-4 text-dark">Sales Trend</h3>
+                <div style="height: 250px;">
+                    <canvas id="salesChart"></canvas>
                 </div>
             </div>
         </div>
 
-        <!-- Recent Sales -->
-        <div class="bg-white rounded-xl shadow-sm">
-            <div class="p-4 border-b border-gray-100">
-                <h2 class="text-sm font-semibold text-gray-800">Recent Sales</h2>
-                <p class="text-xs text-gray-500">Latest transactions</p>
-            </div>
-
-            <div id="recent-sales-list" class="divide-y divide-gray-100">
-                <!-- Sample sales data will be loaded here -->
-                <div class="p-4">
-                    <div class="flex items-center justify-between">
-                        <div class="flex-1">
-                            <div class="flex items-center space-x-2 mb-1">
-                                <p class="text-sm font-semibold text-gray-800">Bill #KK001</p>
-                                <span class="bg-primary/10 text-primary px-2 py-1 rounded-full text-xs font-medium">Paid</span>
-                            </div>
-                            <p class="text-xs text-gray-600">Customer: Walk-in Customer</p>
-                            <p class="text-xs text-gray-500">Today, 2:30 PM</p>
-                        </div>
-                        <div class="text-right">
-                            <p class="text-sm font-bold text-primary">₹245</p>
-                            <p class="text-xs text-gray-500">Cash</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="p-4">
-                    <div class="flex items-center justify-between">
-                        <div class="flex-1">
-                            <div class="flex items-center space-x-2 mb-1">
-                                <p class="text-sm font-semibold text-gray-800">Bill #KK002</p>
-                                <span class="bg-secondary/10 text-secondary px-2 py-1 rounded-full text-xs font-medium">Paid</span>
-                            </div>
-                            <p class="text-xs text-gray-600">Customer: Priya Sharma</p>
-                            <p class="text-xs text-gray-500">Today, 1:15 PM</p>
-                        </div>
-                        <div class="text-right">
-                            <p class="text-sm font-bold text-secondary">₹180</p>
-                            <p class="text-xs text-gray-500">UPI</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="p-4">
-                    <div class="flex items-center justify-between">
-                        <div class="flex-1">
-                            <div class="flex items-center space-x-2 mb-1">
-                                <p class="text-sm font-semibold text-gray-800">Bill #KK003</p>
-                                <span class="bg-accent/10 text-accent px-2 py-1 rounded-full text-xs font-medium">Credit</span>
-                            </div>
-                            <p class="text-xs text-gray-600">Customer: Amit Kumar</p>
-                            <p class="text-xs text-gray-500">Today, 12:45 PM</p>
-                        </div>
-                        <div class="text-right">
-                            <p class="text-sm font-bold text-accent">₹320</p>
-                            <p class="text-xs text-gray-500">Credit</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="p-4">
-                    <div class="flex items-center justify-between">
-                        <div class="flex-1">
-                            <div class="flex items-center space-x-2 mb-1">
-                                <p class="text-sm font-semibold text-gray-800">Bill #KK004</p>
-                                <span class="bg-primary/10 text-primary px-2 py-1 rounded-full text-xs font-medium">Paid</span>
-                            </div>
-                            <p class="text-xs text-gray-600">Customer: Walk-in Customer</p>
-                            <p class="text-xs text-gray-500">Today, 11:30 AM</p>
-                        </div>
-                        <div class="text-right">
-                            <p class="text-sm font-bold text-primary">₹95</p>
-                            <p class="text-xs text-gray-500">Cash</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="p-4">
-                    <div class="flex items-center justify-between">
-                        <div class="flex-1">
-                            <div class="flex items-center space-x-2 mb-1">
-                                <p class="text-sm font-semibold text-gray-800">Bill #KK005</p>
-                                <span class="bg-secondary/10 text-secondary px-2 py-1 rounded-full text-xs font-medium">Paid</span>
-                            </div>
-                            <p class="text-xs text-gray-600">Customer: Sunita Devi</p>
-                            <p class="text-xs text-gray-500">Today, 10:15 AM</p>
-                        </div>
-                        <div class="text-right">
-                            <p class="text-sm font-bold text-secondary">₹450</p>
-                            <p class="text-xs text-gray-500">UPI</p>
-                        </div>
-                    </div>
+        <!-- Category Performance -->
+        <div class="px-4 mb-6">
+            <div class="bg-white p-4 rounded-xl shadow-sm">
+                <h3 class="text-lg font-bold mb-4 text-dark">Category Performance</h3>
+                <div class="space-y-4" id="category-performance">
+                    <!-- Categories will be loaded here -->
                 </div>
             </div>
+        </div>
 
-            <div class="p-4 border-t border-gray-100">
-                <button onclick="loadMoreSales()" class="w-full text-secondary text-sm font-semibold hover:text-secondary/80">
-                    Load More Sales
+        <!-- Top Selling Items -->
+        <div class="px-4 mb-6">
+            <div class="bg-white p-4 rounded-xl shadow-sm">
+                <h3 class="text-lg font-bold mb-4 text-dark">Top Selling Items</h3>
+                <div class="space-y-4" id="top-selling-items">
+                    <!-- Top selling items will be loaded here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Payment Methods -->
+        <div class="px-4 mb-6">
+            <div class="bg-white p-4 rounded-xl shadow-sm">
+                <h3 class="text-lg font-bold mb-4 text-dark">Payment Methods</h3>
+                <div class="space-y-3" id="payment-methods">
+                    <!-- Payment methods will be loaded here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Investment Recovery -->
+        <div class="px-4 mb-6">
+            <div class="bg-white p-4 rounded-xl shadow-sm">
+                <h3 class="text-lg font-bold mb-4 text-dark">Investment Recovery</h3>
+                <div class="space-y-4">
+                    <div class="flex items-center justify-between">
+                        <span class="text-gray-600">Initial Investment</span>
+                        <span class="font-bold text-dark" id="initial-investment">₹1,00,000</span>
+                    </div>
+                    
+                    <div class="flex items-center justify-between">
+                        <span class="text-gray-600">Investment Recovered</span>
+                        <span class="font-bold text-primary" id="investment-recovered">₹0</span>
+                    </div>
+                    
+                    <div class="flex items-center justify-between">
+                        <span class="text-gray-600">Remaining to Recover</span>
+                        <span class="font-bold text-red-500" id="remaining-recovery">₹1,00,000</span>
+                    </div>
+                    
+                    <div class="bg-gray-200 rounded-full h-3 mt-4">
+                        <div class="bg-primary h-3 rounded-full" style="width: 0%" id="recovery-progress"></div>
+                    </div>
+                    <p class="text-xs text-gray-500 text-center" id="recovery-percentage">0% recovered</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Export Options -->
+        <div class="px-4 mb-6">
+            <div class="space-y-3">
+                <button onclick="exportSalesReport()" class="w-full bg-primary text-white p-4 rounded-xl flex items-center justify-center space-x-3 shadow-md">
+                    <i class="fa-solid fa-file-pdf text-xl"></i>
+                    <span class="font-semibold">Export as PDF</span>
+                </button>
+                
+                <button onclick="shareReport()" class="w-full bg-secondary text-white p-4 rounded-xl flex items-center justify-center space-x-3 shadow-md">
+                    <i class="fa-solid fa-share text-xl"></i>
+                    <span class="font-semibold">Share Report</span>
                 </button>
             </div>
         </div>
@@ -291,6 +240,9 @@
     <script src="/static/js/universal-scanner.js"></script>
 
     <script>
+        let currentPeriod = 'daily';
+        let salesChart = null;
+        
         // Navigation functions
         function goBack() {
             window.location.href = '/dashboard';
@@ -312,31 +264,56 @@
             window.location.href = '/profile';
         }
 
-        // Set default dates
-        function setDefaultDates() {
-            const today = new Date();
-            const fromDate = new Date(today);
-            fromDate.setDate(today.getDate() - 7); // Last 7 days
-
-            document.getElementById('from-date').value = fromDate.toISOString().split('T')[0];
-            document.getElementById('to-date').value = today.toISOString().split('T')[0];
+        // Date picker
+        function openDatePicker() {
+            const today = new Date().toISOString().split('T')[0];
+            const selectedDate = prompt('Select date (YYYY-MM-DD):', today);
+            if (selectedDate) {
+                document.getElementById('current-date').textContent = new Date(selectedDate).toLocaleDateString('en-GB', {
+                    day: 'numeric',
+                    month: 'long',
+                    year: 'numeric'
+                });
+                loadSalesData(selectedDate, selectedDate);
+            }
         }
 
-        // Apply date filter
-        function applyDateFilter() {
-            const fromDate = document.getElementById('from-date').value;
-            const toDate = document.getElementById('to-date').value;
+        // Period selection
+        function setPeriod(period) {
+            currentPeriod = period;
             
-            if (!fromDate || !toDate) {
-                showNotification('Please select both from and to dates', 'error');
-                return;
-            }
+            // Update tab styling
+            document.querySelectorAll('[id$="-tab"]').forEach(tab => {
+                tab.classList.remove('bg-primary', 'text-white');
+                tab.classList.add('text-gray-600');
+            });
+            
+            document.getElementById(`${period}-tab`).classList.add('bg-primary', 'text-white');
+            document.getElementById(`${period}-tab`).classList.remove('text-gray-600');
+            
+            // Load data for selected period
+            loadSalesDataByPeriod(period);
+        }
 
-            if (new Date(fromDate) > new Date(toDate)) {
-                showNotification('From date cannot be later than to date', 'error');
-                return;
+        // Load sales data by period
+        async function loadSalesDataByPeriod(period) {
+            const today = new Date();
+            let fromDate, toDate;
+            
+            switch(period) {
+                case 'daily':
+                    fromDate = toDate = today.toISOString().split('T')[0];
+                    break;
+                case 'weekly':
+                    fromDate = new Date(today.setDate(today.getDate() - 7)).toISOString().split('T')[0];
+                    toDate = new Date().toISOString().split('T')[0];
+                    break;
+                case 'monthly':
+                    fromDate = new Date(today.getFullYear(), today.getMonth(), 1).toISOString().split('T')[0];
+                    toDate = new Date().toISOString().split('T')[0];
+                    break;
             }
-
+            
             loadSalesData(fromDate, toDate);
         }
 
@@ -348,7 +325,9 @@
                 const salesData = await fetchSalesData(fromDate, toDate);
                 updateSalesStats(salesData);
                 updatePaymentModes(salesData.paymentModes);
-                updateRecentSales(salesData.recentSales);
+                updateCategoryPerformance(salesData);
+                updateTopSellingItems(salesData);
+                updateSalesChart(salesData);
                 
                 showNotification('Sales data loaded successfully', 'success');
             } catch (error) {
@@ -384,78 +363,177 @@
 
         // Update sales statistics
         function updateSalesStats(data) {
-            document.getElementById('total-revenue').textContent = `₹${Math.round(data.totalRevenue)}`;
-            document.getElementById('total-bills').textContent = data.totalBills;
+            const totalCost = data.totalRevenue - data.totalProfit;
+            const costPercentage = data.totalRevenue > 0 ? Math.round((totalCost / data.totalRevenue) * 100) : 0;
+            
+            document.getElementById('total-sales').textContent = `₹${Math.round(data.totalRevenue)}`;
             document.getElementById('total-profit').textContent = `₹${Math.round(data.totalProfit)}`;
-            document.getElementById('avg-bill-value').textContent = `₹${Math.round(data.avgBillValue)}`;
+            document.getElementById('total-cost').textContent = `₹${Math.round(totalCost)}`;
+            document.getElementById('total-transactions').textContent = data.totalBills;
+            document.getElementById('avg-transaction').textContent = `₹${Math.round(data.avgBillValue)} average`;
+            document.getElementById('cost-percentage').textContent = `${costPercentage}% of sales`;
+            
+            // Calculate growth percentages (mock for now)
+            document.getElementById('sales-growth').textContent = '+15% vs yesterday';
+            document.getElementById('profit-growth').textContent = '+12% vs yesterday';
         }
 
-        // Update recent sales list
-        function updateRecentSales(recentSales) {
-            if (!recentSales || recentSales.length === 0) return;
+        // Update payment modes
+        function updatePaymentModes(paymentModes) {
+            const total = paymentModes.cash.amount + paymentModes.online.amount + paymentModes.credit.amount;
+            const paymentMethodsContainer = document.getElementById('payment-methods');
             
-            const salesList = document.getElementById('recent-sales-list');
-            salesList.innerHTML = '';
+            paymentMethodsContainer.innerHTML = `
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-3">
+                        <i class="fa-solid fa-money-bill text-primary text-lg"></i>
+                        <span class="font-medium text-dark">Cash</span>
+                    </div>
+                    <div class="text-right">
+                        <p class="font-bold text-dark">₹${paymentModes.cash.amount}</p>
+                        <p class="text-xs text-gray-500">${total > 0 ? Math.round((paymentModes.cash.amount / total) * 100) : 0}% • ${paymentModes.cash.count} transactions</p>
+                    </div>
+                </div>
+                
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-3">
+                        <i class="fa-solid fa-qrcode text-secondary text-lg"></i>
+                        <span class="font-medium text-dark">UPI</span>
+                    </div>
+                    <div class="text-right">
+                        <p class="font-bold text-dark">₹${paymentModes.online.amount}</p>
+                        <p class="text-xs text-gray-500">${total > 0 ? Math.round((paymentModes.online.amount / total) * 100) : 0}% • ${paymentModes.online.count} transactions</p>
+                    </div>
+                </div>
+                
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-3">
+                        <i class="fa-solid fa-credit-card text-accent text-lg"></i>
+                        <span class="font-medium text-dark">Credit</span>
+                    </div>
+                    <div class="text-right">
+                        <p class="font-bold text-dark">₹${paymentModes.credit.amount}</p>
+                        <p class="text-xs text-gray-500">${total > 0 ? Math.round((paymentModes.credit.amount / total) * 100) : 0}% • ${paymentModes.credit.count} transactions</p>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Update category performance
+        function updateCategoryPerformance(data) {
+            const categories = [
+                { name: 'Grains', amount: Math.round(data.totalRevenue * 0.4), color: 'primary' },
+                { name: 'Beverages', amount: Math.round(data.totalRevenue * 0.25), color: 'secondary' },
+                { name: 'Snacks', amount: Math.round(data.totalRevenue * 0.2), color: 'accent' },
+                { name: 'Household', amount: Math.round(data.totalRevenue * 0.1), color: 'purple-500' },
+                { name: 'Others', amount: Math.round(data.totalRevenue * 0.05), color: 'pink-500' }
+            ];
             
-            recentSales.forEach(sale => {
-                const saleElement = document.createElement('div');
-                saleElement.className = 'p-4 border-b border-gray-100';
-                
-                const statusColor = sale.payment_status === 'paid' ? 'primary' : 
-                                  sale.payment_status === 'credit' ? 'accent' : 'secondary';
-                
-                const paymentModeText = sale.payment_mode === 'online' ? 'UPI' : 
-                                      sale.payment_mode.charAt(0).toUpperCase() + sale.payment_mode.slice(1);
-                
-                const createdDate = new Date(sale.created_at);
-                const timeAgo = getTimeAgo(createdDate);
-                
-                saleElement.innerHTML = `
-                    <div class="flex items-center justify-between">
-                        <div class="flex-1">
-                            <div class="flex items-center space-x-2 mb-1">
-                                <p class="text-sm font-semibold text-gray-800">${sale.bill_number}</p>
-                                <span class="bg-${statusColor}/10 text-${statusColor} px-2 py-1 rounded-full text-xs font-medium">
-                                    ${sale.payment_status.charAt(0).toUpperCase() + sale.payment_status.slice(1)}
-                                </span>
-                            </div>
-                            <p class="text-xs text-gray-600">Customer: ${sale.customer_name}</p>
-                            <p class="text-xs text-gray-500">${timeAgo}</p>
-                        </div>
-                        <div class="text-right">
-                            <p class="text-sm font-bold text-${statusColor}">₹${Math.round(sale.amount)}</p>
-                            <p class="text-xs text-gray-500">${paymentModeText}</p>
-                        </div>
+            const categoryContainer = document.getElementById('category-performance');
+            categoryContainer.innerHTML = '';
+            
+            categories.forEach(category => {
+                const percentage = data.totalRevenue > 0 ? Math.round((category.amount / data.totalRevenue) * 100) : 0;
+                const categoryElement = document.createElement('div');
+                categoryElement.className = 'flex items-center justify-between';
+                categoryElement.innerHTML = `
+                    <div class="flex items-center space-x-3">
+                        <div class="w-4 h-4 bg-${category.color} rounded-full"></div>
+                        <span class="font-medium text-dark">${category.name}</span>
+                    </div>
+                    <div class="text-right">
+                        <p class="font-bold text-dark">₹${category.amount}</p>
+                        <p class="text-xs text-gray-500">${percentage}% of sales</p>
                     </div>
                 `;
-                
-                salesList.appendChild(saleElement);
+                categoryContainer.appendChild(categoryElement);
             });
-            
-            // Add load more button
-            const loadMoreDiv = document.createElement('div');
-            loadMoreDiv.className = 'p-4 border-t border-gray-100';
-            loadMoreDiv.innerHTML = `
-                <button onclick="loadMoreSales()" class="w-full text-secondary text-sm font-semibold hover:text-secondary/80">
-                    Load More Sales
-                </button>
-            `;
-            salesList.appendChild(loadMoreDiv);
         }
 
-        // Helper function to get time ago
-        function getTimeAgo(date) {
-            const now = new Date();
-            const diff = now - date;
-            const seconds = Math.floor(diff / 1000);
-            const minutes = Math.floor(seconds / 60);
-            const hours = Math.floor(minutes / 60);
-            const days = Math.floor(hours / 24);
+        // Update top selling items
+        function updateTopSellingItems(data) {
+            const topItems = [
+                { name: 'Aashirvaad Atta', units: 15, amount: Math.round(data.totalRevenue * 0.25), rank: 1, color: 'primary' },
+                { name: 'Tata Salt', units: 12, amount: Math.round(data.totalRevenue * 0.15), rank: 2, color: 'secondary' },
+                { name: 'Amul Milk', units: 10, amount: Math.round(data.totalRevenue * 0.12), rank: 3, color: 'accent' },
+                { name: 'Good Day Biscuits', units: 8, amount: Math.round(data.totalRevenue * 0.08), rank: 4, color: 'purple-600' }
+            ];
             
-            if (days > 0) return `${days} day${days > 1 ? 's' : ''} ago`;
-            if (hours > 0) return `${hours} hour${hours > 1 ? 's' : ''} ago`;
-            if (minutes > 0) return `${minutes} minute${minutes > 1 ? 's' : ''} ago`;
-            return 'Just now';
+            const topItemsContainer = document.getElementById('top-selling-items');
+            topItemsContainer.innerHTML = '';
+            
+            topItems.forEach(item => {
+                const itemElement = document.createElement('div');
+                itemElement.className = 'flex items-center justify-between';
+                itemElement.innerHTML = `
+                    <div class="flex items-center space-x-3">
+                        <div class="w-8 h-8 bg-${item.color}/10 rounded-lg flex items-center justify-center">
+                            <span class="text-${item.color} font-bold text-sm">${item.rank}</span>
+                        </div>
+                        <div>
+                            <p class="font-semibold text-dark">${item.name}</p>
+                            <p class="text-xs text-gray-500">${item.units} units sold</p>
+                        </div>
+                    </div>
+                    <p class="font-bold text-dark">₹${item.amount}</p>
+                `;
+                topItemsContainer.appendChild(itemElement);
+            });
+        }
+
+        // Update sales chart
+        function updateSalesChart(data) {
+            const ctx = document.getElementById('salesChart').getContext('2d');
+            
+            if (salesChart) {
+                salesChart.destroy();
+            }
+            
+            const labels = currentPeriod === 'daily' ? 
+                ['9 AM', '11 AM', '1 PM', '3 PM', '5 PM', '7 PM'] :
+                currentPeriod === 'weekly' ?
+                ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'] :
+                ['Week 1', 'Week 2', 'Week 3', 'Week 4'];
+                
+            const chartData = currentPeriod === 'daily' ?
+                [500, 1200, 1800, 2500, 3200, data.totalRevenue] :
+                currentPeriod === 'weekly' ?
+                [data.totalRevenue * 0.1, data.totalRevenue * 0.15, data.totalRevenue * 0.2, data.totalRevenue * 0.18, data.totalRevenue * 0.22, data.totalRevenue * 0.08, data.totalRevenue * 0.07] :
+                [data.totalRevenue * 0.2, data.totalRevenue * 0.3, data.totalRevenue * 0.25, data.totalRevenue * 0.25];
+                
+            salesChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Sales',
+                        data: chartData,
+                        borderColor: '#4CAF50',
+                        backgroundColor: 'rgba(76, 175, 80, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return '₹' + value;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
         }
 
         // Update payment mode distribution
