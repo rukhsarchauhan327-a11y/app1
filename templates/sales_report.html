@@ -259,7 +259,7 @@
         }
 
         // Current period for data filtering
-        let currentPeriod = 'daily';
+        let currentPeriod = 'weekly';
         
         // Set period and update data
         async function setPeriod(period) {
@@ -272,8 +272,29 @@
             
             document.getElementById(`${period}-tab`).className = 'flex-1 py-3 text-center bg-primary text-white rounded-lg font-semibold';
             
+            // Update chart title based on period
+            updateChartTitle(period);
+            
             // Load data based on selected period
             await loadPeriodData(period);
+        }
+        
+        // Update chart title based on selected period
+        function updateChartTitle(period) {
+            const chartTitle = document.getElementById('chart-title');
+            switch(period) {
+                case 'daily':
+                    chartTitle.textContent = 'Today\'s Investment vs Profit Analysis';
+                    break;
+                case 'weekly':
+                    chartTitle.textContent = '7-Day Investment vs Profit Analysis';
+                    break;
+                case 'monthly':
+                    chartTitle.textContent = '30-Day Investment vs Profit Analysis';
+                    break;
+                default:
+                    chartTitle.textContent = 'Investment vs Profit Analysis';
+            }
         }
         
         // Load data for specific period
@@ -310,6 +331,7 @@
         
         // Load 7-day sales data (default)
         async function load7DaySalesData() {
+            updateChartTitle('weekly');
             await loadPeriodData('weekly');
         }
 
