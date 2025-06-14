@@ -169,15 +169,7 @@
             </div>
         </div>
 
-        <!-- Recent Sales -->
-        <div class="px-4 mb-6">
-            <div class="bg-white p-4 rounded-xl shadow-sm">
-                <h3 class="text-lg font-bold mb-4 text-dark">Recent Sales</h3>
-                <div class="max-h-80 overflow-y-auto space-y-2" id="recent-sales">
-                    <!-- Recent sales will be loaded here -->
-                </div>
-            </div>
-        </div>
+
 
 
 
@@ -674,43 +666,7 @@
             });
         }
         
-        // Update recent sales
-        function updateRecentSales(recentSales) {
-            const salesContainer = document.getElementById('recent-sales');
-            salesContainer.innerHTML = '';
-            
-            if (!recentSales || recentSales.length === 0) {
-                salesContainer.innerHTML = '<p class="text-gray-500 text-center">No recent sales data available</p>';
-                return;
-            }
-            
-            recentSales.slice(0, 8).forEach(sale => {
-                const saleElement = document.createElement('div');
-                saleElement.className = 'flex items-center justify-between p-3 hover:bg-gray-50 rounded-lg cursor-pointer';
-                saleElement.onclick = () => window.location.href = `/receipt?bill_number=${sale.bill_number}`;
-                
-                const statusColor = sale.payment_status === 'paid' ? 'text-green-600' : 'text-orange-600';
-                const paymentIcon = sale.payment_mode === 'cash' ? 'fa-money-bill' : 
-                                  sale.payment_mode === 'credit' ? 'fa-credit-card' : 'fa-mobile-alt';
-                
-                saleElement.innerHTML = `
-                    <div class="flex items-center space-x-3">
-                        <div class="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center">
-                            <i class="fas ${paymentIcon} text-gray-600"></i>
-                        </div>
-                        <div>
-                            <p class="font-semibold">${sale.bill_number}</p>
-                            <p class="text-xs text-gray-500">${sale.customer_name || 'Walk-in Customer'}</p>
-                        </div>
-                    </div>
-                    <div class="text-right">
-                        <p class="font-bold">₹${Math.round(sale.amount)}</p>
-                        <p class="text-xs ${statusColor}">${sale.payment_status}</p>
-                    </div>
-                `;
-                salesContainer.appendChild(saleElement);
-            });
-        }
+
         
 
 
@@ -825,14 +781,13 @@
             updateSalesChart(data, period);
             updateTopSellingItems(data.topItems || []);
             updateCategoryBreakdown(data.categories || []);
-            updateRecentSales(data.recentSales || []);
             updateInvestmentRecovery(data);
             setCurrentDate();
         }
         
         // Show loading state
         function showLoadingState() {
-            const loadingElements = document.querySelectorAll('.metric-card, #top-selling-items, #category-breakdown, #recent-sales');
+            const loadingElements = document.querySelectorAll('.metric-card, #top-selling-items, #category-breakdown');
             loadingElements.forEach(el => {
                 el.style.opacity = '0.5';
                 el.style.pointerEvents = 'none';
@@ -841,7 +796,7 @@
         
         // Hide loading state
         function hideLoadingState() {
-            const loadingElements = document.querySelectorAll('.metric-card, #top-selling-items, #category-breakdown, #recent-sales');
+            const loadingElements = document.querySelectorAll('.metric-card, #top-selling-items, #category-breakdown');
             loadingElements.forEach(el => {
                 el.style.opacity = '1';
                 el.style.pointerEvents = 'auto';
