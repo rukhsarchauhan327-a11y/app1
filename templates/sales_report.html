@@ -366,7 +366,7 @@
             document.getElementById('total-cost').textContent = `₹${Math.round(totalInvestment)}`;
             
             // Remove percentage from cost card as requested
-            document.getElementById('cost-percentage').textContent = 'Cost of goods sold';
+            document.getElementById('cost-percentage').textContent = '';
             
             // Update Investment Recovery section with dynamic investment
             const combinedInvestment = data.totalCombinedInvestment || 0;  // Dynamic - Updates with refilling
@@ -379,10 +379,9 @@
             document.getElementById('recovery-progress').style.width = `${Math.min(100, recoveryPercentage)}%`;
             document.getElementById('recovery-percentage').textContent = `${recoveryPercentage}% recovered`;
             
-            // Update growth indicators with profit percentage
-            const profitPercentage = data.profitPercentage || 0;
-            document.getElementById('sales-growth').textContent = `${profitPercentage}% profit margin`;
-            document.getElementById('profit-growth').textContent = `Period: ${data.period || 'weekly'}`;
+            // Update growth indicators without percentages
+            document.getElementById('sales-growth').textContent = `Sales for ${data.period || 'weekly'}`;
+            document.getElementById('profit-growth').textContent = `Profit for ${data.period || 'weekly'}`;
         }
 
 
