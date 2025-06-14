@@ -1261,29 +1261,7 @@ def api_sales_data():
         # Calculate statistics
         total_revenue = sum(bill.total_amount for bill in bills)
         total_bills = len(bills)
-        
-        # Calculate profit
-        total_cost = 0
-        total_actual_revenue = 0
-        
-        for bill in bills:
-            bill_items = BillItem.query.filter_by(bill_id=bill.id).all()
-            for item in bill_items:
-                product = Product.query.filter_by(name=item.item_name).first()
-                if product and product.cost_price > 0:
-                    if product.is_weight_based and item.weight:
-                        item_cost = (product.cost_price / 1000) * item.weight if product.price_per_kg else product.cost_price * item.quantity
-                    else:
-                        item_cost = product.cost_price * item.quantity
-                    total_cost += item_cost
-                    total_actual_revenue += item.total_price
-                elif product:
-                    # Estimate cost as 65% of selling price
-                    item_cost = item.unit_price * 0.65 * item.quantity
-                    total_cost += item_cost
-                    total_actual_revenue += item.total_price
-        
-        total_profit = total_actual_revenue - total_cost
+        total_profit = 0
         
         # Payment mode distribution
         payment_modes = {
@@ -1316,7 +1294,20 @@ def api_sales_data():
             bill_profit = 0
             
             for item in bill_items:
+                # Try exact match first
                 product = Product.query.filter_by(name=item.item_name).first()
+                
+                # If no exact match, try partial match
+                if not product:
+                    product = Product.query.filter(Product.name.ilike(f'%{item.item_name}%')).first()
+                
+                # If still no match, try reverse partial match
+                if not product:
+                    for p in Product.query.all():
+                        if item.item_name.lower() in p.name.lower() or p.name.lower() in item.item_name.lower():
+                            product = p
+                            break
+                
                 if product:
                     # Calculate investment and profit for this item
                     item_investment = (product.cost_price or 0) * item.quantity
@@ -1358,6 +1349,7 @@ def api_sales_data():
             })
             
             total_investment += bill_investment
+            total_profit += bill_profit
         
         # Process chart data based on period
         from collections import defaultdict
