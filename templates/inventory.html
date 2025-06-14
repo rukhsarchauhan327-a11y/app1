@@ -5,434 +5,483 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Inventory - Kirana Konnect</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        .font-poppins { font-family: 'Poppins', sans-serif; }
-        .text-primary { color: #10B981; }
-        .bg-primary { background-color: #10B981; }
-        .text-accent { color: #F59E0B; }
-        .bg-accent { background-color: #F59E0B; }
-        .text-danger { color: #EF4444; }
-        .bg-danger { background-color: #EF4444; }
-        .text-dark { color: #1F2937; }
-        .bg-primary-dark { background-color: #059669; }
+    <script> window.FontAwesomeConfig = { autoReplaceSvg: 'nest'};</script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://unpkg.com/@zxing/library@latest"></script>
+    <style>::-webkit-scrollbar { display: none;}</style>
+    
+    <script>tailwind.config = {
+  "theme": {
+    "extend": {
+      "colors": {
+        "primary": "#4CAF50",
+        "secondary": "#2196F3",
+        "accent": "#FF9800",
+        "danger": "#F44336",
+        "dark": "#333333",
+        "light": "#F5F5F5"
+      },
+      "fontFamily": {
+        "poppins": [
+          "Poppins",
+          "sans-serif"
+        ],
+        "sans": [
+          "Inter",
+          "sans-serif"
+        ]
+      }
+    }
+  }
+};</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;500;600;700;800;900&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap">
+<style>
+      body {
+        font-family: 'Inter', sans-serif !important;
+      }
+      
+      /* Preserve Font Awesome icons */
+      .fa, .fas, .far, .fal, .fab {
+        font-family: "Font Awesome 6 Free", "Font Awesome 6 Brands" !important;
+      }
     </style>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        primary: '#10B981',
-                        accent: '#F59E0B',
-                        danger: '#EF4444',
-                        dark: '#1F2937'
-                    }
-                }
-            }
-        }
-    </script>
 </head>
 
 <body class="font-poppins bg-gray-50">
     <!-- Header Section -->
-    <header id="header" class="bg-white shadow-sm fixed top-0 left-0 right-0 z-10">
+    <header class="bg-white shadow-sm fixed top-0 left-0 right-0 z-20">
         <div class="flex items-center justify-between p-4">
-            <button class="p-2 hover:bg-gray-100 rounded-lg transition-colors" onclick="goBack()">
-                <i class="fa-solid fa-arrow-left text-gray-600 text-lg"></i>
+            <button class="p-2 rounded-full hover:bg-gray-100" onclick="goBack()">
+                <i class="fa-solid fa-arrow-left text-dark text-lg"></i>
             </button>
-            <h1 class="text-xl font-bold text-dark">Inventory</h1>
-            <button class="p-2 hover:bg-gray-100 rounded-lg transition-colors" onclick="openSearch()">
-                <i class="fa-solid fa-search text-gray-600 text-lg"></i>
+            <div class="text-center">
+                <h1 class="text-lg font-bold text-dark">Inventory</h1>
+                <p class="text-xs text-gray-500">Product Management</p>
+            </div>
+            <button class="p-2 rounded-full hover:bg-gray-100" onclick="openSearch()">
+                <i class="fa-solid fa-search text-dark text-lg"></i>
             </button>
         </div>
     </header>
 
-    <!-- Inventory Stats Header -->
-    <div id="inventory-stats" class="bg-white px-4 py-3 mt-16 shadow-sm border-b">
-        <div class="grid grid-cols-4 gap-2">
-            <div class="text-center cursor-pointer hover:bg-gray-50 p-2 rounded-lg transition-colors" onclick="filterBy('all')">
-                <p class="text-2xl font-bold text-dark" id="total-products">0</p>
-                <p class="text-xs text-gray-500">Total Products</p>
-            </div>
-            <div class="text-center cursor-pointer hover:bg-gray-50 p-2 rounded-lg transition-colors" onclick="filterBy('available')">
-                <p class="text-2xl font-bold text-primary" id="available-products">0</p>
-                <p class="text-xs text-gray-500">Available</p>
-            </div>
-            <div class="text-center cursor-pointer hover:bg-gray-50 p-2 rounded-lg transition-colors" onclick="filterBy('low-stock')">
-                <p class="text-2xl font-bold text-accent" id="low-stock-products">0</p>
-                <p class="text-xs text-gray-500">Low Stock</p>
-            </div>
-            <div class="text-center cursor-pointer hover:bg-gray-50 p-2 rounded-lg transition-colors" onclick="filterBy('expired')">
-                <p class="text-2xl font-bold text-danger" id="expired-products">0</p>
-                <p class="text-xs text-gray-500">Expired</p>
-            </div>
-        </div>
-    </div>
-
     <!-- Filter Tabs -->
-    <div class="bg-white px-4 py-3 border-b">
-        <div class="flex space-x-2 overflow-x-auto">
-            <button class="category-btn bg-primary text-white px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap" onclick="filterByCategory('all')" data-category="all">All</button>
-            <button class="category-btn bg-gray-100 text-gray-600 px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap" onclick="filterByCategory('staples')" data-category="staples">Staples</button>
-            <button class="category-btn bg-gray-100 text-gray-600 px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap" onclick="filterByCategory('beverages')" data-category="beverages">Beverages</button>
-            <button class="category-btn bg-gray-100 text-gray-600 px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap" onclick="filterByCategory('snacks')" data-category="snacks">Snacks</button>
-            <button class="category-btn bg-gray-100 text-gray-600 px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap" onclick="filterByCategory('dairy')" data-category="dairy">Dairy</button>
+    <div class="bg-white mt-16 px-4 py-3 border-b sticky top-16 z-10">
+        <div class="flex space-x-3 overflow-x-auto pb-1">
+            <button class="filter-btn px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap bg-primary text-white" data-filter="all" onclick="filterProducts('all')">
+                All
+            </button>
+            <button class="filter-btn px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap bg-gray-100 text-gray-600" data-filter="staples" onclick="filterProducts('staples')">
+                Staples
+            </button>
+            <button class="filter-btn px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap bg-gray-100 text-gray-600" data-filter="oils" onclick="filterProducts('oils')">
+                Oils
+            </button>
+            <button class="filter-btn px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap bg-gray-100 text-gray-600" data-filter="spices" onclick="filterProducts('spices')">
+                Spices
+            </button>
+            <button class="filter-btn px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap bg-gray-100 text-gray-600" data-filter="snacks" onclick="filterProducts('snacks')">
+                Snacks
+            </button>
+            <button class="filter-btn px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap bg-gray-100 text-gray-600" data-filter="expired" onclick="filterProducts('expired')">
+                Expired
+            </button>
         </div>
     </div>
 
     <!-- Main Content -->
-    <main class="px-4 pt-4 pb-20">
-        <div id="inventory-items" class="space-y-3">
-            <!-- Products will be loaded here -->
+    <main class="px-4 pt-4 pb-20 min-h-screen">
+        <!-- Weight-Based Item - Wheat Flour -->
+        <div class="bg-white rounded-xl p-4 shadow-sm border hover:shadow-md transition-shadow cursor-pointer mb-4" data-category="staples" data-status="low-stock" onclick="viewProductDetails('item-1')">
+            <div class="flex items-center space-x-4">
+                <div class="w-16 h-16 rounded-xl overflow-hidden">
+                    <img class="w-full h-full object-cover" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/ad8aa6cee1-b621e3cd72c9ea714c53.png" alt="wheat flour sack for grocery store">
+                </div>
+                <div class="flex-1">
+                    <div class="flex items-start justify-between">
+                        <div class="flex-1">
+                            <h3 class="font-bold text-dark text-lg">Wheat Flour</h3>
+                            <div class="text-xs text-gray-500 mt-1">
+                                <p>MFG: 10 Jan 2025</p>
+                                <p>EXP: 10 Jan 2026</p>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <span class="bg-danger text-white text-xs px-2 py-1 rounded-full font-semibold">Low Stock</span>
+                            <p class="text-lg font-bold text-primary mt-2">₹50/Kg</p>
+                            <p class="text-sm text-gray-600">100 Kg</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center justify-end space-x-2 mt-3">
+                        <button class="p-2 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors" onclick="event.stopPropagation(); refillItem('item-1')" title="Refill Stock">
+                            <i class="fa-solid fa-plus text-blue-600 text-sm"></i>
+                        </button>
+                        <button class="p-2 bg-green-50 hover:bg-green-100 rounded-lg transition-colors" onclick="event.stopPropagation(); addToCart('item-1')" title="Add to Cart">
+                            <i class="fa-solid fa-shopping-cart text-green-600 text-sm"></i>
+                        </button>
+                        <button class="p-2 bg-red-50 hover:bg-red-100 rounded-lg transition-colors" onclick="event.stopPropagation(); deleteItem('item-1')" title="Delete Item">
+                            <i class="fa-solid fa-trash text-red-600 text-sm"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottle-Based Item - Coconut Oil -->
+        <div class="bg-white rounded-xl p-4 shadow-sm border hover:shadow-md transition-shadow cursor-pointer mb-4" data-category="oils" data-status="available" onclick="viewProductDetails('item-2')">
+            <div class="flex items-center space-x-4">
+                <div class="w-16 h-16 rounded-xl overflow-hidden">
+                    <img class="w-full h-full object-cover" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/02cda64d32-ca63fc32eaab87b7db4c.png" alt="coconut oil bottle product packaging">
+                </div>
+                <div class="flex-1">
+                    <div class="flex items-start justify-between">
+                        <div class="flex-1">
+                            <h3 class="font-bold text-dark text-lg">Coconut Oil</h3>
+                            <div class="text-xs text-gray-500 mt-1">
+                                <p>MFG: 15 Feb 2025</p>
+                                <p>EXP: 15 Feb 2026</p>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <span class="bg-primary text-white text-xs px-2 py-1 rounded-full font-semibold">In Stock</span>
+                            <p class="text-lg font-bold text-primary mt-2">₹180/Bottle</p>
+                            <p class="text-sm text-gray-600">25 Bottles</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center justify-end space-x-2 mt-3">
+                        <button class="p-2 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors" onclick="event.stopPropagation(); refillItem('item-2')" title="Refill Stock">
+                            <i class="fa-solid fa-plus text-blue-600 text-sm"></i>
+                        </button>
+                        <button class="p-2 bg-green-50 hover:bg-green-100 rounded-lg transition-colors" onclick="event.stopPropagation(); addToCart('item-2')" title="Add to Cart">
+                            <i class="fa-solid fa-shopping-cart text-green-600 text-sm"></i>
+                        </button>
+                        <button class="p-2 bg-red-50 hover:bg-red-100 rounded-lg transition-colors" onclick="event.stopPropagation(); deleteItem('item-2')" title="Delete Item">
+                            <i class="fa-solid fa-trash text-red-600 text-sm"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Packet-Based Item - Red Lentils -->
+        <div class="bg-white rounded-xl p-4 shadow-sm border hover:shadow-md transition-shadow cursor-pointer mb-4" data-category="staples" data-status="available" onclick="viewProductDetails('item-3')">
+            <div class="flex items-center space-x-4">
+                <div class="w-16 h-16 rounded-xl overflow-hidden">
+                    <img class="w-full h-full object-cover" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/7ba24e6b64-555ac20dd8e6ac56d0e8.png" alt="red lentils dal package for store">
+                </div>
+                <div class="flex-1">
+                    <div class="flex items-start justify-between">
+                        <div class="flex-1">
+                            <h3 class="font-bold text-dark text-lg">Red Lentils (Dal)</h3>
+                            <div class="text-xs text-gray-500 mt-1">
+                                <p>MFG: 20 Mar 2025</p>
+                                <p>EXP: 20 Mar 2026</p>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <span class="bg-primary text-white text-xs px-2 py-1 rounded-full font-semibold">In Stock</span>
+                            <p class="text-lg font-bold text-primary mt-2">₹120/Kg</p>
+                            <p class="text-sm text-gray-600">50 Kg</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center justify-end space-x-2 mt-3">
+                        <button class="p-2 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors" onclick="event.stopPropagation(); refillItem('item-3')" title="Refill Stock">
+                            <i class="fa-solid fa-plus text-blue-600 text-sm"></i>
+                        </button>
+                        <button class="p-2 bg-green-50 hover:bg-green-100 rounded-lg transition-colors" onclick="event.stopPropagation(); addToCart('item-3')" title="Add to Cart">
+                            <i class="fa-solid fa-shopping-cart text-green-600 text-sm"></i>
+                        </button>
+                        <button class="p-2 bg-red-50 hover:bg-red-100 rounded-lg transition-colors" onclick="event.stopPropagation(); deleteItem('item-3')" title="Delete Item">
+                            <i class="fa-solid fa-trash text-red-600 text-sm"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Spice Item - Turmeric Powder -->
+        <div class="bg-white rounded-xl p-4 shadow-sm border hover:shadow-md transition-shadow cursor-pointer mb-4" data-category="spices" data-status="available" onclick="viewProductDetails('item-4')">
+            <div class="flex items-center space-x-4">
+                <div class="w-16 h-16 rounded-xl overflow-hidden">
+                    <img class="w-full h-full object-cover" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/5a8b9c7e12-332a1b4c5d6e7f8a9b0c.png" alt="turmeric powder spice package">
+                </div>
+                <div class="flex-1">
+                    <div class="flex items-start justify-between">
+                        <div class="flex-1">
+                            <h3 class="font-bold text-dark text-lg">Turmeric Powder</h3>
+                            <div class="text-xs text-gray-500 mt-1">
+                                <p>MFG: 05 Apr 2025</p>
+                                <p>EXP: 05 Apr 2026</p>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <span class="bg-primary text-white text-xs px-2 py-1 rounded-full font-semibold">In Stock</span>
+                            <p class="text-lg font-bold text-primary mt-2">₹200/Kg</p>
+                            <p class="text-sm text-gray-600">15 Kg</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center justify-end space-x-2 mt-3">
+                        <button class="p-2 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors" onclick="event.stopPropagation(); refillItem('item-4')" title="Refill Stock">
+                            <i class="fa-solid fa-plus text-blue-600 text-sm"></i>
+                        </button>
+                        <button class="p-2 bg-green-50 hover:bg-green-100 rounded-lg transition-colors" onclick="event.stopPropagation(); addToCart('item-4')" title="Add to Cart">
+                            <i class="fa-solid fa-shopping-cart text-green-600 text-sm"></i>
+                        </button>
+                        <button class="p-2 bg-red-50 hover:bg-red-100 rounded-lg transition-colors" onclick="event.stopPropagation(); deleteItem('item-4')" title="Delete Item">
+                            <i class="fa-solid fa-trash text-red-600 text-sm"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Snack Item - Biscuits -->
+        <div class="bg-white rounded-xl p-4 shadow-sm border hover:shadow-md transition-shadow cursor-pointer mb-4" data-category="snacks" data-status="expired" onclick="viewProductDetails('item-5')">
+            <div class="flex items-center space-x-4">
+                <div class="w-16 h-16 rounded-xl overflow-hidden">
+                    <img class="w-full h-full object-cover" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/1f2e3d4c5b-998877665544332211aa.png" alt="biscuit packet snack item">
+                </div>
+                <div class="flex-1">
+                    <div class="flex items-start justify-between">
+                        <div class="flex-1">
+                            <h3 class="font-bold text-dark text-lg">Digestive Biscuits</h3>
+                            <div class="text-xs text-gray-500 mt-1">
+                                <p>MFG: 01 Jan 2025</p>
+                                <p>EXP: 01 May 2025</p>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <span class="bg-danger text-white text-xs px-2 py-1 rounded-full font-semibold">Expired</span>
+                            <p class="text-lg font-bold text-primary mt-2">₹45/Packet</p>
+                            <p class="text-sm text-gray-600">12 Packets</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center justify-end space-x-2 mt-3">
+                        <button class="p-2 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors" onclick="event.stopPropagation(); refillItem('item-5')" title="Refill Stock">
+                            <i class="fa-solid fa-plus text-blue-600 text-sm"></i>
+                        </button>
+                        <button class="p-2 bg-green-50 hover:bg-green-100 rounded-lg transition-colors" onclick="event.stopPropagation(); addToCart('item-5')" title="Add to Cart">
+                            <i class="fa-solid fa-shopping-cart text-green-600 text-sm"></i>
+                        </button>
+                        <button class="p-2 bg-red-50 hover:bg-red-100 rounded-lg transition-colors" onclick="event.stopPropagation(); deleteItem('item-5')" title="Delete Item">
+                            <i class="fa-solid fa-trash text-red-600 text-sm"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
         </div>
     </main>
 
-    <!-- Floating Action Button -->
-    <div class="fixed bottom-20 right-4 z-20">
-        <button class="bg-primary text-white w-14 h-14 rounded-full shadow-lg hover:bg-primary-dark transition-colors flex items-center justify-center" onclick="window.location.href='/add-item'">
-            <i class="fa-solid fa-plus text-xl"></i>
-        </button>
-    </div>
-
-    <!-- Navigation -->
-    <nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-4 py-2 z-10">
-        <div class="flex justify-around">
-            <button class="flex flex-col items-center p-2 text-gray-400" onclick="window.location.href='/dashboard'">
-                <i class="fa-solid fa-house text-xl mb-1"></i>
-                <span class="text-xs mt-1">Home</span>
+    <!-- Bottom Navigation -->
+    <nav class="fixed bottom-0 left-0 right-0 bg-white border-t z-30">
+        <div class="flex justify-around items-end py-2">
+            <button onclick="goToDashboard()" class="flex flex-col items-center py-1 px-3">
+                <i class="fa-solid fa-home text-gray-400 text-xl"></i>
+                <span class="text-xs mt-1 text-gray-400">Home</span>
             </button>
-            <button class="flex flex-col items-center p-2 text-primary" onclick="window.location.href='/inventory'">
-                <i class="fa-solid fa-boxes-stacked text-xl mb-1"></i>
-                <span class="text-xs mt-1">Inventory</span>
+            <button onclick="goToInventory()" class="flex flex-col items-center py-1 px-3">
+                <i class="fa-solid fa-box text-primary text-xl"></i>
+                <span class="text-xs mt-1 text-primary font-semibold">Inventory</span>
             </button>
-            <button class="flex flex-col items-center p-2 text-gray-400 relative" onclick="window.location.href='/cart'">
-                <i class="fa-solid fa-shopping-cart text-xl mb-1"></i>
-                <span class="text-xs mt-1">Cart</span>
-                <div id="cart-badge" class="absolute -top-1 -right-1 bg-danger text-white text-xs rounded-full h-5 w-5 flex items-center justify-center" style="display: none;">0</div>
+            <button onclick="openScanner()" class="relative -top-4 bg-primary rounded-full p-4 shadow-lg">
+                <i class="fa-solid fa-barcode text-white text-xl"></i>
             </button>
-            <button class="flex flex-col items-center p-2 text-gray-400" onclick="window.location.href='/profile'">
-                <i class="fa-solid fa-user text-xl mb-1"></i>
-                <span class="text-xs mt-1">Profile</span>
+            <button onclick="goToCart()" class="flex flex-col items-center py-1 px-3 relative">
+                <i class="fa-solid fa-shopping-cart text-gray-400 text-xl"></i>
+                <span class="text-xs mt-1 text-gray-400">Cart</span>
+                <span class="absolute -top-1 -right-1 bg-danger text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold">7</span>
+            </button>
+            <button onclick="goToProfile()" class="flex flex-col items-center py-1 px-3">
+                <i class="fa-solid fa-user text-gray-400 text-xl"></i>
+                <span class="text-xs mt-1 text-gray-400">Profile</span>
             </button>
         </div>
     </nav>
 
     <!-- Search Modal -->
     <div id="search-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden">
-        <div class="absolute inset-0 flex items-start justify-center pt-16">
-            <div class="bg-white w-full max-w-md mx-4 rounded-lg shadow-lg">
-                <div class="p-4 border-b">
-                    <div class="flex items-center space-x-3">
-                        <i class="fa-solid fa-search text-gray-400"></i>
-                        <input type="text" id="search-input" placeholder="Search products..." class="flex-1 outline-none text-lg">
-                        <button onclick="closeSearch()" class="text-gray-400 hover:text-gray-600">
+        <div class="bg-white h-full">
+            <div class="sticky top-0 bg-white border-b z-10">
+                <div class="flex items-center space-x-3 p-4">
+                    <button onclick="closeSearch()" class="p-2 hover:bg-gray-100 rounded-lg">
+                        <i class="fa-solid fa-arrow-left text-gray-600"></i>
+                    </button>
+                    <div class="flex-1 relative">
+                        <input type="text" id="search-input" placeholder="Search products to add..." class="w-full px-4 py-3 border border-gray-300 rounded-lg text-sm">
+                        <button onclick="clearSearch()" class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600">
                             <i class="fa-solid fa-times"></i>
                         </button>
                     </div>
+                    <button onclick="openScanner()" class="p-2 bg-primary text-white rounded-lg hover:bg-primary-dark">
+                        <i class="fa-solid fa-barcode"></i>
+                    </button>
                 </div>
-                <div id="search-results" class="max-h-64 overflow-y-auto p-4">
+            </div>
+            <div class="flex-1 bg-white px-4 pb-4 overflow-y-auto">
+                <div id="search-results" class="space-y-3">
                     <!-- Search results will appear here -->
                 </div>
-                <div id="search-empty" class="text-center py-8 text-gray-500 hidden">
-                    <i class="fa-solid fa-search text-4xl mb-2"></i>
-                    <p>No products found</p>
+                <div id="search-empty" class="text-center py-12 hidden">
+                    <i class="fa-solid fa-search text-gray-300 text-4xl mb-4"></i>
+                    <p class="text-gray-500">No products found</p>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Notification -->
-    <div id="notification" class="fixed top-20 left-4 right-4 bg-green-500 text-white px-4 py-3 rounded-lg shadow-lg transform -translate-y-full transition-transform duration-300 z-50">
-        <div class="flex items-center justify-between">
-            <span id="notification-text">Notification message</span>
-            <button onclick="hideNotification()" class="text-white">
-                <i class="fa-solid fa-times"></i>
-            </button>
+    <!-- Scanner Modal -->
+    <div id="scanner-modal" class="fixed inset-0 bg-black bg-opacity-90 z-50 hidden">
+        <div class="fixed inset-0 flex flex-col">
+            <div class="bg-black text-white p-4">
+                <div class="flex items-center justify-between">
+                    <button onclick="closeScanner()" class="p-2 hover:bg-gray-800 rounded-lg">
+                        <i class="fa-solid fa-times text-white"></i>
+                    </button>
+                    <h2 class="text-lg font-semibold">Scan to Add Product</h2>
+                    <button onclick="toggleFlashlight()" class="p-2 hover:bg-gray-800 rounded-lg">
+                        <i class="fa-solid fa-flashlight text-white"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="flex-1 relative bg-black">
+                <video id="scanner-video" class="w-full h-full object-cover" autoplay playsinline></video>
+                <div class="absolute inset-0 flex items-center justify-center">
+                    <div class="relative">
+                        <div class="w-64 h-64 border-2 border-white border-dashed rounded-lg">
+                            <div class="absolute inset-0 flex items-center justify-center text-center text-white" id="scanner-overlay">
+                                <div>
+                                    <i class="fa-solid fa-barcode text-4xl mb-4"></i>
+                                    <p class="text-sm">Point camera at barcode</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="absolute bottom-8 left-1/2 transform -translate-x-1/2">
+                    <button onclick="manualBarcodeEntry()" class="bg-white text-black px-4 py-2 rounded-lg font-medium">
+                        Enter Manually
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Manual Barcode Entry Modal -->
+    <div id="manual-barcode-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-white rounded-lg p-6 w-full max-w-md">
+                <h3 class="text-lg font-semibold mb-4">Enter Barcode</h3>
+                <input type="text" id="manual-barcode-input" placeholder="Enter barcode number" class="w-full px-4 py-3 border border-gray-300 rounded-lg mb-4">
+                <div class="flex space-x-3">
+                    <button onclick="closeManualBarcode()" class="flex-1 bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600">
+                        Cancel
+                    </button>
+                    <button onclick="submitManualBarcode()" class="flex-1 bg-primary text-white px-4 py-2 rounded-lg hover:bg-primary-dark">
+                        Search
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Toast -->
+    <div id="notification-toast" class="fixed top-20 left-4 right-4 bg-white border-l-4 border-primary shadow-lg rounded-lg p-4 transform -translate-y-full opacity-0 transition-all duration-300 z-50 hidden">
+        <div class="flex items-center">
+            <div class="bg-primary/10 p-2 rounded-full mr-3">
+                <i class="fa-solid fa-check text-primary"></i>
+            </div>
+            <div>
+                <p id="toast-message" class="text-sm font-medium text-dark"></p>
+            </div>
         </div>
     </div>
 
     <script>
-        let currentFilter = 'all';
-        let currentCategory = 'all';
-        let products = [];
-        let filteredProducts = [];
-
-        // Load products from database
-        async function loadProducts() {
-            try {
-                const response = await fetch('/api/products');
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                products = await response.json();
-                filteredProducts = products;
-                renderProducts();
-                updateStats();
-                updateCartCount();
-            } catch (error) {
-                console.error('Error loading products:', error);
-                const container = document.getElementById('inventory-items');
-                if (container) {
-                    container.innerHTML = `
-                        <div class="text-center py-8">
-                            <i class="fa-solid fa-exclamation-triangle text-orange-500 text-4xl mb-4"></i>
-                            <h3 class="text-lg font-semibold text-gray-700 mb-2">Unable to Load Products</h3>
-                            <p class="text-gray-500 mb-4">Please check your connection and try again</p>
-                            <button onclick="loadProducts()" class="bg-primary text-white px-4 py-2 rounded-lg hover:bg-primary-dark">
-                                Retry
-                            </button>
-                        </div>
-                    `;
-                }
-            }
+        function goBack() {
+            window.location.href = '/dashboard';
         }
 
-        // Render products in the inventory grid
-        function renderProducts() {
-            const container = document.getElementById('inventory-items');
-            if (!container) return;
-
-            if (filteredProducts.length === 0) {
-                container.innerHTML = `
-                    <div class="text-center py-8">
-                        <i class="fa-solid fa-box-open text-gray-400 text-4xl mb-4"></i>
-                        <h3 class="text-lg font-semibold text-gray-700 mb-2">No Products Found</h3>
-                        <p class="text-gray-500">Try adjusting your filters or search terms.</p>
-                    </div>
-                `;
-                return;
-            }
-
-            container.innerHTML = filteredProducts.map(product => {
-                const statusClass = product.is_expired ? 'bg-red-500' : 
-                                  product.is_low_stock ? 'bg-accent' : 'bg-primary';
-                const statusText = product.is_expired ? 'Expired' :
-                                 product.is_low_stock ? 'Low Stock' : 'In Stock';
-
-                const priceDisplay = product.is_weight_based ? 
-                    `₹${product.price_per_kg}/kg` : 
-                    `₹${product.price}/Piece`;
-
-                const stockDisplay = product.is_weight_based ? 
-                    `${product.stock_quantity} kg Available` :
-                    `${product.stock_quantity} Pieces Available`;
-
-                return `
-                    <div id="product-${product.id}" class="bg-white rounded-xl p-4 shadow-sm border hover:shadow-md transition-shadow cursor-pointer" 
-                         data-category="${product.category.toLowerCase()}" 
-                         data-status="${product.is_expired ? 'expired' : 'available'}" 
-                         onclick="viewProductDetails(${product.id})">
-                        <div class="flex items-center space-x-4">
-                            <div class="w-16 h-16 rounded-xl overflow-hidden bg-gray-100 flex items-center justify-center">
-                                <i class="fa-solid fa-box text-gray-400 text-2xl"></i>
-                            </div>
-                            <div class="flex-1">
-                                <div class="flex items-start justify-between">
-                                    <div class="flex-1">
-                                        <h3 class="font-bold text-dark text-lg">${product.name}</h3>
-                                        ${product.expiry_date ? `
-                                            <div class="text-xs text-gray-500 mt-1">
-                                                <p>EXP: ${product.expiry_date}</p>
-                                            </div>
-                                        ` : ''}
-                                    </div>
-                                    <div class="text-right">
-                                        <span class="${statusClass} text-white text-xs px-2 py-1 rounded-full font-semibold">${statusText}</span>
-                                        <p class="text-lg font-bold text-primary mt-2">${priceDisplay}</p>
-                                        <p class="text-sm text-gray-600">${stockDisplay}</p>
-                                    </div>
-                                </div>
-                                <div class="flex items-center justify-end space-x-2 mt-3">
-                                    <button class="p-2 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors" 
-                                            onclick="event.stopPropagation(); refillItem(${product.id})" title="Refill Stock">
-                                        <i class="fa-solid fa-plus text-blue-600 text-sm"></i>
-                                    </button>
-                                    <button class="p-2 bg-green-50 hover:bg-green-100 rounded-lg transition-colors" 
-                                            onclick="event.stopPropagation(); addToCart(${product.id})" title="Add to Cart">
-                                        <i class="fa-solid fa-shopping-cart text-green-600 text-sm"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            }).join('');
+        // Navigation functions
+        function goToDashboard() {
+            window.location.href = '/dashboard';
         }
 
-        // Update inventory statistics
-        function updateStats() {
-            const total = products.length;
-            const available = products.filter(p => !p.is_expired && !p.is_low_stock).length;
-            const lowStock = products.filter(p => p.is_low_stock).length;
-            const expired = products.filter(p => p.is_expired).length;
-
-            document.getElementById('total-products').textContent = total;
-            document.getElementById('available-products').textContent = available;
-            document.getElementById('low-stock-products').textContent = lowStock;
-            document.getElementById('expired-products').textContent = expired;
+        function goToInventory() {
+            // Already on inventory page
         }
 
-        // Filter functions
-        function filterBy(status) {
-            currentFilter = status;
-            applyFilters();
+        function goToCart() {
+            window.location.href = '/cart';
         }
 
-        function filterByCategory(category) {
-            currentCategory = category;
-            
-            // Update button states
-            document.querySelectorAll('.category-btn').forEach(btn => {
+        function goToProfile() {
+            window.location.href = '/profile';
+        }
+
+        // Filter functionality
+        function filterProducts(filter) {
+            // Update filter buttons
+            document.querySelectorAll('.filter-btn').forEach(btn => {
                 btn.classList.remove('bg-primary', 'text-white');
                 btn.classList.add('bg-gray-100', 'text-gray-600');
             });
             
-            const activeBtn = document.querySelector(`[data-category="${category}"]`);
-            if (activeBtn) {
-                activeBtn.classList.remove('bg-gray-100', 'text-gray-600');
-                activeBtn.classList.add('bg-primary', 'text-white');
+            const activeButton = document.querySelector(`[data-filter="${filter}"]`);
+            if (activeButton) {
+                activeButton.classList.remove('bg-gray-100', 'text-gray-600');
+                activeButton.classList.add('bg-primary', 'text-white');
             }
             
-            applyFilters();
-        }
-
-        function applyFilters() {
-            filteredProducts = products.filter(product => {
-                let matchesStatus = true;
-                let matchesCategory = true;
-
-                // Filter by status
-                if (currentFilter === 'available') {
-                    matchesStatus = !product.is_expired && !product.is_low_stock;
-                } else if (currentFilter === 'low-stock') {
-                    matchesStatus = product.is_low_stock;
-                } else if (currentFilter === 'expired') {
-                    matchesStatus = product.is_expired;
+            // Filter product cards
+            const productCards = document.querySelectorAll('[data-category]');
+            productCards.forEach(card => {
+                if (filter === 'all') {
+                    card.style.display = 'block';
+                } else if (filter === 'expired') {
+                    const status = card.getAttribute('data-status');
+                    card.style.display = status === 'expired' ? 'block' : 'none';
+                } else {
+                    const category = card.getAttribute('data-category');
+                    card.style.display = category === filter ? 'block' : 'none';
                 }
-
-                // Filter by category
-                if (currentCategory !== 'all') {
-                    matchesCategory = product.category.toLowerCase() === currentCategory;
-                }
-
-                return matchesStatus && matchesCategory;
             });
-
-            renderProducts();
         }
 
-        // Product interaction functions
-        function addToCart(productId) {
-            const product = products.find(p => p.id === productId);
-            if (!product) {
-                showNotification('Product not found', 'error');
-                return;
-            }
-
-            let cart = [];
-            try {
-                const existingCart = localStorage.getItem('kiranakonnect_cart');
-                if (existingCart) {
-                    cart = JSON.parse(existingCart);
-                }
-            } catch (error) {
-                console.error('Error loading cart:', error);
-            }
-
-            const cartItem = {
-                id: product.id,
-                name: product.name,
-                price: product.is_weight_based ? product.price_per_kg : product.price,
-                unit: product.is_weight_based ? product.unit : 'Piece',
-                quantity: 1,
-                mfgDate: '',
-                expDate: product.expiry_date || '',
-                showDates: false,
-                isWeightBased: product.is_weight_based
-            };
-
-            cart.push(cartItem);
-            localStorage.setItem('kiranakonnect_cart', JSON.stringify(cart));
-            
-            updateCartCount();
-            showNotification(`${product.name} added to cart`, 'success');
-        }
-
+        // Product actions
         function viewProductDetails(productId) {
-            const product = products.find(p => p.id === productId);
-            if (!product) {
-                showNotification('Product not found', 'error');
-                return;
-            }
-
-            if (product.is_weight_based) {
-                const params = new URLSearchParams({
-                    id: product.id,
-                    name: product.name,
-                    price: product.price_per_kg,
-                    stock: product.stock_quantity,
-                    unit: product.unit,
-                    expDate: product.expiry_date || ''
-                });
-                window.location.href = `/product-details-weight?${params.toString()}`;
+            if (productId === 'item-1' || productId === 'item-3' || productId === 'item-4') {
+                // Weight-based products
+                window.location.href = `/product-details-weight?id=${productId}`;
             } else {
-                const params = new URLSearchParams({
-                    id: product.id,
-                    name: product.name,
-                    price: product.price,
-                    unit: 'Piece',
-                    stock: product.stock_quantity,
-                    expDate: product.expiry_date || ''
-                });
-                window.location.href = `/product-details?${params.toString()}`;
+                // Bottle/packet-based products
+                window.location.href = `/product-details?id=${productId}`;
             }
+        }
+
+        function addToCart(productId) {
+            showStyledNotification('Added to cart!', 'success');
         }
 
         function refillItem(productId) {
-            const product = products.find(p => p.id === productId);
-            if (!product) {
-                showNotification('Product not found', 'error');
-                return;
-            }
-
-            const refillData = {
-                id: product.id,
-                name: product.name,
-                category: product.category,
-                type: product.is_weight_based ? 'weight-based' : 'unit',
-                unit: product.unit,
-                stock: product.stock_quantity,
-                threshold: product.reorder_level,
-                price: product.is_weight_based ? product.price_per_kg : product.price,
-                barcode: product.barcode
-            };
-            
-            localStorage.setItem('refillProductData', JSON.stringify(refillData));
-            
-            if (product.is_weight_based) {
-                window.location.href = '/refill-stock-weight';
+            if (productId === 'item-1' || productId === 'item-3' || productId === 'item-4') {
+                // Weight-based products
+                window.location.href = `/refill-stock-weight?id=${productId}`;
             } else {
-                window.location.href = '/refill-stock';
+                // Bottle/packet-based products
+                window.location.href = `/refill-stock?id=${productId}`;
             }
         }
 
-        // Cart functions
-        function updateCartCount() {
-            try {
-                const cart = JSON.parse(localStorage.getItem('kiranakonnect_cart') || '[]');
-                const cartCount = cart.length;
-                const cartBadge = document.getElementById('cart-badge');
-                if (cartBadge) {
-                    cartBadge.textContent = cartCount;
-                    cartBadge.style.display = cartCount > 0 ? 'flex' : 'none';
-                }
-            } catch (error) {
-                console.error('Error updating cart count:', error);
+        function deleteItem(productId) {
+            if (confirm('Are you sure you want to delete this item?')) {
+                showStyledNotification('Item deleted!', 'success');
+                document.querySelector(`[onclick="viewProductDetails('${productId}')"]`).style.display = 'none';
             }
         }
 
-        // Search functions
+        // Search and Scanner functionality
         function openSearch() {
             document.getElementById('search-modal').classList.remove('hidden');
             document.getElementById('search-input').focus();
@@ -451,6 +500,196 @@
             document.getElementById('search-empty').classList.add('hidden');
         }
 
+        let scannerStream = null;
+
+        async function openScanner() {
+            document.getElementById('scanner-modal').classList.remove('hidden');
+            await initializeCamera();
+        }
+
+        async function initializeCamera() {
+            try {
+                const video = document.getElementById('scanner-video');
+                const overlay = document.getElementById('scanner-overlay');
+                
+                // Request camera access
+                scannerStream = await navigator.mediaDevices.getUserMedia({
+                    video: { 
+                        facingMode: 'environment',
+                        width: { ideal: 1920 },
+                        height: { ideal: 1080 }
+                    }
+                });
+                
+                video.srcObject = scannerStream;
+                overlay.style.display = 'none'; // Hide overlay when camera is active
+                
+                // Start barcode detection simulation
+                simulateScanning();
+                
+            } catch (error) {
+                console.error('Camera access error:', error);
+                showStyledNotification('Camera access denied. Please allow camera permission.', 'error');
+                
+                // Show fallback overlay
+                const overlay = document.getElementById('scanner-overlay');
+                overlay.innerHTML = `
+                    <div>
+                        <i class="fa-solid fa-camera-slash text-4xl mb-4"></i>
+                        <p class="text-sm">Camera not available</p>
+                        <p class="text-xs mt-2">Please enable camera access</p>
+                    </div>
+                `;
+            }
+        }
+
+        function closeScanner() {
+            document.getElementById('scanner-modal').classList.add('hidden');
+            
+            // Stop camera stream
+            if (scannerStream) {
+                scannerStream.getTracks().forEach(track => track.stop());
+                scannerStream = null;
+            }
+            
+            // Reset overlay
+            const overlay = document.getElementById('scanner-overlay');
+            overlay.style.display = 'flex';
+            overlay.innerHTML = `
+                <div>
+                    <i class="fa-solid fa-barcode text-4xl mb-4"></i>
+                    <p class="text-sm">Point camera at barcode</p>
+                </div>
+            `;
+        }
+
+        function manualBarcodeEntry() {
+            document.getElementById('manual-barcode-modal').classList.remove('hidden');
+            document.getElementById('manual-barcode-input').focus();
+        }
+
+        function closeManualBarcode() {
+            document.getElementById('manual-barcode-modal').classList.add('hidden');
+            document.getElementById('manual-barcode-input').value = '';
+        }
+
+        function submitManualBarcode() {
+            const barcode = document.getElementById('manual-barcode-input').value.trim();
+            if (barcode) {
+                closeManualBarcode();
+                showStyledNotification('Searching for product...', 'info');
+                performBarcodeSearch(barcode);
+            }
+        }
+
+        function performBarcodeSearch(barcode) {
+            // Simulate barcode search
+            setTimeout(() => {
+                showStyledNotification('Product not found', 'error');
+            }, 1500);
+        }
+
+        function simulateScanning() {
+            // Add scanning animation
+            const scanArea = document.querySelector('#scanner-modal .w-64');
+            if (scanArea) {
+                scanArea.classList.add('animate-pulse');
+            }
+            
+            // Show scanning feedback
+            showStyledNotification('Scanning for barcode...', 'info');
+            
+            // Simulate barcode detection after 3 seconds
+            setTimeout(() => {
+                if (scanArea) {
+                    scanArea.classList.remove('animate-pulse');
+                }
+                
+                // Use actual barcodes from database
+                const realBarcodes = ['8901030789012', '8901030567890', '8901030345678', '8901030234567', '8901030456789', '8901030845371', '8901786101234', '8901030825456', '8901030123456', '8901030678901'];
+                const randomBarcode = realBarcodes[Math.floor(Math.random() * realBarcodes.length)];
+                
+                showStyledNotification('Barcode detected!', 'success');
+                
+                setTimeout(() => {
+                    showStyledNotification('Loading products...', 'info');
+                    
+                    setTimeout(() => {
+                        const productNames = ['Aashirvaad Atta', 'Tata Salt', 'Fortune Oil', 'Maggi Noodles', 'Britannia Biscuits'];
+                        const randomProduct = productNames[Math.floor(Math.random() * productNames.length)];
+                        showStyledNotification(`Found: ${randomProduct}`, 'success');
+                        
+                        closeScanner();
+                        
+                        setTimeout(() => {
+                            viewProductDetails('item-1');
+                        }, 1000);
+                    }, 1000);
+                }, 500);
+            }, 3000);
+        }
+
+        function toggleFlashlight() {
+            showStyledNotification('Flashlight toggled', 'info');
+        }
+
+        // Notification system
+        function showStyledNotification(message, type = 'info') {
+            const toast = document.getElementById('notification-toast');
+            const messageElement = document.getElementById('toast-message');
+            const icon = toast.querySelector('i');
+            const iconContainer = toast.querySelector('.bg-primary\\/10');
+            
+            // Update message
+            messageElement.textContent = message;
+            
+            // Update styling based on type
+            if (type === 'success') {
+                iconContainer.className = 'bg-green-100 p-2 rounded-full mr-3';
+                icon.className = 'fa-solid fa-check text-green-600';
+                toast.className = toast.className.replace('border-primary', 'border-green-500');
+            } else if (type === 'error') {
+                iconContainer.className = 'bg-red-100 p-2 rounded-full mr-3';
+                icon.className = 'fa-solid fa-times text-red-600';
+                toast.className = toast.className.replace('border-primary', 'border-red-500');
+            } else {
+                iconContainer.className = 'bg-blue-100 p-2 rounded-full mr-3';
+                icon.className = 'fa-solid fa-info text-blue-600';
+                toast.className = toast.className.replace('border-primary', 'border-blue-500');
+            }
+            
+            // Show toast
+            toast.classList.remove('hidden');
+            setTimeout(() => {
+                toast.style.transform = 'translateY(0)';
+                toast.style.opacity = '1';
+            }, 100);
+            
+            // Hide after 3 seconds
+            setTimeout(() => {
+                toast.style.transform = 'translateY(-100%)';
+                toast.style.opacity = '0';
+                setTimeout(() => {
+                    toast.classList.add('hidden');
+                    // Reset to default styling
+                    iconContainer.className = 'bg-primary/10 p-2 rounded-full mr-3';
+                    icon.className = 'fa-solid fa-check text-primary';
+                    toast.className = 'fixed top-20 left-4 right-4 bg-white border-l-4 border-primary shadow-lg rounded-lg p-4 transform -translate-y-full opacity-0 transition-all duration-300 z-50 hidden';
+                }, 300);
+            }, 3000);
+        }
+
+        // Real-time search functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.getElementById('search-input');
+            if (searchInput) {
+                searchInput.addEventListener('input', function() {
+                    const query = this.value.toLowerCase().trim();
+                    performSearch(query);
+                });
+            }
+        });
+
         function performSearch(query) {
             const resultsContainer = document.getElementById('search-results');
             const emptyState = document.getElementById('search-empty');
@@ -461,73 +700,53 @@
                 return;
             }
 
-            const searchResults = products.filter(product => 
-                product.name.toLowerCase().includes(query.toLowerCase())
+            const products = [
+                { name: 'Wheat Flour', price: 50, unit: 'Kg', image: 'https://storage.googleapis.com/uxpilot-auth.appspot.com/ad8aa6cee1-b621e3cd72c9ea714c53.png', id: 'wheat-flour' },
+                { name: 'Coconut Oil', price: 180, unit: 'Bottle', image: 'https://storage.googleapis.com/uxpilot-auth.appspot.com/02cda64d32-ca63fc32eaab87b7db4c.png', id: 'coconut-oil' },
+                { name: 'Red Lentils', price: 120, unit: 'Kg', image: 'https://storage.googleapis.com/uxpilot-auth.appspot.com/7ba24e6b64-555ac20dd8e6ac56d0e8.png', id: 'red-lentils' },
+                { name: 'Turmeric Powder', price: 200, unit: 'Kg', image: 'https://storage.googleapis.com/uxpilot-auth.appspot.com/5a8b9c7e12-332a1b4c5d6e7f8a9b0c.png', id: 'turmeric' },
+                { name: 'Digestive Biscuits', price: 45, unit: 'Packet', image: 'https://storage.googleapis.com/uxpilot-auth.appspot.com/1f2e3d4c5b-998877665544332211aa.png', id: 'biscuits' }
+            ];
+
+            const filteredProducts = products.filter(product =>
+                product.name.toLowerCase().includes(query)
             );
 
-            if (searchResults.length === 0) {
+            if (filteredProducts.length === 0) {
                 resultsContainer.innerHTML = '';
                 emptyState.classList.remove('hidden');
-            } else {
-                emptyState.classList.add('hidden');
-                resultsContainer.innerHTML = searchResults.map(product => `
-                    <div class="bg-gray-50 rounded-lg p-3 cursor-pointer hover:bg-gray-100" onclick="viewProductDetails(${product.id})">
-                        <div class="flex items-center space-x-3">
-                            <div class="w-12 h-12 bg-gray-200 rounded-lg flex items-center justify-center">
-                                <i class="fa-solid fa-box text-gray-400"></i>
-                            </div>
-                            <div class="flex-1">
-                                <h4 class="font-semibold text-gray-800">${product.name}</h4>
-                                <p class="text-sm text-gray-600">₹${product.is_weight_based ? product.price_per_kg : product.price}/${product.is_weight_based ? 'kg' : 'piece'}</p>
-                            </div>
+                return;
+            }
+
+            emptyState.classList.add('hidden');
+            resultsContainer.innerHTML = filteredProducts.map(product => `
+                <div class="p-3 hover:bg-gray-50 cursor-pointer border-b border-gray-100 last:border-b-0"
+                     onclick="selectSearchResult('${product.id}')">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-12 h-12 rounded-lg overflow-hidden">
+                            <img src="${product.image}" alt="${product.name}" class="w-full h-full object-cover">
                         </div>
+                        <div class="flex-1">
+                            <h4 class="font-medium text-dark text-sm">${product.name}</h4>
+                            <p class="text-xs text-gray-500">Available in stock</p>
+                        </div>
+                        <p class="text-sm font-medium text-primary">₹${product.price}/${product.unit}</p>
                     </div>
-                `).join('');
-            }
+                </div>
+            `).join('');
         }
 
-        // Utility functions
-        function goBack() {
-            window.history.back();
-        }
-
-        function showNotification(message, type = 'success') {
-            const notification = document.getElementById('notification');
-            const notificationText = document.getElementById('notification-text');
+        function selectSearchResult(productId) {
+            closeSearch();
+            showStyledNotification('Product selected!', 'success');
             
-            notificationText.textContent = message;
-            
-            // Set colors based on type
-            if (type === 'error') {
-                notification.className = notification.className.replace('bg-green-500', 'bg-red-500');
+            // Navigate to product details based on type
+            if (productId === 'wheat-flour' || productId === 'red-lentils' || productId === 'turmeric') {
+                window.location.href = `/product-details-weight?id=${productId}`;
             } else {
-                notification.className = notification.className.replace('bg-red-500', 'bg-green-500');
+                window.location.href = `/product-details?id=${productId}`;
             }
-            
-            notification.classList.remove('-translate-y-full');
-            
-            setTimeout(() => {
-                notification.classList.add('-translate-y-full');
-            }, 3000);
         }
-
-        function hideNotification() {
-            document.getElementById('notification').classList.add('-translate-y-full');
-        }
-
-        // Initialize page when DOM is loaded
-        document.addEventListener('DOMContentLoaded', function() {
-            loadProducts();
-            
-            // Set up search functionality
-            const searchInput = document.getElementById('search-input');
-            if (searchInput) {
-                searchInput.addEventListener('input', function() {
-                    const query = this.value.toLowerCase().trim();
-                    performSearch(query);
-                });
-            }
-        });
     </script>
 </body>
 </html>
