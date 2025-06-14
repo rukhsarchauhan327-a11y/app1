@@ -123,7 +123,7 @@
                 <i class="fa-solid fa-box text-gray-400 text-xl"></i>
                 <span class="text-xs mt-1 text-gray-400">Inventory</span>
             </button>
-            <button onclick="window.location.href='/add-item'" class="relative -top-4 bg-primary rounded-full p-4 shadow-lg">
+            <button onclick="openScanner()" class="relative -top-4 bg-primary rounded-full p-4 shadow-lg">
                 <i class="fa-solid fa-barcode text-white text-xl"></i>
             </button>
             <button class="flex flex-col items-center py-1 px-3 relative" onclick="window.location.href='/cart'">
@@ -137,6 +137,58 @@
             </button>
         </div>
     </nav>
+
+    <!-- Scanner Modal -->
+    <div id="scanner-modal" class="fixed inset-0 bg-black bg-opacity-90 z-50 hidden">
+        <div class="fixed inset-0 flex flex-col">
+            <div class="bg-black text-white p-4">
+                <div class="flex items-center justify-between">
+                    <button onclick="closeScanner()" class="p-2 hover:bg-gray-800 rounded-lg">
+                        <i class="fa-solid fa-times text-white"></i>
+                    </button>
+                    <h2 class="text-lg font-semibold">Scan to Search Product</h2>
+                    <button onclick="toggleFlashlight()" class="p-2 hover:bg-gray-800 rounded-lg">
+                        <i class="fa-solid fa-flashlight text-white"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="flex-1 relative bg-black">
+                <div class="absolute inset-0 flex items-center justify-center">
+                    <div class="relative">
+                        <div class="w-64 h-64 border-2 border-white border-dashed rounded-lg flex items-center justify-center">
+                            <div class="text-center text-white">
+                                <i class="fa-solid fa-barcode text-4xl mb-4"></i>
+                                <p class="text-sm">Point camera at barcode</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="absolute bottom-8 left-1/2 transform -translate-x-1/2">
+                    <button onclick="manualBarcodeEntry()" class="bg-white text-black px-4 py-2 rounded-lg font-medium">
+                        Enter Manually
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Manual Barcode Entry Modal -->
+    <div id="manual-barcode-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-white rounded-lg p-6 w-full max-w-md">
+                <h3 class="text-lg font-semibold mb-4">Enter Barcode</h3>
+                <input type="text" id="manual-barcode-input" placeholder="Enter barcode number" class="w-full px-4 py-3 border border-gray-300 rounded-lg mb-4">
+                <div class="flex space-x-3">
+                    <button onclick="closeManualBarcode()" class="flex-1 bg-gray-500 text-white py-2 px-4 rounded-lg hover:bg-gray-600">
+                        Cancel
+                    </button>
+                    <button onclick="searchByBarcode()" class="flex-1 bg-primary text-white py-2 px-4 rounded-lg hover:bg-primary-dark">
+                        Search
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- Styled Notification Toast -->
     <div id="notification-toast" class="fixed top-20 left-4 right-4 bg-white border-l-4 border-primary shadow-lg rounded-lg p-4 transform -translate-y-full opacity-0 transition-all duration-300 z-50 hidden">
@@ -422,7 +474,41 @@
             }
         }
 
+        // Scanner functionality
+        function openScanner() {
+            document.getElementById('scanner-modal').classList.remove('hidden');
+            // In a real app, this would start the camera
+            console.log('Scanner opened');
+        }
 
+        function closeScanner() {
+            document.getElementById('scanner-modal').classList.add('hidden');
+        }
+
+        function toggleFlashlight() {
+            // In a real app, this would control the camera flash
+            console.log('Flashlight toggled');
+        }
+
+        function manualBarcodeEntry() {
+            closeScanner();
+            document.getElementById('manual-barcode-modal').classList.remove('hidden');
+            document.getElementById('manual-barcode-input').focus();
+        }
+
+        function closeManualBarcode() {
+            document.getElementById('manual-barcode-modal').classList.add('hidden');
+            document.getElementById('manual-barcode-input').value = '';
+        }
+
+        function searchByBarcode() {
+            var barcode = document.getElementById('manual-barcode-input').value.trim();
+            if (barcode) {
+                closeManualBarcode();
+                // Redirect to inventory page with search
+                window.location.href = '/inventory?search=' + encodeURIComponent(barcode);
+            }
+        }
 
         // Initialize page
         document.addEventListener('DOMContentLoaded', function() {
@@ -430,6 +516,16 @@
             
             // Auto-refresh notifications every 30 seconds
             setInterval(loadNotifications, 30000);
+
+            // Handle Enter key in manual barcode input
+            var input = document.getElementById('manual-barcode-input');
+            if (input) {
+                input.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        searchByBarcode();
+                    }
+                });
+            }
         });
     </script>
 </body>
