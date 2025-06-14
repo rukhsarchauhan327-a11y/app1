@@ -497,25 +497,28 @@
                 .then(data => {
                     const product = data.products.find(p => p.barcode === barcode);
                     if (product) {
-                        // Navigate to product details page
-                        const params = new URLSearchParams({
-                            id: product.id,
-                            name: product.name,
-                            price: product.price,
-                            category: product.category || 'General',
-                            barcode: product.barcode || '',
-                            unit: product.is_weight_based ? 'Kg' : 'Piece',
-                            stock: product.stock_quantity,
-                            expDate: product.expiry_date || ''
-                        });
-                        window.location.href = `/product-details?${params.toString()}`;
+                        showNotification(`Found ${product.name}`, 'success');
+                        // Navigate to product details page after showing notification
+                        setTimeout(() => {
+                            const params = new URLSearchParams({
+                                id: product.id,
+                                name: product.name,
+                                price: product.price,
+                                category: product.category || 'General',
+                                barcode: product.barcode || '',
+                                unit: product.is_weight_based ? 'Kg' : 'Piece',
+                                stock: product.stock_quantity,
+                                expDate: product.expiry_date || ''
+                            });
+                            window.location.href = `/product-details?${params.toString()}`;
+                        }, 1000);
                     } else {
-                        alert('Product not found in inventory');
+                        showNotification('Product not found in inventory', 'error');
                     }
                 })
                 .catch(error => {
                     console.error('Error searching for product:', error);
-                    alert('Error searching for product');
+                    showNotification('Error searching for product', 'error');
                 });
         }
 
@@ -543,9 +546,57 @@
             var barcode = document.getElementById('manual-barcode-input').value.trim();
             if (barcode) {
                 closeManualBarcode();
-                // Redirect to inventory page with search
-                window.location.href = '/inventory?search=' + encodeURIComponent(barcode);
+                performBarcodeSearch(barcode);
             }
+        }
+
+        // Notification system for scanner feedback
+        function showNotification(message, type = 'info') {
+            const existingNotifications = document.querySelectorAll('.kc-notification');
+            existingNotifications.forEach(notif => {
+                if (notif.parentNode) {
+                    notif.parentNode.removeChild(notif);
+                }
+            });
+
+            const notification = document.createElement('div');
+            const bgColor = type === 'success' ? 'bg-green-500' : 
+                           type === 'error' ? 'bg-red-500' : 
+                           type === 'warning' ? 'bg-orange-500' : 'bg-blue-500';
+            
+            const icon = type === 'success' ? 'fa-check-circle' : 
+                        type === 'error' ? 'fa-exclamation-circle' : 
+                        type === 'warning' ? 'fa-exclamation-triangle' : 'fa-info-circle';
+            
+            notification.className = `kc-notification fixed top-4 left-4 right-4 ${bgColor} text-white px-4 py-3 rounded-xl shadow-xl z-[9999] transform transition-all duration-300 ease-out opacity-0 translate-y-[-20px]`;
+            notification.style.maxWidth = 'calc(100vw - 2rem)';
+            notification.innerHTML = `
+                <div class="flex items-center space-x-3">
+                    <i class="fa-solid ${icon} text-lg flex-shrink-0"></i>
+                    <span class="text-sm font-medium flex-1">${message}</span>
+                    <button onclick="this.parentElement.parentElement.remove()" class="text-white hover:text-gray-200 ml-2 flex-shrink-0">
+                        <i class="fa-solid fa-times text-sm"></i>
+                    </button>
+                </div>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.classList.remove('opacity-0', 'translate-y-[-20px]');
+                notification.classList.add('opacity-100', 'translate-y-0');
+            }, 50);
+            
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.classList.add('opacity-0', 'translate-y-[-20px]');
+                    setTimeout(() => {
+                        if (notification.parentNode) {
+                            notification.parentNode.removeChild(notification);
+                        }
+                    }, 300);
+                }
+            }, 4000);
         }
 
         // Initialize page
