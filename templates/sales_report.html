@@ -159,15 +159,7 @@
             </div>
         </div>
 
-        <!-- Category Breakdown -->
-        <div class="px-4 mb-6">
-            <div class="bg-white p-4 rounded-xl shadow-sm">
-                <h3 class="text-lg font-bold mb-4 text-dark">Category Performance</h3>
-                <div class="space-y-3" id="category-breakdown">
-                    <!-- Category data will be loaded here -->
-                </div>
-            </div>
-        </div>
+
 
 
 
@@ -636,35 +628,7 @@
 
 
 
-        // Update category breakdown
-        function updateCategoryBreakdown(categories) {
-            const categoryContainer = document.getElementById('category-breakdown');
-            categoryContainer.innerHTML = '';
-            
-            if (!categories || categories.length === 0) {
-                categoryContainer.innerHTML = '<p class="text-gray-500 text-center">No category data available</p>';
-                return;
-            }
-            
-            const colors = ['bg-primary', 'bg-secondary', 'bg-accent', 'bg-purple-600', 'bg-pink-600'];
-            
-            categories.forEach((category, index) => {
-                const color = colors[index % colors.length];
-                const categoryElement = document.createElement('div');
-                categoryElement.className = 'flex items-center justify-between p-3 border border-gray-200 rounded-lg';
-                categoryElement.innerHTML = `
-                    <div class="flex items-center space-x-3">
-                        <div class="w-4 h-4 ${color} rounded-full"></div>
-                        <span class="font-medium">${category.name}</span>
-                    </div>
-                    <div class="text-right">
-                        <p class="font-bold">₹${Math.round(category.amount)}</p>
-                        <p class="text-xs text-gray-500">${category.percentage}%</p>
-                    </div>
-                `;
-                categoryContainer.appendChild(categoryElement);
-            });
-        }
+
         
 
         
@@ -780,14 +744,13 @@
             updateMetricsCards(data);
             updateSalesChart(data, period);
             updateTopSellingItems(data.topItems || []);
-            updateCategoryBreakdown(data.categories || []);
             updateInvestmentRecovery(data);
             setCurrentDate();
         }
         
         // Show loading state
         function showLoadingState() {
-            const loadingElements = document.querySelectorAll('.metric-card, #top-selling-items, #category-breakdown');
+            const loadingElements = document.querySelectorAll('.metric-card, #top-selling-items');
             loadingElements.forEach(el => {
                 el.style.opacity = '0.5';
                 el.style.pointerEvents = 'none';
@@ -796,7 +759,7 @@
         
         // Hide loading state
         function hideLoadingState() {
-            const loadingElements = document.querySelectorAll('.metric-card, #top-selling-items, #category-breakdown');
+            const loadingElements = document.querySelectorAll('.metric-card, #top-selling-items');
             loadingElements.forEach(el => {
                 el.style.opacity = '1';
                 el.style.pointerEvents = 'auto';
