@@ -481,64 +481,120 @@
         }
 
         function simulateScanning() {
-            // Show scanning progress notifications
-            showNotification('Initializing camera...', 'info');
+            // Add scanning animation
+            const scanArea = document.querySelector('#scanner-modal .w-64');
+            if (scanArea) {
+                scanArea.classList.add('animate-pulse');
+            }
             
-            setTimeout(() => {
-                showNotification('Scanning for barcode...', 'info');
-            }, 800);
+            // Show scanning feedback
+            showStyledNotification('Scanning for barcode...', 'info');
             
+            // Simulate barcode detection after 3 seconds
             setTimeout(() => {
-                showNotification('Barcode detected!', 'success');
-            }, 1800);
-            
-            setTimeout(() => {
-                showNotification('Loading product details...', 'info');
-            }, 2200);
-            
-            // Simulate successful scan after 3 seconds using real database barcodes
-            setTimeout(() => {
+                if (scanArea) {
+                    scanArea.classList.remove('animate-pulse');
+                }
+                
+                // Use actual barcodes from database
                 const realBarcodes = ['8901030789012', '8901030567890', '8901030345678', '8901030234567', '8901030456789', '8901030845371', '8901786101234', '8901030825456', '8901030123456', '8901030678901'];
                 const randomBarcode = realBarcodes[Math.floor(Math.random() * realBarcodes.length)];
+                
+                showStyledNotification('Barcode detected!', 'success');
                 performBarcodeSearch(randomBarcode);
                 closeScanner();
             }, 3000);
         }
 
         function performBarcodeSearch(barcode) {
-            // Search for product by barcode in inventory
+            // Load products if not already loaded
             fetch('/api/products')
                 .then(response => response.json())
                 .then(data => {
-                    const product = data.products.find(p => p.barcode === barcode);
+                    const products = data.products || [];
+                    const product = products.find(p => p.barcode === barcode);
                     if (product) {
-                        showNotification(`Found ${product.name}`, 'success');
-                        // Navigate to product details page after showing notification
+                        showStyledNotification(`Found: ${product.name}`, 'success');
                         setTimeout(() => {
-                            const params = new URLSearchParams({
-                                id: product.id,
-                                name: product.name,
-                                price: product.price,
-                                category: product.category || 'General',
-                                barcode: product.barcode || '',
-                                unit: product.is_weight_based ? 'Kg' : 'Piece',
-                                stock: product.stock_quantity,
-                                expDate: product.expiry_date || ''
-                            });
-                            window.location.href = `/product-details?${params.toString()}`;
+                            viewProductDetails(product);
                         }, 1000);
                     } else {
-                        showNotification('Product not found in inventory', 'error');
+                        showStyledNotification('Product not found', 'error');
                     }
                 })
                 .catch(error => {
                     console.error('Error searching for product:', error);
-                    showNotification('Error searching for product', 'error');
+                    showStyledNotification('Error searching for product', 'error');
                 });
+        }
+
+        function viewProductDetails(product) {
+            if (product.is_weight_based) {
+                const params = new URLSearchParams({
+                    id: product.id,
+                    name: product.name,
+                    price: product.price_per_kg,
+                    stock: product.stock_quantity,
+                    unit: product.unit,
+                    expDate: product.expiry_date || ''
+                });
+                window.location.href = `/product-details-weight?${params.toString()}`;
+            } else {
+                const params = new URLSearchParams({
+                    id: product.id,
+                    name: product.name,
+                    price: product.price,
+                    unit: 'Piece',
+                    stock: product.stock_quantity,
+                    expDate: product.expiry_date || ''
+                });
+                window.location.href = `/product-details?${params.toString()}`;
+            }
         }
 
         function closeScanner() {
             document.getElementById('scanner-modal').classList.add('hidden');
+        }
+
+        function showStyledNotification(message, type = 'info') {
+            // Remove any existing notifications to prevent stacking
+            const existingNotifications = document.querySelectorAll('.notification-toast');
+            existingNotifications.forEach(notif => {
+                if (notif.parentNode) {
+                    notif.parentNode.removeChild(notif);
+                }
+            });
+
+            const notification = document.createElement('div');
+            notification.className = `notification-toast fixed top-4 right-4 z-50 p-4 rounded-lg text-white font-medium shadow-lg transform transition-all duration-300 ${
+                type === 'success' ? 'bg-green-500' : 
+                type === 'error' ? 'bg-red-500' : 
+                type === 'warning' ? 'bg-orange-500' : 'bg-blue-500'
+            }`;
+            notification.style.transform = 'translateX(100%)';
+            notification.innerHTML = `
+                <div class="flex items-center space-x-2">
+                    <i class="fa-solid ${type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-times-circle' : type === 'warning' ? 'fa-exclamation-triangle' : 'fa-info-circle'}"></i>
+                    <span>${message}</span>
+                </div>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // Animate in
+            setTimeout(() => {
+                notification.style.transform = 'translateX(0)';
+            }, 10);
+            
+            // Remove after 3 seconds
+            setTimeout(() => {
+                notification.style.transform = 'translateX(100%)';
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        notification.parentNode.removeChild(notification);
+                    }
+                }, 300);
+            }, 3000);
         }
 
         function toggleFlashlight() {

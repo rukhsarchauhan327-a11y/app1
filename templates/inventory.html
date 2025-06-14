@@ -1065,10 +1065,26 @@
         }
 
         function simulateScanning() {
-            // Simulate successful scan after 3 seconds using real database barcodes
+            // Add scanning animation
+            const scanArea = document.querySelector('#scanner-modal .w-64');
+            if (scanArea) {
+                scanArea.classList.add('animate-pulse');
+            }
+            
+            // Show scanning feedback
+            showStyledNotification('Scanning for barcode...', 'info');
+            
+            // Simulate barcode detection after 3 seconds
             setTimeout(() => {
+                if (scanArea) {
+                    scanArea.classList.remove('animate-pulse');
+                }
+                
+                // Use actual barcodes from database
                 const realBarcodes = ['8901030789012', '8901030567890', '8901030345678', '8901030234567', '8901030456789', '8901030845371', '8901786101234', '8901030825456', '8901030123456', '8901030678901'];
                 const randomBarcode = realBarcodes[Math.floor(Math.random() * realBarcodes.length)];
+                
+                showStyledNotification('Barcode detected!', 'success');
                 performBarcodeSearch(randomBarcode);
                 closeScanner();
             }, 3000);
@@ -1143,6 +1159,47 @@
                     element.style.border = '';
                 }, 3000);
             }
+        }
+
+        function showStyledNotification(message, type = 'info') {
+            // Remove any existing notifications to prevent stacking
+            const existingNotifications = document.querySelectorAll('.notification-toast');
+            existingNotifications.forEach(notif => {
+                if (notif.parentNode) {
+                    notif.parentNode.removeChild(notif);
+                }
+            });
+
+            const notification = document.createElement('div');
+            notification.className = `notification-toast fixed top-4 right-4 z-50 p-4 rounded-lg text-white font-medium shadow-lg transform transition-all duration-300 ${
+                type === 'success' ? 'bg-green-500' : 
+                type === 'error' ? 'bg-red-500' : 
+                type === 'warning' ? 'bg-orange-500' : 'bg-blue-500'
+            }`;
+            notification.style.transform = 'translateX(100%)';
+            notification.innerHTML = `
+                <div class="flex items-center space-x-2">
+                    <i class="fa-solid ${type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-times-circle' : type === 'warning' ? 'fa-exclamation-triangle' : 'fa-info-circle'}"></i>
+                    <span>${message}</span>
+                </div>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // Animate in
+            setTimeout(() => {
+                notification.style.transform = 'translateX(0)';
+            }, 10);
+            
+            // Remove after 3 seconds
+            setTimeout(() => {
+                notification.style.transform = 'translateX(100%)';
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        notification.parentNode.removeChild(notification);
+                    }
+                }, 300);
+            }, 3000);
         }
 
         // Notification system for search/scanner
