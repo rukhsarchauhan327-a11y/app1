@@ -1084,9 +1084,15 @@
                         <div class="w-64 h-64 border-2 border-white border-dashed rounded-lg bg-transparent"></div>
                     </div>
                 </div>
-                <div class="absolute bottom-8 left-1/2 transform -translate-x-1/2">
+                <div id="scanner-status" class="absolute top-4 left-4 right-4 text-center">
+                    <span class="bg-primary text-white px-3 py-1 rounded-full text-sm">Position barcode in frame</span>
+                </div>
+                <div class="absolute bottom-8 left-1/2 transform -translate-x-1/2 flex space-x-3">
                     <button onclick="manualBarcodeEntry()" class="bg-white text-black px-4 py-2 rounded-lg font-medium">
                         Enter Manually
+                    </button>
+                    <button onclick="toggleFlashlight()" class="bg-gray-800 text-white px-4 py-2 rounded-lg font-medium">
+                        <i class="fa-solid fa-flashlight"></i>
                     </button>
                 </div>
             </div>
