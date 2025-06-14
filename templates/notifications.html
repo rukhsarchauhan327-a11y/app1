@@ -161,19 +161,6 @@
                                 <p class="text-sm">Point camera at barcode</p>
                             </div>
                         </div>
-                        <!-- Scanner scanning frame overlay -->
-                        <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
-                            <div class="w-48 h-32 border-2 border-red-500 bg-transparent rounded-lg">
-                                <div class="absolute top-0 left-0 w-4 h-4 border-t-4 border-l-4 border-red-500"></div>
-                                <div class="absolute top-0 right-0 w-4 h-4 border-t-4 border-r-4 border-red-500"></div>
-                                <div class="absolute bottom-0 left-0 w-4 h-4 border-b-4 border-l-4 border-red-500"></div>
-                                <div class="absolute bottom-0 right-0 w-4 h-4 border-b-4 border-r-4 border-red-500"></div>
-                            </div>
-                        </div>
-                        <!-- Status overlay -->
-                        <div id="scanner-status" class="absolute top-2 left-2 right-2 text-center">
-                            <span class="bg-blue-500 text-white px-3 py-1 rounded-full text-sm">Starting scanner...</span>
-                        </div>
                     </div>
                 </div>
                 <div class="absolute bottom-8 left-1/2 transform -translate-x-1/2">
@@ -494,48 +481,13 @@
         }
 
         function simulateScanning() {
-            // Show scanning progress like other pages
-            updateScannerStatus('Initializing camera...', 'blue');
-            
-            setTimeout(() => {
-                updateScannerStatus('Camera ready - Scanning for barcode...', 'green');
-            }, 500);
-            
-            setTimeout(() => {
-                updateScannerStatus('Scanning in progress...', 'orange');
-            }, 1500);
-            
-            setTimeout(() => {
-                updateScannerStatus('Barcode detected - Processing...', 'purple');
-            }, 2500);
-            
             // Simulate successful scan after 3 seconds using real database barcodes
             setTimeout(() => {
-                updateScannerStatus('Product found!', 'green');
                 const realBarcodes = ['8901030789012', '8901030567890', '8901030345678', '8901030234567', '8901030456789', '8901030845371', '8901786101234', '8901030825456', '8901030123456', '8901030678901'];
                 const randomBarcode = realBarcodes[Math.floor(Math.random() * realBarcodes.length)];
-                
-                setTimeout(() => {
-                    performBarcodeSearch(randomBarcode);
-                    closeScanner();
-                }, 500);
+                performBarcodeSearch(randomBarcode);
+                closeScanner();
             }, 3000);
-        }
-
-        function updateScannerStatus(message, color) {
-            const statusElement = document.getElementById('scanner-status');
-            if (!statusElement) return;
-            
-            const colorClasses = {
-                'blue': 'bg-blue-500',
-                'green': 'bg-green-500', 
-                'orange': 'bg-orange-500',
-                'red': 'bg-red-500',
-                'purple': 'bg-purple-500'
-            };
-            
-            const bgClass = colorClasses[color] || 'bg-blue-500';
-            statusElement.innerHTML = `<span class="${bgClass} text-white px-3 py-1 rounded-full text-sm">${message}</span>`;
         }
 
         function performBarcodeSearch(barcode) {
@@ -596,6 +548,11 @@
                 closeManualBarcode();
                 performBarcodeSearch(barcode);
             }
+        }
+
+        function toggleFlashlight() {
+            // In a real app, this would control the camera flash
+            console.log('Flashlight toggled');
         }
 
         // Notification system for scanner feedback
