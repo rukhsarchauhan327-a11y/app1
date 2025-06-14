@@ -629,6 +629,13 @@
         let products = [];
         let filteredProducts = [];
 
+        // Initialize products array to prevent "find is not a function" errors
+        function initializeProducts() {
+            if (!Array.isArray(products)) {
+                products = [];
+            }
+        }
+
         // Navigation functions
         function goBack() {
             window.location.href = '/dashboard';
@@ -953,17 +960,24 @@
         let deleteProductId = null;
 
         function deleteItem(productId) {
+            // Ensure products is an array
+            initializeProducts();
+            
             // Handle both static HTML elements and dynamic products
             let productName = '';
             let elementToDelete = null;
             
             // Try to find in products array first (for dynamic products)
-            const product = products.find(p => p.id === productId);
-            if (product) {
-                productName = product.name;
-                elementToDelete = document.getElementById(`product-${productId}`);
-            } else {
-                // Handle static HTML elements
+            if (Array.isArray(products) && products.length > 0) {
+                const product = products.find(p => p.id === productId);
+                if (product) {
+                    productName = product.name;
+                    elementToDelete = document.getElementById(`product-${productId}`);
+                }
+            }
+            
+            // If not found in products array, handle static HTML elements
+            if (!elementToDelete) {
                 elementToDelete = document.getElementById(productId);
                 if (elementToDelete) {
                     const nameElement = elementToDelete.querySelector('h3');
@@ -987,10 +1001,16 @@
 
         function confirmDelete() {
             if (deleteProductId) {
+                // Ensure products is an array
+                initializeProducts();
+                
                 // Remove from products array if it exists there
-                const productIndex = products.findIndex(p => p.id === deleteProductId);
-                if (productIndex > -1) {
-                    products.splice(productIndex, 1);
+                let productIndex = -1;
+                if (Array.isArray(products) && products.length > 0) {
+                    productIndex = products.findIndex(p => p.id === deleteProductId);
+                    if (productIndex > -1) {
+                        products.splice(productIndex, 1);
+                    }
                 }
 
                 // Remove from DOM - try both static and dynamic element IDs
@@ -1002,7 +1022,7 @@
                     showNotification('Product deleted successfully', 'success');
                     
                     // Update stats only if products array was modified
-                    if (productIndex > -1) {
+                    if (productIndex > -1 && typeof updateStats === 'function') {
                         updateStats();
                     }
                 } else {
@@ -1132,17 +1152,24 @@
         }
 
         function applyFilters() {
-            filteredProducts = products.filter(product => {
-                const statusMatch = currentFilter === 'all' || 
-                    (currentFilter === 'available' && !product.is_expired && !product.is_low_stock) ||
-                    (currentFilter === 'low' && product.is_low_stock) ||
-                    (currentFilter === 'expiring' && product.is_expired);
-                
-                const categoryMatch = currentCategory === 'all' || 
-                    product.category.toLowerCase() === currentCategory.toLowerCase();
-                
-                return statusMatch && categoryMatch;
-            });
+            // Ensure products is an array before filtering
+            initializeProducts();
+            
+            if (Array.isArray(products)) {
+                filteredProducts = products.filter(product => {
+                    const statusMatch = currentFilter === 'all' || 
+                        (currentFilter === 'available' && !product.is_expired && !product.is_low_stock) ||
+                        (currentFilter === 'low' && product.is_low_stock) ||
+                        (currentFilter === 'expiring' && product.is_expired);
+                    
+                    const categoryMatch = currentCategory === 'all' || 
+                        product.category.toLowerCase() === currentCategory.toLowerCase();
+                    
+                    return statusMatch && categoryMatch;
+                });
+            } else {
+                filteredProducts = [];
+            }
             
             renderProducts();
         }
@@ -1204,6 +1231,10 @@
 
         // Initialize page
         document.addEventListener('DOMContentLoaded', function() {
+            // Initialize products array first
+            initializeProducts();
+            
+            // Load products from API
             loadProducts();
             
             // Add search input event listener if element exists
@@ -1220,8 +1251,11 @@
         });
 
         function performBarcodeSearch(barcode) {
+            // Ensure products is an array
+            initializeProducts();
+            
             // Ensure products are loaded before searching
-            if (products.length === 0) {
+            if (!Array.isArray(products) || products.length === 0) {
                 showStyledNotification('Loading products...', 'info');
                 loadProductsForSearch().then(() => {
                     performBarcodeSearchInternal(barcode);
@@ -1232,14 +1266,21 @@
         }
 
         function performBarcodeSearchInternal(barcode) {
-            const product = products.find(p => p.barcode === barcode);
-            if (product) {
-                showStyledNotification(`Found: ${product.name}`, 'success');
-                setTimeout(() => {
-                    viewProductDetails(product.id);
-                }, 1000);
+            // Ensure products is an array before using find
+            initializeProducts();
+            
+            if (Array.isArray(products) && products.length > 0) {
+                const product = products.find(p => p.barcode === barcode);
+                if (product) {
+                    showStyledNotification(`Found: ${product.name}`, 'success');
+                    setTimeout(() => {
+                        viewProductDetails(product.id);
+                    }, 1000);
+                } else {
+                    showStyledNotification('Product not found', 'error');
+                }
             } else {
-                showStyledNotification('Product not found', 'error');
+                showStyledNotification('No products loaded', 'error');
             }
         }
 
