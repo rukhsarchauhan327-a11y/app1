@@ -56,10 +56,7 @@
             <button onclick="goBack()" class="mr-4">
                 <i class="fa-solid fa-arrow-left text-dark text-xl"></i>
             </button>
-            <h1 class="text-xl font-bold text-dark flex-1 text-center">Daily Reports</h1>
-            <button onclick="exportSalesReport()">
-                <i class="fa-solid fa-download text-dark text-xl"></i>
-            </button>
+            <h1 class="text-xl font-bold text-dark flex-1 text-center">Sales Analytics</h1>
         </div>
     </header>
 
@@ -539,29 +536,7 @@
             }
         }
 
-        // Export sales report
-        function exportSalesReport() {
-            window.location.href = '/export-business-data';
-        }
 
-        // Share report
-        function shareReport() {
-            if (navigator.share) {
-                navigator.share({
-                    title: 'Sales Report - Kirana Konnect',
-                    text: 'Check out our latest sales report',
-                    url: window.location.href
-                });
-            } else {
-                // Fallback for browsers without Web Share API
-                const url = window.location.href;
-                navigator.clipboard.writeText(url).then(() => {
-                    showNotification('Report link copied to clipboard', 'success');
-                }).catch(() => {
-                    showNotification('Unable to share report', 'error');
-                });
-            }
-        }
 
         // Update investment recovery based on current period
         function updateInvestmentRecovery(data) {
