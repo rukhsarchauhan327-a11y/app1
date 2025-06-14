@@ -358,11 +358,12 @@
             return result.data;
         }
 
-        // Update sales statistics
-        function updateSalesStats(data) {
+        // Main dashboard update function
+        function updateDashboard(data) {
+            console.log('Updating dashboard with data:', data);
+            
             const totalInvestment = data.totalInvestment || 0;
             const totalProfit = data.totalProfit || 0;
-            const investmentPercentage = data.totalRevenue > 0 ? Math.round((totalInvestment / data.totalRevenue) * 100) : 0;
             
             // Update main metrics cards with period-based data
             document.getElementById('total-sales').textContent = `₹${Math.round(data.totalRevenue || 0)}`;
@@ -377,6 +378,8 @@
             const remainingInvestment = data.remainingInvestment || 0;  // Dynamic - Updates with sales
             const recoveryPercentage = combinedInvestment > 0 ? Math.round(((combinedInvestment - remainingInvestment) / combinedInvestment) * 100) : 0;
             
+            console.log('Investment values:', {combinedInvestment, remainingInvestment, recoveryPercentage});
+            
             document.getElementById('total-refilled-investment').textContent = `₹${Math.round(combinedInvestment)}`;
             document.getElementById('profit-generated').textContent = `₹${Math.round(totalProfit)}`;  // Period-based profit
             document.getElementById('remaining-recovery').textContent = `₹${Math.round(remainingInvestment)}`;
@@ -386,6 +389,10 @@
             // Update growth indicators without percentages
             document.getElementById('sales-growth').textContent = `Sales for ${data.period || 'weekly'}`;
             document.getElementById('profit-growth').textContent = `Profit for ${data.period || 'weekly'}`;
+            
+            // Update chart and top selling items
+            updateInvestmentProfitChart(data.chartData);
+            updateTopSellingItems(data.topItems);
         }
 
 
