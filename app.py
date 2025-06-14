@@ -1302,28 +1302,82 @@ def api_sales_data():
                 payment_modes['credit']['amount'] += bill.total_amount
                 payment_modes['credit']['count'] += 1
         
-        # Category performance
+        # Category performance and top selling items with investment tracking
         category_performance = {}
         top_selling_items = {}
+        total_investment = 0
+        daily_data = []
         
         for bill in bills:
             bill_items = BillItem.query.filter_by(bill_id=bill.id).all()
+            bill_investment = 0
+            bill_profit = 0
+            
             for item in bill_items:
                 product = Product.query.filter_by(name=item.item_name).first()
                 if product:
+                    # Calculate investment and profit for this item
+                    item_investment = (product.cost_price or 0) * item.quantity
+                    item_profit = item.total_price - item_investment
+                    
+                    bill_investment += item_investment
+                    bill_profit += item_profit
+                    
                     # Category performance
                     category = product.category or 'Others'
                     if category not in category_performance:
-                        category_performance[category] = {'amount': 0, 'items': 0}
+                        category_performance[category] = {'amount': 0, 'items': 0, 'investment': 0, 'profit': 0}
                     category_performance[category]['amount'] += item.total_price
                     category_performance[category]['items'] += 1
+                    category_performance[category]['investment'] += item_investment
+                    category_performance[category]['profit'] += item_profit
                     
                     # Top selling items
                     item_name = item.item_name
                     if item_name not in top_selling_items:
-                        top_selling_items[item_name] = {'amount': 0, 'quantity': 0}
+                        top_selling_items[item_name] = {
+                            'amount': 0, 
+                            'quantity': 0, 
+                            'investment': 0, 
+                            'profit': 0,
+                            'product_id': product.id
+                        }
                     top_selling_items[item_name]['amount'] += item.total_price
                     top_selling_items[item_name]['quantity'] += item.quantity
+                    top_selling_items[item_name]['investment'] += item_investment
+                    top_selling_items[item_name]['profit'] += item_profit
+            
+            # Add daily data for chart
+            daily_data.append({
+                'date': bill.created_at.strftime('%Y-%m-%d'),
+                'investment': bill_investment,
+                'profit': bill_profit,
+                'revenue': bill.total_amount
+            })
+            
+            total_investment += bill_investment
+        
+        # Process daily data for chart
+        from collections import defaultdict
+        chart_data = defaultdict(lambda: {'investment': 0, 'profit': 0, 'revenue': 0})
+        
+        for data in daily_data:
+            chart_data[data['date']]['investment'] += data['investment']
+            chart_data[data['date']]['profit'] += data['profit']
+            chart_data[data['date']]['revenue'] += data['revenue']
+        
+        # Convert to sorted list
+        sorted_dates = sorted(chart_data.keys())
+        investment_data = []
+        profit_data = []
+        cumulative_investment = 0
+        cumulative_profit = 0
+        
+        for date in sorted_dates:
+            cumulative_investment += chart_data[date]['investment']
+            cumulative_profit += chart_data[date]['profit']
+            investment_data.append(cumulative_investment)
+            profit_data.append(cumulative_profit)
         
         # Sort categories by amount
         sorted_categories = sorted(category_performance.items(), key=lambda x: x[1]['amount'], reverse=True)
@@ -1331,7 +1385,7 @@ def api_sales_data():
         
         # Sort top selling items
         sorted_items = sorted(top_selling_items.items(), key=lambda x: x[1]['amount'], reverse=True)
-        top_items = [{'name': item[0], 'amount': item[1]['amount'], 'quantity': item[1]['quantity']} for item in sorted_items[:5]]
+        top_items = [{'name': item[0], 'amount': item[1]['amount'], 'quantity': item[1]['quantity'], 'investment': item[1]['investment'], 'profit': item[1]['profit'], 'product_id': item[1]['product_id']} for item in sorted_items[:5]]
         
         # Recent sales (last 10)
         recent_bills = Bill.query.order_by(Bill.created_at.desc()).limit(10).all()
@@ -1359,10 +1413,16 @@ def api_sales_data():
                 'totalRevenue': total_revenue,
                 'totalBills': total_bills,
                 'totalProfit': total_profit,
+                'totalInvestment': total_investment,
                 'avgBillValue': total_revenue / total_bills if total_bills > 0 else 0,
                 'paymentModes': payment_modes,
                 'categories': categories,
                 'topItems': top_items,
+                'chartData': {
+                    'dates': sorted_dates,
+                    'investment': investment_data,
+                    'profit': profit_data
+                },
                 'recentSales': recent_sales
             }
         })

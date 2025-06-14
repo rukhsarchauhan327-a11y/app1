@@ -337,7 +337,7 @@
                 updateCategoryPerformance(salesData.categories);
                 updateTopSellingItems(salesData.topItems);
                 updateSalesChart(salesData);
-                updateInvestmentRecovery(salesData.totalProfit);
+                updateInvestmentRecovery(salesData);
                 
                 showNotification('Sales data loaded successfully', 'success');
             } catch (error) {
@@ -481,7 +481,8 @@
                 const color = colors[index % colors.length];
                 const rank = index + 1;
                 const itemElement = document.createElement('div');
-                itemElement.className = 'flex items-center justify-between';
+                itemElement.className = 'flex items-center justify-between cursor-pointer hover:bg-gray-50 p-2 rounded-lg transition-colors';
+                itemElement.onclick = () => openProductDetails(item.product_id);
                 itemElement.innerHTML = `
                     <div class="flex items-center space-x-3">
                         <div class="w-8 h-8 bg-${color}/10 rounded-lg flex items-center justify-center">
@@ -489,16 +490,26 @@
                         </div>
                         <div>
                             <p class="font-semibold text-dark">${item.name}</p>
-                            <p class="text-xs text-gray-500">${Math.round(item.quantity)} units sold</p>
+                            <p class="text-xs text-gray-500">${Math.round(item.quantity)} units sold • Investment: ₹${Math.round(item.investment || 0)}</p>
                         </div>
                     </div>
-                    <p class="font-bold text-dark">₹${Math.round(item.amount)}</p>
+                    <div class="text-right">
+                        <p class="font-bold text-dark">₹${Math.round(item.amount)}</p>
+                        <p class="text-xs text-green-600">+₹${Math.round(item.profit || 0)} profit</p>
+                    </div>
                 `;
                 topItemsContainer.appendChild(itemElement);
             });
         }
+        
+        // Open product details page
+        function openProductDetails(productId) {
+            if (productId) {
+                window.location.href = `/product-details?id=${productId}`;
+            }
+        }
 
-        // Update sales chart
+        // Update investment vs profit chart
         function updateSalesChart(data) {
             try {
                 const ctx = document.getElementById('salesChart');
@@ -508,30 +519,49 @@
                     salesChart.destroy();
                 }
                 
-                const labels = currentPeriod === 'daily' ? 
-                    ['9 AM', '11 AM', '1 PM', '3 PM', '5 PM', '7 PM'] :
-                    currentPeriod === 'weekly' ?
-                    ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'] :
-                    ['Week 1', 'Week 2', 'Week 3', 'Week 4'];
-                    
-                const baseRevenue = data.totalRevenue || 0;
-                const chartData = currentPeriod === 'daily' ?
-                    [baseRevenue * 0.1, baseRevenue * 0.2, baseRevenue * 0.35, baseRevenue * 0.5, baseRevenue * 0.75, baseRevenue] :
-                    currentPeriod === 'weekly' ?
-                    [baseRevenue * 0.1, baseRevenue * 0.15, baseRevenue * 0.2, baseRevenue * 0.18, baseRevenue * 0.22, baseRevenue * 0.08, baseRevenue * 0.07] :
-                    [baseRevenue * 0.2, baseRevenue * 0.3, baseRevenue * 0.25, baseRevenue * 0.25];
-                    
+                let labels, investmentData, profitData;
+                
+                if (data.chartData && data.chartData.dates && data.chartData.dates.length > 0) {
+                    // Use real data from API
+                    labels = data.chartData.dates.map(date => {
+                        const d = new Date(date);
+                        return currentPeriod === 'daily' ? 
+                            d.toLocaleDateString('hi-IN', { day: 'numeric', month: 'short' }) :
+                            currentPeriod === 'weekly' ?
+                            d.toLocaleDateString('hi-IN', { day: 'numeric', month: 'short' }) :
+                            d.toLocaleDateString('hi-IN', { month: 'short', year: '2-digit' });
+                    });
+                    investmentData = data.chartData.investment;
+                    profitData = data.chartData.profit;
+                } else {
+                    // Fallback labels when no data
+                    labels = currentPeriod === 'daily' ? 
+                        ['Today'] :
+                        currentPeriod === 'weekly' ?
+                        ['This Week'] :
+                        ['This Month'];
+                    investmentData = [data.totalInvestment || 0];
+                    profitData = [data.totalProfit || 0];
+                }
+                
                 salesChart = new Chart(ctx, {
                     type: 'line',
                     data: {
                         labels: labels,
                         datasets: [{
-                            label: 'Sales',
-                            data: chartData,
+                            label: 'Investment',
+                            data: investmentData,
+                            borderColor: '#ff6b6b',
+                            backgroundColor: 'rgba(255, 107, 107, 0.1)',
+                            tension: 0.4,
+                            fill: false
+                        }, {
+                            label: 'Profit Generated',
+                            data: profitData,
                             borderColor: '#4CAF50',
                             backgroundColor: 'rgba(76, 175, 80, 0.1)',
                             tension: 0.4,
-                            fill: true
+                            fill: false
                         }]
                     },
                     options: {
@@ -539,7 +569,8 @@
                         maintainAspectRatio: false,
                         plugins: {
                             legend: {
-                                display: false
+                                display: true,
+                                position: 'top'
                             }
                         },
                         scales: {
@@ -555,7 +586,7 @@
                     }
                 });
             } catch (error) {
-                console.error('Error updating sales chart:', error);
+                console.error('Error updating investment vs profit chart:', error);
             }
         }
 
@@ -583,17 +614,17 @@
             }
         }
 
-        // Update investment recovery
-        function updateInvestmentRecovery(totalProfit) {
-            const initialInvestment = 100000; // ₹1,00,000
-            const recovered = Math.min(totalProfit * 10, initialInvestment); // Assuming total accumulated profit
-            const remaining = initialInvestment - recovered;
-            const percentage = Math.round((recovered / initialInvestment) * 100);
+        // Update investment recovery based on current period
+        function updateInvestmentRecovery(data) {
+            const totalInvestment = data.totalInvestment || 0;
+            const totalProfit = data.totalProfit || 0;
+            const recoveryPercentage = totalInvestment > 0 ? Math.min((totalProfit / totalInvestment) * 100, 100) : 0;
+            const remaining = Math.max(totalInvestment - totalProfit, 0);
             
-            document.getElementById('investment-recovered').textContent = `₹${Math.round(recovered)}`;
+            document.getElementById('investment-recovered').textContent = `₹${Math.round(totalProfit)}`;
             document.getElementById('remaining-recovery').textContent = `₹${Math.round(remaining)}`;
-            document.getElementById('recovery-progress').style.width = `${percentage}%`;
-            document.getElementById('recovery-percentage').textContent = `${percentage}% recovered`;
+            document.getElementById('recovery-progress').style.width = `${recoveryPercentage}%`;
+            document.getElementById('recovery-percentage').textContent = `${Math.round(recoveryPercentage)}% recovered`;
         }
 
         // Show notification
