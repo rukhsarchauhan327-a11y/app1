@@ -1429,6 +1429,12 @@
                 if (e.key === 'emailBackupEnabled') {
                     checkBackupStatus();
                 }
+                
+                // Listen for notification updates from notifications page
+                if (e.key === 'notificationUpdate') {
+                    console.log('Notification update detected, refreshing count...');
+                    updateNotificationCount();
+                }
             });
         });
     </script>

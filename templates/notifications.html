@@ -256,6 +256,24 @@
                     if (data.success) {
                         loadNotifications();
                         showStyledNotification('All notifications marked as read!', 'success');
+                        
+                        // Update dashboard notification count if on same domain
+                        if (window.opener && !window.opener.closed) {
+                            try {
+                                // Update parent window notification count
+                                const parentBadge = window.opener.document.getElementById('notification-count');
+                                if (parentBadge) {
+                                    parentBadge.style.display = 'none';
+                                    parentBadge.textContent = '0';
+                                }
+                            } catch(e) {
+                                console.log('Could not update parent notification count');
+                            }
+                        }
+                        
+                        // Use localStorage to communicate with dashboard
+                        localStorage.setItem('notificationUpdate', Date.now().toString());
+                        
                     } else {
                         showStyledNotification('Failed to mark notifications as read', 'error');
                     }
@@ -472,8 +490,25 @@
             var colors = getNotificationColors(notification);
             div.classList.add(colors.borderColor);
             
-            // Make notification clickable - navigate to relevant page
+            // Make notification clickable - navigate to relevant page and mark as read
             div.onclick = function() {
+                // Mark notification as read first
+                if (!notification.is_read) {
+                    fetch('/api/notifications/' + notification.id + '/mark-read', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            // Update localStorage to notify dashboard
+                            localStorage.setItem('notificationUpdate', Date.now().toString());
+                        }
+                    })
+                    .catch(error => console.error('Error marking notification as read:', error));
+                }
+                
+                // Navigate to relevant page
                 handleNotificationClick(notification.type);
             };
             
