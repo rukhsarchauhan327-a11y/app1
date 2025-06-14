@@ -138,7 +138,7 @@
         </div>
     </nav>
 
-    <!-- Scanner Modal -->
+    <!-- Universal Scanner Modal -->
     <div id="scanner-modal" class="fixed inset-0 bg-black bg-opacity-90 z-50 hidden">
         <div class="fixed inset-0 flex flex-col">
             <div class="bg-black text-white p-4">
@@ -146,7 +146,7 @@
                     <button onclick="closeScanner()" class="p-2 hover:bg-gray-800 rounded-lg">
                         <i class="fa-solid fa-times text-white"></i>
                     </button>
-                    <h2 class="text-lg font-semibold">Scan to Search Product</h2>
+                    <h2 id="scanner-title" class="text-lg font-semibold">Scan Barcode</h2>
                     <button onclick="toggleFlashlight()" class="p-2 hover:bg-gray-800 rounded-lg">
                         <i class="fa-solid fa-flashlight text-white"></i>
                     </button>
@@ -156,12 +156,23 @@
                 <video id="scanner-video" class="w-full h-full object-cover" autoplay playsinline muted></video>
                 <div class="absolute inset-0 flex items-center justify-center">
                     <div class="relative">
-                        <div class="w-64 h-64 border-2 border-white border-dashed rounded-lg bg-transparent"></div>
+                        <div class="w-64 h-64 border-2 border-white border-dashed rounded-lg bg-transparent">
+                            <div class="absolute top-0 left-0 w-4 h-4 border-t-4 border-l-4 border-white"></div>
+                            <div class="absolute top-0 right-0 w-4 h-4 border-t-4 border-r-4 border-white"></div>
+                            <div class="absolute bottom-0 left-0 w-4 h-4 border-b-4 border-l-4 border-white"></div>
+                            <div class="absolute bottom-0 right-0 w-4 h-4 border-b-4 border-r-4 border-white"></div>
+                        </div>
                     </div>
                 </div>
-                <div class="absolute bottom-8 left-1/2 transform -translate-x-1/2">
+                <div id="scanner-status" class="absolute top-4 left-4 right-4 text-center">
+                    <span class="bg-primary text-white px-3 py-1 rounded-full text-sm">Position barcode in frame</span>
+                </div>
+                <div class="absolute bottom-8 left-1/2 transform -translate-x-1/2 flex space-x-3">
                     <button onclick="manualBarcodeEntry()" class="bg-white text-black px-4 py-2 rounded-lg font-medium">
                         Enter Manually
+                    </button>
+                    <button onclick="toggleFlashlight()" class="bg-gray-800 text-white px-4 py-2 rounded-lg font-medium">
+                        <i class="fa-solid fa-flashlight"></i>
                     </button>
                 </div>
             </div>

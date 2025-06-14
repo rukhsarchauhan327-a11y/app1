@@ -456,7 +456,7 @@
         </div>
     </div>
 
-    <!-- Scanner Modal -->
+    <!-- Universal Scanner Modal -->
     <div id="scanner-modal" class="fixed inset-0 bg-black bg-opacity-90 z-50 hidden">
         <div class="fixed inset-0 flex flex-col">
             <div class="bg-black text-white p-4">
@@ -464,7 +464,7 @@
                     <button onclick="closeScanner()" class="p-2 hover:bg-gray-800 rounded-lg">
                         <i class="fa-solid fa-times text-white"></i>
                     </button>
-                    <h2 class="text-lg font-semibold">Scan to Search Product</h2>
+                    <h2 id="scanner-title" class="text-lg font-semibold">Scan Barcode</h2>
                     <button onclick="toggleFlashlight()" class="p-2 hover:bg-gray-800 rounded-lg">
                         <i class="fa-solid fa-flashlight text-white"></i>
                     </button>
@@ -474,12 +474,23 @@
                 <video id="scanner-video" class="w-full h-full object-cover" autoplay playsinline muted></video>
                 <div class="absolute inset-0 flex items-center justify-center">
                     <div class="relative">
-                        <div class="w-64 h-64 border-2 border-white border-dashed rounded-lg bg-transparent"></div>
+                        <div class="w-64 h-64 border-2 border-white border-dashed rounded-lg bg-transparent">
+                            <div class="absolute top-0 left-0 w-4 h-4 border-t-4 border-l-4 border-white"></div>
+                            <div class="absolute top-0 right-0 w-4 h-4 border-t-4 border-r-4 border-white"></div>
+                            <div class="absolute bottom-0 left-0 w-4 h-4 border-b-4 border-l-4 border-white"></div>
+                            <div class="absolute bottom-0 right-0 w-4 h-4 border-b-4 border-r-4 border-white"></div>
+                        </div>
                     </div>
                 </div>
-                <div class="absolute bottom-8 left-1/2 transform -translate-x-1/2">
+                <div id="scanner-status" class="absolute top-4 left-4 right-4 text-center">
+                    <span class="bg-primary text-white px-3 py-1 rounded-full text-sm">Position barcode in frame</span>
+                </div>
+                <div class="absolute bottom-8 left-1/2 transform -translate-x-1/2 flex space-x-3">
                     <button onclick="manualBarcodeEntry()" class="bg-white text-black px-4 py-2 rounded-lg font-medium">
                         Enter Manually
+                    </button>
+                    <button onclick="toggleFlashlight()" class="bg-gray-800 text-white px-4 py-2 rounded-lg font-medium">
+                        <i class="fa-solid fa-flashlight"></i>
                     </button>
                 </div>
             </div>
@@ -819,32 +830,54 @@
             document.getElementById('search-empty').classList.add('hidden');
         }
 
+        // Universal Scanner Component
         let currentStream = null;
+        let scannerCodeReader = null;
 
-        function openScanner() {
+        function openScanner(title = 'Scan Barcode') {
+            // Set scanner title
+            document.getElementById('scanner-title').textContent = title;
             document.getElementById('scanner-modal').classList.remove('hidden');
             
-            // Initialize camera to fix black screen
+            // Initialize camera
             const video = document.getElementById('scanner-video');
+            const statusElement = document.getElementById('scanner-status');
+            
+            updateScannerStatus('Starting camera...', 'bg-blue-500');
+            
             if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
                 navigator.mediaDevices.getUserMedia({ 
                     video: { 
                         facingMode: 'environment',
-                        width: { ideal: 640 },
-                        height: { ideal: 480 }
+                        width: { ideal: 1280 },
+                        height: { ideal: 720 }
                     } 
                 })
                 .then(function(stream) {
                     video.srcObject = stream;
                     video.play();
                     currentStream = stream;
+                    updateScannerStatus('Position barcode in frame', 'bg-green-500');
+                    
+                    // Initialize barcode scanning if ZXing is available
+                    if (typeof ZXing !== 'undefined') {
+                        scannerCodeReader = new ZXing.BrowserMultiFormatReader();
+                        scannerCodeReader.decodeFromVideoDevice(undefined, video, (result, err) => {
+                            if (result) {
+                                const barcodeValue = result.text;
+                                closeScanner();
+                                handleBarcodeResult(barcodeValue);
+                            }
+                        });
+                    }
                 })
                 .catch(function(err) {
                     console.error('Camera error:', err);
+                    updateScannerStatus('Camera access denied - Enter manually below', 'bg-red-500');
                 });
+            } else {
+                updateScannerStatus('Camera not supported - Enter manually below', 'bg-orange-500');
             }
-            
-            simulateScanning();
         }
 
         function closeScanner() {
@@ -855,6 +888,28 @@
                 currentStream.getTracks().forEach(track => track.stop());
                 currentStream = null;
             }
+            
+            // Stop barcode reader
+            if (scannerCodeReader) {
+                scannerCodeReader.reset();
+                scannerCodeReader = null;
+            }
+        }
+
+        function updateScannerStatus(message, colorClass) {
+            const statusElement = document.getElementById('scanner-status');
+            statusElement.innerHTML = `<span class="${colorClass} text-white px-3 py-1 rounded-full text-sm">${message}</span>`;
+        }
+
+        function handleBarcodeResult(barcode) {
+            // This function will be overridden in each page based on context
+            console.log('Barcode scanned:', barcode);
+            performBarcodeSearch(barcode);
+        }
+
+        function toggleFlashlight() {
+            // In a real app, this would control the camera flash
+            console.log('Flashlight toggled');
         }
 
         function manualBarcodeEntry() {
