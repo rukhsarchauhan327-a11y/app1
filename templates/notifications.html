@@ -481,6 +481,21 @@
         }
 
         function simulateScanning() {
+            // Show scanning progress notifications
+            showNotification('Initializing camera...', 'info');
+            
+            setTimeout(() => {
+                showNotification('Scanning for barcode...', 'info');
+            }, 800);
+            
+            setTimeout(() => {
+                showNotification('Barcode detected!', 'success');
+            }, 1800);
+            
+            setTimeout(() => {
+                showNotification('Loading product details...', 'info');
+            }, 2200);
+            
             // Simulate successful scan after 3 seconds using real database barcodes
             setTimeout(() => {
                 const realBarcodes = ['8901030789012', '8901030567890', '8901030345678', '8901030234567', '8901030456789', '8901030845371', '8901786101234', '8901030825456', '8901030123456', '8901030678901'];
