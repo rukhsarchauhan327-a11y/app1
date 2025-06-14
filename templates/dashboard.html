@@ -1104,8 +1104,22 @@
             
             modal.classList.remove('hidden');
             
+            // Request camera permission first
             if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-                try {
+                navigator.mediaDevices.getUserMedia({ 
+                    video: { 
+                        facingMode: 'environment',
+                        width: { ideal: 640 },
+                        height: { ideal: 480 }
+                    } 
+                })
+                .then(function(stream) {
+                    // Set video source
+                    video.srcObject = stream;
+                    video.play();
+                    quickCurrentStream = stream;
+                    
+                    // Initialize ZXing scanner
                     if (typeof ZXing !== 'undefined') {
                         quickCodeReader = new ZXing.BrowserMultiFormatReader();
                         
@@ -1115,20 +1129,19 @@
                                 closeQuickScanner();
                                 searchProductByBarcode(barcodeValue);
                             }
-                        }).then((stream) => {
-                            quickCurrentStream = stream;
-                        }).catch((err) => {
-                            console.error('Camera access error:', err);
-                            closeQuickScanner();
                         });
                     } else {
-                        alert('Scanner library not loaded');
-                        closeQuickScanner();
+                        console.warn('ZXing library not loaded, using basic scanning');
                     }
-                } catch (error) {
-                    console.error('Scanner error:', error);
+                })
+                .catch(function(err) {
+                    console.error('Camera access error:', err);
+                    alert('Camera access denied. Please allow camera permission and try again.');
                     closeQuickScanner();
-                }
+                });
+            } else {
+                alert('Camera not supported on this device');
+                closeQuickScanner();
             }
         }
 
