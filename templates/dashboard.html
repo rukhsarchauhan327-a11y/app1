@@ -830,87 +830,10 @@
             document.getElementById('search-empty').classList.add('hidden');
         }
 
-        // Universal Scanner Component
-        let currentStream = null;
-        let scannerCodeReader = null;
-
-        function openScanner(title = 'Scan Barcode') {
-            // Set scanner title
-            document.getElementById('scanner-title').textContent = title;
-            document.getElementById('scanner-modal').classList.remove('hidden');
-            
-            // Initialize camera
-            const video = document.getElementById('scanner-video');
-            const statusElement = document.getElementById('scanner-status');
-            
-            updateScannerStatus('Starting camera...', 'bg-blue-500');
-            
-            if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-                navigator.mediaDevices.getUserMedia({ 
-                    video: { 
-                        facingMode: 'environment',
-                        width: { ideal: 1280 },
-                        height: { ideal: 720 }
-                    } 
-                })
-                .then(function(stream) {
-                    video.srcObject = stream;
-                    video.play();
-                    currentStream = stream;
-                    updateScannerStatus('Position barcode in frame', 'bg-green-500');
-                    
-                    // Initialize barcode scanning if ZXing is available
-                    if (typeof ZXing !== 'undefined') {
-                        scannerCodeReader = new ZXing.BrowserMultiFormatReader();
-                        scannerCodeReader.decodeFromVideoDevice(undefined, video, (result, err) => {
-                            if (result) {
-                                const barcodeValue = result.text;
-                                closeScanner();
-                                handleBarcodeResult(barcodeValue);
-                            }
-                        });
-                    }
-                })
-                .catch(function(err) {
-                    console.error('Camera error:', err);
-                    updateScannerStatus('Camera access denied - Enter manually below', 'bg-red-500');
-                });
-            } else {
-                updateScannerStatus('Camera not supported - Enter manually below', 'bg-orange-500');
-            }
-        }
-
-        function closeScanner() {
-            document.getElementById('scanner-modal').classList.add('hidden');
-            
-            // Stop camera stream
-            if (currentStream) {
-                currentStream.getTracks().forEach(track => track.stop());
-                currentStream = null;
-            }
-            
-            // Stop barcode reader
-            if (scannerCodeReader) {
-                scannerCodeReader.reset();
-                scannerCodeReader = null;
-            }
-        }
-
-        function updateScannerStatus(message, colorClass) {
-            const statusElement = document.getElementById('scanner-status');
-            statusElement.innerHTML = `<span class="${colorClass} text-white px-3 py-1 rounded-full text-sm">${message}</span>`;
-        }
-
-        function handleBarcodeResult(barcode) {
-            // This function will be overridden in each page based on context
-            console.log('Barcode scanned:', barcode);
+        // Initialize page-specific barcode handler
+        window.onBarcodeScanned = function(barcode) {
             performBarcodeSearch(barcode);
-        }
-
-        function toggleFlashlight() {
-            // In a real app, this would control the camera flash
-            console.log('Flashlight toggled');
-        }
+        };
 
         function manualBarcodeEntry() {
             document.getElementById('manual-barcode-modal').classList.remove('hidden');

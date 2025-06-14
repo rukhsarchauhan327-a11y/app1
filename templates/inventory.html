@@ -544,28 +544,7 @@
                         <i class="fa-solid fa-flashlight"></i>
                     </button>
                 </div>
-                <script>
-                    // Camera initialization script for black screen fix
-                    function initializeCamera() {
-                        const video = document.getElementById('scanner-video');
-                        if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-                            navigator.mediaDevices.getUserMedia({ 
-                                video: { 
-                                    facingMode: 'environment',
-                                    width: { ideal: 640 },
-                                    height: { ideal: 480 }
-                                } 
-                            })
-                            .then(function(stream) {
-                                video.srcObject = stream;
-                                video.play();
-                            })
-                            .catch(function(err) {
-                                console.error('Camera error:', err);
-                            });
-                        }
-                    }
-                </script>
+
             </div>
         </div>
     </div>
