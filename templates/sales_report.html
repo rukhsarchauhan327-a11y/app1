@@ -76,8 +76,8 @@
         <!-- Period Tabs -->
         <div class="px-4 mb-6">
             <div class="flex bg-gray-100 rounded-xl p-1">
-                <button onclick="setPeriod('daily')" class="flex-1 py-3 text-center bg-primary text-white rounded-lg font-semibold" id="daily-tab">Daily</button>
-                <button onclick="setPeriod('weekly')" class="flex-1 py-3 text-center text-gray-600" id="weekly-tab">Weekly</button>
+                <button onclick="setPeriod('daily')" class="flex-1 py-3 text-center text-gray-600" id="daily-tab">Daily</button>
+                <button onclick="setPeriod('weekly')" class="flex-1 py-3 text-center bg-primary text-white rounded-lg font-semibold" id="weekly-tab">Weekly</button>
                 <button onclick="setPeriod('monthly')" class="flex-1 py-3 text-center text-gray-600" id="monthly-tab">Monthly</button>
             </div>
         </div>
@@ -147,7 +147,7 @@
             <div class="bg-white p-6 rounded-xl shadow-sm">
                 <div class="flex items-center justify-between mb-6">
                     <div>
-                        <h3 class="text-xl font-bold text-dark">7-Day Investment vs Profit Analysis</h3>
+                        <h3 class="text-xl font-bold text-dark" id="chart-title">Investment vs Profit Analysis</h3>
                         <p class="text-sm text-gray-600 mt-1">Real-time tracking of your business performance</p>
                     </div>
                     <div class="bg-gradient-to-r from-primary to-secondary text-white px-3 py-1 rounded-full text-xs font-medium">
@@ -258,25 +258,63 @@
             loadSalesDataByPeriod(period);
         }
 
-        // Load 7-day sales data
-        async function load7DaySalesData() {
+        // Current period for data filtering
+        let currentPeriod = 'daily';
+        
+        // Set period and update data
+        async function setPeriod(period) {
+            currentPeriod = period;
+            
+            // Update tab appearance
+            document.getElementById('daily-tab').className = 'flex-1 py-3 text-center text-gray-600';
+            document.getElementById('weekly-tab').className = 'flex-1 py-3 text-center text-gray-600';
+            document.getElementById('monthly-tab').className = 'flex-1 py-3 text-center text-gray-600';
+            
+            document.getElementById(`${period}-tab`).className = 'flex-1 py-3 text-center bg-primary text-white rounded-lg font-semibold';
+            
+            // Load data based on selected period
+            await loadPeriodData(period);
+        }
+        
+        // Load data for specific period
+        async function loadPeriodData(period) {
             try {
                 const today = new Date();
-                const sevenDaysAgo = new Date(today);
-                sevenDaysAgo.setDate(today.getDate() - 6);
+                let fromDate, toDate;
                 
-                const fromDate = sevenDaysAgo.toISOString().split('T')[0];
-                const toDate = today.toISOString().split('T')[0];
+                switch(period) {
+                    case 'daily':
+                        fromDate = today.toISOString().split('T')[0];
+                        toDate = today.toISOString().split('T')[0];
+                        break;
+                    case 'weekly':
+                        const sevenDaysAgo = new Date(today);
+                        sevenDaysAgo.setDate(today.getDate() - 6);
+                        fromDate = sevenDaysAgo.toISOString().split('T')[0];
+                        toDate = today.toISOString().split('T')[0];
+                        break;
+                    case 'monthly':
+                        const thirtyDaysAgo = new Date(today);
+                        thirtyDaysAgo.setDate(today.getDate() - 29);
+                        fromDate = thirtyDaysAgo.toISOString().split('T')[0];
+                        toDate = today.toISOString().split('T')[0];
+                        break;
+                }
                 
-                await loadSalesData(fromDate, toDate);
+                await loadSalesData(fromDate, toDate, period);
             } catch (error) {
-                console.error('Error loading 7-day sales data:', error);
+                console.error(`Error loading ${period} sales data:`, error);
                 showNotification('Error loading sales data', 'error');
             }
         }
+        
+        // Load 7-day sales data (default)
+        async function load7DaySalesData() {
+            await loadPeriodData('weekly');
+        }
 
         // Load sales data
-        async function loadSalesData(fromDate = null, toDate = null) {
+        async function loadSalesData(fromDate = null, toDate = null, period = 'weekly') {
             try {
                 console.log('Loading sales data...');
                 showNotification('Loading sales data...', 'info');
@@ -286,7 +324,7 @@
                 
                 updateSalesStats(salesData);
                 updateTopSellingItems(salesData.topItems);
-                updateSalesChart(salesData);
+                updateSalesChart(salesData, period);
                 updateInvestmentRecovery(salesData);
                 
                 showNotification('Sales data loaded successfully', 'success');
@@ -396,8 +434,8 @@
             }
         }
 
-        // Update investment vs profit chart with 7-day real data
-        function updateSalesChart(data) {
+        // Update investment vs profit chart with dynamic period data
+        function updateSalesChart(data, period = 'weekly') {
             try {
                 console.log('Updating chart with data:', data);
                 const ctx = document.getElementById('salesChart');
@@ -412,19 +450,41 @@
                 
                 let labels, investmentData, profitData;
                 
-                // Use real 7-day data from API
+                // Use real data from API based on period
                 if (data.chartData && data.chartData.dates && data.chartData.dates.length > 0) {
                     labels = data.chartData.dates.map(date => {
                         const d = new Date(date);
-                        return d.toLocaleDateString('en-US', { weekday: 'short' });
+                        switch(period) {
+                            case 'daily':
+                                return d.toLocaleDateString('en-US', { hour: '2-digit', minute: '2-digit' });
+                            case 'weekly':
+                                return d.toLocaleDateString('en-US', { weekday: 'short' });
+                            case 'monthly':
+                                return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                            default:
+                                return d.toLocaleDateString('en-US', { weekday: 'short' });
+                        }
                     });
                     investmentData = data.chartData.investment;
                     profitData = data.chartData.profit;
                 } else {
-                    // Empty chart with 7 days
-                    labels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-                    investmentData = [0, 0, 0, 0, 0, 0, 0];
-                    profitData = [0, 0, 0, 0, 0, 0, 0];
+                    // Empty chart based on period
+                    switch(period) {
+                        case 'daily':
+                            labels = ['6AM', '9AM', '12PM', '3PM', '6PM', '9PM'];
+                            investmentData = [0, 0, 0, 0, 0, 0];
+                            profitData = [0, 0, 0, 0, 0, 0];
+                            break;
+                        case 'monthly':
+                            labels = ['Week 1', 'Week 2', 'Week 3', 'Week 4'];
+                            investmentData = [0, 0, 0, 0];
+                            profitData = [0, 0, 0, 0];
+                            break;
+                        default: // weekly
+                            labels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+                            investmentData = [0, 0, 0, 0, 0, 0, 0];
+                            profitData = [0, 0, 0, 0, 0, 0, 0];
+                    }
                 }
                 
                 console.log('Chart data:', { labels, investmentData, profitData });

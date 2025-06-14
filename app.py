@@ -1351,18 +1351,42 @@ def api_sales_data():
             total_investment += bill_investment
             total_profit += bill_profit
         
-        # Generate real-time 7-day chart data
+        # Generate dynamic chart data based on date range
         from collections import defaultdict
         from datetime import datetime, timedelta
         
-        # Get last 7 days including today
-        today = datetime.now().date()
-        seven_days = [(today - timedelta(days=i)) for i in range(6, -1, -1)]
+        # Determine period based on date range
+        if from_date and to_date:
+            start_date = datetime.strptime(from_date, '%Y-%m-%d').date()
+            end_date = datetime.strptime(to_date, '%Y-%m-%d').date()
+            date_diff = (end_date - start_date).days
+            
+            if date_diff == 0:  # Same day - daily view
+                # Generate hourly data for single day
+                chart_dates = []
+                for hour in range(0, 24, 4):  # Every 4 hours
+                    chart_dates.append(start_date.strftime('%Y-%m-%d'))
+            elif date_diff <= 7:  # Weekly view
+                # Generate daily data for week
+                chart_dates = []
+                for i in range(date_diff + 1):
+                    chart_dates.append((start_date + timedelta(days=i)).strftime('%Y-%m-%d'))
+            else:  # Monthly view
+                # Generate weekly data for month
+                chart_dates = []
+                current_date = start_date
+                while current_date <= end_date:
+                    chart_dates.append(current_date.strftime('%Y-%m-%d'))
+                    current_date += timedelta(days=7)
+        else:
+            # Default to 7-day view
+            today = datetime.now().date()
+            chart_dates = [(today - timedelta(days=i)).strftime('%Y-%m-%d') for i in range(6, -1, -1)]
         
-        # Initialize chart data for 7 days
+        # Initialize chart data
         chart_data = {}
-        for day in seven_days:
-            chart_data[day.strftime('%Y-%m-%d')] = {'investment': 0, 'profit': 0, 'revenue': 0}
+        for date in chart_dates:
+            chart_data[date] = {'investment': 0, 'profit': 0, 'revenue': 0}
         
         # Fill with real data
         for data in daily_data:
@@ -1373,13 +1397,12 @@ def api_sales_data():
                 chart_data[date_key]['revenue'] += data['revenue']
         
         # Convert to arrays for chart
-        sorted_dates = [day.strftime('%Y-%m-%d') for day in seven_days]
         investment_data = []
         profit_data = []
         cumulative_investment = 0
         cumulative_profit = 0
         
-        for date in sorted_dates:
+        for date in chart_dates:
             cumulative_investment += chart_data[date]['investment']
             cumulative_profit += chart_data[date]['profit']
             investment_data.append(cumulative_investment)
@@ -1433,7 +1456,7 @@ def api_sales_data():
                 'categories': categories,
                 'topItems': top_items,
                 'chartData': {
-                    'dates': sorted_dates,
+                    'dates': chart_dates,
                     'investment': investment_data,
                     'profit': profit_data
                 },
