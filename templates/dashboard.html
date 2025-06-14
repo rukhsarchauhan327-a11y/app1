@@ -471,14 +471,10 @@
                 </div>
             </div>
             <div class="flex-1 relative bg-black">
+                <video id="scanner-video" class="w-full h-full object-cover" autoplay playsinline muted></video>
                 <div class="absolute inset-0 flex items-center justify-center">
                     <div class="relative">
-                        <div class="w-64 h-64 border-2 border-white border-dashed rounded-lg flex items-center justify-center">
-                            <div class="text-center text-white">
-                                <i class="fa-solid fa-barcode text-4xl mb-4"></i>
-                                <p class="text-sm">Point camera at barcode</p>
-                            </div>
-                        </div>
+                        <div class="w-64 h-64 border-2 border-white border-dashed rounded-lg bg-transparent"></div>
                     </div>
                 </div>
                 <div class="absolute bottom-8 left-1/2 transform -translate-x-1/2">
@@ -586,7 +582,7 @@
                     </button>
                 </div>
                 <div class="relative">
-                    <video id="quick-scanner-video" class="w-full h-64 bg-gray-200 rounded-lg object-cover"></video>
+                    <video id="quick-scanner-video" class="w-full h-64 bg-gray-200 rounded-lg object-cover" autoplay playsinline muted></video>
                     <div class="absolute inset-0 flex items-center justify-center">
                         <div class="w-48 h-32 border-2 border-red-500 bg-transparent"></div>
                     </div>
