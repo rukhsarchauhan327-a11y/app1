@@ -257,10 +257,14 @@
         // Load data for specific period
         async function loadPeriodData(period) {
             try {
+                console.log(`Loading data for period: ${period}`);
                 const response = await fetch(`/api/sales-data?period=${period}`);
                 const result = await response.json();
                 
+                console.log('API Response:', result);
+                
                 if (result.success) {
+                    console.log('Updating dashboard with data:', result.data);
                     updateDashboard(result.data);
                 } else {
                     console.error('Error loading sales data:', result.error);
@@ -622,8 +626,8 @@
 
         // Initialize page
         document.addEventListener('DOMContentLoaded', function() {
-            setCurrentDate();
-            load7DaySalesData();
+            console.log('Initializing analytics page...');
+            loadPeriodData('weekly');
         });
     </script>
 </body>
