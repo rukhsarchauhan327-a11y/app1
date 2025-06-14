@@ -297,24 +297,33 @@
 
         // Load sales data by period
         async function loadSalesDataByPeriod(period) {
-            const today = new Date();
-            let fromDate, toDate;
-            
-            switch(period) {
-                case 'daily':
-                    fromDate = toDate = today.toISOString().split('T')[0];
-                    break;
-                case 'weekly':
-                    fromDate = new Date(today.setDate(today.getDate() - 7)).toISOString().split('T')[0];
-                    toDate = new Date().toISOString().split('T')[0];
-                    break;
-                case 'monthly':
-                    fromDate = new Date(today.getFullYear(), today.getMonth(), 1).toISOString().split('T')[0];
-                    toDate = new Date().toISOString().split('T')[0];
-                    break;
+            try {
+                const today = new Date();
+                let fromDate, toDate;
+                
+                switch(period) {
+                    case 'daily':
+                        fromDate = toDate = today.toISOString().split('T')[0];
+                        break;
+                    case 'weekly':
+                        const weekAgo = new Date(today);
+                        weekAgo.setDate(today.getDate() - 7);
+                        fromDate = weekAgo.toISOString().split('T')[0];
+                        toDate = new Date().toISOString().split('T')[0];
+                        break;
+                    case 'monthly':
+                        fromDate = new Date(today.getFullYear(), today.getMonth(), 1).toISOString().split('T')[0];
+                        toDate = new Date().toISOString().split('T')[0];
+                        break;
+                    default:
+                        fromDate = toDate = today.toISOString().split('T')[0];
+                }
+                
+                await loadSalesData(fromDate, toDate);
+            } catch (error) {
+                console.error('Error loading sales data by period:', error);
+                showNotification('Error loading sales data', 'error');
             }
-            
-            loadSalesData(fromDate, toDate);
         }
 
         // Load sales data
@@ -325,9 +334,10 @@
                 const salesData = await fetchSalesData(fromDate, toDate);
                 updateSalesStats(salesData);
                 updatePaymentModes(salesData.paymentModes);
-                updateCategoryPerformance(salesData);
-                updateTopSellingItems(salesData);
+                updateCategoryPerformance(salesData.categories);
+                updateTopSellingItems(salesData.topItems);
                 updateSalesChart(salesData);
+                updateInvestmentRecovery(salesData.totalProfit);
                 
                 showNotification('Sales data loaded successfully', 'success');
             } catch (error) {
@@ -380,8 +390,14 @@
 
         // Update payment modes
         function updatePaymentModes(paymentModes) {
-            const total = paymentModes.cash.amount + paymentModes.online.amount + paymentModes.credit.amount;
             const paymentMethodsContainer = document.getElementById('payment-methods');
+            
+            if (!paymentModes) {
+                paymentMethodsContainer.innerHTML = '<p class="text-gray-500 text-center">No payment data available</p>';
+                return;
+            }
+            
+            const total = (paymentModes.cash?.amount || 0) + (paymentModes.online?.amount || 0) + (paymentModes.credit?.amount || 0);
             
             paymentMethodsContainer.innerHTML = `
                 <div class="flex items-center justify-between">
@@ -390,8 +406,8 @@
                         <span class="font-medium text-dark">Cash</span>
                     </div>
                     <div class="text-right">
-                        <p class="font-bold text-dark">₹${paymentModes.cash.amount}</p>
-                        <p class="text-xs text-gray-500">${total > 0 ? Math.round((paymentModes.cash.amount / total) * 100) : 0}% • ${paymentModes.cash.count} transactions</p>
+                        <p class="font-bold text-dark">₹${Math.round(paymentModes.cash?.amount || 0)}</p>
+                        <p class="text-xs text-gray-500">${total > 0 ? Math.round(((paymentModes.cash?.amount || 0) / total) * 100) : 0}% • ${paymentModes.cash?.count || 0} transactions</p>
                     </div>
                 </div>
                 
@@ -401,8 +417,8 @@
                         <span class="font-medium text-dark">UPI</span>
                     </div>
                     <div class="text-right">
-                        <p class="font-bold text-dark">₹${paymentModes.online.amount}</p>
-                        <p class="text-xs text-gray-500">${total > 0 ? Math.round((paymentModes.online.amount / total) * 100) : 0}% • ${paymentModes.online.count} transactions</p>
+                        <p class="font-bold text-dark">₹${Math.round(paymentModes.online?.amount || 0)}</p>
+                        <p class="text-xs text-gray-500">${total > 0 ? Math.round(((paymentModes.online?.amount || 0) / total) * 100) : 0}% • ${paymentModes.online?.count || 0} transactions</p>
                     </div>
                 </div>
                 
@@ -412,38 +428,37 @@
                         <span class="font-medium text-dark">Credit</span>
                     </div>
                     <div class="text-right">
-                        <p class="font-bold text-dark">₹${paymentModes.credit.amount}</p>
-                        <p class="text-xs text-gray-500">${total > 0 ? Math.round((paymentModes.credit.amount / total) * 100) : 0}% • ${paymentModes.credit.count} transactions</p>
+                        <p class="font-bold text-dark">₹${Math.round(paymentModes.credit?.amount || 0)}</p>
+                        <p class="text-xs text-gray-500">${total > 0 ? Math.round(((paymentModes.credit?.amount || 0) / total) * 100) : 0}% • ${paymentModes.credit?.count || 0} transactions</p>
                     </div>
                 </div>
             `;
         }
 
         // Update category performance
-        function updateCategoryPerformance(data) {
-            const categories = [
-                { name: 'Grains', amount: Math.round(data.totalRevenue * 0.4), color: 'primary' },
-                { name: 'Beverages', amount: Math.round(data.totalRevenue * 0.25), color: 'secondary' },
-                { name: 'Snacks', amount: Math.round(data.totalRevenue * 0.2), color: 'accent' },
-                { name: 'Household', amount: Math.round(data.totalRevenue * 0.1), color: 'purple-500' },
-                { name: 'Others', amount: Math.round(data.totalRevenue * 0.05), color: 'pink-500' }
-            ];
-            
+        function updateCategoryPerformance(categories) {
             const categoryContainer = document.getElementById('category-performance');
             categoryContainer.innerHTML = '';
             
-            categories.forEach(category => {
-                const percentage = data.totalRevenue > 0 ? Math.round((category.amount / data.totalRevenue) * 100) : 0;
+            if (!categories || categories.length === 0) {
+                categoryContainer.innerHTML = '<p class="text-gray-500 text-center">No category data available</p>';
+                return;
+            }
+            
+            const colors = ['primary', 'secondary', 'accent', 'purple-500', 'pink-500'];
+            
+            categories.forEach((category, index) => {
+                const color = colors[index % colors.length];
                 const categoryElement = document.createElement('div');
                 categoryElement.className = 'flex items-center justify-between';
                 categoryElement.innerHTML = `
                     <div class="flex items-center space-x-3">
-                        <div class="w-4 h-4 bg-${category.color} rounded-full"></div>
+                        <div class="w-4 h-4 bg-${color} rounded-full"></div>
                         <span class="font-medium text-dark">${category.name}</span>
                     </div>
                     <div class="text-right">
-                        <p class="font-bold text-dark">₹${category.amount}</p>
-                        <p class="text-xs text-gray-500">${percentage}% of sales</p>
+                        <p class="font-bold text-dark">₹${Math.round(category.amount)}</p>
+                        <p class="text-xs text-gray-500">${category.percentage}% of sales</p>
                     </div>
                 `;
                 categoryContainer.appendChild(categoryElement);
@@ -451,31 +466,33 @@
         }
 
         // Update top selling items
-        function updateTopSellingItems(data) {
-            const topItems = [
-                { name: 'Aashirvaad Atta', units: 15, amount: Math.round(data.totalRevenue * 0.25), rank: 1, color: 'primary' },
-                { name: 'Tata Salt', units: 12, amount: Math.round(data.totalRevenue * 0.15), rank: 2, color: 'secondary' },
-                { name: 'Amul Milk', units: 10, amount: Math.round(data.totalRevenue * 0.12), rank: 3, color: 'accent' },
-                { name: 'Good Day Biscuits', units: 8, amount: Math.round(data.totalRevenue * 0.08), rank: 4, color: 'purple-600' }
-            ];
-            
+        function updateTopSellingItems(topItems) {
             const topItemsContainer = document.getElementById('top-selling-items');
             topItemsContainer.innerHTML = '';
             
-            topItems.forEach(item => {
+            if (!topItems || topItems.length === 0) {
+                topItemsContainer.innerHTML = '<p class="text-gray-500 text-center">No top selling items data available</p>';
+                return;
+            }
+            
+            const colors = ['primary', 'secondary', 'accent', 'purple-600', 'pink-600'];
+            
+            topItems.forEach((item, index) => {
+                const color = colors[index % colors.length];
+                const rank = index + 1;
                 const itemElement = document.createElement('div');
                 itemElement.className = 'flex items-center justify-between';
                 itemElement.innerHTML = `
                     <div class="flex items-center space-x-3">
-                        <div class="w-8 h-8 bg-${item.color}/10 rounded-lg flex items-center justify-center">
-                            <span class="text-${item.color} font-bold text-sm">${item.rank}</span>
+                        <div class="w-8 h-8 bg-${color}/10 rounded-lg flex items-center justify-center">
+                            <span class="text-${color} font-bold text-sm">${rank}</span>
                         </div>
                         <div>
                             <p class="font-semibold text-dark">${item.name}</p>
-                            <p class="text-xs text-gray-500">${item.units} units sold</p>
+                            <p class="text-xs text-gray-500">${Math.round(item.quantity)} units sold</p>
                         </div>
                     </div>
-                    <p class="font-bold text-dark">₹${item.amount}</p>
+                    <p class="font-bold text-dark">₹${Math.round(item.amount)}</p>
                 `;
                 topItemsContainer.appendChild(itemElement);
             });
@@ -483,80 +500,63 @@
 
         // Update sales chart
         function updateSalesChart(data) {
-            const ctx = document.getElementById('salesChart').getContext('2d');
-            
-            if (salesChart) {
-                salesChart.destroy();
-            }
-            
-            const labels = currentPeriod === 'daily' ? 
-                ['9 AM', '11 AM', '1 PM', '3 PM', '5 PM', '7 PM'] :
-                currentPeriod === 'weekly' ?
-                ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'] :
-                ['Week 1', 'Week 2', 'Week 3', 'Week 4'];
+            try {
+                const ctx = document.getElementById('salesChart');
+                if (!ctx) return;
                 
-            const chartData = currentPeriod === 'daily' ?
-                [500, 1200, 1800, 2500, 3200, data.totalRevenue] :
-                currentPeriod === 'weekly' ?
-                [data.totalRevenue * 0.1, data.totalRevenue * 0.15, data.totalRevenue * 0.2, data.totalRevenue * 0.18, data.totalRevenue * 0.22, data.totalRevenue * 0.08, data.totalRevenue * 0.07] :
-                [data.totalRevenue * 0.2, data.totalRevenue * 0.3, data.totalRevenue * 0.25, data.totalRevenue * 0.25];
+                if (salesChart) {
+                    salesChart.destroy();
+                }
                 
-            salesChart = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        label: 'Sales',
-                        data: chartData,
-                        borderColor: '#4CAF50',
-                        backgroundColor: 'rgba(76, 175, 80, 0.1)',
-                        tension: 0.4,
-                        fill: true
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            display: false
-                        }
+                const labels = currentPeriod === 'daily' ? 
+                    ['9 AM', '11 AM', '1 PM', '3 PM', '5 PM', '7 PM'] :
+                    currentPeriod === 'weekly' ?
+                    ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'] :
+                    ['Week 1', 'Week 2', 'Week 3', 'Week 4'];
+                    
+                const baseRevenue = data.totalRevenue || 0;
+                const chartData = currentPeriod === 'daily' ?
+                    [baseRevenue * 0.1, baseRevenue * 0.2, baseRevenue * 0.35, baseRevenue * 0.5, baseRevenue * 0.75, baseRevenue] :
+                    currentPeriod === 'weekly' ?
+                    [baseRevenue * 0.1, baseRevenue * 0.15, baseRevenue * 0.2, baseRevenue * 0.18, baseRevenue * 0.22, baseRevenue * 0.08, baseRevenue * 0.07] :
+                    [baseRevenue * 0.2, baseRevenue * 0.3, baseRevenue * 0.25, baseRevenue * 0.25];
+                    
+                salesChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Sales',
+                            data: chartData,
+                            borderColor: '#4CAF50',
+                            backgroundColor: 'rgba(76, 175, 80, 0.1)',
+                            tension: 0.4,
+                            fill: true
+                        }]
                     },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            ticks: {
-                                callback: function(value) {
-                                    return '₹' + value;
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    callback: function(value) {
+                                        return '₹' + Math.round(value);
+                                    }
                                 }
                             }
                         }
                     }
-                }
-            });
-        }
-
-        // Update payment mode distribution
-        function updatePaymentModes(paymentModes) {
-            const total = paymentModes.cash.amount + paymentModes.online.amount + paymentModes.credit.amount;
-            
-            // Cash
-            const cashPercentage = total > 0 ? Math.round((paymentModes.cash.amount / total) * 100) : 0;
-            document.getElementById('cash-amount').textContent = `₹${paymentModes.cash.amount}`;
-            document.getElementById('cash-percentage').style.width = `${cashPercentage}%`;
-            document.getElementById('cash-count').textContent = `${paymentModes.cash.count} transactions`;
-            
-            // Online
-            const onlinePercentage = total > 0 ? Math.round((paymentModes.online.amount / total) * 100) : 0;
-            document.getElementById('online-amount').textContent = `₹${paymentModes.online.amount}`;
-            document.getElementById('online-percentage').style.width = `${onlinePercentage}%`;
-            document.getElementById('online-count').textContent = `${paymentModes.online.count} transactions`;
-            
-            // Credit
-            const creditPercentage = total > 0 ? Math.round((paymentModes.credit.amount / total) * 100) : 0;
-            document.getElementById('credit-amount').textContent = `₹${paymentModes.credit.amount}`;
-            document.getElementById('credit-percentage').style.width = `${creditPercentage}%`;
-            document.getElementById('credit-count').textContent = `${paymentModes.credit.count} transactions`;
+                });
+            } catch (error) {
+                console.error('Error updating sales chart:', error);
+            }
         }
 
         // Export sales report
@@ -564,13 +564,36 @@
             window.location.href = '/export-business-data';
         }
 
-        // Load more sales
-        function loadMoreSales() {
-            showNotification('Loading more sales...', 'info');
-            // In real app, this would load more data from backend
-            setTimeout(() => {
-                showNotification('No more sales to load', 'info');
-            }, 1000);
+        // Share report
+        function shareReport() {
+            if (navigator.share) {
+                navigator.share({
+                    title: 'Sales Report - Kirana Konnect',
+                    text: 'Check out our latest sales report',
+                    url: window.location.href
+                });
+            } else {
+                // Fallback for browsers without Web Share API
+                const url = window.location.href;
+                navigator.clipboard.writeText(url).then(() => {
+                    showNotification('Report link copied to clipboard', 'success');
+                }).catch(() => {
+                    showNotification('Unable to share report', 'error');
+                });
+            }
+        }
+
+        // Update investment recovery
+        function updateInvestmentRecovery(totalProfit) {
+            const initialInvestment = 100000; // ₹1,00,000
+            const recovered = Math.min(totalProfit * 10, initialInvestment); // Assuming total accumulated profit
+            const remaining = initialInvestment - recovered;
+            const percentage = Math.round((recovered / initialInvestment) * 100);
+            
+            document.getElementById('investment-recovered').textContent = `₹${Math.round(recovered)}`;
+            document.getElementById('remaining-recovery').textContent = `₹${Math.round(remaining)}`;
+            document.getElementById('recovery-progress').style.width = `${percentage}%`;
+            document.getElementById('recovery-percentage').textContent = `${percentage}% recovered`;
         }
 
         // Show notification
@@ -590,10 +613,20 @@
             }, 3000);
         }
 
+        // Set current date
+        function setCurrentDate() {
+            const today = new Date();
+            document.getElementById('current-date').textContent = today.toLocaleDateString('en-GB', {
+                day: 'numeric',
+                month: 'long',
+                year: 'numeric'
+            });
+        }
+
         // Initialize page
         document.addEventListener('DOMContentLoaded', function() {
-            setDefaultDates();
-            loadSalesData();
+            setCurrentDate();
+            loadSalesDataByPeriod('daily');
         });
     </script>
 </body>

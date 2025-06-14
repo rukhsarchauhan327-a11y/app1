@@ -1302,6 +1302,37 @@ def api_sales_data():
                 payment_modes['credit']['amount'] += bill.total_amount
                 payment_modes['credit']['count'] += 1
         
+        # Category performance
+        category_performance = {}
+        top_selling_items = {}
+        
+        for bill in bills:
+            bill_items = BillItem.query.filter_by(bill_id=bill.id).all()
+            for item in bill_items:
+                product = Product.query.filter_by(name=item.item_name).first()
+                if product:
+                    # Category performance
+                    category = product.category or 'Others'
+                    if category not in category_performance:
+                        category_performance[category] = {'amount': 0, 'items': 0}
+                    category_performance[category]['amount'] += item.total_price
+                    category_performance[category]['items'] += 1
+                    
+                    # Top selling items
+                    item_name = item.item_name
+                    if item_name not in top_selling_items:
+                        top_selling_items[item_name] = {'amount': 0, 'quantity': 0}
+                    top_selling_items[item_name]['amount'] += item.total_price
+                    top_selling_items[item_name]['quantity'] += item.quantity
+        
+        # Sort categories by amount
+        sorted_categories = sorted(category_performance.items(), key=lambda x: x[1]['amount'], reverse=True)
+        categories = [{'name': cat[0], 'amount': cat[1]['amount'], 'percentage': round((cat[1]['amount'] / total_revenue) * 100) if total_revenue > 0 else 0} for cat in sorted_categories[:5]]
+        
+        # Sort top selling items
+        sorted_items = sorted(top_selling_items.items(), key=lambda x: x[1]['amount'], reverse=True)
+        top_items = [{'name': item[0], 'amount': item[1]['amount'], 'quantity': item[1]['quantity']} for item in sorted_items[:5]]
+        
         # Recent sales (last 10)
         recent_bills = Bill.query.order_by(Bill.created_at.desc()).limit(10).all()
         recent_sales = []
@@ -1330,6 +1361,8 @@ def api_sales_data():
                 'totalProfit': total_profit,
                 'avgBillValue': total_revenue / total_bills if total_bills > 0 else 0,
                 'paymentModes': payment_modes,
+                'categories': categories,
+                'topItems': top_items,
                 'recentSales': recent_sales
             }
         })
