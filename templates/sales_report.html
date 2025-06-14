@@ -84,13 +84,13 @@
 
         <!-- Key Metrics Cards -->
         <div class="px-4 mb-6">
-            <div class="grid grid-cols-2 gap-4">
+            <div class="grid grid-cols-3 gap-3">
                 <!-- Total Sales -->
                 <div class="bg-white p-4 rounded-xl shadow-sm border-l-4 border-primary">
                     <div class="text-center">
                         <p class="text-xs text-gray-500 uppercase tracking-wide font-medium mb-2">Total Sales</p>
-                        <p class="text-2xl font-bold text-primary" id="total-sales">₹0</p>
-                        <p class="text-xs text-green-600 mt-1" id="sales-growth">+0% vs yesterday</p>
+                        <p class="text-xl font-bold text-primary" id="total-sales">₹0</p>
+                        <p class="text-xs text-green-600 mt-1" id="sales-growth">+15% growth</p>
                     </div>
                 </div>
 
@@ -98,8 +98,8 @@
                 <div class="bg-white p-4 rounded-xl shadow-sm border-l-4 border-green-600">
                     <div class="text-center">
                         <p class="text-xs text-gray-500 uppercase tracking-wide font-medium mb-2">Total Profit</p>
-                        <p class="text-2xl font-bold text-green-600" id="total-profit">₹0</p>
-                        <p class="text-xs text-green-600 mt-1" id="profit-growth">+0% vs yesterday</p>
+                        <p class="text-xl font-bold text-green-600" id="total-profit">₹0</p>
+                        <p class="text-xs text-green-600 mt-1" id="profit-growth">+12% growth</p>
                     </div>
                 </div>
 
@@ -107,17 +107,8 @@
                 <div class="bg-white p-4 rounded-xl shadow-sm border-l-4 border-red-500">
                     <div class="text-center">
                         <p class="text-xs text-gray-500 uppercase tracking-wide font-medium mb-2">Total Cost</p>
-                        <p class="text-2xl font-bold text-red-500" id="total-cost">₹0</p>
-                        <p class="text-xs text-gray-500 mt-1" id="cost-percentage">0% of sales</p>
-                    </div>
-                </div>
-
-                <!-- Transactions -->
-                <div class="bg-white p-4 rounded-xl shadow-sm border-l-4 border-secondary">
-                    <div class="text-center">
-                        <p class="text-xs text-gray-500 uppercase tracking-wide font-medium mb-2">Transactions</p>
-                        <p class="text-2xl font-bold text-secondary" id="total-transactions">0</p>
-                        <p class="text-xs text-secondary mt-1" id="avg-transaction">₹0 average</p>
+                        <p class="text-xl font-bold text-red-500" id="total-cost">₹0</p>
+                        <p class="text-xs text-gray-500 mt-1" id="cost-percentage">Investment ratio</p>
                     </div>
                 </div>
             </div>
@@ -342,8 +333,6 @@
             document.getElementById('total-sales').textContent = `₹${Math.round(data.totalRevenue || 0)}`;
             document.getElementById('total-profit').textContent = `₹${Math.round(data.totalProfit || 0)}`;
             document.getElementById('total-cost').textContent = `₹${Math.round(totalInvestment)}`;
-            document.getElementById('total-transactions').textContent = data.totalBills || 0;
-            document.getElementById('avg-transaction').textContent = `₹${Math.round(data.avgBillValue || 0)} average`;
             document.getElementById('cost-percentage').textContent = `${investmentPercentage}% investment ratio`;
             
             // Update period-specific growth indicators
