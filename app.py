@@ -1236,25 +1236,36 @@ def get_time_ago(datetime_obj):
 
 @app.route('/api/sales-data')
 def api_sales_data():
-    """Get sales data with optional date filtering"""
+    """Get sales data with period filtering (daily/weekly/monthly)"""
     try:
-        from_date = request.args.get('from_date')
-        to_date = request.args.get('to_date')
+        period = request.args.get('period', 'weekly')  # daily, weekly, monthly
+        from datetime import datetime, timedelta
         
-        # Build query based on date filters
-        query = Bill.query.filter(Bill.payment_status == 'paid')
+        # Calculate date range based on period
+        today = datetime.now()
+        if period == 'daily':
+            from_datetime = today.replace(hour=0, minute=0, second=0, microsecond=0)
+            to_datetime = today.replace(hour=23, minute=59, second=59, microsecond=999999)
+        elif period == 'weekly':
+            from_datetime = today - timedelta(days=6)
+            from_datetime = from_datetime.replace(hour=0, minute=0, second=0, microsecond=0)
+            to_datetime = today.replace(hour=23, minute=59, second=59, microsecond=999999)
+        elif period == 'monthly':
+            from_datetime = today - timedelta(days=29)
+            from_datetime = from_datetime.replace(hour=0, minute=0, second=0, microsecond=0)
+            to_datetime = today.replace(hour=23, minute=59, second=59, microsecond=999999)
+        else:
+            # Default to weekly
+            from_datetime = today - timedelta(days=6)
+            from_datetime = from_datetime.replace(hour=0, minute=0, second=0, microsecond=0)
+            to_datetime = today.replace(hour=23, minute=59, second=59, microsecond=999999)
         
-        if from_date:
-            from datetime import datetime as dt
-            from_datetime = dt.strptime(from_date, '%Y-%m-%d')
-            query = query.filter(Bill.created_at >= from_datetime)
-        
-        if to_date:
-            from datetime import datetime as dt
-            to_datetime = dt.strptime(to_date, '%Y-%m-%d')
-            # Add 23:59:59 to include the entire day
-            to_datetime = to_datetime.replace(hour=23, minute=59, second=59)
-            query = query.filter(Bill.created_at <= to_datetime)
+        # Build query for the period
+        query = Bill.query.filter(
+            Bill.payment_status == 'paid',
+            Bill.created_at >= from_datetime,
+            Bill.created_at <= to_datetime
+        )
         
         bills = query.all()
         
@@ -1351,37 +1362,31 @@ def api_sales_data():
             total_investment += bill_investment
             total_profit += bill_profit
         
-        # Generate dynamic chart data based on date range
+        # Generate chart data based on period
         from collections import defaultdict
-        from datetime import datetime, timedelta
         
-        # Determine period based on date range
-        if from_date and to_date:
-            start_date = datetime.strptime(from_date, '%Y-%m-%d').date()
-            end_date = datetime.strptime(to_date, '%Y-%m-%d').date()
-            date_diff = (end_date - start_date).days
-            
-            if date_diff == 0:  # Same day - daily view
-                # Generate hourly data for single day
-                chart_dates = []
-                for hour in range(0, 24, 4):  # Every 4 hours
-                    chart_dates.append(start_date.strftime('%Y-%m-%d'))
-            elif date_diff <= 7:  # Weekly view
-                # Generate daily data for week
-                chart_dates = []
-                for i in range(date_diff + 1):
-                    chart_dates.append((start_date + timedelta(days=i)).strftime('%Y-%m-%d'))
-            else:  # Monthly view
-                # Generate weekly data for month
-                chart_dates = []
-                current_date = start_date
-                while current_date <= end_date:
-                    chart_dates.append(current_date.strftime('%Y-%m-%d'))
-                    current_date += timedelta(days=7)
+        # Generate chart dates based on period
+        chart_dates = []
+        if period == 'daily':
+            # Show hourly data for current day
+            base_date = today.replace(hour=0, minute=0, second=0, microsecond=0)
+            for hour in range(0, 24, 4):  # Every 4 hours
+                chart_dates.append((base_date + timedelta(hours=hour)).strftime('%Y-%m-%d %H:00'))
+        elif period == 'weekly':
+            # Show daily data for past 7 days
+            for i in range(6, -1, -1):
+                date = (today - timedelta(days=i)).strftime('%Y-%m-%d')
+                chart_dates.append(date)
+        elif period == 'monthly':
+            # Show weekly data for past 30 days
+            for i in range(4, -1, -1):  # Past 5 weeks
+                date = (today - timedelta(weeks=i)).strftime('%Y-%m-%d')
+                chart_dates.append(date)
         else:
-            # Default to 7-day view
-            today = datetime.now().date()
-            chart_dates = [(today - timedelta(days=i)).strftime('%Y-%m-%d') for i in range(6, -1, -1)]
+            # Default to weekly
+            for i in range(6, -1, -1):
+                date = (today - timedelta(days=i)).strftime('%Y-%m-%d')
+                chart_dates.append(date)
         
         # Initialize chart data
         chart_data = {}
@@ -1436,21 +1441,20 @@ def api_sales_data():
                 'created_at': bill.created_at.strftime('%Y-%m-%d %H:%M:%S')
             })
         
-        # Calculate total investment (initial + refilling combined)
-        # This includes both initial inventory and all refilling amounts
+        # Calculate total combined investment (static - doesn't change with period)
+        # This represents all initial + refilling investments
         total_combined_investment = 0
-        total_sold_amount = 0
         products = Product.query.all()
         
         for product in products:
             if product.cost_price:
-                # Initial + Current stock = Total investment in this product
-                initial_stock = 0  # This would be tracked separately in real system
+                # Current stock represents total investment (initial + refilled)
                 current_stock = product.stock_quantity or 0
                 total_product_investment = product.cost_price * current_stock
                 total_combined_investment += total_product_investment
         
-        # Calculate total selling amount (cost price of sold items)
+        # Calculate period-specific sold amount (changes with daily/weekly/monthly)
+        period_sold_amount = 0
         for bill in bills:
             bill_items = BillItem.query.filter_by(bill_id=bill.id).all()
             for item in bill_items:
@@ -1460,26 +1464,41 @@ def api_sales_data():
                     product = Product.query.filter(Product.name.ilike(f'%{item.item_name}%')).first()
                 
                 if product and product.cost_price:
-                    # Add cost price of sold quantity to total sold amount
-                    total_sold_amount += (product.cost_price * item.quantity)
+                    # Add cost price of sold quantity for this period
+                    period_sold_amount += (product.cost_price * item.quantity)
 
-        # Calculate remaining investment to recover
+        # Calculate remaining investment (total investment - all time sold amount)
+        # For this we need to calculate total sold amount from all bills, not just period
+        all_bills = Bill.query.filter(Bill.payment_status == 'paid').all()
+        total_sold_amount = 0
+        for bill in all_bills:
+            bill_items = BillItem.query.filter_by(bill_id=bill.id).all()
+            for item in bill_items:
+                product = Product.query.filter_by(name=item.item_name).first()
+                if not product:
+                    product = Product.query.filter(Product.name.ilike(f'%{item.item_name}%')).first()
+                
+                if product and product.cost_price:
+                    total_sold_amount += (product.cost_price * item.quantity)
+        
         remaining_investment = max(0, total_combined_investment - total_sold_amount)
         
         return jsonify({
             'success': True,
             'data': {
-                'totalRevenue': total_revenue,
-                'totalBills': total_bills,
-                'totalProfit': total_profit,
-                'totalInvestment': total_investment,
-                'totalCombinedInvestment': total_combined_investment,  # Initial + Refilling
-                'totalSoldAmount': total_sold_amount,  # Cost price of sold items
-                'remainingInvestment': remaining_investment,  # Amount still to recover
+                'period': period,
+                'totalRevenue': total_revenue,  # Period-based sales
+                'totalBills': total_bills,      # Period-based bill count
+                'totalProfit': total_profit,    # Period-based profit
+                'totalInvestment': total_investment,  # Period-based investment
+                'totalCombinedInvestment': total_combined_investment,  # Static - Initial + Refilling
+                'periodSoldAmount': period_sold_amount,  # Period-based sold amount
+                'remainingInvestment': remaining_investment,  # Static - Amount still to recover
+                'profitPercentage': round((total_profit / total_revenue) * 100) if total_revenue > 0 else 0,
                 'avgBillValue': total_revenue / total_bills if total_bills > 0 else 0,
                 'paymentModes': payment_modes,
                 'categories': categories,
-                'topItems': top_items,
+                'topItems': top_items,  # Period-based top items
                 'chartData': {
                     'dates': chart_dates,
                     'investment': investment_data,

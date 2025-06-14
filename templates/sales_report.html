@@ -269,6 +269,22 @@
         // Load data for specific period
         async function loadPeriodData(period) {
             try {
+                const response = await fetch(`/api/sales-data?period=${period}`);
+                const result = await response.json();
+                
+                if (result.success) {
+                    updateDashboard(result.data);
+                } else {
+                    console.error('Error loading sales data:', result.error);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+
+        // Initialize data loading (keeping for backwards compatibility)
+        async function loadInitialData(period) {
+            try {
                 const today = new Date();
                 let fromDate, toDate;
                 
@@ -356,27 +372,29 @@
             const totalProfit = data.totalProfit || 0;
             const investmentPercentage = data.totalRevenue > 0 ? Math.round((totalInvestment / data.totalRevenue) * 100) : 0;
             
-            // Update main metrics cards
+            // Update main metrics cards with period-based data
             document.getElementById('total-sales').textContent = `₹${Math.round(data.totalRevenue || 0)}`;
             document.getElementById('total-profit').textContent = `₹${Math.round(totalProfit)}`;
             document.getElementById('total-cost').textContent = `₹${Math.round(totalInvestment)}`;
-            document.getElementById('cost-percentage').textContent = `${investmentPercentage}% investment ratio`;
+            
+            // Remove percentage from cost card as requested
+            document.getElementById('cost-percentage').textContent = 'Cost of goods sold';
             
             // Update Investment Recovery section with new logic
-            const combinedInvestment = data.totalCombinedInvestment || 0;  // Initial + Refilling
-            const soldAmount = data.totalSoldAmount || 0;  // Cost price of sold items
-            const remainingInvestment = data.remainingInvestment || 0;  // Amount still to recover
-            const recoveryPercentage = combinedInvestment > 0 ? Math.round((soldAmount / combinedInvestment) * 100) : 0;
+            const combinedInvestment = data.totalCombinedInvestment || 0;  // Static - Initial + Refilling
+            const remainingInvestment = data.remainingInvestment || 0;  // Static - Amount still to recover
+            const recoveryPercentage = combinedInvestment > 0 ? Math.round(((combinedInvestment - remainingInvestment) / combinedInvestment) * 100) : 0;
             
             document.getElementById('total-refilled-investment').textContent = `₹${Math.round(combinedInvestment)}`;
-            document.getElementById('profit-generated').textContent = `₹${Math.round(totalProfit)}`;
+            document.getElementById('profit-generated').textContent = `₹${Math.round(totalProfit)}`;  // Period-based profit
             document.getElementById('remaining-recovery').textContent = `₹${Math.round(remainingInvestment)}`;
             document.getElementById('recovery-progress').style.width = `${Math.min(100, recoveryPercentage)}%`;
             document.getElementById('recovery-percentage').textContent = `${recoveryPercentage}% recovered`;
             
-            // Update period-specific growth indicators
-            document.getElementById('sales-growth').textContent = '+15% growth';
-            document.getElementById('profit-growth').textContent = '+12% growth';
+            // Update growth indicators with profit percentage
+            const profitPercentage = data.profitPercentage || 0;
+            document.getElementById('sales-growth').textContent = `${profitPercentage}% profit margin`;
+            document.getElementById('profit-growth').textContent = `Period: ${data.period || 'weekly'}`;
         }
 
 
