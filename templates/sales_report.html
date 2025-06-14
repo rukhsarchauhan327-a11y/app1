@@ -179,32 +179,7 @@
             </div>
         </div>
 
-        <!-- Payment Modes -->
-        <div class="px-4 mb-20">
-            <div class="bg-white p-4 rounded-xl shadow-sm">
-                <h3 class="text-lg font-bold mb-4 text-dark">Payment Methods</h3>
-                <div class="grid grid-cols-3 gap-3">
-                    <div class="text-center p-3 bg-green-50 rounded-lg">
-                        <i class="fas fa-money-bill text-green-600 text-2xl mb-2"></i>
-                        <p class="text-sm font-medium text-gray-700">Cash</p>
-                        <p class="text-lg font-bold text-green-600" id="cash-amount">₹0</p>
-                        <p class="text-xs text-gray-500" id="cash-count">0 bills</p>
-                    </div>
-                    <div class="text-center p-3 bg-blue-50 rounded-lg">
-                        <i class="fas fa-mobile-alt text-blue-600 text-2xl mb-2"></i>
-                        <p class="text-sm font-medium text-gray-700">Online</p>
-                        <p class="text-lg font-bold text-blue-600" id="online-amount">₹0</p>
-                        <p class="text-xs text-gray-500" id="online-count">0 bills</p>
-                    </div>
-                    <div class="text-center p-3 bg-orange-50 rounded-lg">
-                        <i class="fas fa-credit-card text-orange-600 text-2xl mb-2"></i>
-                        <p class="text-sm font-medium text-gray-700">Credit</p>
-                        <p class="text-lg font-bold text-orange-600" id="credit-amount">₹0</p>
-                        <p class="text-xs text-gray-500" id="credit-count">0 bills</p>
-                    </div>
-                </div>
-            </div>
-        </div>
+
 
 
     </main>
@@ -737,20 +712,7 @@
             });
         }
         
-        // Update payment modes
-        function updatePaymentModes(paymentModes) {
-            const cashAmount = paymentModes.cash?.amount || 0;
-            const onlineAmount = paymentModes.online?.amount || 0;
-            const creditAmount = paymentModes.credit?.amount || 0;
-            
-            document.getElementById('cash-amount').textContent = `₹${Math.round(cashAmount)}`;
-            document.getElementById('online-amount').textContent = `₹${Math.round(onlineAmount)}`;
-            document.getElementById('credit-amount').textContent = `₹${Math.round(creditAmount)}`;
-            
-            document.getElementById('cash-count').textContent = `${paymentModes.cash?.count || 0} bills`;
-            document.getElementById('online-count').textContent = `${paymentModes.online?.count || 0} bills`;
-            document.getElementById('credit-count').textContent = `${paymentModes.credit?.count || 0} bills`;
-        }
+
 
         // Update investment recovery based on current period
         function updateInvestmentRecovery(data) {
@@ -864,7 +826,6 @@
             updateTopSellingItems(data.topItems || []);
             updateCategoryBreakdown(data.categories || []);
             updateRecentSales(data.recentSales || []);
-            updatePaymentModes(data.paymentModes || {});
             updateInvestmentRecovery(data);
             setCurrentDate();
         }
