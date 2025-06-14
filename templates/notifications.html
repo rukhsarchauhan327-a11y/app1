@@ -205,22 +205,109 @@
         }
 
         function loadNotifications() {
-            fetch('/api/notifications')
-                .then(function(response) {
-                    return response.json();
-                })
-                .then(function(data) {
-                    allNotifications = data.notifications || [];
-                    addSystemNotifications();
-                    displayNotifications(allNotifications, currentFilter);
-                    updateNotificationBadge(data.count || 0);
-                    document.getElementById('loading-state').style.display = 'none';
-                })
-                .catch(function(error) {
-                    console.error('Error loading notifications:', error);
-                    document.getElementById('loading-state').style.display = 'none';
-                    document.getElementById('empty-state').style.display = 'block';
+            // Load real product data instead of summary notifications
+            Promise.all([
+                fetch('/api/low-stock-products'),
+                fetch('/api/expired-products'),
+                fetch('/api/notifications')
+            ])
+            .then(function(responses) {
+                return Promise.all(responses.map(r => r.json()));
+            })
+            .then(function(data) {
+                var lowStockData = data[0];
+                var expiredData = data[1];
+                var systemNotifications = data[2];
+                
+                allNotifications = createProductNotifications(
+                    lowStockData.products || [], 
+                    expiredData.products || []
+                );
+                
+                // Add system notifications (backup, subscription, etc.)
+                if (systemNotifications.notifications) {
+                    var systemNotes = systemNotifications.notifications.filter(n => 
+                        n.type === 'backup' || n.type === 'subscription' || n.type === 'system'
+                    );
+                    allNotifications = allNotifications.concat(systemNotes);
+                }
+                
+                addSystemNotifications();
+                updateFilterCounts();
+                displayNotifications(allNotifications, currentFilter);
+                updateNotificationBadge(allNotifications.length);
+                document.getElementById('loading-state').style.display = 'none';
+            })
+            .catch(function(error) {
+                console.error('Error loading notifications:', error);
+                document.getElementById('loading-state').style.display = 'none';
+                document.getElementById('empty-state').style.display = 'block';
+            });
+        }
+
+        function createProductNotifications(lowStockProducts, expiredProducts) {
+            var notifications = [];
+            
+            // Create individual notifications for each low stock product
+            for (var i = 0; i < lowStockProducts.length; i++) {
+                var product = lowStockProducts[i];
+                var urgency = product.level === 'critical' ? 'urgent' : 
+                             product.level === 'low' ? 'high' : 'medium';
+                             
+                notifications.push({
+                    id: 'stock-' + product.id,
+                    title: product.level === 'critical' ? 'CRITICAL: Out of Stock' : 'Low Stock Alert',
+                    message: product.name + ' - Only ' + product.stock_quantity + ' ' + product.unit + ' left (Min: ' + product.reorder_level + ')',
+                    type: 'inventory',
+                    priority: urgency,
+                    time_ago: 'Live Update',
+                    product_data: product
                 });
+            }
+            
+            // Create individual notifications for each expired/expiring product
+            for (var j = 0; j < expiredProducts.length; j++) {
+                var product = expiredProducts[j];
+                var isExpired = product.status === 'expired';
+                
+                notifications.push({
+                    id: 'expiry-' + product.id,
+                    title: isExpired ? 'EXPIRED PRODUCT' : 'Expiring Soon',
+                    message: product.name + ' - ' + product.days_info + ' (Current stock: ' + product.stock_quantity + ')',
+                    type: 'expiry',
+                    priority: isExpired ? 'urgent' : 'high',
+                    time_ago: 'Live Update',
+                    product_data: product
+                });
+            }
+            
+            return notifications;
+        }
+
+        function updateFilterCounts() {
+            var criticalCount = 0;
+            var inventoryCount = 0;
+            var paymentCount = 0;
+            var totalCount = allNotifications.length;
+            
+            for (var i = 0; i < allNotifications.length; i++) {
+                var notification = allNotifications[i];
+                if (notification.priority === 'urgent') {
+                    criticalCount++;
+                }
+                if (notification.type === 'inventory' || notification.type === 'expiry') {
+                    inventoryCount++;
+                }
+                if (notification.type === 'payment') {
+                    paymentCount++;
+                }
+            }
+            
+            // Update filter button text with product-focused language
+            document.querySelector('[data-filter="critical"]').textContent = 'Critical (' + criticalCount + ')';
+            document.querySelector('[data-filter="inventory"]').textContent = 'Stock Alerts (' + inventoryCount + ')';
+            document.querySelector('[data-filter="payment"]').textContent = 'Payments (' + paymentCount + ')';
+            document.querySelector('[data-filter="all"]').textContent = 'All (' + totalCount + ')';
         }
 
         function addSystemNotifications() {
@@ -316,24 +403,72 @@
                 handleNotificationClick(notification.type);
             };
             
-            div.innerHTML = 
-                '<div class="flex items-start space-x-3">' +
-                    '<div class="' + colors.iconBg + ' p-2 rounded-full">' +
-                        '<i class="fa-solid ' + colors.icon + ' ' + colors.iconColor + ' text-lg"></i>' +
-                    '</div>' +
-                    '<div class="flex-1">' +
-                        '<div class="flex items-start justify-between">' +
-                            '<div>' +
-                                '<h3 class="font-semibold text-dark text-sm">' + notification.title + '</h3>' +
-                                '<p class="text-xs text-gray-600 mt-1">' + notification.message + '</p>' +
-                                '<p class="text-xs text-gray-400 mt-2">' + (notification.time_ago || 'Just now') + '</p>' +
-                            '</div>' +
-                            '<span class="' + colors.badgeColor + ' text-white text-xs px-2 py-1 rounded-full">' + 
-                                notification.priority.toUpperCase() + 
-                            '</span>' +
+            // Enhanced display for product notifications
+            if (notification.product_data) {
+                var product = notification.product_data;
+                var actionButton = '';
+                var statusInfo = '';
+                
+                if (notification.type === 'inventory') {
+                    var progressPercent = product.progress || 0;
+                    var progressColor = product.level === 'critical' ? '#ef4444' : 
+                                       product.level === 'low' ? '#f59e0b' : '#10b981';
+                    statusInfo = '<div class="w-full bg-gray-200 rounded-full h-2 mt-2">' +
+                               '<div class="h-2 rounded-full" style="width: ' + progressPercent + '%; background-color: ' + progressColor + '"></div>' +
+                               '</div>';
+                    actionButton = '<button onclick="window.location.href=\'/refill-stock?id=' + product.id + '\'" class="bg-blue-500 text-white px-3 py-1 rounded text-xs mt-2">Refill Stock</button>';
+                } else if (notification.type === 'expiry') {
+                    var isExpired = product.status === 'expired';
+                    statusInfo = '<span class="text-xs ' + (isExpired ? 'text-red-600' : 'text-orange-600') + ' font-medium">Expiry: ' + product.expiry_date + '</span>';
+                    actionButton = isExpired ? 
+                        '<button onclick="removeExpiredProduct(' + product.id + ')" class="bg-red-500 text-white px-3 py-1 rounded text-xs mt-2">Remove</button>' :
+                        '<button onclick="window.location.href=\'/product-details?id=' + product.id + '\'" class="bg-orange-500 text-white px-3 py-1 rounded text-xs mt-2">Check Details</button>';
+                }
+                
+                div.innerHTML = 
+                    '<div class="flex items-start space-x-3">' +
+                        '<div class="' + colors.iconBg + ' p-2 rounded-full">' +
+                            '<i class="fa-solid ' + colors.icon + ' ' + colors.iconColor + ' text-lg"></i>' +
                         '</div>' +
-                    '</div>' +
-                '</div>';
+                        '<div class="flex-1">' +
+                            '<div class="flex items-start justify-between">' +
+                                '<div class="flex-1">' +
+                                    '<h3 class="font-semibold text-dark text-sm">' + notification.title + '</h3>' +
+                                    '<p class="text-sm font-medium text-gray-800 mt-1">' + product.name + '</p>' +
+                                    '<p class="text-xs text-gray-600 mt-1">' + notification.message + '</p>' +
+                                    statusInfo +
+                                    '<div class="flex items-center justify-between mt-2">' +
+                                        '<span class="text-xs text-gray-400">' + notification.time_ago + '</span>' +
+                                        actionButton +
+                                    '</div>' +
+                                '</div>' +
+                                '<span class="' + colors.badgeColor + ' text-white text-xs px-2 py-1 rounded-full ml-2">' + 
+                                    notification.priority.toUpperCase() + 
+                                '</span>' +
+                            '</div>' +
+                        '</div>' +
+                    '</div>';
+            } else {
+                // Standard notification display for system notifications
+                div.innerHTML = 
+                    '<div class="flex items-start space-x-3">' +
+                        '<div class="' + colors.iconBg + ' p-2 rounded-full">' +
+                            '<i class="fa-solid ' + colors.icon + ' ' + colors.iconColor + ' text-lg"></i>' +
+                        '</div>' +
+                        '<div class="flex-1">' +
+                            '<div class="flex items-start justify-between">' +
+                                '<div>' +
+                                    '<h3 class="font-semibold text-dark text-sm">' + notification.title + '</h3>' +
+                                    '<p class="text-xs text-gray-600 mt-1">' + notification.message + '</p>' +
+                                    '<p class="text-xs text-gray-400 mt-2">' + (notification.time_ago || 'Just now') + '</p>' +
+                                '</div>' +
+                                '<span class="' + colors.badgeColor + ' text-white text-xs px-2 py-1 rounded-full">' + 
+                                    notification.priority.toUpperCase() + 
+                                '</span>' +
+                            '</div>' +
+                        '</div>' +
+                    '</div>';
+            }
             
             return div;
         }
@@ -410,6 +545,15 @@
 
         function getUnreadCount() {
             return allNotifications.length;
+        }
+
+        function removeExpiredProduct(productId) {
+            if (confirm('Are you sure you want to remove this expired product from inventory?')) {
+                // In a real app, this would call an API to remove the product
+                alert('Product will be removed from inventory');
+                // Refresh the notifications to reflect changes
+                loadNotifications();
+            }
         }
 
         function updateNotificationBadge(count) {
