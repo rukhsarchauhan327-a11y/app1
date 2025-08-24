@@ -6,6 +6,10 @@ import os
 app = Flask(__name__)
 app.secret_key = 'your-secret-key-here'
 
+# Configure Flask for development
+app.config['DEBUG'] = True
+app.config['TEMPLATES_AUTO_RELOAD'] = True
+
 # Sample data for demonstration
 sample_products = [
     {
