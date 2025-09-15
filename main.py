@@ -1,14 +1,10 @@
-from flask import Flask, render_template, request, jsonify, redirect, url_for
+from flask import Flask, render_template, request, jsonify
 from datetime import datetime, timedelta
 import json
 import os
 
 app = Flask(__name__)
-app.secret_key = 'your-secret-key-here'
-
-# Configure Flask for development
-app.config['DEBUG'] = True
-app.config['TEMPLATES_AUTO_RELOAD'] = True
+app.secret_key = 'kirana-konnect-secret-key'
 
 # Sample data for demonstration
 sample_products = [
@@ -271,4 +267,4 @@ def api_low_stock_products():
     return jsonify(low_stock_data)
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    app.run(host='0.0.0.0', port=5000, debug=False)
